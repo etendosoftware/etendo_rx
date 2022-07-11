@@ -1,0 +1,12 @@
+org.gradle.parallel=true
+
+dasPushImage=registry.futit.cloud/default_etendorx_das:1.0.0
+authPushImage=registry.futit.cloud/default_etendorx_auth:1.0.0
+edgePushImage=registry.futit.cloud/default_etendorx_edge:1.0.0
+zapierIntegrationPushImage=registry.futit.cloud/default_etendorx_zapier_integration:1.0.0
+pushUrl=https://registry.futit.cloud
+pushUsername=
+pushPassword=
+
+
+

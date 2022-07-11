@@ -1,0 +1,59 @@
+{
+  "projections": [
+    {
+      "name": "auth",
+      "entities": [
+        {
+          "name": "AdUser",
+          "fields": [
+            {
+              "name": "id"
+            },
+            {
+              "name": "active"
+            },
+            {
+              "name": "client"
+            },
+            {
+              "name": "organization"
+            },
+            {
+              "name": "defaultClient"
+            },
+            {
+              "name": "defaultOrganization"
+            },
+            {
+              "name": "username"
+            },
+            {
+              "name": "password"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "repositories": [
+    {
+      "entityName": "AdUser",
+      "searches": [
+        {
+          "query": "SELECT u FROM AdUser u WHERE u.username = :username and u.active = :active",
+          "method": "searchByUsername",
+          "params": [
+            {
+              "name": "username",
+              "type": "java.lang.String"
+            },
+            {
+              "name": "active",
+              "type": "java.lang.Boolean"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
