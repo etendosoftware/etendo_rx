@@ -13,6 +13,9 @@ public interface ClientRestBase<T extends RepresentationWithId<T>> {
   @PatchMapping("/{id}")
   ResponseEntity<T> update(@RequestBody T entity, @PathVariable String id, @RequestHeader HttpHeaders headers);
 
+  @PostMapping("/{id}")
+  ResponseEntity<T> post(@RequestBody T entity, @RequestHeader HttpHeaders headers);
+
   @GetMapping("/")
   public PagedModel<T> findAll();
 
@@ -31,6 +34,9 @@ public interface ClientRestBase<T extends RepresentationWithId<T>> {
   @PostMapping("/")
   public ResponseEntity<T> save(@RequestBody T entity, @RequestHeader HttpHeaders headers);
 
+  @PostMapping("/")
+  public ResponseEntity<T> saveRequest(@RequestBody RequestModel entity, @RequestHeader HttpHeaders headers);
+
   @DeleteMapping("/{id}")
   public void delete(@PathVariable String id);
 
@@ -39,5 +45,8 @@ public interface ClientRestBase<T extends RepresentationWithId<T>> {
 
   @GetMapping("/search/findAllUpdated?startDate={startDate}&endDate={endDate}&page={page}&size={size}")
   PagedModel<T> findAllUpdated(@PathVariable String startDate, @PathVariable String endDate, @PathVariable int size, @PathVariable int page);
+
+  @PatchMapping("/{id}/remoteid")
+  ResponseEntity<T> updateRemoteId(@RequestBody T entity, @PathVariable String id, @RequestHeader HttpHeaders headers);
 
 }
