@@ -19,8 +19,13 @@ dependencies {
 	implementation (project(':com.etendorx.utils.auth')) {
 		exclude group: 'org.slf4j', module: '*'
 	}
+
+	implementation project(":com.etendorx.clientrest")
+	implementation project(":com.etendorx.clientrest_core")
+
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 	// Feign
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
@@ -34,11 +39,19 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation "com.github.tomakehurst:wiremock-jre8:2.33.1"
+	testImplementation 'com.github.tomakehurst:wiremock-jre8:2.33.1'
 }
 
 ext {
 	set('springCloudVersion', "2021.0.2")
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs += ['src-gen/main/java']
+		}
+	}
 }
 
 /**
@@ -72,7 +85,6 @@ bootBuildImage {
 		}
 	}
 }
-
 springBoot {
 	buildInfo()
 }

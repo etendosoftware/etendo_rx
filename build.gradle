@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'java-library'
+    id 'groovy'
 }
 group = 'com.etendorx'
 version = '0.0.1-SNAPSHOT'
@@ -10,11 +11,55 @@ sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
+    maven {
+        url = 'https://repo.futit.cloud/repository/etendo-public-jars/'
+    }
+}
+
+// TODO: Create the Etendo rx gradle plugin.
+configurations {
+    entities
 }
 
 dependencies {
+    entities 'com.etendorx:generate-entities:latest.integration'
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+project.tasks.register("generate.entities", JavaExec) {
+    classpath = project.configurations.getByName("entities")
+    mainClass = 'com.etendorx.gen.GenerateEntitiesApplication'
+}
+
+project.tasks.getByName("generate.entities").dependsOn({
+    project.tasks.findByName("clean.generated.code")
+})
+
+static void cleanDirectory(Project project, File modulesLocation, String dirToClean) {
+    modulesLocation.traverse(type: groovy.io.FileType.DIRECTORIES, maxDepth: 0) {
+        File dir = new File(it, dirToClean)
+        if (dir.exists() && dir.isDirectory()) {
+            project.logger.info("Cleaning directory: ${dir.getAbsolutePath()}")
+            project.delete(dir.listFiles())
+        }
+    }
+}
+
+project.tasks.register("clean.generated.code") {
+    doLast {
+        List directoriesToClean = [
+                [dir: "modules", folder: "src-gen"],
+                [dir: "modules_gen", folder: "src"]
+        ]
+
+        directoriesToClean.forEach({
+            File dir = project.file(it.dir)
+            if (dir && dir.exists() && dir.isDirectory()) {
+                cleanDirectory(project, dir, it.folder)
+            }
+        })
+    }
 }
 
 test {
