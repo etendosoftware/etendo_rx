@@ -456,8 +456,7 @@ public class Column extends ModelObject {
    * @return true when the property column has a Sequence reference associated to it
    */
   public boolean isSequence() {
-    return (referenceValue != null && !referenceValue.getSequenceConfigurations()
-        .isEmpty()) || !reference.getSequenceConfigurations().isEmpty();
+    return (referenceValue != null);
   }
 
   public String getDBSequenceName() {
