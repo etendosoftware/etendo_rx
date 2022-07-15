@@ -22,7 +22,7 @@ configurations {
 }
 
 dependencies {
-    entities 'com.etendorx:generate-entities:latest.integration'
+    entities project('com.etendorx.generate_entities')
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
