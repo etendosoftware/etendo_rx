@@ -1,6 +1,22 @@
-package com.etendorx.integrations.asyncprocess.config;
+/*
+ * Copyright 2022  Futit Services SL
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import com.etendorx.integrations.asyncprocess.topology.AsyncProcessTopology;
+package com.etendorx.asyncprocess.config;
+
+import com.etendorx.asyncprocess.topology.AsyncProcessTopology;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -25,6 +41,7 @@ public class StreamConfiguration {
   @Value("${kafka.streams.state.dir:/tmp/kafka-streams/async-process-queries}")
   private String kafkaStreamsStateDir;
 
+  @Value("${kafka")
 
   @Bean
   public Properties kafkaStreamsConfiguration() {

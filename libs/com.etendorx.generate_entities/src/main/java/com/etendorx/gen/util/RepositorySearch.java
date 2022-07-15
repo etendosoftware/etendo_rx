@@ -15,6 +15,8 @@
  */
 package com.etendorx.gen.util;
 
+import org.codehaus.jettison.json.JSONArray;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;

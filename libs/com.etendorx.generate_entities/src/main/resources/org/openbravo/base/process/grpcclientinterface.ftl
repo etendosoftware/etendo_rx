@@ -24,6 +24,7 @@
 
 package com.etendorx.integration.mobilesync.service;
 
+import com.etendorx.clientrest.base.RequestModel;
 import com.etendorx.das.grpc.common.${name}GrpcRepositoryGrpc;
 <#list searches as search>
 import com.etendorx.das.grpc.common.${name}_${search.method}Search;
@@ -54,4 +55,7 @@ public interface ${name}${projectionName?cap_first}DasService {
     ${packageName}.${name}${projectionName?cap_first}Model entity
     );
 </#if>
+
+    void saveRequest(RequestModel requestModel);
+
 }

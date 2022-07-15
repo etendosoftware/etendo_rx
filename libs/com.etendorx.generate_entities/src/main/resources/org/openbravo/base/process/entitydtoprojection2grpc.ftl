@@ -27,27 +27,27 @@ import java.math.BigDecimal;
 import static com.etendorx.integration.mobilesync.service.GEtendoSync.getTime;
 
 public class ${name}DTO${projectionName?cap_first}2Grpc {
-public static ${name} apply(${name}${projectionName?cap_first}Model u) {
-var p = ${name}.newBuilder();
+  public static ${name} apply(${name}${projectionName?cap_first}Model u) {
+    var p = ${name}.newBuilder();
 <#list fields as field>
     <#if is_object(field.type)>
-        if(u.get${field.name?cap_first}Id() != null) {
-        p.set${field.name?cap_first}Id(u.get${field.name?cap_first}Id());
-        }
+    if (u.get${field.name?cap_first}Id() != null) {
+      p.set${field.name?cap_first}Id(u.get${field.name?cap_first}Id());
+    }
     <#elseif field.type == "java.util.Date">
-        if(u.get${field.name?cap_first}() != null) {
-        p.set${field.name?cap_first}(getTime(u.get${field.name?cap_first}()));
-        }
+    if (u.get${field.name?cap_first}() != null) {
+      p.set${field.name?cap_first}(getTime(u.get${field.name?cap_first}()));
+    }
     <#elseif field.type == "java.math.BigDecimal">
-        if(u.get${field.name?cap_first}() != null) {
-        p.set${field.name?cap_first}(u.get${field.name?cap_first}().doubleValue());
-        }
+    if (u.get${field.name?cap_first}() != null) {
+      p.set${field.name?cap_first}(u.get${field.name?cap_first}().doubleValue());
+    }
     <#else>
-        if(u.get${field.name?cap_first}() != null) {
-        p.set${field.name?cap_first}(u.get${field.name?cap_first}());
-        }
+    if (u.get${field.name?cap_first}() != null) {
+      p.set${field.name?cap_first}(u.get${field.name?cap_first}());
+    }
     </#if>
 </#list>
-return p.build();
-}
+    return p.build();
+  }
 }

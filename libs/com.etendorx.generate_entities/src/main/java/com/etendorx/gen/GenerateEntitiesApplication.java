@@ -35,9 +35,6 @@ import org.etendorx.base.session.OBPropertiesProvider;
 import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.ModelProvider;
 import org.openbravo.base.model.Property;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -416,7 +413,7 @@ public class GenerateEntitiesApplication {
         final String className = data.get("className").toString();
         final String onlyClassName = data.get("onlyClassName").toString();
         final String packageEntities = data.get("packageEntities").toString();
-
+        final String packageProjectionRepo = pathEntitiesModelRx.substring(pathEntitiesModelRx.lastIndexOf('/') + 1);
         String fullPathProjectionRepo = pathEntitiesModelRx + "/src/main/java/" + packageEntities.replace('.', '/');
         final String projectionClass = className.replace(onlyClassName,
                 org.etendorx.base.gen.Utilities.toCamelCase(

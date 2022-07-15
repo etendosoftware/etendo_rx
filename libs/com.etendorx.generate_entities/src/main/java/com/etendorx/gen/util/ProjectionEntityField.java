@@ -20,6 +20,8 @@ public class ProjectionEntityField {
   private String value;
   private String type;
   private String className;
+  private String projectedEntity;
+  private String projectedField;
 
   public ProjectionEntityField(String name, String value, String type) {
     this.name = name;

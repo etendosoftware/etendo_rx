@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
 import com.etendorx.clientrest.base.ClientRestBase;
 import com.etendorx.clientrest.base.FeignConfiguration;
-import com.etendorx.entities.entities.org.openbravo.model.common.businesspartner.CBpartnerMobilesyncModel;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.web.bind.annotation.GetMapping;

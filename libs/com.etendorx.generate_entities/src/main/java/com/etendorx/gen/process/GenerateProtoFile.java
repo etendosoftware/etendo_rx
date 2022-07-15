@@ -87,7 +87,13 @@ public class GenerateProtoFile {
 
   private void generateSourcefile(String pathEtendoRx, Projection projection,
                                   List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews, String sourcefilePath, String templatePath,
-                                  String prefix, String sufix)
+                                  String prefix, String sufix) throws FileNotFoundException {
+    generateSourcefile(pathEtendoRx, projection, repositories,computedColumns, includeViews, sourcefilePath, templatePath, prefix, sufix, null);
+  }
+
+  private void generateSourcefile(String pathEtendoRx, Projection projection,
+                                  List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews, String sourcefilePath, String templatePath,
+                                  String prefix, String sufix, String packageName)
       throws FileNotFoundException {
 
     var outFileDir = pathEtendoRx + sourcefilePath;
@@ -109,7 +115,17 @@ public class GenerateProtoFile {
             outFile = new File(outFileDir, repository.get("name").toString() +
                 sufix + ".java");
             repository.put("fields", projectionEntity.getFieldsMap());
-            repository.put("packageName", projectionEntity.getPackageName());
+            StringBuilder pgkName = new StringBuilder();
+            if(packageName != null) {
+              pgkName.append(packageName)
+                  .append(".")
+                  .append(
+                      projectionEntity.getPackageName().replace("com.etendorx.entities.entities.", "")
+                  );
+            } else {
+              pgkName.append(projectionEntity.getPackageName());
+            }
+            repository.put("packageName", pgkName.toString());
             repository.put("projectionName", projection.getName());
             Writer outWriterProjection = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));
@@ -159,7 +175,8 @@ public class GenerateProtoFile {
         "",
         "DTOGrpc2" + projection.getName()
             .substring(0, 1)
-            .toUpperCase() + projection.getName().substring(1)
+            .toUpperCase() + projection.getName().substring(1),
+        "com.etendorx.integration.mobilesync.entities"
 
     );
   }
@@ -175,7 +192,9 @@ public class GenerateProtoFile {
         "",
         "DTO" +
             projection.getName().substring(0, 1).toUpperCase() + projection.getName().substring(1) +
-            "2Grpc");
+            "2Grpc",
+        "com.etendorx.integration.mobilesync.entities"
+    );
 
   }
 
@@ -190,7 +209,9 @@ public class GenerateProtoFile {
         "",
         "" +
             projection.getName().substring(0, 1).toUpperCase() + projection.getName().substring(1) +
-            "DasServiceGrpcImpl");
+            "DasServiceGrpcImpl",
+        "com.etendorx.integration.mobilesync.entities"
+    );
 
   }
 
@@ -205,7 +226,9 @@ public class GenerateProtoFile {
         "",
         "" +
             projection.getName().substring(0, 1).toUpperCase() + projection.getName().substring(1) +
-            "DasService");
+            "DasService",
+            "com.etendorx.integration.mobilesync.entities"
+        );
 
   }
 
