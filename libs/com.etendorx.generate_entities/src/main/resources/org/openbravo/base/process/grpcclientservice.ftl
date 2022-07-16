@@ -23,9 +23,10 @@
 
 package com.etendorx.integration.mobilesync.service;
 
+import com.etendorx.clientrest.base.RequestModel;
 import com.etendorx.das.grpc.common.${name}GrpcRepositoryGrpc;
 <#list searches as search>
-    import com.etendorx.das.grpc.common.${name}_${search.method}Search;
+import com.etendorx.das.grpc.common.${name}_${search.method}Search;
 </#list>
 import com.etendorx.integration.mobilesync.dto.${name}DTOGrpc2${projectionName?cap_first};
 import io.grpc.ManagedChannel;
@@ -43,43 +44,45 @@ import static com.etendorx.integration.mobilesync.service.GEtendoSync.getTime;
 @Component("${name}Grpc")
 public class ${name}${projectionName?cap_first}DasServiceGrpcImpl implements ${name}${projectionName?cap_first}DasService  {
 
-@Getter
-@Value("${"$"}{grpc-server.url}")
-String dasUrl;
+  @Getter
+  @Value("${"$"}{grpc-server.url}")
+  String dasUrl;
 
-@Getter
-@Value("${"$"}{grpc-server.port}")
-Integer dasPort;
+  @Getter
+  @Value("${"$"}{grpc-server.port}")
+  Integer dasPort;
 
 <#list searches as search>
-    @Override
-    public List<${packageName}.${name}${projectionName?cap_first}Model> ${search.method}(
+  @Override
+  public List<${packageName}.${name}${projectionName?cap_first}Model> ${search.method}(
     <#list search.params as p><#if p.type?? && p.type == "java.util.Date">Date ${p.name}<#else>${p.type} ${p.name}</#if><#if p?has_next>, </#if></#list>
-    ) {
+  ) {
     ManagedChannel channel = ManagedChannelBuilder.forAddress(getDasUrl(), getDasPort())
-    .maxInboundMessageSize((int) (32 * 1e6))
-    .usePlaintext()
-    .build();
+      .maxInboundMessageSize((int) (32 * 1e6))
+      .usePlaintext()
+      .build();
+
     ${name}GrpcRepositoryGrpc.${name}GrpcRepositoryBlockingStub service = ${name}GrpcRepositoryGrpc.newBlockingStub(channel);
 
     var searchCreated = ${name}_${search.method}Search.newBuilder();
     <#list search.params as p>
-        searchCreated.set${p.name?cap_first}(<#if p.type?? && p.type == "java.util.Date">getTime(${p.name})<#else>${p.name}</#if>);
+    searchCreated.set${p.name?cap_first}(<#if p.type?? && p.type == "java.util.Date">getTime(${p.name})<#else>${p.name}</#if>);
     </#list>
 
     var list = service.${search.method}(searchCreated.build());
 
     channel.shutdown();
     return list.get${name?lower_case?cap_first}List().stream().map(${name}DTOGrpc2${projectionName?cap_first}::apply).collect(Collectors.toList());
-    }
+  }
+
 </#list>
 <#if transactional>
-
-    @Override
-    public ${packageName}.${name}${projectionName?cap_first}Model save(${packageName}.${name}${projectionName?cap_first}Model location) {
+  @Override
+  public ${packageName}.${name}${projectionName?cap_first}Model save(${packageName}.${name}${projectionName?cap_first}Model location) {
     ManagedChannel channel = ManagedChannelBuilder.forAddress(getDasUrl(), getDasPort())
-    .usePlaintext()
-    .build();
+      .usePlaintext()
+      .build();
+
     ${name}GrpcRepositoryGrpc.${name}GrpcRepositoryBlockingStub service = ${name}GrpcRepositoryGrpc.newBlockingStub(channel);
     var saveParam = com.etendorx.das.grpc.common.${name}_saveParam.newBuilder();
     saveParam.setEntity( com.etendorx.integration.mobilesync.dto.${name}DTO${projectionName?cap_first}2Grpc.apply(location) );
@@ -88,8 +91,12 @@ Integer dasPort;
 
     channel.shutdown();
     return ${name}DTOGrpc2${projectionName?cap_first}.apply(savedEntity);
-
-    }
+  }
 </#if>
+
+  @Override
+  public void saveRequest(RequestModel requestModel) {
+
+  }
 
 }

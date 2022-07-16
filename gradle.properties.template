@@ -23,6 +23,7 @@ rx.generateCode=true
 
 # DEPRECATED
 rx.computedColumns=false
+rx.views=false
 
 # Location where to generate the entities. Default is set to the current directory ('./')
 # Uncomment this if you want a custom location.

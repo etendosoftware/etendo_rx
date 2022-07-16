@@ -74,3 +74,7 @@ Thumbs.db
 /modules/
 *.pem
 /libs/generate_entities_repo/
+**/application.properties
+
+**/bin/
+**/src-gen/

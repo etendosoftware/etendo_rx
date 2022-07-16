@@ -413,7 +413,7 @@ public class GenerateEntitiesApplication {
         final String className = data.get("className").toString();
         final String onlyClassName = data.get("onlyClassName").toString();
         final String packageEntities = data.get("packageEntities").toString();
-
+        final String packageProjectionRepo = pathEntitiesModelRx.substring(pathEntitiesModelRx.lastIndexOf('/') + 1);
         String fullPathProjectionRepo = pathEntitiesModelRx + "/src/main/java/" + packageEntities.replace('.', '/');
         final String projectionClass = className.replace(onlyClassName,
                 org.etendorx.base.gen.Utilities.toCamelCase(

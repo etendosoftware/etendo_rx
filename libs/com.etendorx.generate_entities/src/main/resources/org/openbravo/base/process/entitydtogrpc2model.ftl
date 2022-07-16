@@ -43,4 +43,5 @@ public class ${name}DTOGrpc2${projectionName?cap_first} {
         </#list>
         return p;
     }
+
 }
