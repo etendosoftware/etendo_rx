@@ -16,8 +16,8 @@
 
 package com.etendorx.asyncprocess.service;
 
-import com.etendorx.asyncprocess.model.AsyncProcess;
-import com.etendorx.asyncprocess.topology.AsyncProcessTopology;
+import com.etendorx.lib.kafka.model.AsyncProcess;
+import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StoreQueryParameters;
 import org.apache.kafka.streams.state.HostInfo;

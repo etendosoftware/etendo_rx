@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.etendorx.asyncprocess.model;
+package com.etendorx.lib.kafka.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

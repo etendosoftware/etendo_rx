@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.etendorx.asyncprocess.topology;
+package com.etendorx.lib.kafka.topology;
 
-import com.etendorx.asyncprocess.model.AsyncProcess;
-import com.etendorx.asyncprocess.model.AsyncProcessExecution;
-import com.etendorx.asyncprocess.model.AsyncProcessState;
-import com.etendorx.asyncprocess.model.JsonSerde;
+import com.etendorx.lib.kafka.model.AsyncProcess;
+import com.etendorx.lib.kafka.model.AsyncProcessExecution;
+import com.etendorx.lib.kafka.model.AsyncProcessState;
+import com.etendorx.lib.kafka.model.JsonSerde;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.etendorx.asyncprocess.model;
+package com.etendorx.lib.kafka.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -34,6 +34,7 @@ public class AsyncProcessExecution implements Comparable<AsyncProcessExecution> 
   private String asyncProcessId;
   private String log;
   private String description;
+  private String params;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING,
       pattern = "dd-MM-yyyy hh:mm:ss")

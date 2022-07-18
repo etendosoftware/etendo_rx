@@ -17,7 +17,7 @@
 package com.etendorx.asyncprocess.controller;
 
 
-import com.etendorx.asyncprocess.model.AsyncProcess;
+import com.etendorx.lib.kafka.model.AsyncProcess;
 import com.etendorx.asyncprocess.service.AsyncProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -14,34 +14,29 @@
  * limitations under the License.
  */
 
-package com.etendorx.asyncprocess.service;
+package com.etendorx.lib.kafka;
 
 import com.etendorx.lib.kafka.model.AsyncProcessExecution;
 import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.streams.state.HostInfo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.UUID;
 
-@Service
+import static com.etendorx.lib.kafka.model.JsonSerde.OBJECT_MAPPER;
+
+@Component
 @Slf4j
-public class AsyncProcessExecutionService {
+public class KafkaMessageUtil {
 
   private final KafkaProducer<String, String> producer;
-  private final HostInfo hostInfo;
-  public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-  @Autowired
-  public AsyncProcessExecutionService(KafkaProducer<String, String> producer, HostInfo hostInfo) {
+  public KafkaMessageUtil(KafkaProducer<String, String> producer) {
     this.producer = producer;
-    this.hostInfo = hostInfo;
   }
 
   public void save(AsyncProcessExecution asyncProcessExecution) {
