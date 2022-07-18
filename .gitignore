@@ -78,3 +78,4 @@ Thumbs.db
 
 **/bin/
 **/src-gen/
+/libs/generate_entities_repo/core/bin/main/

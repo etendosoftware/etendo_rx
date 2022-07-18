@@ -16,7 +16,7 @@
 
 package com.etendorx.asyncprocess.config;
 
-import com.etendorx.asyncprocess.topology.AsyncProcessTopology;
+import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -41,13 +41,14 @@ public class StreamConfiguration {
   @Value("${kafka.streams.state.dir:/tmp/kafka-streams/async-process-queries}")
   private String kafkaStreamsStateDir;
 
-  @Value("${kafka")
+  @Value("${bootstrap_server:localhost:9092}")
+  private String bootstrapServer;
 
   @Bean
   public Properties kafkaStreamsConfiguration() {
     Properties properties = new Properties();
     properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "async-process-queries");
-    properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+    properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
     properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
     properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
     properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -68,19 +69,6 @@ public class StreamConfiguration {
     Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
 
     return kafkaStreams;
-  }
-
-  @Bean
-  public KafkaProducer<String, String> producer() {
-    KafkaProducer<String, String> producer =
-        new KafkaProducer<>(
-            Map.of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaStreamsConfiguration().get(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG),
-                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class
-            )
-        );
-    return producer;
   }
 
   @Bean

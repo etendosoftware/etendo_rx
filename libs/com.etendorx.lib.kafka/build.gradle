@@ -4,7 +4,7 @@ plugins {
     id 'io.spring.dependency-management'
 }
 
-group = 'com.etendorx.asyncprocess'
+group = 'com.etendorx.lib.kafka'
 version = '1.0-SNAPSHOT'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
@@ -13,15 +13,15 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+//    implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
 	implementation 'org.apache.kafka:kafka-streams'
+    implementation 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.1.0'
-
-    implementation project(':com.etendorx.lib.kafka')
+//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//    testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.1.0'
 }
 
 ext {
@@ -34,6 +34,7 @@ dependencyManagement {
     }
 }
 
+/*
 tasks.named('test') {
     useJUnitPlatform()
 }
@@ -41,3 +42,4 @@ tasks.named('test') {
 springBoot {
     buildInfo()
 }
+*/

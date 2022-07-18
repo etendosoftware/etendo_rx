@@ -16,7 +16,7 @@
 
 package com.etendorx.asyncprocess.controller;
 
-import com.etendorx.asyncprocess.model.AsyncProcessExecution;
+import com.etendorx.lib.kafka.model.AsyncProcessExecution;
 import com.etendorx.asyncprocess.service.AsyncProcessExecutionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
