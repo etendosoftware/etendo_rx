@@ -17,6 +17,7 @@
 package com.etendorx.lib.kafka;
 
 import com.etendorx.lib.kafka.model.AsyncProcessExecution;
+import com.etendorx.lib.kafka.model.AsyncProcessState;
 import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class KafkaMessageUtil {
     this.producer = producer;
   }
 
-  public void save(AsyncProcessExecution asyncProcessExecution) {
+  private void save(AsyncProcessExecution asyncProcessExecution) {
     asyncProcessExecution.setTime(new Date());
     asyncProcessExecution.setId(UUID.randomUUID().toString());
     send(producer, new ProducerRecord<>(AsyncProcessTopology.ASYNC_PROCESS_EXECUTION, asyncProcessExecution.getAsyncProcessId(), toJson(asyncProcessExecution)));
@@ -54,6 +55,21 @@ public class KafkaMessageUtil {
   @SneakyThrows
   private static String toJson(AsyncProcessExecution asyncProcessExecution) {
     return OBJECT_MAPPER.writeValueAsString(asyncProcessExecution);
+  }
+
+  public void saveProcessExecution(
+      Object bodyChanges,
+      String mid,
+      String description,
+      AsyncProcessState state) {
+    AsyncProcessExecution process = AsyncProcessExecution.builder()
+        .asyncProcessId(mid)
+        .description(description)
+        .params(bodyChanges != null ? bodyChanges.toString() : "")
+        .time(new Date())
+        .state(state)
+        .build();
+    this.save(process);
   }
 
 }
