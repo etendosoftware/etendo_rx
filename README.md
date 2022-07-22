@@ -15,7 +15,7 @@
     - ```-i <modules>``` A separated comma list of modules to include in the generation of the 'metadata.json'
 
 ```
-Examles:
+Examples:
 Omiting the generation of the 'metadata.json'
 > ./gradlew generate.entities --info --args="-g false"
 
