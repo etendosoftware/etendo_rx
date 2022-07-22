@@ -30,6 +30,12 @@ dependencies {
 project.tasks.register("generate.entities", JavaExec) {
     classpath = project.configurations.getByName("entities")
     mainClass = 'com.etendorx.gen.GenerateEntitiesApplication'
+    debugOptions {
+        enabled = project.findProperty("debug") ? true : false
+        port = (project.findProperty("port") ?: "5005") as Integer
+        server = true
+        suspend = true
+    }
 }
 
 project.tasks.getByName("generate.entities").dependsOn({
