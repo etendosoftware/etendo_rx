@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.etendorx.asyncprocess'
-version = '1.0-SNAPSHOT'
+version = '0.0.1-SNAPSHOT'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
@@ -21,7 +21,13 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.1.0'
 
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
+    //
     implementation project(':com.etendorx.lib.kafka')
+    implementation(project(':com.etendorx.utils.auth')) {
+        exclude group: 'org.slf4j', module: '*'
+    }
+
 }
 
 ext {

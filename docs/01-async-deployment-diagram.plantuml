@@ -1,0 +1,36 @@
+@startuml
+actor "External event" as App
+database postgres as PG {
+
+}
+
+component EtendoRX as rx {
+  queue kafka as KF {
+
+  }
+  node DAS {
+
+  }
+  node AUTH {
+
+  }
+  node AsyncProcess as AP {
+
+  }
+  () EDGE 
+
+  node "<<Process implementation>>" as PI {
+
+  }
+
+  DAS -up-> PG
+  AUTH -> DAS
+  EDGE -up-> AUTH
+  EDGE -up-> AP
+  App -up-> EDGE
+  AP -up-> DAS
+  AP -right-> KF
+  PI -up-> KF
+  PI -up-> DAS
+}
+@enduml

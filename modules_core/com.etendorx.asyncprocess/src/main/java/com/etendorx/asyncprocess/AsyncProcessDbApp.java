@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.etendorx.lib.kafka", "com.etendorx.asyncprocess"})
+@ComponentScan(basePackages = {"com.etendorx.lib.kafka", "com.etendorx.asyncprocess", "com.etendorx.utils.auth.key.context"})
 public class AsyncProcessDbApp {
 
   public static void main(String[] args) {

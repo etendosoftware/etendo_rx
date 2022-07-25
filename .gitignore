@@ -79,3 +79,5 @@ Thumbs.db
 **/bin/
 **/src-gen/
 /libs/generate_entities_repo/core/bin/main/
+/docs/out/00-async-process/
+docs/out/01-async-deployment-diagram/01-async-deployment-diagram.svg
