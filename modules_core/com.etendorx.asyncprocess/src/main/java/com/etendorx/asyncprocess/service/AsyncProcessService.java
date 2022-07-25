@@ -26,6 +26,9 @@ import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service that returns information from a process stored in Kafka.
+ */
 @Service
 public class AsyncProcessService {
 

@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.etendorx.asyncprocess'
-version = '1.0-SNAPSHOT'
+version = '0.0.1-SNAPSHOT'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
@@ -15,13 +15,19 @@ repositories {
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.apache.kafka:kafka-streams'
+    implementation 'org.apache.kafka:kafka-streams'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.1.0'
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
+    //
     implementation project(':com.etendorx.lib.kafka')
+    implementation(project(':com.etendorx.utils.auth')) {
+        exclude group: 'org.slf4j', module: '*'
+    }
 }
 
 ext {

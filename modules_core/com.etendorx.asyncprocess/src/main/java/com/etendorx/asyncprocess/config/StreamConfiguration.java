@@ -33,21 +33,24 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Initial configuration of stream services
+ */
 @Configuration
 public class StreamConfiguration {
 
+  public static final String ASYNC_PROCESS_QUERIES = "async-process-queries";
   @Value("${kafka.streams.host.info:localhost:8080}")
   private String kafkaStreamsHostInfo;
   @Value("${kafka.streams.state.dir:/tmp/kafka-streams/async-process-queries}")
   private String kafkaStreamsStateDir;
-
   @Value("${bootstrap_server:localhost:9092}")
   private String bootstrapServer;
 
   @Bean
   public Properties kafkaStreamsConfiguration() {
     Properties properties = new Properties();
-    properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "async-process-queries");
+    properties.put(StreamsConfig.APPLICATION_ID_CONFIG, ASYNC_PROCESS_QUERIES);
     properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
     properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
     properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
