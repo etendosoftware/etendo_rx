@@ -103,8 +103,7 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
             " where c.table = :table " +
             " order by c.position asc";
     //@formatter:on
-    Query<Column> query = session.createQuery(hql, Column.class).setParameter("table", table);
-    return query.list();
+    return session.createQuery(hql, Column.class).setParameter("table", table).list();
   }
 
   /*

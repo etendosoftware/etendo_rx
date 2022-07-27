@@ -16,6 +16,7 @@
 
 package org.etendorx.base;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.database.ConnectionProvider;
@@ -110,7 +111,7 @@ public class ConnectionProviderContextListener implements ServletContextListener
       log4j.error("Error checking JNDI mode file:" + strPoolFile, var4);
     }
 
-    return "yes".equals(jndiUsage);
+    return StringUtils.equals("yes", jndiUsage);
   }
 
   private static void destroyPool(ConnectionProvider connectionPool) {
@@ -124,7 +125,7 @@ public class ConnectionProviderContextListener implements ServletContextListener
       try {
         connectionPool.destroy();
       } catch (Exception var2) {
-        var2.printStackTrace();
+        log4j.error(var2);
       }
     }
 

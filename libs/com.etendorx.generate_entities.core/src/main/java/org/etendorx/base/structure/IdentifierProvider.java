@@ -43,6 +43,10 @@ public class IdentifierProvider implements OBSingleton {
   public static final String SEPARATOR = " - ";
   private static IdentifierProvider instance;
 
+  private SimpleDateFormat dateFormat = null;
+  private SimpleDateFormat dateTimeFormat = null;
+  private SimpleDateFormat timeFormat = null;
+
   public static synchronized IdentifierProvider getInstance() {
     if (instance == null) {
       instance = OBProvider.getInstance().get(IdentifierProvider.class);
@@ -54,10 +58,6 @@ public class IdentifierProvider implements OBSingleton {
     IdentifierProvider.instance = instance;
   }
 
-  private SimpleDateFormat dateFormat = null;
-  private SimpleDateFormat dateTimeFormat = null;
-  private SimpleDateFormat timeFormat = null;
-
   /**
    * Returns the identifier of the object. The identifier is computed using the identifier
    * properties of the Entity of the object. It is translated (if applicable) to the current
@@ -68,17 +68,12 @@ public class IdentifierProvider implements OBSingleton {
    * @return the identifier
    */
   public String getIdentifier(Object o) {
-/*
-    final Language lang = OBContext.getOBContext() != null ? OBContext.getOBContext().getLanguage()
-        : null;
-
- */
     return getIdentifier(o, true /*, lang */);
   }
 
   // identifyDeep determines if refered to objects are used
   // to identify the object
-  private String getIdentifier(Object o, boolean identifyDeep /*, Language language */) {
+  private String getIdentifier(Object o, boolean identifyDeep) {
     // TODO: add support for null fields
     final StringBuilder sb = new StringBuilder();
     final org.etendorx.base.structure.DynamicEnabled dob = (DynamicEnabled) o;
@@ -131,12 +126,10 @@ public class IdentifierProvider implements OBSingleton {
         }
 
         if (id instanceof String) {
-          value = ((org.etendorx.base.structure.BaseOBObject) dob).get( /*identifier.getName(), language,*/
-              (String) id);
+          value = dob.get((String) id);
         } else {
           // give up, couldn't find the id
-          value = ((org.etendorx.base.structure.BaseOBObject) dob).get(
-              identifier.getName() /*, language */);
+          value = dob.get(identifier.getName());
         }
 
       } else if (!property.isPrimitive() && identifyDeep) {

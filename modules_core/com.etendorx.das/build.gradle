@@ -37,7 +37,7 @@ dependencies {
     implementation project(':com.etendorx.grpc.common')
     implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
     implementation 'com.google.protobuf:protobuf-java-util:3.19.4'
-    implementation(project(':com.etendorx.utils.auth')) {
+    implementation (project(':com.etendorx.utils.auth')) {
         exclude group: 'org.slf4j', module: '*'
     }
     implementation "org.springframework.boot:spring-boot-starter-actuator"

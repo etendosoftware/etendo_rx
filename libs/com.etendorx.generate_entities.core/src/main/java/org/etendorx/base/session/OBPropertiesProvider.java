@@ -18,6 +18,8 @@ package org.etendorx.base.session;
 
 //import com.etendoerp.properties.EtendoPropertiesProvider;
 
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dom4j.Document;
@@ -71,22 +73,6 @@ public class OBPropertiesProvider {
     return obProperties;
   }
 
-  /*
-    public Document getFormatXMLDocument() {
-      if (formatXML == null) {
-        final File file = getFileFromDevelopmentPath("Format.xml");
-        if (file != null) {
-          try {
-            SAXReader reader = XMLUtil.getInstance().newSAXReader();
-            formatXML = reader.read(new FileReader(file));
-          } catch (Exception e) {
-            throw new IllegalStateException(e);
-          }
-        }
-      }
-      return formatXML;
-    }
-  */
   public void setFormatXML(InputStream is) {
     try {
       SAXReader reader = XMLUtil.getInstance().newSAXReader();
@@ -154,8 +140,7 @@ public class OBPropertiesProvider {
     if (value == null) {
       return false;
     }
-
-    return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes");
+    return StringUtils.equalsIgnoreCase(value, "true") || StringUtils.equalsIgnoreCase(value, "yes");
   }
 
   // tries to read the properties from the openbravo development project

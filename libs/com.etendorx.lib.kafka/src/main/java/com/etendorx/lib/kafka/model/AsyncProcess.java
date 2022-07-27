@@ -38,8 +38,8 @@ public class AsyncProcess {
   private TreeSet<AsyncProcessExecution> executions = new TreeSet<>();
 
   public AsyncProcess process(AsyncProcessExecution asyncProcessExecution) {
-    this.id = asyncProcessExecution.getAsyncProcessId();
     addExecution(asyncProcessExecution);
+    this.id = asyncProcessExecution.getAsyncProcessId();
     this.lastUpdate = asyncProcessExecution.getTime();
     this.state = asyncProcessExecution.getState();
     return this;

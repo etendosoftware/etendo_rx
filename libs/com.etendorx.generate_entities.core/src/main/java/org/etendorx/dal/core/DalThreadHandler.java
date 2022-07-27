@@ -48,9 +48,6 @@ public abstract class DalThreadHandler extends ThreadHandler {
         // note before the code below was enabled, however for longer running transactions
         // openbravo does multiple http requests, so while the long running transaction
         // had set inadministratormode, the subsequence http requests put it to false again
-        // if (OBContext.getOBContext() != null) {
-        // OBContext.getOBContext().setInAdministratorMode(false);
-        // }
         org.etendorx.dal.core.OBContext.setOBContext((OBContext) null);
       }
     }

@@ -1,5 +1,6 @@
-import org.gradle.internal.logging.text.StyledTextOutputFactory;
-import static org.gradle.internal.logging.text.StyledTextOutput.Style;
+import org.gradle.internal.logging.text.StyledTextOutputFactory
+
+import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 plugins {
     id 'org.springframework.boot' version '2.6.3'
@@ -113,7 +114,7 @@ task rx(dependsOn: [
         } while (!configServerIsUp)
         out.withStyle(Style.Success).println("Config server is up. Starting services")
         for (i in 1..<svc.size()) {
-            if( !exclude.contains( svc[i])) {
+            if (!exclude.contains(svc[i])) {
                 var jar = files(jars[i])
                 Thread.start {
                     javaexec {
@@ -127,7 +128,7 @@ task rx(dependsOn: [
         do {
             Thread.sleep(10000)
             for (i in 0..<svc.size()) {
-                if( !exclude.contains( svc[i])) {
+                if (!exclude.contains(svc[i])) {
                     try {
                         def message = new URL("http://localhost:" + port[i] + "/actuator/health").text
                         if (i == 0) {
