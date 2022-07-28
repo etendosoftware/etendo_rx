@@ -90,6 +90,7 @@ task rx(dependsOn: [
         // Wait for config server
         def configJar = files(jars[0])
         Thread.start {
+            environment 'SPRING_CLOUD_CONFIG_SERVER_GIT_URI', './rxconfig'
             javaexec {
                 classpath configJar
             }
