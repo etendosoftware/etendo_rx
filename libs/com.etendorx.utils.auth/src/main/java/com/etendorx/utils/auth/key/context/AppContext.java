@@ -16,6 +16,8 @@
 
 package com.etendorx.utils.auth.key.context;
 
+import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
+
 public class AppContext {
     private static final ThreadLocal<UserContext> currentUser = new ThreadLocal<>();
     private static String authToken;
@@ -25,6 +27,9 @@ public class AppContext {
     }
 
     public static UserContext getCurrentUser() {
+        if(currentUser.get() == null) {
+            throw new ForbiddenException();
+        }
         return currentUser.get();
     }
 
@@ -37,6 +42,9 @@ public class AppContext {
     }
 
     public static String getAuthToken() {
+        if(currentUser.get() == null) {
+            throw new ForbiddenException();
+        }
         return authToken;
     }
 }

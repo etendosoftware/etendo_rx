@@ -1,5 +1,6 @@
 package com.etendorx.utils.auth.key;
 
+import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
