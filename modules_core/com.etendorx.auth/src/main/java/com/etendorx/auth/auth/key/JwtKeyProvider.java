@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.util.Objects;
 
 @Component
 public class JwtKeyProvider {

@@ -54,7 +54,14 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-println sourceSets.main.java.srcDirs
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java'
+            srcDirs 'src-gen/main/java'
+        }
+    }
+}
 
 bootBuildImage {
     imageName = "${dasPushImage}"

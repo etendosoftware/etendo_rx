@@ -1,10 +1,11 @@
 org.gradle.parallel=true
+org.gradle.daemon=false
 
-dasPushImage=registry.futit.cloud/default_etendorx_das:1.0.0
-authPushImage=registry.futit.cloud/default_etendorx_auth:1.0.0
-edgePushImage=registry.futit.cloud/default_etendorx_edge:1.0.0
-zapierIntegrationPushImage=registry.futit.cloud/default_etendorx_zapier_integration:1.0.0
-pushUrl=https://registry.futit.cloud
+dasPushImage=
+authPushImage=
+edgePushImage=
+zapierIntegrationPushImage=
+pushUrl=
 pushUsername=
 pushPassword=
 
@@ -21,10 +22,5 @@ bbdd.sessionConfig=select update_dateFormat('DD-MM-YYYY')
 # Boolean value to generate or not code to RX
 rx.generateCode=true
 
-# DEPRECATED
 rx.computedColumns=true
-
-# Location where to generate the entities. Default is set to the current directory ('./')
-# Uncomment this if you want a custom location.
-#rx.path=
-
+rx.views=true

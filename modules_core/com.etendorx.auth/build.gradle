@@ -43,7 +43,7 @@ dependencies {
 }
 
 ext {
-	set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2021.0.2")
 }
 
 sourceSets {
@@ -87,4 +87,9 @@ bootBuildImage {
 }
 springBoot {
 	buildInfo()
+}
+
+test.onlyIf {
+	// TODO: Test execution needs to be parametrized
+	false
 }

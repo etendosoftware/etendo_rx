@@ -1,0 +1,57 @@
+@startuml
+
+actor ExternalProcess as EP
+participant AsyncProcess as AP
+participant "<<Process Implementation>>" as PI
+participant MessageBus as MB
+
+== Process ==
+MB <- PI: subscribe
+activate PI
+note right: to {process name} topic
+deactivate PI
+
+EP -> AP: Start process execution
+activate EP
+activate AP
+note left: Send {process name}
+AP -> MB: Queue
+activate MB
+AP <- MB: OK
+deactivate MB
+EP <- AP: [ACCEPTED]
+deactivate EP
+note left: Response with {process uuid}
+
+
+deactivate AP
+deactivate EP
+note right
+queue message in 
+{process name} topic 
+including payload
+end note
+
+MB -> PI: changes on topic
+activate PI
+PI -> PI: execute process
+activate AP
+PI --> AP: process info
+deactivate AP
+
+deactivate PI
+
+== Check status ==
+EP -> AP: [GET] {process uuid}
+activate EP
+activate AP
+
+note left
+Get process execution
+status and log
+end note
+AP -> EP: Process status info
+deactivate EP
+deactivate AP
+
+@enduml

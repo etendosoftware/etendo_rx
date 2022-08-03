@@ -1,3 +1,7 @@
+import org.gradle.internal.logging.text.StyledTextOutputFactory
+
+import static org.gradle.internal.logging.text.StyledTextOutput.Style
+
 plugins {
     id 'org.springframework.boot' version '2.6.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
@@ -22,7 +26,7 @@ configurations {
 }
 
 dependencies {
-    entities 'com.etendorx:generate-entities:latest.integration'
+    entities project('com.etendorx.generate_entities')
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -70,4 +74,89 @@ project.tasks.register("clean.generated.code") {
 
 test {
     useJUnitPlatform()
+}
+
+task rx(dependsOn: [
+        ":com.etendorx.configserver:build",
+        ":com.etendorx.auth:build",
+        ":com.etendorx.das:build",
+        ":com.etendorx.edge:build",
+        ":com.etendorx.asyncprocess:build"
+]) {
+    doLast {
+        var svc = ["config", "auth", "das", "edge", "async"]
+        var port = [8888, 8094, 8092, 8096, 8099]
+        var jars = [
+                "modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-1.0.0.jar",
+                "modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-0.0.1-SNAPSHOT.jar",
+                "modules_core/com.etendorx.das/build/libs/com.etendorx.das-0.0.1-SNAPSHOT.jar",
+                "modules_core/com.etendorx.edge/build/libs/com.etendorx.edge-0.0.1-SNAPSHOT.jar",
+                "modules_core/com.etendorx.asyncprocess/build/libs/com.etendorx.asyncprocess-0.0.1-SNAPSHOT.jar"
+        ]
+        def out = services.get(StyledTextOutputFactory).create("STATUS")
+        // Wait for config server
+        def configJar = files(jars[0])
+        Thread.start {
+            javaexec {
+                environment 'SPRING_PROFILES_ACTIVE': "native"
+                environment 'SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCHLOCATIONS', "file://${projectDir.absolutePath}/rxconfig"
+                classpath configJar
+            }
+        }
+        def configServerIsUp = false
+        def exclude = []
+        if (project.hasProperty('rx_exclude')) {
+            exclude.addAll(rx_exclude.split(","))
+        }
+        do {
+            try {
+                Thread.sleep(5000)
+                def check = new URL("http://localhost:" + port[0] + "/application/default").text
+                out.withStyle(Style.Success).println("UP")
+                configServerIsUp = true
+            } catch (ignored) {
+                out.withStyle(Style.Failure).println("DOWN")
+            }
+        } while (!configServerIsUp)
+        out.withStyle(Style.Success).println("Config server is up. Starting services")
+        for (i in 1..<svc.size()) {
+            if (!exclude.contains(svc[i])) {
+                var jar = files(jars[i])
+                Thread.start {
+                    javaexec {
+                        environment 'SPRING_PROFILES_ACTIVE', 'dev'
+                        classpath jar
+                    }
+                }
+            }
+        }
+        //
+        do {
+            Thread.sleep(10000)
+            for (i in 0..<svc.size()) {
+                if (!exclude.contains(svc[i])) {
+                    try {
+                        def message = new URL("http://localhost:" + port[i] + "/actuator/health").text
+                        if (i == 0) {
+                            // Workaround: config server doesn't work well with actuator functionality
+                            message = "{\"status\": \"UP\"}"
+                        }
+                        out.withStyle(Style.Success).println("[" + svc[i] + ": " + message + "]")
+                    } catch (ignored) {
+                        out.withStyle(Style.Failure).println("[" + svc[i] + ": Cannot connect]")
+                    }
+                }
+            }
+        } while (true)
+    }
+}
+
+task setup(type: Copy) {
+    from('rxconfig') {
+        include '*.yaml.template'
+    }
+    into('rxconfig')
+    rename { fileName ->
+        fileName.replace('.yaml.template', '.yaml')
+    }
 }
