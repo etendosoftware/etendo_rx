@@ -27,7 +27,10 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
-    runtimeOnly 'org.postgresql:postgresql'
+
+    runtimeOnly group: 'com.oracle.database.jdbc', name: 'ojdbc8', version: '21.6.0.0.1'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
+
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
