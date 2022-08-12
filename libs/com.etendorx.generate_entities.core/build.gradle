@@ -21,10 +21,10 @@ publishing {
     }
     repositories {
         maven {
-            url 'https://repo.futit.cloud/repository/etendo-public-jars'
+            url "${repositoryUrl}"
             credentials {
-                username = "${nexusUser}"
-                password = "${nexusPassword}"
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
             }
         }
     }

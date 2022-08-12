@@ -1,3 +1,16 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        maven {
+            url 'https://repo.futit.cloud/repository/maven-public-releases'
+        }
+        maven {
+            url 'https://repo.futit.cloud/repository/maven-public-snapshots'
+        }
+    }
+}
+
 rootProject.name = 'etendorx'
 
 def subDirs = new File("modules_core").listFiles(new FileFilter() {

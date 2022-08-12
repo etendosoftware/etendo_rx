@@ -2,14 +2,35 @@ plugins {
     id 'java'
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
+    id 'maven-publish'
 }
 
-group = 'com.etendorx.asyncprocess'
-version = '0.0.1-SNAPSHOT'
+group = 'com.etendorx'
+version = '0.0.1'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
+}
+
+publishing {
+    publications {
+        bootJava(MavenPublication) {
+            groupId = group
+            artifactId = 'asyncprocess'
+            version = version
+            artifact tasks.named("bootJar")
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
 }
 
 dependencies {
