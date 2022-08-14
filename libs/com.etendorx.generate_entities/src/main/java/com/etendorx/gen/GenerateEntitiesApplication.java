@@ -16,6 +16,8 @@
 
 package com.etendorx.gen;
 
+import com.etendorx.gen.commandline.CommandLineProcess;
+import com.etendorx.gen.process.GenerateMetadata;
 import com.etendorx.gen.process.GenerateProtoFile;
 import com.etendorx.gen.util.CodeGenerationException;
 import com.etendorx.gen.util.MetadataUtil;
@@ -23,13 +25,14 @@ import com.etendorx.gen.util.Projection;
 import com.etendorx.gen.util.ProjectionEntity;
 import com.etendorx.gen.util.TemplateUtil;
 import com.etendorx.gen.util.Repository;
+import com.etendorx.gen.util.MetadataContainer;
+import com.etendorx.gen.util.Metadata;
 import freemarker.template.Template;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.etendorx.base.gen.Utilities;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.etendorx.base.session.OBPropertiesProvider;
 import org.openbravo.base.model.Entity;
@@ -78,6 +81,8 @@ public class GenerateEntitiesApplication {
     }
 
     public void run(String... args) {
+        // Parse args
+        CommandLineProcess commandLineProcess = new CommandLineProcess(args);
 
         final String srcPath = ".";
         String friendlyWarnings = "false";
@@ -86,7 +91,7 @@ public class GenerateEntitiesApplication {
         }
         final File baseDir = new File(srcPath);
         setPropertiesFile(baseDir.getAbsolutePath() + File.separator + "gradle.properties");
-        execute(baseDir.getAbsolutePath());
+        execute(baseDir.getAbsolutePath(), commandLineProcess);
     }
 
     public String getBasePath() {
@@ -121,7 +126,7 @@ public class GenerateEntitiesApplication {
         this.srcGenPath = srcGenPath;
     }
 
-    public void execute(String baseDir) {
+    public void execute(String baseDir, CommandLineProcess cmdProcess) {
         if (getBasePath() == null) {
             setBasePath(".");
         }
@@ -160,7 +165,24 @@ public class GenerateEntitiesApplication {
         log.info("Path JPA Repo Rx={}", pathJPARepoRx);
         log.info("DAS Url={}", dasUrl);
 
-        var metadata = MetadataUtil.analizeMetadata(pathEtendoRx);
+        GenerateMetadata generateMetadata = GenerateMetadata.getInstance();
+        boolean shouldGenerateMetadata = true;
+
+        if (cmdProcess != null) {
+            generateMetadata.setExcludedModules(cmdProcess.getExcludedModules());
+            generateMetadata.setIncludedModules(cmdProcess.getIncludedModules());
+            shouldGenerateMetadata = cmdProcess.isGenerateMetadata();
+        }
+
+        if (shouldGenerateMetadata) {
+            log.info("* Running generation of metadata");
+            generateMetadata.generate(pathEtendoRx);
+        } else {
+            log.info("* Generation of metadata skipped.");
+        }
+
+        MetadataContainer metadataContainer = MetadataUtil.analyzeMetadata(pathEtendoRx);
+        Metadata metadata = metadataContainer.getMetadataMix();
 
         generateAllChildProperties = OBPropertiesProvider.getInstance()
             .getBooleanProperty("hb.generate.all.parent.child.properties");
@@ -174,6 +196,11 @@ public class GenerateEntitiesApplication {
 
         try {
             metadata = MetadataUtil.fillTypes(metadata, entities, packageEntities);
+
+            for (Metadata moduleMetadata : metadataContainer.getMetadataList()) {
+                MetadataUtil.fillTypes(moduleMetadata, entities, packageEntities);
+            }
+
             boolean hasErrors = false;
             log.info("****************************");
             log.info(" Checking entities name in metadata.json ");
@@ -239,6 +266,15 @@ public class GenerateEntitiesApplication {
                             generateProjections(data, pathJPARepoRx, projection, entity);
 
                             generateModelProjected(data, pathEntitiesModelRx, projection, entity);
+
+                            if (!StringUtils.equals(PROJECTION_DEFAULT, projection.getName())) {
+                                generateClientRestProjected(
+                                        data,
+                                        pathEtendoRx,
+                                        projection,
+                                        entity,
+                                        null);
+                            }
                         }
                     }
                 }
@@ -252,17 +288,15 @@ public class GenerateEntitiesApplication {
 
             generateBaseEntityRx(new HashMap<>(), pathEntitiesRx, baseRXObject, packageEntities);
 
+            GenerateProtoFile generateProtoFile = new GenerateProtoFile();
+            generateProtoFile.setEntitiesModel(entities);
             // Generate Proto File
-            new GenerateProtoFile().generate(pathEtendoRx, metadata.getRepositoriesMap(), projections, computedColumns, includeViews);
+            generateProtoFile.generate(pathEtendoRx, metadata.getRepositoriesMap(), projections, metadataContainer, computedColumns, includeViews);
         } catch (IOException e) {
             log.error(ERROR_GENERATING_FILE + GENERATED_DIR, e);
         }
-
-
         log.info("Generated " + entities.size() + " entities");
     }
-
-
 
     private void generateEntityModel(Map<String, Object> data, String pathClientRestRx) throws FileNotFoundException {
 
@@ -413,7 +447,7 @@ public class GenerateEntitiesApplication {
         final String className = data.get("className").toString();
         final String onlyClassName = data.get("onlyClassName").toString();
         final String packageEntities = data.get("packageEntities").toString();
-        final String packageProjectionRepo = pathEntitiesModelRx.substring(pathEntitiesModelRx.lastIndexOf('/') + 1);
+
         String fullPathProjectionRepo = pathEntitiesModelRx + "/src/main/java/" + packageEntities.replace('.', '/');
         final String projectionClass = className.replace(onlyClassName,
                 org.etendorx.base.gen.Utilities.toCamelCase(

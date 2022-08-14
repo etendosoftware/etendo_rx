@@ -30,8 +30,8 @@ public class Metadata {
   private final Map<String, Projection> projections = new HashMap<>();
   private final Map<String, Repository> repositories = new HashMap<>();
 
-  // TODO: Should contain the location of the module
-  File locationModule;
+  // Contains the location of the module
+  private File locationModule;
 
   public Map<String, Projection> getProjections() {
     return projections;
@@ -49,5 +49,13 @@ public class Metadata {
       d.put("searches", v.getSearchesMap());
       return d;
     }).collect(Collectors.toList());
+  }
+
+  public File getLocationModule() {
+    return locationModule;
+  }
+
+  public void setLocationModule(File locationModule) {
+    this.locationModule = locationModule;
   }
 }

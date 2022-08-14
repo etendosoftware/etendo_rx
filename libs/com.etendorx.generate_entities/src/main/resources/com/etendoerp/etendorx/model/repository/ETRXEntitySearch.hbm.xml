@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2022  Futit Services SL
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.etendoerp.etendorx.model.repository.ETRXEntitySearch" lazy="false" table="etrx_entity_search">
+        <cache usage="read-write"/>
+
+        <id name="id" type="string" column="etrx_entity_search_id">
+            <generator class="org.etendorx.base.session.DalUUIDGenerator"/>
+        </id>
+
+        <property name="updated"/>
+
+        <property name="active" type="org.etendorx.base.session.OBYesNoType" not-null="true"
+                  column="isactive"/>
+
+        <property name="query" />
+        <property name="method" />
+
+        <many-to-one name="repository" not-null="true" class="com.etendoerp.etendorx.model.repository.ETRXRepository"
+                     column="etrx_repository_id"/>
+
+        <set name="params" table="etrx_search_param" inverse="true"
+             cascade="save-update" lazy="true" fetch="select">
+            <key>
+                <column name="etrx_entity_search_id" not-null="true"/>
+            </key>
+            <one-to-many class="com.etendoerp.etendorx.model.repository.ETRXSearchParam"/>
+        </set>
+
+    </class>
+</hibernate-mapping>

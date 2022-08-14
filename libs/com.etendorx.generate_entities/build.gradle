@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.etendorx'
-version '1.0.0'
+version '1.0.2'
 
 repositories {
     mavenCentral()
@@ -50,6 +50,7 @@ dependencies {
     implementation 'org.hibernate:hibernate-core:5.4.2.Final'
     implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation group: 'org.codehaus.jettison', name: 'jettison', version: '1.4.1'
+    implementation 'commons-cli:commons-cli:1.5.0'
 
     implementation project(":com.etendorx.generate_entities.core")
     implementation project(":com.etendorx.generate_entities.extradomaintype")

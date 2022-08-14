@@ -17,7 +17,7 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
-package com.etendorx.das.grpc.common;
+package ${javaPackage};
 
 <#list entities as entity>
 message ${entity.name} {
@@ -43,9 +43,12 @@ repeated ${entity.name} ${entity.name?lower_case} = 2;
  */
 <#list repository.searches as search>
 message ${repository.name}_${search.method}Search {
+<#assign x = 1>
 <#list search.params as param>
 ${proto_type(param.type)} ${param.name} = ${param?index + 1};
+<#assign x = param?index + 2>
 </#list>
+string projection = ${x};
 }
 </#list>
 <#if repository.transactional>
