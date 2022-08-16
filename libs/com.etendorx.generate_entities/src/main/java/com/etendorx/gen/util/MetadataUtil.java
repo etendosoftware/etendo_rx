@@ -179,18 +179,16 @@ public class MetadataUtil {
    * @return {@link ProjectionEntityField}
    */
   public static ProjectionEntityField generateProjectionEntityField(Property propertyModel) {
-    ProjectionEntityField projectionEntityField = new ProjectionEntityField(propertyModel.getName(), null, propertyModel.getTypeName());
-    projectionEntityField.setClassName(generateClassName(propertyModel));
-    return projectionEntityField;
+    return new ProjectionEntityField(propertyModel.getName(), null, propertyModel.getTypeName(), generateClassName(propertyModel));
   }
 
   static String generateClassName(Property propertyModel) {
     String className = "";
 
     if (propertyModel.getTargetEntity() != null && propertyModel.getTargetEntity().getTableName() != null) {
-      var m = propertyModel.getTargetEntity().getTableName().split("_");
+      var tableNameSplit = propertyModel.getTargetEntity().getTableName().split("_");
       var cn = "";
-      for (String s : m) {
+      for (String s : tableNameSplit) {
         cn += s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
       }
       className = cn;

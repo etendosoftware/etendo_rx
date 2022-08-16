@@ -268,12 +268,7 @@ public class GenerateEntitiesApplication {
                             generateModelProjected(data, pathEntitiesModelRx, projection, entity);
 
                             if (!StringUtils.equals(PROJECTION_DEFAULT, projection.getName())) {
-                                generateClientRestProjected(
-                                        data,
-                                        pathEtendoRx,
-                                        projection,
-                                        entity,
-                                        null);
+                                generateClientRestProjected(data, pathEtendoRx, projection, entity, null);
                             }
                         }
                     }
