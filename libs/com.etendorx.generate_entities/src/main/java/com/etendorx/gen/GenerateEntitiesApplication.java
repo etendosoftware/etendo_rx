@@ -260,7 +260,7 @@ public class GenerateEntitiesApplication {
                     generateEntityModel(data, pathEtendoRx);
 
                     for (Projection projection : projections) {
-                        if (projection.getEntities().size() == 0 || projection.getEntities().containsKey(
+                        if (StringUtils.equals(PROJECTION_DEFAULT, projection.getName()) || projection.getEntities().containsKey(
                             data.get("newClassName").toString())) {
 
                             generateProjections(data, pathJPARepoRx, projection, entity);
@@ -389,6 +389,19 @@ public class GenerateEntitiesApplication {
         return "";
     }
 
+    /**
+     * Generates the Projection java file used to obtain custom data from an Entity when making a DAS request.
+     * Generates the 'Default' Projection with all the Entity fields,
+     * and the user specified one using the entity defined in a Projection (metadata.json) with custom EntityFields.
+     *
+     * When you make a DAS request, you specify the projection in the URL parameter '?projection=ProjectionName'
+     *
+     * @param data
+     * @param pathJPARepoRx
+     * @param projection
+     * @param entity
+     * @throws FileNotFoundException
+     */
     private void generateProjections(
             Map<String, Object> data, String pathJPARepoRx, Projection projection, Entity entity) throws FileNotFoundException {
 
