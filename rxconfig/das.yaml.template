@@ -9,18 +9,3 @@ spring:
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-logging:
-  level:
-    web: # Shows each request on output
-      INFO
-    org:
-      hibernate:
-        type:
-          descriptor: # Shows each hibernate SQL query
-            sql: WARN
