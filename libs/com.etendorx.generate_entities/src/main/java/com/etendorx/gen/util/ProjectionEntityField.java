@@ -29,6 +29,13 @@ public class ProjectionEntityField {
     this.type = type;
   }
 
+  public ProjectionEntityField(String name, String value, String type, String className) {
+    this.name = name;
+    this.value = value;
+    this.type = type;
+    this.className = className;
+  }
+
   public String getName() {
     return name;
   }

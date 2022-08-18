@@ -15,6 +15,7 @@
  */
 package com.etendorx.gen.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -23,6 +24,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.etendorx.base.exception.OBException;
 import org.etendorx.base.gen.Utilities;
 import org.openbravo.base.model.Entity;
+import org.openbravo.base.model.Property;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -67,9 +71,12 @@ public class MetadataUtil {
   public static final String ENTITY_PACKAGE = "entities";
   public static final String CLIENTREST_PACKAGE = "clientrest";
 
-  // TODO: Each module should contain his own 'metadata' object
-  public static Metadata analizeMetadata(String pathEtendoRx) throws OBException {
+  public static MetadataContainer analyzeMetadata(String pathEtendoRx) throws OBException {
+
+    MetadataContainer metadataContainer = new MetadataContainer();
     var metadata = new Metadata();
+    metadataContainer.setMetadataMix(metadata);
+
     log.info("Search projections in path {}/{}",
         pathEtendoRx, "modules");
     var directories = getMetadataFiles(pathEtendoRx + File.separator + "modules" + File.separator);
@@ -79,16 +86,21 @@ public class MetadataUtil {
       var projectionsFile = new File(metadataPath);
       if (projectionsFile.exists()) {
         log.info("Founded metadata {}", metadataPath);
+
+        Metadata moduleMetadata = new Metadata();
+        moduleMetadata.setLocationModule(dir);
+        metadataContainer.getMetadataList().add(moduleMetadata);
+
         try {
-          analizeProjections(metadata.getProjections(), projectionsFile, dir);
-          analizeRepositories(metadata.getRepositories(), projectionsFile);
+          analizeProjections(metadata.getProjections(), projectionsFile, dir, moduleMetadata);
+          analizeRepositories(metadata.getRepositories(), projectionsFile, moduleMetadata);
         } catch (JSONException | IOException | CodeGenerationException exception) {
           exception.printStackTrace();
           throw new OBException(exception.getMessage());
         }
       }
     }
-    return metadata;
+    return metadataContainer;
   }
 
   /**
@@ -121,6 +133,69 @@ public class MetadataUtil {
     return moduleLocation.getName().replace("\\.", "/");
   }
 
+  /**
+   * Generates a Map between the 'newClassname' (the name of the {@link ProjectionEntity} defined in a projection) and the corresponding {@link Entity}.
+   * @param entities List of entities to map
+   * @return Map
+   */
+  public static Map<String, Entity> generateEntitiesMap(List<Entity> entities) {
+    Map<String, Entity> entityMap = new HashMap<>();
+    entities.forEach(entity -> {
+      String newClassName = Utilities.toCamelCase(entity.getTableName());
+      entityMap.put(newClassName, entity);
+    });
+    return entityMap;
+  }
+
+  /**
+   * Creates a new {@link ProjectionEntity} based on a {@link Entity}
+   * @param entityModel {@link Entity}
+   * @return {@link ProjectionEntity}
+   */
+  public static ProjectionEntity generateProjectionEntity(Entity entityModel) {
+    String newClassName = Utilities.toCamelCase(entityModel.getTableName());
+    ProjectionEntity projectionEntity = new ProjectionEntity(newClassName, "");
+
+    // Filter the valid properties of the entityModel
+    var filteredProperties = entityModel.getProperties().stream().filter(property ->
+            !property.isComputedColumn() &&
+            !StringUtils.isBlank(property.getTypeName())
+             && (property.isId() || (property.isPrimitive() && !property.getPrimitiveType().isArray())
+                    || (property.getTargetEntity() != null && !property.isOneToMany() && !property.getTargetEntity().isView()))
+    );
+
+    // Fill the projectionEntity fields with the entityModel filteredProperties
+    filteredProperties.forEach(property -> {
+      ProjectionEntityField projectionEntityField = generateProjectionEntityField(property);
+      projectionEntity.getFields().put(projectionEntityField.getName(), projectionEntityField);
+    });
+
+    return projectionEntity;
+  }
+
+  /**
+   * Creates a new {@link ProjectionEntityField} based on a {@link Property}
+   * @param propertyModel {@link Property}
+   * @return {@link ProjectionEntityField}
+   */
+  public static ProjectionEntityField generateProjectionEntityField(Property propertyModel) {
+    return new ProjectionEntityField(propertyModel.getName(), null, propertyModel.getTypeName(), generateClassName(propertyModel));
+  }
+
+  static String generateClassName(Property propertyModel) {
+    String className = "";
+
+    if (propertyModel.getTargetEntity() != null && propertyModel.getTargetEntity().getTableName() != null) {
+      var tableNameSplit = propertyModel.getTargetEntity().getTableName().split("_");
+      var cn = "";
+      for (String s : tableNameSplit) {
+        cn += s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+      }
+      className = cn;
+    }
+    return className;
+  }
+
   public static List<File> getMetadataFiles(String path) {
     File location = new File(path);
 
@@ -133,7 +208,7 @@ public class MetadataUtil {
         Collectors.toList());
   }
 
-  private static void analizeProjections(Map<String, Projection> projections, File projectionsFile, File moduleLocation)
+  private static void analizeProjections(Map<String, Projection> projections, File projectionsFile, File moduleLocation, Metadata moduleMetadata)
       throws IOException, JSONException, CodeGenerationException {
     var content = Files.readString(projectionsFile.toPath());
     var jsonProps = new JSONObject(content);
@@ -147,6 +222,9 @@ public class MetadataUtil {
           grpc = jsonProjection.getBoolean(GRPC);
         }
         // TODO: If different modules use the same name of a projection, then the location module will be incorrect.
+
+        Projection moduleProjection = getProjection(moduleMetadata.getProjections(), name, grpc);
+
         Projection projection = getProjection(projections, name, grpc);
         projection.setModuleLocation(moduleLocation);
         if (jsonProjection.has(ENTITIES)) {
@@ -159,6 +237,9 @@ public class MetadataUtil {
             if (jsonEntity.has(IDENTITY)) {
               identity = jsonEntity.getString(IDENTITY);
             }
+
+            ProjectionEntity moduleProjectionEntity = getProjectionEntity(moduleProjection, entityName, identity);
+
             ProjectionEntity projectionEntity = getProjectionEntity(projection, entityName, identity);
             if (jsonEntity.has(FIELDS)) {
               var fields = jsonEntity.getJSONArray(FIELDS);
@@ -175,6 +256,7 @@ public class MetadataUtil {
                   if (field.has(TYPE)) {
                     fieldType = field.getString(TYPE);
                   }
+                  getProjectionEntityField(moduleProjectionEntity, fieldName, fieldValue, fieldType);
                   getProjectionEntityField(projectionEntity, fieldName, fieldValue, fieldType);
                 }
               }
@@ -188,7 +270,7 @@ public class MetadataUtil {
   }
 
   private static void analizeRepositories(Map<String, Repository> repositories,
-                                          File projectionsFile) throws IOException, JSONException {
+      File projectionsFile, Metadata moduleMetadata) throws IOException, JSONException {
     var content = Files.readString(projectionsFile.toPath());
     var jsonProps = new JSONObject(content);
     if (jsonProps.has(REPOSITORIES)) {
@@ -200,6 +282,9 @@ public class MetadataUtil {
         if (jsonRepository.has(TRANSACTIONAL)) {
           transactional = jsonRepository.getBoolean(TRANSACTIONAL);
         }
+
+        Repository moduleRepository = getRepository(moduleMetadata.getRepositories(), entityName, transactional);
+
         Repository repository = getRepository(repositories, entityName, transactional);
         if (jsonRepository.has(SEARCHES)) {
           var searches = jsonRepository.getJSONArray(SEARCHES);
@@ -213,6 +298,9 @@ public class MetadataUtil {
             if (jsonSearch.has(FETCH_ATTRIBUTES)) {
               fetchAttributes = jsonSearch.getJSONArray(FETCH_ATTRIBUTES);
             }
+
+            RepositorySearch moduleRepositorySearch = getRepositorySearch(moduleRepository, method, query, fetchAttributes);
+
             repositorySearch = getRepositorySearch(repository, method, query, fetchAttributes);
             if (jsonSearch.has(PARAMS)) {
               var params = jsonSearch.getJSONArray(PARAMS);
@@ -222,6 +310,7 @@ public class MetadataUtil {
                 if (field.has(NAME)) {
                   var paramName = field.getString(NAME);
                   var paramType = field.getString(TYPE);
+                  getRepositorySearchParam(moduleRepositorySearch, paramName, paramType);
                   getRepositorySearchParam(repositorySearch, paramName, paramType);
                 }
               }
@@ -253,6 +342,34 @@ public class MetadataUtil {
       projection.getEntities().put(entityName, projectionEntity);
     }
     return projectionEntity;
+  }
+
+  /**
+   * Generates a unique projection from a module metadata.
+   * The projections contain a merge from multiple projections with the same entity.
+   * The entity will contain all the declared fields.
+   * @param moduleMetadata The module from where the projection will be obtained
+   * @param projectionFilter A lambda function used to filter the module projections
+   * @return A Projection.
+   */
+  public static Projection generateProjectionMix(Metadata moduleMetadata, Predicate<Projection> projectionFilter) {
+    Projection projectionMix = new Projection("mix");
+
+    List<Projection> moduleProjectionFiltered = moduleMetadata.getProjections().values().stream().filter(projectionFilter).collect(Collectors.toList());
+    for (Projection moduleProjection : moduleProjectionFiltered) {
+      for (ProjectionEntity moduleProjectionEntity : moduleProjection.getEntities().values()) {
+        ProjectionEntity projectionEntityMix = getProjectionEntity(projectionMix, moduleProjectionEntity.getName(), "");
+        for (ProjectionEntityField moduleProjectionEntityField: moduleProjectionEntity.getFields().values()) {
+            getProjectionEntityField(
+                    projectionEntityMix,
+                    moduleProjectionEntityField.getName(),
+                    moduleProjectionEntityField.getValue(),
+                    moduleProjectionEntityField.getType()
+              );
+        }
+      }
+    }
+    return projectionMix;
   }
 
   private static Projection getProjection(Map<String, Projection> projections, String projectionName, boolean grpc) {
