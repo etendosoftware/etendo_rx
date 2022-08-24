@@ -3,12 +3,13 @@
 <#assign noAuditTables = ["ad_ref_table","ad_clientinfo", "ad_orginfo", "obkmo_widget_reference", "ad_org", "ad_client"]>
 <#assign auditFields = ["ad_org_id", "ad_client_id", "isactive", "created", "createdby", "updated", "updatedby"]>
 
-package ${packageName}.${entity.packageName};
+package ${entity.packageName};
 
 import com.etendorx.entities.entities.BaseRXObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.io.Serializable;
 
@@ -20,10 +21,11 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-@javax.persistence.Entity
+@javax.persistence.Entity(name = "${entity.name}")
 @javax.persistence.Table(name = "${entity.tableName?lower_case}")
 @javax.persistence.Cacheable
-public class ${newClassName} <#if noAuditTables?seq_contains(entity.tableName?lower_case)>implements Serializable<#else>extends BaseRXObject</#if> {
+@EntityScan
+public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.tableName?lower_case)>implements Serializable<#else>extends BaseRXObject</#if> {
 <#list entity.properties as p>
     <#if !p.computedColumn>
     <#if p.isId()>
@@ -74,7 +76,7 @@ public class ${newClassName} <#if noAuditTables?seq_contains(entity.tableName?lo
     @javax.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.getTargetEntity().getTableName()}_id"<#if repeated>, updatable = false, insertable = false</#if>)
     </#if>
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
-    ${packageName}.${p.getTableName(p.getObjectTypeName())} ${p.javaName};
+    ${p.targetEntity.className} ${p.javaName};
 
     <#else>
     <#if p.targetEntity?? && !p.isId() && !p.getTargetEntity().isView()>

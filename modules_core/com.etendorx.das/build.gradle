@@ -61,7 +61,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compileOnly project(':com.etendorx.entities')
     codegen project(':com.etendorx.entities')
     codegen project(':com.etendorx.grpc.common')
     implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
@@ -70,6 +70,11 @@ dependencies {
         exclude group: 'org.slf4j', module: '*'
     }
     implementation "org.springframework.boot:spring-boot-starter-actuator"
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.testcontainers:postgresql:1.17.3'
+    testImplementation 'org.testcontainers:junit-jupiter:1.17.3'
+    testImplementation project(':com.etendorx.entities')
 
 }
 
