@@ -1,9 +1,9 @@
 package com.etendorx.das.handler;
 
 import com.etendorx.entities.entities.BaseRXObject;
-import com.etendorx.entities.jparepo.AdClientRepository;
-import com.etendorx.entities.jparepo.AdOrgRepository;
-import com.etendorx.entities.jparepo.AdUserRepository;
+import com.etendorx.entities.jparepo.ADClientRepository;
+import com.etendorx.entities.jparepo.ADUserRepository;
+import com.etendorx.entities.jparepo.OrganizationRepository;
 import com.etendorx.utils.auth.key.context.AppContext;
 import com.etendorx.utils.auth.key.context.UserContext;
 import lombok.extern.slf4j.Slf4j;
@@ -39,17 +39,17 @@ public class EventHandlerEntities {
         UserContext userContext = getUserContext();
 
         // Set client
-        var adClientRepo = SpringContext.getBean(AdClientRepository.class);
+        var adClientRepo = SpringContext.getBean(ADClientRepository.class);
         var adClientOptional = adClientRepo.findById(userContext.getClientId());
         adClientOptional.ifPresent(entity::setClient);
 
         // Set organization
-        var adOrgRepo = SpringContext.getBean(AdOrgRepository.class);
+        var adOrgRepo = SpringContext.getBean(OrganizationRepository.class);
         var adOrgOptional = adOrgRepo.findById(userContext.getOrganizationId());
         adOrgOptional.ifPresent(entity::setOrganization);
 
         // Set user
-        var adUserRepo = SpringContext.getBean(AdUserRepository.class);
+        var adUserRepo = SpringContext.getBean(ADUserRepository.class);
         var adUserOptional = adUserRepo.findById(userContext.getUserId());
         adUserOptional.ifPresent(entity::setCreatedBy);
         adUserOptional.ifPresent(entity::setUpdatedBy);
@@ -65,7 +65,7 @@ public class EventHandlerEntities {
         UserContext userContext = getUserContext();
 
         // Set user
-        var adUserRepo = SpringContext.getBean(AdUserRepository.class);
+        var adUserRepo = SpringContext.getBean(ADUserRepository.class);
         var adUserOptional = adUserRepo.findById(userContext.getUserId());
         adUserOptional.ifPresent(entity::setUpdatedBy);
         entity.setUpdated(new Date());

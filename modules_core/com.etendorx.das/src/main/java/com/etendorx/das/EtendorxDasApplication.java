@@ -23,9 +23,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EntityScan(basePackages = {"com.etendorx.entities.entities.*"})
 @EnableJpaRepositories("com.etendorx.entities.jparepo")
-@ComponentScan({"com.etendorx.das.handler", "com.etendorx.das.grpcrepo", "com.etendorx.utils.auth.key.context", "com.etendorx.das.services"})
+@ComponentScan({"com.etendorx.das.handler", "com.etendorx.das.grpcrepo", "com.etendorx.utils.auth.key.context", "com.etendorx.das.services", "com.etendorx.das.scan"})
 public class EtendorxDasApplication {
 
   public static void main(String[] args) {

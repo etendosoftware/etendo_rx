@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ${packageName}.${entity.getPackageName()};
+package ${entity.getPackageName()};
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
@@ -23,15 +23,15 @@ import org.springframework.data.rest.core.config.Projection;
  *
  * @author Sebastian Barrozo
  */
-@Projection(name = "${projectionName}", types = ${packageName}.${entity.getPackageName()}.${newClassName}.class)
-public interface ${newClassName}${projectionName?cap_first}Projection {
-<#list entity.properties as p><#compress>
+@Projection(name = "${projectionName}", types = ${entity.getPackageName()}.${entity.simpleClassName}.class)
+public interface ${entity.simpleClassName}${projectionName?cap_first}Projection {
+<#list entity.properties as p>
     <#assign showField = false><#assign idDbName = ""><#if projectionFields?size == 0><#assign showField = true>
     <#else>
     <#list projectionFields as field>
     <#if field.name == p.javaName && (computedColumns || !p.computedColumn)><#assign showField = true></#if>
     </#list>
-    </#if></#compress>
+    </#if>
     <#if showField>
     <#if !p.computedColumn>
     <#if p.isId()>

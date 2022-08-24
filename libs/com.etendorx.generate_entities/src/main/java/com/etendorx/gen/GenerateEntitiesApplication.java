@@ -20,13 +20,13 @@ import com.etendorx.gen.commandline.CommandLineProcess;
 import com.etendorx.gen.process.GenerateMetadata;
 import com.etendorx.gen.process.GenerateProtoFile;
 import com.etendorx.gen.util.CodeGenerationException;
+import com.etendorx.gen.util.Metadata;
+import com.etendorx.gen.util.MetadataContainer;
 import com.etendorx.gen.util.MetadataUtil;
 import com.etendorx.gen.util.Projection;
 import com.etendorx.gen.util.ProjectionEntity;
-import com.etendorx.gen.util.TemplateUtil;
 import com.etendorx.gen.util.Repository;
-import com.etendorx.gen.util.MetadataContainer;
-import com.etendorx.gen.util.Metadata;
+import com.etendorx.gen.util.TemplateUtil;
 import freemarker.template.Template;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -48,10 +48,11 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.HashMap;
+import java.util.stream.Collectors;
 
 /**
  * Task generates the entities using the freemarker template engine.
@@ -275,6 +276,8 @@ public class GenerateEntitiesApplication {
                 }
             }
 
+            generateEntityScan(entities, pathEntitiesRx);
+
             // TODO: Loop over all the 'metadata' objects and create the:
             // 'projections' (used by the JPA) defined by the user
             // 'model projected' (used by the feign client to store the data)
@@ -291,6 +294,21 @@ public class GenerateEntitiesApplication {
             log.error(ERROR_GENERATING_FILE + GENERATED_DIR, e);
         }
         log.info("Generated " + entities.size() + " entities");
+    }
+
+    private void generateEntityScan(List<Entity> entities, String pathEntitiesRx) throws FileNotFoundException {
+        Map<String, Object> data = new HashMap<>();
+        data.put("packages", entities.stream().map(Entity::getPackageName)
+          .distinct()
+          .collect(Collectors.toList()));
+        var outFile = new File(pathEntitiesRx, "src/main/entities/com/etendorx/das/scan/EntityScan.java");
+        new File(outFile.getParent()).mkdirs();
+        String ftlFileNameRX = "/org/openbravo/base/gen/entityscan.ftl";
+        freemarker.template.Template templateRX = TemplateUtil.createTemplateImplementation(
+          ftlFileNameRX);
+        Writer outWriter = new BufferedWriter(
+          new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));
+        TemplateUtil.processTemplate(templateRX, data, outWriter);
     }
 
     private void generateEntityModel(Map<String, Object> data, String pathClientRestRx) throws FileNotFoundException {
@@ -342,8 +360,8 @@ public class GenerateEntitiesApplication {
         final String packageJPARepo = pathJPARepoRx.substring(pathJPARepoRx.lastIndexOf('/') + 1) + ".jparepo";
         final String fullPathJPARepo = pathJPARepoRx + "/src/main/jparepo/" + packageJPARepo.replace(
             '.', '/');
-        final String repositoryClass = org.etendorx.base.gen.Utilities.toCamelCase(
-            data.get("tableName").toString()) + "Repository.java";
+        final String repositoryClass =
+          ((Entity)data.get("entity")).getName() + "Repository.java";
         new File(fullPathJPARepo).mkdirs();
         var outFileRepo = new File(fullPathJPARepo, repositoryClass);
 
@@ -369,11 +387,9 @@ public class GenerateEntitiesApplication {
         final String className = data.get("className").toString();
         final String onlyClassName = data.get("onlyClassName").toString();
         final String packageEntities = data.get("packageEntities").toString();
-        final String fullPathEntities = pathEntitiesRx + "/src/main/entities/" + packageEntities.replace(
-            '.', '/');
-        var classfileName = className.replace(onlyClassName,
-            org.etendorx.base.gen.Utilities.toCamelCase(
-                data.get("tableName").toString())) + ".java";
+        final String fullPathEntities = pathEntitiesRx + "/src/main/entities/";
+        var classfileName = className + ".java";
+
         log.debug(GENERATING_FILE + classfileName);
         var outFile = new File(fullPathEntities, classfileName);
         new File(outFile.getParent()).mkdirs();
@@ -416,11 +432,8 @@ public class GenerateEntitiesApplication {
         final String onlyClassName = data.get("onlyClassName").toString();
         final String packageEntities = data.get("packageEntities").toString();
         final String packageProjectionRepo = pathJPARepoRx.substring(pathJPARepoRx.lastIndexOf('/') + 1);
-        final String fullPathProjectionRepo = pathJPARepoRx + "/src/main/projections/" + packageEntities.replace(
-            '.', '/');
-        final String projectionClass = className.replace(onlyClassName,
-            org.etendorx.base.gen.Utilities.toCamelCase(
-                entity.getTableName())) + StringUtils.capitalize(
+        final String fullPathProjectionRepo = pathJPARepoRx + "/src/main/projections/";
+        final String projectionClass = className + StringUtils.capitalize(
             projectionName) + "Projection.java";
 
         var outFileProjection = new File(fullPathProjectionRepo, projectionClass);

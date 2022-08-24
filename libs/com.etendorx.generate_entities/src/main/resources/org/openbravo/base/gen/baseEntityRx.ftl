@@ -16,9 +16,11 @@
 
 package com.etendorx.entities.entities;
 
-import com.etendorx.entities.entities.org.openbravo.model.ad.system.AdClient;
 import lombok.Getter;
 import lombok.Setter;
+import org.openbravo.model.ad.access.User;
+import org.openbravo.model.ad.system.Client;
+import org.openbravo.model.common.enterprise.Organization;
 
 import javax.persistence.MappedSuperclass;
 
@@ -28,11 +30,11 @@ import javax.persistence.MappedSuperclass;
 public abstract class BaseRXObject {
     @javax.persistence.JoinColumn(name = "ad_client_id", referencedColumnName = "AD_Client_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
-    AdClient client;
+    Client client;
 
     @javax.persistence.JoinColumn(name = "ad_org_id", referencedColumnName = "AD_Org_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
-    com.etendorx.entities.entities.org.openbravo.model.common.enterprise.AdOrg organization;
+    Organization organization;
 
     @javax.persistence.Column(name = "isactive")
     @javax.persistence.Convert(converter= com.etendorx.entities.utilities.BooleanToStringConverter.class)
@@ -43,13 +45,13 @@ public abstract class BaseRXObject {
 
     @javax.persistence.JoinColumn(name = "createdby", referencedColumnName = "AD_User_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
-    com.etendorx.entities.entities.org.openbravo.model.ad.access.AdUser createdBy;
+    User createdBy;
 
     @javax.persistence.Column(name = "updated")
     java.util.Date updated;
 
     @javax.persistence.JoinColumn(name = "updatedby", referencedColumnName = "AD_User_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
-    com.etendorx.entities.entities.org.openbravo.model.ad.access.AdUser updatedBy;
+    User updatedBy;
 
 }
