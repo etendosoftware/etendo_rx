@@ -18,14 +18,17 @@ package com.etendorx.asyncprocess.controller;
 
 
 import com.etendorx.asyncprocess.service.AsyncProcessService;
-import com.etendorx.lib.asyncprocess.models.AsyncProcess;
-import com.etendorx.lib.asyncprocess.models.AsyncProcessState;
-import com.etendorx.lib.asyncprocess.utils.KafkaMessageUtil;
+import com.etendorx.lib.kafka.KafkaMessageUtil;
+import com.etendorx.lib.kafka.model.AsyncProcess;
+import com.etendorx.lib.kafka.model.AsyncProcessState;
 import com.etendorx.utils.auth.key.context.AppContext;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -34,10 +37,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
-
+/**
+ * Controller for rest api access to async process
+ */
 @RestController
 @RequestMapping("/async-process")
 public class AsyncProcessController {
@@ -61,8 +63,8 @@ public class AsyncProcessController {
   @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
   public Map<String, String> index(
-      @RequestBody Map<String, Map<String, ?>> bodyChanges,
-      @RequestParam(required = false, name = "process") String processName
+    @RequestBody Map<String, Map<String, ?>> bodyChanges,
+    @RequestParam(required = false, name = "process") String processName
   ) throws Exception {
     Map<String, String> ret = new HashMap<>();
     Map<String, Object> session = new HashMap<>();
@@ -89,16 +91,20 @@ public class AsyncProcessController {
   public static String message(KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge, String reqUid, String processName, Object bodyChanges) throws Exception {
     return message(kafkaMessageUtil, streamBridge, reqUid, processName, bodyChanges, null);
   }
-  public static String message(KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge, String reqUid, String processName, Object bodyChanges, String messageDescription) throws Exception {
 
-    String mid;
-    if (reqUid == null) {
-      UUID uuid = UUID.randomUUID();
-      mid = uuid.toString().toUpperCase().replace("-", "");
+  public static String message(
+    KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge, String requestUuid, String processName,
+    Object bodyChanges, String messageDescription) throws Exception {
+
+    String uuid;
+    if (requestUuid == null) {
+      uuid = UUID.randomUUID().toString().toUpperCase().replace("-", "");
     } else {
-      mid = reqUid;
+      uuid = requestUuid;
     }
+
     if (bodyChanges.getClass().isAssignableFrom(LinkedHashMap.class)) {
+      @SuppressWarnings("unchecked")
       var localBody = (Map<String, Map<String, String>>) bodyChanges;
       Map<String, String> session;
       if (localBody.containsKey("session")) {
@@ -107,22 +113,22 @@ public class AsyncProcessController {
         session = new LinkedHashMap<>();
         localBody.put("session", session);
       }
-      session.put("id", mid);
+      session.put("id", uuid);
     }
 
     kafkaMessageUtil.saveProcessExecution(
-        bodyChanges, mid,
-        messageDescription == null ? "Sync message received" : messageDescription, AsyncProcessState.ACCEPTED);
+      bodyChanges, uuid, messageDescription == null ? "Sync message received" : messageDescription,
+      AsyncProcessState.ACCEPTED
+    );
 
     Message<Object> message = MessageBuilder.withPayload(bodyChanges)
-        .setHeader(KafkaHeaders.MESSAGE_KEY, mid.getBytes(StandardCharsets.UTF_8))
-        .build();
+      .setHeader(KafkaHeaders.MESSAGE_KEY, uuid.getBytes(StandardCharsets.UTF_8))
+      .build();
     if (!streamBridge.send(processName, message)) {
       throw new Exception("Error sending message");
     }
 
-    return mid;
+    return uuid;
   }
-
 
 }

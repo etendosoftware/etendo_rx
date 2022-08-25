@@ -1,0 +1,11 @@
+server:
+  port: 8092
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5470/etendo
+    username: tad
+    password: tad
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false

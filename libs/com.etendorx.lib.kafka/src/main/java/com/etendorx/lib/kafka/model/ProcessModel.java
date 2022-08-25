@@ -19,5 +19,4 @@ package com.etendorx.lib.kafka.model;
 public interface ProcessModel<O, D extends ProcessModel<O, D>> {
   D process(O value);
 
-
 }
