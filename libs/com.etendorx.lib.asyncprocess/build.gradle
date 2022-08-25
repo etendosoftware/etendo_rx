@@ -4,7 +4,7 @@ plugins {
     id 'io.spring.dependency-management'
 }
 
-group = 'com.etendorx.lib.kafka'
+group = 'com.etendorx.lib'
 version = '1.0-SNAPSHOT'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
@@ -15,7 +15,7 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	implementation 'org.apache.kafka:kafka-streams'
+    implementation 'org.apache.kafka:kafka-streams'
     implementation 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
