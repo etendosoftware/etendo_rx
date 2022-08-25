@@ -9,7 +9,6 @@
 
 > The properties will be taken from the 'gradle.properties' file.
 
-
 ### Project properties
 
 You can set custom properties when running a project to override the default ones.

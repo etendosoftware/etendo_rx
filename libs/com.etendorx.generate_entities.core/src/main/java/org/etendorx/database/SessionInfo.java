@@ -136,7 +136,7 @@ public class SessionInfo {
   }
 
   private static boolean usingJdbcConnectionPool() {
-    return org.etendorx.database.ExternalConnectionPool.getInstance() == null ?
+    return ExternalConnectionPool.getInstance() == null ?
         false :
         "org.openbravo.apachejdbcconnectionpool.JdbcExternalConnectionPool".equals(
             ExternalConnectionPool.getInstance().getClass().getName());
@@ -333,7 +333,7 @@ public class SessionInfo {
 
   public static void setProcessId(String processId) {
     if (processId == null || !processId.equals(getProcessId())) {
-      org.etendorx.database.SessionInfo.processId.set(processId);
+      SessionInfo.processId.set(processId);
       changedInfo.set(true);
     }
 
@@ -345,7 +345,7 @@ public class SessionInfo {
 
   public static void setProcessType(String processType) {
     if (processType == null || !processType.equals(getProcessType())) {
-      org.etendorx.database.SessionInfo.processType.set(processType);
+      SessionInfo.processType.set(processType);
       changedInfo.set(true);
     }
 
@@ -388,7 +388,7 @@ public class SessionInfo {
   }
 
   public static void setAuditActive(boolean isAuditActive) {
-    org.etendorx.database.SessionInfo.isAuditActive = isAuditActive;
+    SessionInfo.isAuditActive = isAuditActive;
     initialized = true;
   }
 
@@ -405,7 +405,7 @@ public class SessionInfo {
   }
 
   public static void setModuleId(String moduleId) {
-    org.etendorx.database.SessionInfo.moduleId.set(moduleId);
+    SessionInfo.moduleId.set(moduleId);
   }
 
   public static boolean isUsageAuditActive() {
@@ -413,7 +413,7 @@ public class SessionInfo {
   }
 
   public static void setUsageAuditActive(boolean usageAuditActive) {
-    org.etendorx.database.SessionInfo.usageAuditActive = usageAuditActive;
+    SessionInfo.usageAuditActive = usageAuditActive;
   }
 
   public static void auditThisThread(boolean shouldAudit) {

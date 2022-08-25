@@ -44,7 +44,7 @@ public class EntityValidator {
     if (!validateRequired) {
       return;
     }
-    final org.etendorx.base.validation.ValidationException ve = new ValidationException();
+    final ValidationException ve = new ValidationException();
     for (final Property p : entity.getProperties()) {
       final PropertyValidator pv = p.getValidator();
       if (pv != null) {

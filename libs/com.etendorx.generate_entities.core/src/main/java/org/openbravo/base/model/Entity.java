@@ -891,30 +891,6 @@ public class Entity {
   private List<String> getJavaImportsInternal(List<Property> propertyList) {
     List<String> imports = new ArrayList<String>();
     Set<String> simpleImports = new HashSet<String>();
-    imports.add("org.etendorx.base.structure.BaseOBObject");
-    simpleImports.add("BaseOBObject");
-
-    if (isTraceable()) {
-      imports.add("org.etendorx.base.structure.Traceable");
-      simpleImports.add("Traceable");
-    }
-    if (isClientEnabled()) {
-      imports.add("org.etendorx.base.structure.ClientEnabled");
-      simpleImports.add("ClientEnabled");
-    }
-    if (isOrganizationEnabled()) {
-      imports.add("org.etendorx.base.structure.OrganizationEnabled");
-      simpleImports.add("OrganizationEnabled");
-    }
-    if (isActiveEnabled()) {
-      imports.add("org.etendorx.base.structure.ActiveEnabled");
-      simpleImports.add("ActiveEnabled");
-    }
-    if (isInheritedAccessEnabled()) {
-      imports.add("org.etendorx.base.structure.InheritedAccessEnabled");
-      simpleImports.add("InheritedAccessEnabled");
-    }
-
     // collect types of properties
     for (Property p : propertyList) {
       String fullType, simpleType;

@@ -29,6 +29,9 @@ import java.math.BigDecimal;
 
 public class NumericPropertyValidator extends BasePropertyValidator {
 
+  private BigDecimal minValue;
+  private BigDecimal maxValue;
+
   static boolean isValidationRequired(Property p) {
     if (p.isPrimitive() && (p.getPrimitiveType() == Float.class || p.getPrimitiveType() == BigDecimal.class || p.getPrimitiveType() == Integer.class || p.getPrimitiveType() == Long.class)) {
       if (p.getMinValue() != null || p.getMaxValue() != null) {
@@ -37,9 +40,6 @@ public class NumericPropertyValidator extends BasePropertyValidator {
     }
     return false;
   }
-
-  private BigDecimal minValue;
-  private BigDecimal maxValue;
 
   public void initialize() {
     Check.isTrue(getProperty().getFieldLength() > 0,

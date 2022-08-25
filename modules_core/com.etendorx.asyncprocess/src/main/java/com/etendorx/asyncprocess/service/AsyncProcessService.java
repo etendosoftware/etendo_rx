@@ -16,7 +16,8 @@
 
 package com.etendorx.asyncprocess.service;
 
-import com.etendorx.lib.kafka.model.AsyncProcess;
+import com.etendorx.lib.asyncprocess.models.AsyncProcess;
+import com.etendorx.lib.asyncprocess.models.AsyncProcessConstants;
 import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StoreQueryParameters;
@@ -26,6 +27,9 @@ import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service that returns information from a process stored in Kafka.
+ */
 @Service
 public class AsyncProcessService {
 
@@ -44,8 +48,8 @@ public class AsyncProcessService {
 
   private ReadOnlyKeyValueStore<String, AsyncProcess> getStore() {
     return kafkaStreams.store(
-        StoreQueryParameters.fromNameAndType(
-            AsyncProcessTopology.ASYNC_PROCESS_STORE,
-            QueryableStoreTypes.keyValueStore()));
+      StoreQueryParameters.fromNameAndType(
+        AsyncProcessTopology.ASYNC_PROCESS_STORE,
+        QueryableStoreTypes.keyValueStore()));
   }
 }

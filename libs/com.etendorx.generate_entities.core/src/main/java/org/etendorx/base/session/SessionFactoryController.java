@@ -16,6 +16,7 @@
 
 package org.etendorx.base.session;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.exception.OBException;
@@ -57,6 +58,12 @@ public abstract class SessionFactoryController {
 
   private static boolean runningInWebContainer = false;
 
+  private SessionFactory sessionFactory = null;
+  private Configuration configuration = null;
+  private boolean isPostgresDatabase = false;
+  private String bbddUser;
+
+
   /**
    * Keeps track if the Dal layer runs within Tomcat or within for example an Ant task.
    *
@@ -93,11 +100,6 @@ public abstract class SessionFactoryController {
     }
     instance = sfc;
   }
-
-  private SessionFactory sessionFactory = null;
-  private Configuration configuration = null;
-  private boolean isPostgresDatabase = false;
-  private String bbddUser;
 
   public SessionFactory getSessionFactory() {
     initialize();
@@ -309,7 +311,7 @@ public abstract class SessionFactoryController {
     if (!isRunningInWebContainer()) {
       return false;
     }
-    return ("yes".equals(obProps.getProperty("JNDI.usage")) ? true : false);
+    return StringUtils.equals("yes", obProps.getProperty("JNDI.usage"));
   }
 
   protected void setInterceptor(Configuration configuration) {

@@ -80,7 +80,7 @@ public class DataPoolChecker implements OBSingleton {
             "  from OBUIAPP_Data_Pool_Selection dps " +
             " where dps.active = true";
     //@formatter:on
-    Query<Object[]> query = org.etendorx.dal.service.OBDal.getInstance()
+    Query<Object[]> query = OBDal.getInstance()
         .getSession()
         .createQuery(hql, Object[].class);
     List<Object[]> queryResults = query.list();

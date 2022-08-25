@@ -26,7 +26,7 @@ import org.openbravo.base.model.Property;
  */
 
 public abstract class BasePropertyValidator
-    implements org.etendorx.base.validation.PropertyValidator {
+    implements PropertyValidator {
 
   private Property property;
 

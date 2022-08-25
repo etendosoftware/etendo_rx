@@ -69,18 +69,17 @@ class OBProviderConfigReader {
       Class<?> clz = null;
       try {
         clz = OBClassLoader.getInstance().loadClass(clzName);
+        if (OBModulePrefixRequired.class.isAssignableFrom(clz) && prefix != null && prefix.trim()
+            .length() > 0) {
+          OBProvider.getInstance()
+              .register(prefix + "." + name, clz, true);
+        } else {
+          OBProvider.getInstance().register(name, clz, true);
+        }
       } catch (final ClassNotFoundException e) {
         // catch ClassNotFoundException
         log.warn(
             "Class " + clzName + " can not be loaded. This can happen " + "when rebuilding after installing new modules. " + "The system needs to be restarted to find " + "new services");
-        continue;
-      }
-      if (OBModulePrefixRequired.class.isAssignableFrom(clz) && prefix != null && prefix.trim()
-          .length() > 0) {
-        org.etendorx.base.provider.OBProvider.getInstance()
-            .register(prefix + "." + name, clz, true);
-      } else {
-        OBProvider.getInstance().register(name, clz, true);
       }
     }
   }

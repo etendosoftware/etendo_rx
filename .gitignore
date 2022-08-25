@@ -59,7 +59,6 @@ Thumbs.db
 /modules_gen/com.etendorx.grpc.common/gen/
 /modules_gen/com.etendorx.grpc.common/src/main/proto/
 /modules_gen/com.etendorx.grpc.common/gen/
-/rxconfig
 /modules_core/com.etendorx.das/src-gen/
 /modules/com.etendorx.integration.zapier/
 /.git_bb/
@@ -67,7 +66,6 @@ Thumbs.db
 /compose/
 /config/
 /kubernetes/
-/rxconfig/
 /Dockerfile
 /HELP.md
 /rx.sh
@@ -79,5 +77,5 @@ Thumbs.db
 **/bin/
 **/src-gen/
 /libs/generate_entities_repo/core/bin/main/
-/docs/out/00-async-process/
-docs/out/01-async-deployment-diagram/01-async-deployment-diagram.svg
+/docs/out/
+/rxconfig/*.yaml

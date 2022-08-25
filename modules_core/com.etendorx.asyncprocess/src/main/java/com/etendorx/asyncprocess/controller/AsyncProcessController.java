@@ -17,12 +17,11 @@
 package com.etendorx.asyncprocess.controller;
 
 
-import com.etendorx.lib.kafka.KafkaMessageUtil;
-import com.etendorx.lib.kafka.model.AsyncProcess;
 import com.etendorx.asyncprocess.service.AsyncProcessService;
-import com.etendorx.lib.kafka.model.AsyncProcessState;
+import com.etendorx.lib.asyncprocess.models.AsyncProcess;
+import com.etendorx.lib.asyncprocess.models.AsyncProcessState;
+import com.etendorx.lib.asyncprocess.utils.KafkaMessageUtil;
 import com.etendorx.utils.auth.key.context.AppContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -111,7 +110,9 @@ public class AsyncProcessController {
       session.put("id", mid);
     }
 
-    kafkaMessageUtil.saveProcessExecution(bodyChanges, mid, messageDescription == null ? "Sync message received" : messageDescription, AsyncProcessState.ACCEPTED);
+    kafkaMessageUtil.saveProcessExecution(
+        bodyChanges, mid,
+        messageDescription == null ? "Sync message received" : messageDescription, AsyncProcessState.ACCEPTED);
 
     Message<Object> message = MessageBuilder.withPayload(bodyChanges)
         .setHeader(KafkaHeaders.MESSAGE_KEY, mid.getBytes(StandardCharsets.UTF_8))

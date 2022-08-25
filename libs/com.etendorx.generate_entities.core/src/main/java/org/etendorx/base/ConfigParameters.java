@@ -16,6 +16,7 @@
 
 package org.etendorx.base;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,11 +61,11 @@ public class ConfigParameters implements Serializable {
   private static final String DEFAULT_JAVA_DATETIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
   private static final String DEFAULT_SQL_DATETIME_FORMAT = "DD-MM-YYYY HH24:MI:SS";
 
-  public static org.etendorx.base.ConfigParameters retrieveFrom(ServletContext context) {
-    org.etendorx.base.ConfigParameters params = (org.etendorx.base.ConfigParameters) context.getAttribute(
+  public static ConfigParameters retrieveFrom(ServletContext context) {
+    ConfigParameters params = (ConfigParameters) context.getAttribute(
         "openbravoConfig");
     if (params == null) {
-      params = new org.etendorx.base.ConfigParameters(context);
+      params = new ConfigParameters(context);
       params.storeIn(context);
     }
 
@@ -155,7 +156,7 @@ public class ConfigParameters implements Serializable {
       try {
         return Long.parseLong(str);
       } catch (NumberFormatException var3) {
-        var3.printStackTrace();
+        log4j.error(var3);
         return null;
       }
     } else {
@@ -165,7 +166,6 @@ public class ConfigParameters implements Serializable {
 
   private String extractContext(String _prefix) {
     String path = "/";
-    //int secondPath = 0;
     int firstPath = _prefix.lastIndexOf(path);
     if (firstPath == -1) {
       path = "\\";
@@ -315,7 +315,7 @@ public class ConfigParameters implements Serializable {
 
   public static String getMachineName() {
     String name = System.getProperty("machine.name");
-    if (name == null || name.isEmpty()) {
+    if (StringUtils.isEmpty(name)) {
       try {
         name = InetAddress.getLocalHost().getHostName();
         log4j.info("Checking override properties for " + name);

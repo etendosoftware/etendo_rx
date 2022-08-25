@@ -2,14 +2,35 @@ plugins {
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
     id 'java'
+    id 'maven-publish'
 }
 
-group = 'com.etendorx.das_core'
-version = '0.0.1-SNAPSHOT'
+group = 'com.etendorx'
+version = '1.0.0'
 sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = 'das_core'
+            version = version
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
 }
 
 dependencies {

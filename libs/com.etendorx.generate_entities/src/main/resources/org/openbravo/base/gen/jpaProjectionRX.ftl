@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+<<<<<<< HEAD
 package ${packageName}.${entity.getPackageName()};
+=======
+package ${entity.getPackageName()};
+>>>>>>> origin/develop
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
@@ -23,15 +27,25 @@ import org.springframework.data.rest.core.config.Projection;
  *
  * @author Sebastian Barrozo
  */
+<<<<<<< HEAD
 @Projection(name = "${projectionName}", types = ${packageName}.${entity.getPackageName()}.${newClassName}.class)
 public interface ${newClassName}${projectionName?cap_first}Projection {
 <#list entity.properties as p><#compress>
+=======
+@Projection(name = "${projectionName}", types = ${entity.getPackageName()}.${entity.simpleClassName}.class)
+public interface ${entity.simpleClassName}${projectionName?cap_first}Projection {
+<#list entity.properties as p>
+>>>>>>> origin/develop
     <#assign showField = false><#assign idDbName = ""><#if projectionFields?size == 0><#assign showField = true>
     <#else>
     <#list projectionFields as field>
     <#if field.name == p.javaName && (computedColumns || !p.computedColumn)><#assign showField = true></#if>
     </#list>
+<<<<<<< HEAD
     </#if></#compress>
+=======
+    </#if>
+>>>>>>> origin/develop
     <#if showField>
     <#if !p.computedColumn>
     <#if p.isId()>

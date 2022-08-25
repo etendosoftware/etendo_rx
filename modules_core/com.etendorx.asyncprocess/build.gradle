@@ -19,7 +19,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.1.0'
+    testImplementation 'org.apache.kafka:kafka-streams-test-utils'
 
     implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
     //
@@ -27,6 +27,8 @@ dependencies {
     implementation(project(':com.etendorx.utils.auth')) {
         exclude group: 'org.slf4j', module: '*'
     }
+
+    implementation project(':com.etendorx.lib.asyncprocess')
 
 }
 

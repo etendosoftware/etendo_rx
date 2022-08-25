@@ -1,3 +1,15 @@
+<<<<<<< HEAD
+=======
+<#function plural name1>
+    <#if name1?ends_with('s') >
+        <#return name1>
+    <#elseif name1?ends_with('y') >
+        <#return name1?substring(0, name1?length - 1) + 'ies'>
+    <#else>
+        <#return name1 + 's'>
+    </#if>
+</#function>
+>>>>>>> origin/develop
 /**
  * Copyright 2022 Futit Services SL
  *
@@ -15,8 +27,13 @@
  */
 package ${packageJPARepo};
 
+<<<<<<< HEAD
 import ${packageName}.${entity.getPackageName()}.${newClassName}DefaultProjection;
 import ${packageName}.${entity.getPackageName()}.${newClassName};
+=======
+import ${entity.getPackageName()}.${entity.simpleClassName}DefaultProjection;
+import ${entity.getPackageName()}.${entity.simpleClassName};
+>>>>>>> origin/develop
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -27,11 +44,19 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
+<<<<<<< HEAD
  * ${newClassName} JPA CRUD Repository
  *
  */
 @RepositoryRestResource(excerptProjection = ${newClassName}DefaultProjection.class)
 public interface ${newClassName}Repository extends PagingAndSortingRepository<${newClassName}, String>{
+=======
+ * ${entity.simpleClassName} JPA CRUD Repository
+ *
+ */
+@RepositoryRestResource(excerptProjection = ${entity.simpleClassName}DefaultProjection.class, path = "${entity.name}")
+public interface ${entity.name}Repository extends PagingAndSortingRepository<${entity.simpleClassName}, String>{
+>>>>>>> origin/develop
     <#if searches??>
 
     <#list searches as s>
@@ -39,7 +64,11 @@ public interface ${newClassName}Repository extends PagingAndSortingRepository<${
     <#if (s.fetchAttributes??) && (s.fetchAttributes?size > 0)>
     @EntityGraph(value = "${newClassName}.detail", type = EntityGraph.EntityGraphType.LOAD, attributePaths = { <#list s.fetchAttributes as attr>"${attr}"<#if !attr?is_last>, </#if></#list> })
     </#if>
+<<<<<<< HEAD
     Page<${newClassName}> ${s.method}(
+=======
+    Page<${entity.simpleClassName}> ${s.method}(
+>>>>>>> origin/develop
     <#list s.params as p>@Param("${p.name}") <#if p.type == 'java.util.Date'>@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)</#if> ${p.type} ${p.name},
     </#list>Pageable pageable);
 

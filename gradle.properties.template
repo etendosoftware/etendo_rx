@@ -1,4 +1,9 @@
+repositoryUser=
+repositoryPassword=
+repositoryUrl=
+
 org.gradle.parallel=true
+org.gradle.daemon=false
 
 dasPushImage=
 authPushImage=
@@ -21,6 +26,7 @@ bbdd.sessionConfig=select update_dateFormat('DD-MM-YYYY')
 # Boolean value to generate or not code to RX
 rx.generateCode=true
 
+<<<<<<< HEAD
 # DEPRECATED
 rx.computedColumns=false
 rx.views=false
@@ -29,3 +35,7 @@ rx.views=false
 # Uncomment this if you want a custom location.
 #rx.path=
 
+=======
+rx.computedColumns=true
+rx.views=true
+>>>>>>> origin/develop

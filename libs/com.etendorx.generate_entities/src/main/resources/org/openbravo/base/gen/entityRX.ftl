@@ -3,12 +3,20 @@
 <#assign noAuditTables = ["ad_ref_table","ad_clientinfo", "ad_orginfo", "obkmo_widget_reference", "ad_org", "ad_client"]>
 <#assign auditFields = ["ad_org_id", "ad_client_id", "isactive", "created", "createdby", "updated", "updatedby"]>
 
+<<<<<<< HEAD
 package ${packageName}.${entity.packageName};
+=======
+package ${entity.packageName};
+>>>>>>> origin/develop
 
 import com.etendorx.entities.entities.BaseRXObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
+<<<<<<< HEAD
+=======
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+>>>>>>> origin/develop
 
 import java.io.Serializable;
 
@@ -20,10 +28,18 @@ import java.io.Serializable;
 
 @Getter
 @Setter
+<<<<<<< HEAD
 @javax.persistence.Entity
 @javax.persistence.Table(name = "${entity.tableName?lower_case}")
 @javax.persistence.Cacheable
 public class ${newClassName} <#if noAuditTables?seq_contains(entity.tableName?lower_case)>implements Serializable<#else>extends BaseRXObject</#if> {
+=======
+@javax.persistence.Entity(name = "${entity.name}")
+@javax.persistence.Table(name = "${entity.tableName?lower_case}")
+@javax.persistence.Cacheable
+@EntityScan
+public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.tableName?lower_case)>implements Serializable<#else>extends BaseRXObject</#if> {
+>>>>>>> origin/develop
 <#list entity.properties as p>
     <#if !p.computedColumn>
     <#if p.isId()>
@@ -74,7 +90,11 @@ public class ${newClassName} <#if noAuditTables?seq_contains(entity.tableName?lo
     @javax.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.getTargetEntity().getTableName()}_id"<#if repeated>, updatable = false, insertable = false</#if>)
     </#if>
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
+<<<<<<< HEAD
     ${packageName}.${p.getTableName(p.getObjectTypeName())} ${p.javaName};
+=======
+    ${p.targetEntity.className} ${p.javaName};
+>>>>>>> origin/develop
 
     <#else>
     <#if p.targetEntity?? && !p.isId() && !p.getTargetEntity().isView()>

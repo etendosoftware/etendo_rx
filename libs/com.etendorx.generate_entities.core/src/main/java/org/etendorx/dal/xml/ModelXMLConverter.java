@@ -57,7 +57,7 @@ public class ModelXMLConverter implements OBSingleton {
    * @return the Dom4j document containing the list of Entities
    */
   public Document getEntitiesAsXML() {
-    final Document doc = org.etendorx.dal.xml.XMLUtil.getInstance().createDomDocument();
+    final Document doc = XMLUtil.getInstance().createDomDocument();
     final Element root = doc.addElement("Types");
     final List<String> entityNames = new ArrayList<String>();
     for (final Entity e : ModelProvider.getInstance().getModel()) {
@@ -94,7 +94,7 @@ public class ModelXMLConverter implements OBSingleton {
     Collections.sort(entityNames);
 
     final Element rootElement = root.addElement("xs:element");
-    rootElement.addAttribute("name", org.etendorx.dal.xml.XMLConstants.OB_ROOT_ELEMENT);
+    rootElement.addAttribute("name", XMLConstants.OB_ROOT_ELEMENT);
     final Element complexType = rootElement.addElement("xs:complexType");
     final Element choiceElement = complexType.addElement("xs:choice");
     choiceElement.addAttribute("minOccurs", "0");
@@ -116,15 +116,15 @@ public class ModelXMLConverter implements OBSingleton {
       addPropertyElements(typeSequenceElement, ModelProvider.getInstance().getEntity(entityName));
 
       typeElement.addElement("xs:attribute")
-          .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ID_ATTRIBUTE)
+          .addAttribute("name", XMLConstants.ID_ATTRIBUTE)
           .addAttribute("type", "xs:string")
           .addAttribute("use", "optional");
       typeElement.addElement("xs:attribute")
-          .addAttribute("name", org.etendorx.dal.xml.XMLConstants.IDENTIFIER_ATTRIBUTE)
+          .addAttribute("name", XMLConstants.IDENTIFIER_ATTRIBUTE)
           .addAttribute("type", "xs:string")
           .addAttribute("use", "optional");
       typeElement.addElement("xs:attribute")
-          .addAttribute("name", org.etendorx.dal.xml.XMLConstants.REFERENCE_ATTRIBUTE)
+          .addAttribute("name", XMLConstants.REFERENCE_ATTRIBUTE)
           .addAttribute("type", "xs:boolean")
           .addAttribute("use", "optional");
       typeElement.addElement("xs:anyAttribute");
@@ -179,23 +179,23 @@ public class ModelXMLConverter implements OBSingleton {
     final Element complexElem = schemaElement.addElement("xs:complexType")
         .addAttribute("name", "ReferenceType");
     complexElem.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ID_ATTRIBUTE)
+        .addAttribute("name", XMLConstants.ID_ATTRIBUTE)
         .addAttribute("type", "xs:string")
         .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ENTITYNAME_ATTRIBUTE)
+        .addAttribute("name", XMLConstants.ENTITYNAME_ATTRIBUTE)
         .addAttribute("type", "xs:string")
         .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.IDENTIFIER_ATTRIBUTE)
+        .addAttribute("name", XMLConstants.IDENTIFIER_ATTRIBUTE)
         .addAttribute("type", "xs:string")
         .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.TRANSIENT_ATTRIBUTE)
+        .addAttribute("name", XMLConstants.TRANSIENT_ATTRIBUTE)
         .addAttribute("type", "xs:boolean")
         .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.INACTIVE_ATTRIBUTE)
+        .addAttribute("name", XMLConstants.INACTIVE_ATTRIBUTE)
         .addAttribute("type", "xs:boolean")
         .addAttribute("use", "optional");
   }
@@ -216,10 +216,10 @@ public class ModelXMLConverter implements OBSingleton {
     final Element extension = simple.addElement("xs:extension")
         .addAttribute("base", "xs:" + typeName);
     extension.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.TRANSIENT_ATTRIBUTE)
+        .addAttribute("name", XMLConstants.TRANSIENT_ATTRIBUTE)
         .addAttribute("type", "xs:boolean");
     extension.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.INACTIVE_ATTRIBUTE)
+        .addAttribute("name", XMLConstants.INACTIVE_ATTRIBUTE)
         .addAttribute("type", "xs:boolean")
         .addAttribute("use", "optional");
   }
@@ -286,7 +286,7 @@ public class ModelXMLConverter implements OBSingleton {
     final Element complexElem = schemaElement.addElement("xs:complexType")
         .addAttribute("name", "ResultEntityType");
     complexElem.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ID_ATTRIBUTE)
+        .addAttribute("name", XMLConstants.ID_ATTRIBUTE)
         .addAttribute("type", "xs:string")
         .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")

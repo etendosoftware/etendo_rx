@@ -164,7 +164,6 @@ public class OBProvider {
       register(clz, clz, false);
 
       reg = registrations.get(clz.getName());
-      return (T) reg.getInstance();
     }
     return (T) reg.getInstance();
   }

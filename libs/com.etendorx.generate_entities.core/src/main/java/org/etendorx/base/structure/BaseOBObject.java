@@ -82,8 +82,6 @@ public abstract class BaseOBObject
     if (!getEntity().hasProperty(propName)) {
       // ignoring warning as this always happens when the database needs to be updated
       // or when uninstalling modules.
-      // log.warn("Property " + propName + " does not exist for entity " + getEntityName()
-      // + ". This is not necessarily a problem, this can happen when modules are uninstalled.");
       return;
     }
     try {
@@ -111,49 +109,6 @@ public abstract class BaseOBObject
     return data[p.getIndexInEntity()];
   }
 
-  /*
-  private Object getDataValue(Property p, Language language, String id) {
-    if (data == null) {
-      // nothing set in this case anyway
-      return null;
-    }
-
-    if (p.isTranslatable() && OBContext.hasTranslationInstalled()) {
-      if (!hasLookedForTrl) {
-        hasLookedForTrl = true;
-        try {
-          if (id != null && p.getTrlParentProperty() != null) {
-            BaseOBObject translation = getTranslation(p.getTrlParentProperty(), language, id);
-            if (translation != null) {
-              dataTrl = translation;
-            }
-          }
-        } catch (Throwable t) {
-          // continue using base language
-          log.debug("Error looking for translation of " + p + ". Using base value", t);
-        }
-      }
-
-      if (dataTrl != null) {
-        return dataTrl.get(p.getTranslationProperty().getName());
-      }
-    }
-
-    return data[p.getIndexInEntity()];
-  }
-*/
-  /*
-  private BaseOBObject getTranslation(Property trlParentProperty, Language language, String id) {
-    OBCriteria<BaseOBObject> obCriteria = OBDal.getInstance()
-        .createCriteria(trlParentProperty.getEntity().getName())
-        .add(Restrictions.eq(trlParentProperty.getName() + ".id", id))
-        .add(Restrictions.eq("language", language))
-        .setFilterOnReadableClients(false)
-        .setFilterOnReadableOrganization(false)
-        .setMaxResults(1);
-    return (BaseOBObject) obCriteria.uniqueResult();
-  }
-*/
   private void setDataValue(String propName, Object value) {
     if (data == null) {
       data = new Object[getEntity().getProperties().size()];
@@ -195,56 +150,6 @@ public abstract class BaseOBObject
     checkDerivedReadable(p);
     return getDataValue(p);
   }
-
-  /**
-   * Returns the value of the {@link Property Property} identified by the propName translating it,
-   * if possible, to the language. This method does security checking. If a security violation
-   * occurs then a OBSecurityException is thrown.
-   *
-   * @see BaseOBObject#get(String)
-   *
-   * @param propName
-   *          the name of the {@link Property Property} for which the value is requested
-   * @param language
-   *          language to translate to
-   * @return value of the property
-   * @throws OBSecurityException
-   *           in case property is not readable
-   */
-  /*
-  public Object get(String propName, Language language) {
-    return get(propName, language, null);
-  }
-*/
-  /**
-   * Returns the value of the {@link Property Property} identified by the propName translating it,
-   * if possible, to the language. In case the translated value is not in session, it will look for
-   * the same in the object. This method does security checking. If a security violation occurs then
-   * a OBSecurityException is thrown.
-   *
-   * @see BaseOBObject#get(String)
-   *
-   * @param propName
-   *          the name of the {@link Property Property} for which the value is requested
-   * @param language
-   *          language to translate to
-   * @param id
-   *          uuid of the referenced object
-   * @return value of the property
-   * @throws OBSecurityException
-   *           in case property is not readable
-   */
-  /*
-  public Object get(String propName, Language language, String id) {
-    final Property p = getEntity().getProperty(propName);
-    checkDerivedReadable(p);
-    if (language != null) {
-      return getDataValue(p, language, id);
-    } else {
-      return getDataValue(p);
-    }
-  }
-*/
 
   /**
    * Set a value for the {@link Property Property} identified by the propName. This method checks
