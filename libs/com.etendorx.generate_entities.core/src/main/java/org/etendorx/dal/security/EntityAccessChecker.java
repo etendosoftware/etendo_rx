@@ -45,7 +45,7 @@ import java.util.*;
  * Derived readable checks are done when a value is retrieved of an object (@see
  * BaseOBObject#get(String)).
  * <p>
- * This class is used from the {@link SecurityChecker} which combines all entity security checks.
+ * This class is used from the {@link org.etendorx.dal.security.SecurityChecker} which combines all entity security checks.
  *
  * @author mtaal
  * @see Entity

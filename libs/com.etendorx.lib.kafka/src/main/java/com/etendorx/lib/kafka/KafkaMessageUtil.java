@@ -58,17 +58,17 @@ public class KafkaMessageUtil {
   }
 
   public void saveProcessExecution(
-    Object bodyChanges,
-    String mid,
-    String description,
-    AsyncProcessState state) {
+      Object bodyChanges,
+      String mid,
+      String description,
+      AsyncProcessState state) {
     AsyncProcessExecution process = AsyncProcessExecution.builder()
-      .asyncProcessId(mid)
-      .description(description)
-      .params(bodyChanges != null ? bodyChanges.toString() : "")
-      .time(new Date())
-      .state(state)
-      .build();
+        .asyncProcessId(mid)
+        .description(description)
+        .params(bodyChanges != null ? bodyChanges.toString() : "")
+        .time(new Date())
+        .state(state)
+        .build();
     this.save(process);
   }
 

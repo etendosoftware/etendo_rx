@@ -246,7 +246,7 @@ public class OBInterceptor extends EmptyInterceptor {
     final Organization o1 = ((OrganizationEnabled) entity).getOrganization();
 
      */
-    final OBContext obContext = OBContext.getOBContext();
+    final org.etendorx.dal.core.OBContext obContext = org.etendorx.dal.core.OBContext.getOBContext();
     final BaseOBObject bob = (BaseOBObject) entity;
     boolean isNew = bob.getId() == null || bob.isNewOBObject();
 
@@ -356,7 +356,7 @@ public class OBInterceptor extends EmptyInterceptor {
     // the object t is modified because right after this call a security
     // check is done (see onSave). This is before hibernate can copy
     // the changes from currentState to the object. This happens slighlty later.
-    final OBContext obContext = OBContext.getOBContext();
+    final org.etendorx.dal.core.OBContext obContext = org.etendorx.dal.core.OBContext.getOBContext();
     /*
     final User currentUser = getCurrentUser();
     if (log.isDebugEnabled()) {
@@ -415,7 +415,7 @@ public class OBInterceptor extends EmptyInterceptor {
   // Sets the updated/updatedby
   // TODO: can the client/organization change?
   protected void onUpdate(Traceable t, String[] propertyNames, Object[] currentState) {
-    if (OBContext.getOBContext()
+    if (org.etendorx.dal.core.OBContext.getOBContext()
         .isInAdministratorMode() && preventUpdateInfoChange.get() != null && preventUpdateInfoChange.get()) {
       return;
     }

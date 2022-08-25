@@ -34,13 +34,13 @@ import java.io.InputStream;
 public class OBConfigFileProvider implements OBSingleton {
   private final Logger log = LogManager.getLogger();
 
-  private static final String CUSTOM_POSTFIX = "-" + OBProvider.CONFIG_FILE_NAME;
+  private static final String CUSTOM_POSTFIX = "-" + org.etendorx.base.provider.OBProvider.CONFIG_FILE_NAME;
 
   private static OBConfigFileProvider instance;
 
   public static synchronized OBConfigFileProvider getInstance() {
     if (instance == null) {
-      instance = OBProvider.getInstance()
+      instance = org.etendorx.base.provider.OBProvider.getInstance()
           .get(OBConfigFileProvider.class);
     }
     return instance;
@@ -114,11 +114,11 @@ public class OBConfigFileProvider implements OBSingleton {
           providerDir = providerDir.getParentFile();
         }
         File configFile = new File(providerDir,
-            OBProvider.CONFIG_FILE_NAME);
+            org.etendorx.base.provider.OBProvider.CONFIG_FILE_NAME);
         if (configFile.exists()) {
           final InputStream is = new FileInputStream(configFile);
           log.info("Found provider config file " + configFile.getAbsolutePath());
-          OBProvider.getInstance().register("", is);
+          org.etendorx.base.provider.OBProvider.getInstance().register("", is);
         }
 
         for (final Module module : ModelProvider.getInstance().getModules()) {
@@ -130,7 +130,7 @@ public class OBConfigFileProvider implements OBSingleton {
           if (configFile.exists()) {
             final InputStream is = new FileInputStream(configFile);
             log.info("Found provider config file " + configFile.getAbsolutePath());
-            OBProvider.getInstance()
+            org.etendorx.base.provider.OBProvider.getInstance()
                 .register(module.getJavaPackage(), is);
           }
         }
@@ -148,9 +148,9 @@ public class OBConfigFileProvider implements OBSingleton {
       }
 
       final InputStream is = getResourceAsStream(
-          classPathLocation + "/" + OBProvider.CONFIG_FILE_NAME);
+          classPathLocation + "/" + org.etendorx.base.provider.OBProvider.CONFIG_FILE_NAME);
       if (is != null) {
-        OBProvider.getInstance().register("", is);
+        org.etendorx.base.provider.OBProvider.getInstance().register("", is);
       }
 
       for (final Module module : ModelProvider.getInstance().getModules()) {
@@ -161,7 +161,7 @@ public class OBConfigFileProvider implements OBSingleton {
         final InputStream cis = getResourceAsStream(configLoc);
         if (cis != null) {
           log.info("Found provider config file " + configLoc);
-          OBProvider.getInstance()
+          org.etendorx.base.provider.OBProvider.getInstance()
               .register(module.getJavaPackage(), cis);
         }
       }

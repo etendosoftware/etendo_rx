@@ -33,7 +33,7 @@ import java.util.Properties;
 
 public class JNDIConnectionProvider implements ConnectionProvider {
   protected static Logger log4j = LogManager.getLogger();
-  protected static Map<String, PoolInfo> pools = new HashMap();
+  protected static Map<String, org.etendorx.database.JNDIConnectionProvider.PoolInfo> pools = new HashMap();
   protected String defaultPoolName = "";
 
   public JNDIConnectionProvider(String file, boolean isRelative) throws PoolNotFoundException {
@@ -76,7 +76,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
       }
 
       pools.put(poolName,
-          new PoolInfo(poolName, ds, rdbms,
+          new org.etendorx.database.JNDIConnectionProvider.PoolInfo(poolName, ds, rdbms,
               dbSessionConfig));
       if (log4j.isDebugEnabled()) {
         log4j.debug("Added to pools");
@@ -119,7 +119,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
     Connection conn = null;
 
     try {
-      conn = ((PoolInfo) pools.get(
+      conn = ((org.etendorx.database.JNDIConnectionProvider.PoolInfo) pools.get(
           poolName)).ds.getConnection();
       return conn;
     } catch (SQLException var4) {
@@ -132,7 +132,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
   }
 
   public String getRDBMS(String poolName) {
-    return ((PoolInfo) pools.get(poolName)).rdbms;
+    return ((org.etendorx.database.JNDIConnectionProvider.PoolInfo) pools.get(poolName)).rdbms;
   }
 
   protected boolean releaseConnection(Connection conn) {

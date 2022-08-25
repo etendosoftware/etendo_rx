@@ -33,24 +33,24 @@ public abstract class ExternalConnectionPool {
   static Logger log = LogManager.getLogger();
   public static final String DEFAULT_POOL = "DEFAULT";
   public static final String READONLY_POOL = "RO";
-  private static ExternalConnectionPool instance;
+  private static org.etendorx.database.ExternalConnectionPool instance;
   private static final String PG_TOO_MANY_CONNECTIONS = "53300";
   private static final String ORA_CONNECTION_REFUSED = "66000";
 
   public ExternalConnectionPool() {
   }
 
-  public static final synchronized ExternalConnectionPool getInstance(
+  public static final synchronized org.etendorx.database.ExternalConnectionPool getInstance(
       String externalConnectionPoolClassName) throws ReflectiveOperationException {
     if (instance == null) {
-      instance = (ExternalConnectionPool) Class.forName(
+      instance = (org.etendorx.database.ExternalConnectionPool) Class.forName(
           externalConnectionPoolClassName).getDeclaredConstructor().newInstance();
     }
 
     return instance;
   }
 
-  public static final ExternalConnectionPool getInstance() {
+  public static final org.etendorx.database.ExternalConnectionPool getInstance() {
     return instance;
   }
 

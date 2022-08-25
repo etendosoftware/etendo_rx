@@ -12,6 +12,11 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+    // Configuration used to store the dependencies that the FAT JAR will contain
+    bundle
+}
+
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
@@ -22,6 +27,13 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.1'
     implementation 'org.springframework.data:spring-data-rest-core:3.6.1'
     implementation project(':com.etendorx.das_core')
+    bundle (project(':com.etendorx.das_core')) {
+        exclude group:'*', module:"*"
+    }
+}
+
+bootJar {
+    enabled = false
 }
 
 tasks.named('test') {

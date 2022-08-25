@@ -44,18 +44,18 @@ public abstract class DalThreadHandler extends ThreadHandler {
       try {
         closeOtherSessions();
       } finally {
-        SessionHandler.deleteSessionHandler();
+        org.etendorx.dal.core.SessionHandler.deleteSessionHandler();
         // note before the code below was enabled, however for longer running transactions
         // openbravo does multiple http requests, so while the long running transaction
         // had set inadministratormode, the subsequence http requests put it to false again
-        OBContext.setOBContext((OBContext) null);
+        org.etendorx.dal.core.OBContext.setOBContext((OBContext) null);
       }
     }
   }
 
   private void closeDefaultPoolSession(boolean errorOccured) {
-    SessionHandler sessionHandler = SessionHandler.isSessionHandlerPresent() ?
-        SessionHandler.getInstance() :
+    org.etendorx.dal.core.SessionHandler sessionHandler = org.etendorx.dal.core.SessionHandler.isSessionHandlerPresent() ?
+        org.etendorx.dal.core.SessionHandler.getInstance() :
         null;
     if (sessionHandler != null && sessionHandler.doSessionInViewPatter()) {
       // application software can force a rollback
@@ -68,7 +68,7 @@ public abstract class DalThreadHandler extends ThreadHandler {
   }
 
   private void closeOtherSessions() {
-    if (SessionHandler.existsOpenedSessions()) {
+    if (org.etendorx.dal.core.SessionHandler.existsOpenedSessions()) {
       SessionHandler.getInstance().cleanUpSessions();
     }
   }

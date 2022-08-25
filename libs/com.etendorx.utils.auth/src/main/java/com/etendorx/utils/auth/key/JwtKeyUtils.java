@@ -1,5 +1,6 @@
 package com.etendorx.utils.auth.key;
 
+import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -8,7 +9,11 @@ import io.jsonwebtoken.impl.DefaultClaims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.*;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;

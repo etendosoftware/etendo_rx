@@ -61,11 +61,11 @@ public class ConfigParameters implements Serializable {
   private static final String DEFAULT_JAVA_DATETIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
   private static final String DEFAULT_SQL_DATETIME_FORMAT = "DD-MM-YYYY HH24:MI:SS";
 
-  public static ConfigParameters retrieveFrom(ServletContext context) {
-    ConfigParameters params = (ConfigParameters) context.getAttribute(
+  public static org.etendorx.base.ConfigParameters retrieveFrom(ServletContext context) {
+    org.etendorx.base.ConfigParameters params = (org.etendorx.base.ConfigParameters) context.getAttribute(
         "openbravoConfig");
     if (params == null) {
-      params = new ConfigParameters(context);
+      params = new org.etendorx.base.ConfigParameters(context);
       params.storeIn(context);
     }
 

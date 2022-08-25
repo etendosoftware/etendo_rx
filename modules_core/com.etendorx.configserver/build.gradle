@@ -2,14 +2,35 @@ plugins {
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
     id 'java'
+    id 'maven-publish'
 }
 
 group = 'com.etendorx'
-version = '1.0.0'
+version = '1.0.1'
 sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
+}
+
+publishing {
+    publications {
+        bootJava(MavenPublication) {
+            groupId = group
+            artifactId = 'configserver'
+            version = version
+            artifact tasks.named("bootJar")
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
 }
 
 ext {

@@ -76,8 +76,8 @@ public class IdentifierProvider implements OBSingleton {
   private String getIdentifier(Object o, boolean identifyDeep) {
     // TODO: add support for null fields
     final StringBuilder sb = new StringBuilder();
-    final DynamicEnabled dob = (DynamicEnabled) o;
-    final String entityName = ((Identifiable) dob).getEntityName();
+    final org.etendorx.base.structure.DynamicEnabled dob = (DynamicEnabled) o;
+    final String entityName = ((org.etendorx.base.structure.Identifiable) dob).getEntityName();
     final List<Property> identifiers = ModelProvider.getInstance()
         .getEntity(entityName)
         .getIdentifierProperties();
@@ -86,27 +86,27 @@ public class IdentifierProvider implements OBSingleton {
       if (sb.length() > 0) {
         sb.append(SEPARATOR);
       }
-      Property property = ((BaseOBObject) dob).getEntity()
+      Property property = ((org.etendorx.base.structure.BaseOBObject) dob).getEntity()
           .getProperty(identifier.getName());
       Object value;
 
       if (property.hasDisplayColumn()) {
         Property displayColumnProperty = DalUtil.getPropertyFromPath(
             property.getReferencedProperty().getEntity(), property.getDisplayPropertyName());
-        BaseOBObject referencedObject = (BaseOBObject) dob.get(
+        org.etendorx.base.structure.BaseOBObject referencedObject = (org.etendorx.base.structure.BaseOBObject) dob.get(
             property.getName());
         if (referencedObject == null) {
           continue;
         }
         if (displayColumnProperty.hasDisplayColumn()) {
           // Allowing one level deep of displayed column pointing to references with display column
-          value = ((BaseOBObject) dob.get(
+          value = ((org.etendorx.base.structure.BaseOBObject) dob.get(
               property.getDisplayPropertyName())).get(
               displayColumnProperty.getDisplayPropertyName());
         } else if (!displayColumnProperty.isPrimitive()) {
           // Displaying identifier for non primitive properties
 
-          value = ((BaseOBObject) referencedObject.get(
+          value = ((org.etendorx.base.structure.BaseOBObject) referencedObject.get(
               property.getDisplayPropertyName())).getIdentifier();
         } else {
           value = referencedObject.get(property.getDisplayPropertyName() /*, language*/);
@@ -117,12 +117,12 @@ public class IdentifierProvider implements OBSingleton {
       } else if (property.isTranslatable()) {
         // Trying to get id of translatable object.
         Object id = dob.get("id");
-        if (id instanceof BaseOBObject) {
+        if (id instanceof org.etendorx.base.structure.BaseOBObject) {
           // When the object is created for a drop down list filter, it is incorrect: id is not a
           // String but a BaseOBject. This code deals with this exception.
 
           // TODO: once issue #23706 is fixed, this should not be needed anymore
-          id = ((BaseOBObject) id).get("id");
+          id = ((org.etendorx.base.structure.BaseOBObject) id).get("id");
         }
 
         if (id instanceof String) {
@@ -142,7 +142,7 @@ public class IdentifierProvider implements OBSingleton {
         value = dob.get(identifier.getName());
       }
 
-      if (value instanceof Identifiable && identifyDeep) {
+      if (value instanceof org.etendorx.base.structure.Identifiable && identifyDeep) {
         sb.append(getIdentifier(value, false /*, language*/));
       } else if (value != null) {
 

@@ -71,7 +71,7 @@ class OBProviderConfigReader {
         clz = OBClassLoader.getInstance().loadClass(clzName);
         if (OBModulePrefixRequired.class.isAssignableFrom(clz) && prefix != null && prefix.trim()
             .length() > 0) {
-          OBProvider.getInstance()
+          org.etendorx.base.provider.OBProvider.getInstance()
               .register(prefix + "." + name, clz, true);
         } else {
           OBProvider.getInstance().register(name, clz, true);

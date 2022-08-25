@@ -26,16 +26,5 @@ bbdd.sessionConfig=select update_dateFormat('DD-MM-YYYY')
 # Boolean value to generate or not code to RX
 rx.generateCode=true
 
-<<<<<<< HEAD
-# DEPRECATED
-rx.computedColumns=false
-rx.views=false
-
-# Location where to generate the entities. Default is set to the current directory ('./')
-# Uncomment this if you want a custom location.
-#rx.path=
-
-=======
 rx.computedColumns=true
 rx.views=true
->>>>>>> origin/develop
