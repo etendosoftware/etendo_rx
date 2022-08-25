@@ -63,8 +63,8 @@ public class AsyncProcessController {
   @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
   public Map<String, String> index(
-      @RequestBody Map<String, Map<String, ?>> bodyChanges,
-      @RequestParam(required = false, name = "process") String processName
+    @RequestBody Map<String, Map<String, ?>> bodyChanges,
+    @RequestParam(required = false, name = "process") String processName
   ) throws Exception {
     Map<String, String> ret = new HashMap<>();
     Map<String, Object> session = new HashMap<>();
@@ -93,8 +93,8 @@ public class AsyncProcessController {
   }
 
   public static String message(
-      KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge, String requestUuid, String processName,
-      Object bodyChanges, String messageDescription) throws Exception {
+    KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge, String requestUuid, String processName,
+    Object bodyChanges, String messageDescription) throws Exception {
 
     String uuid;
     if (requestUuid == null) {
@@ -102,6 +102,7 @@ public class AsyncProcessController {
     } else {
       uuid = requestUuid;
     }
+
     if (bodyChanges.getClass().isAssignableFrom(LinkedHashMap.class)) {
       @SuppressWarnings("unchecked")
       var localBody = (Map<String, Map<String, String>>) bodyChanges;
@@ -116,13 +117,13 @@ public class AsyncProcessController {
     }
 
     kafkaMessageUtil.saveProcessExecution(
-        bodyChanges, uuid, messageDescription == null ? "Sync message received" : messageDescription,
-        AsyncProcessState.ACCEPTED
+      bodyChanges, uuid, messageDescription == null ? "Sync message received" : messageDescription,
+      AsyncProcessState.ACCEPTED
     );
 
     Message<Object> message = MessageBuilder.withPayload(bodyChanges)
-        .setHeader(KafkaHeaders.MESSAGE_KEY, uuid.getBytes(StandardCharsets.UTF_8))
-        .build();
+      .setHeader(KafkaHeaders.MESSAGE_KEY, uuid.getBytes(StandardCharsets.UTF_8))
+      .build();
     if (!streamBridge.send(processName, message)) {
       throw new Exception("Error sending message");
     }

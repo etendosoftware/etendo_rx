@@ -12,7 +12,7 @@ pluginManagement {
 }
 
 rootProject.name = 'etendorx'
-var directories = ["libs", "modules_core", "modules_gen", "modules_test"]
+var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modules"]
 
 directories.each {
     def subDirs = new File(it).listFiles(new FileFilter() {
