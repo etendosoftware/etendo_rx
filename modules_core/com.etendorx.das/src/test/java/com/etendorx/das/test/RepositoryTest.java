@@ -74,7 +74,7 @@ public class RepositoryTest {
 
   @Test
   public void whenFindByName() {
-    var userList = userRepository.searchByUsername(true, "admin", null);
+    var userList = userRepository.searchByUsername("admin", true, null);
     assert userList.getSize() == 1;
     assert userList.getContent().get(0) != null;
   }

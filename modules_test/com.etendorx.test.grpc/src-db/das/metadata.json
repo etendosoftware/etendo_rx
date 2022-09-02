@@ -1,7 +1,8 @@
 {
   "projections": [
     {
-      "name": "auth",
+      "name": "test",
+      "grpc": true,
       "entities": [
         {
           "name": "ADUser",
@@ -10,25 +11,21 @@
               "name": "id"
             },
             {
-              "name": "active"
-            },
-            {
-              "name": "client"
-            },
-            {
-              "name": "organization"
-            },
-            {
-              "name": "defaultClient"
-            },
-            {
-              "name": "defaultOrganization"
-            },
-            {
               "name": "username"
+            }
+          ]
+        },
+        {
+          "name": "PricingAdjustment",
+          "fields": [
+            {
+              "name": "id"
             },
             {
-              "name": "password"
+              "name": "name"
+            },
+            {
+              "name": "startingDate"
             }
           ]
         }
@@ -50,6 +47,21 @@
             {
               "name": "active",
               "type": "java.lang.Boolean"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityName": "PricingAdjustment",
+      "searches": [
+        {
+          "query": "SELECT p FROM PricingAdjustment p WHERE p.id = :id",
+          "method": "searchOffer",
+          "params": [
+            {
+              "name": "id",
+              "type": "java.lang.String"
             }
           ]
         }

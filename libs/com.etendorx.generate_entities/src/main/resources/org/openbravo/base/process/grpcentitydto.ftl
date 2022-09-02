@@ -1,5 +1,5 @@
 <#function is_object string>
-    <#if string == "java.lang.String" || string == "String" || string == "java.math.BigDecimal" || string == "java.lang.Long" || string == "java.util.Date" || string == "java.lang.Boolean"><#return false><#else><#return true></#if>
+    <#if string == "java.lang.String" || string == "String" || string == "java.math.BigDecimal" || string == "java.lang.Long" || string == "java.util.Date" || string == "java.lang.Boolean" || string == "java.sql.Timestamp"><#return false><#else><#return true></#if>
 </#function>
 /*
 * Copyright 2022  Futit Services SL
@@ -32,6 +32,8 @@ public class ${name}DTO {
         p.put("${field.name?lower_case}_id", u.get${field.name?cap_first}Id());
     <#elseif field.type == "java.util.Date">
         p.put("${field.name?lower_case}", new Date(u.get${field.name?cap_first}().getSeconds()));
+    <#elseif field.type == "java.sql.Timestamp">
+        p.put("${field.name?lower_case}", u.get${field.name?cap_first}());
     <#else>
         p.put("${field.name?lower_case}", u.get${field.name?cap_first}());
     </#if>
