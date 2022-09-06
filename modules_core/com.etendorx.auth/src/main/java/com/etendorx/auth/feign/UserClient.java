@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name="users", url="${das.url}/adUsers")
+@FeignClient(name="users", url="${das.url}/ADUser")
 public interface UserClient {
 
     @GetMapping("/search/searchByUsername?username={username}")
