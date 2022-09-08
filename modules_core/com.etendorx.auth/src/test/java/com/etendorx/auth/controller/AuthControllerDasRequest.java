@@ -58,7 +58,7 @@ public class AuthControllerDasRequest {
     }
 
     void addMockUrl(String port) {
-        UrlPattern urlSearchUser = WireMock.urlEqualTo("/adUsers/search/searchByUsername?username=admin&active=true&projection=auth");
+        UrlPattern urlSearchUser = WireMock.urlEqualTo("/ADUser/search/searchByUsername?username=admin&active=true&projection=auth");
         // Mock User
         stubFor(WireMock.get(urlSearchUser)
                 .willReturn(WireMock.aResponse()
@@ -66,7 +66,7 @@ public class AuthControllerDasRequest {
                         .withHeader("Content-Type", MediaTypes.HAL_JSON_VALUE)
                         .withBody(AuthControllerUtils.getSearchUserResponseBody(port))));
 
-        UrlPattern urlUndefinedSearchUser = WireMock.urlEqualTo("/adUsers/search/searchByUsername?username=undefined&active=true&projection=auth");
+        UrlPattern urlUndefinedSearchUser = WireMock.urlEqualTo("/ADUser/search/searchByUsername?username=undefined&active=true&projection=auth");
         // Mock User
         stubFor(WireMock.get(urlUndefinedSearchUser)
                 .willReturn(WireMock.aResponse()
