@@ -77,10 +77,14 @@ public class MetadataUtil {
     var metadata = new Metadata();
     metadataContainer.setMetadataMix(metadata);
 
-    log.info("Search projections in path {}/{}",
-        pathEtendoRx, "modules");
-    var directories = getMetadataFiles(pathEtendoRx + File.separator + "modules" + File.separator);
-    directories.addAll(getMetadataFiles(pathEtendoRx + File.separator + "modules_core" + File.separator));
+    var modulesDir = List.of("modules", "modules_core", "modules_test");
+
+    List<File> directories = new ArrayList<>();
+    modulesDir.forEach(dir -> {
+      log.info("Search projections in path {}/{}", pathEtendoRx, dir);
+      directories.addAll(getMetadataFiles(pathEtendoRx + File.separator + dir + File.separator));
+    });
+
     for (File dir : directories) {
       var metadataPath = dir + File.separator + "src-db" + File.separator + "das" + File.separator + "metadata.json";
       var projectionsFile = new File(metadataPath);
@@ -141,7 +145,7 @@ public class MetadataUtil {
   public static Map<String, Entity> generateEntitiesMap(List<Entity> entities) {
     Map<String, Entity> entityMap = new HashMap<>();
     entities.forEach(entity -> {
-      String newClassName = Utilities.toCamelCase(entity.getTableName());
+      String newClassName = entity.getName();
       entityMap.put(newClassName, entity);
     });
     return entityMap;
@@ -153,7 +157,7 @@ public class MetadataUtil {
    * @return {@link ProjectionEntity}
    */
   public static ProjectionEntity generateProjectionEntity(Entity entityModel) {
-    String newClassName = Utilities.toCamelCase(entityModel.getTableName());
+    String newClassName = entityModel.getName();
     ProjectionEntity projectionEntity = new ProjectionEntity(newClassName, "");
 
     // Filter the valid properties of the entityModel
@@ -184,8 +188,7 @@ public class MetadataUtil {
 
   static String generateClassName(Property propertyModel) {
     String className = "";
-
-    if (propertyModel.getTargetEntity() != null && propertyModel.getTargetEntity().getTableName() != null) {
+    if (propertyModel.getTargetEntity() != null && propertyModel.getTargetEntity().getName() != null) {
       var tableNameSplit = propertyModel.getTargetEntity().getTableName().split("_");
       var cn = "";
       for (String s : tableNameSplit) {
@@ -446,10 +449,11 @@ public class MetadataUtil {
   private static void manageFillTypes(List<Entity> entities, String packageEntities,
                                       ProjectionEntity entity, ProjectionEntityField field) throws CodeGenerationException {
     var entityModel = entities.stream()
-        .filter(e -> Utilities.toCamelCase(e.getTableName()).compareTo(entity.getName()) == 0)
+        .filter(e -> e.getName().compareTo(entity.getName()) == 0)
         .findFirst();
     if (entityModel.isPresent()) {
-      entity.setPackageName(packageEntities + "." + entityModel.get().getPackageName());
+      entity.setPackageName(entityModel.get().getPackageName());
+      entity.setClassName(entityModel.get().getClassName());
       // TODO Fix identity kind through dictionary
       if (entity.getIdentity() != null && entity.getIdentity().compareTo("NONE") == 0) {
         entityModel.get().setHelp("identity=NONE");
@@ -496,13 +500,13 @@ public class MetadataUtil {
     } else {
       // Try to find case typos
       var entityModelIgnoreCase = entities.stream()
-          .filter(e -> Utilities.toCamelCase(e.getTableName())
+          .filter(e -> e.getName()
               .compareToIgnoreCase(entity.getName()) == 0)
           .findFirst();
       if (entityModelIgnoreCase.isPresent()) {
         throw new CodeGenerationException(
-            "Entitiy Model " + entity.getName() + " doesn't exist, maybe you refer to " + Utilities.toCamelCase(
-                entityModelIgnoreCase.get().getTableName()));
+            "Entitiy Model " + entity.getName() + " doesn't exist, maybe you refer to " +
+                entityModelIgnoreCase.get().getName());
       } else {
         throw new CodeGenerationException("Entitiy Model " + entity.getName() + " doesn't exist");
       }

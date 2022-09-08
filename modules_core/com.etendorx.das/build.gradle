@@ -75,6 +75,9 @@ dependencies {
     testImplementation 'org.testcontainers:postgresql:1.17.3'
     testImplementation 'org.testcontainers:junit-jupiter:1.17.3'
     testImplementation project(':com.etendorx.entities')
+    testImplementation project(':com.etendorx.grpc.common')
+    testImplementation 'io.grpc:grpc-testing:1.49.0'
+    testImplementation 'io.github.lognet:grpc-spring-boot-starter:4.6.0'
 
 }
 

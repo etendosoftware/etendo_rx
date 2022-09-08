@@ -166,6 +166,7 @@ public class GenerateProtoFile {
               pgkName.append(projectionEntity.getPackageName());
             }
             repository.put("packageName", pgkName.toString());
+            repository.put("className", projectionEntity.getClassName());
             repository.put("projectionName", projection.getName());
             Writer outWriterProjection = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));

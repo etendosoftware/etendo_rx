@@ -1,6 +1,6 @@
 <#-- @formatter:off -->
 <#function is_object string>
- <#if string == "java.lang.String" || string == "String" || string == "java.math.BigDecimal" || string == "java.lang.Long" || string == "java.util.Date" || string == "java.lang.Boolean"><#return false><#else><#return true></#if>
+ <#if string == "java.lang.String" || string == "String" || string == "java.math.BigDecimal" || string == "java.lang.Long" || string == "java.util.Date" || string == "java.lang.Boolean" || string == "java.sql.Timestamp"><#return false><#else><#return true></#if>
 </#function>
 <#function proto_type string>
  <#switch string>
@@ -9,6 +9,7 @@
   <#case "java.math.BigDecimal"><#return "double"><#break>
   <#case "java.lang.Long"><#return "int64"><#break>
   <#case "java.util.Date"><#return "google.protobuf.Timestamp"><#break>
+  <#case "java.sql.Timestamp"><#return "google.protobuf.Timestamp"><#break>
   <#case "java.lang.Boolean"><#return "bool"><#break>
   <#default><#return string>
  </#switch>

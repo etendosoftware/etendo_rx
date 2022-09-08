@@ -32,7 +32,7 @@ public class ETRXProjectionEntity extends ModelObject {
     public void setTable(Table table) {
         this.table = table;
         if (table != null && !StringUtils.isBlank(table.getTableName())) {
-            this.setName(Utilities.toCamelCase(table.getTableName()));
+            this.setName(table.getName());
         }
     }
 
