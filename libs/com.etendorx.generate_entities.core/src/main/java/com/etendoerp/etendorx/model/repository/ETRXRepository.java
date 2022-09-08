@@ -32,7 +32,7 @@ public class ETRXRepository extends ModelObject {
     public void setTable(Table table) {
         this.table = table;
         if (table != null && !StringUtils.isBlank(table.getTableName())) {
-            this.setEntityName(Utilities.toCamelCase(table.getTableName()));
+            this.setEntityName(table.getName());
         }
     }
 

@@ -1,5 +1,5 @@
 <#function is_object string>
-    <#if string == "java.lang.String" || string == "String" || string == "java.math.BigDecimal" || string == "java.lang.Long" || string == "java.util.Date" || string == "java.lang.Boolean"><#return false><#else><#return true></#if>
+    <#if string == "java.lang.String" || string == "String" || string == "java.math.BigDecimal" || string == "java.lang.Long" || string == "java.util.Date" || string == "java.lang.Boolean" || string == "java.sql.Timestamp"><#return false><#else><#return true></#if>
 </#function>
 <#function cast_par p>
     -- ${p.type} --
@@ -23,8 +23,8 @@
 
 package com.etendorx.das.grpcrepo;
 
-import com.etendorx.das.grpc.common.*;
 import com.etendorx.entities.jparepo.${name}Repository;
+import com.etendorx.${projectionName}.grpc.*;
 import com.google.protobuf.util.Timestamps;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class ${name}GrpcService extends ${name}GrpcRepositoryGrpc.${name}GrpcRep
     @Autowired
     ${name}Repository repository;
 
-    private ${name} DTO(${name}.Builder modelBuilder, ${packageName}.${name} p) {
+    private ${name} DTO(${name}.Builder modelBuilder, ${className} p) {
         modelBuilder.clear();
     <#list fields as field>
         <#if field.projectedEntity??>

@@ -1466,7 +1466,7 @@ public class Property {
   }
 
   public String getTableName(String className) {
-    final String newClassName = Utilities.toCamelCase(getTargetEntity().getTableName());
+    final String newClassName = getTargetEntity().getName();
     final String packagePlusNewClass = className.substring(0,
         className.lastIndexOf('.')) + "." + newClassName;
     return packagePlusNewClass;
