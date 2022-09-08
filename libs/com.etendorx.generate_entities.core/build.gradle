@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.etendorx'
-version '1.0.0'
+version = "$gradle.ext.versionJars"
 
 repositories {
     mavenCentral()
