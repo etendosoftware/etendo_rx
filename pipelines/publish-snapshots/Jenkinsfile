@@ -1,0 +1,187 @@
+pipeline {
+    options {
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        CONTEXT_NAME    = 'etendo'
+        BBDD_SID        = 'etendo'
+        BBDD_PORT       = '5432'
+        BBDD_SYSTEMUSER = 'postgres'
+        BBDD_SYSTEMPASS = 'syspass'
+        BBDD_USER       = 'tad'
+        BBDD_PASSWORD   = 'tad'
+        NEXUS_USER      =  credentials('nexus-admin-user')
+        NEXUS_PASSWORD  =  credentials('nexus-admin-passwd')
+        JAVA_HOME       = '/usr/lib/jvm/java-11-openjdk-amd64'
+        CATALINA_HOME   = "${WORKSPACE}/apache-tomcat-8.5.75"
+        REPOSITORY_URL  = 'https://repo.futit.cloud/repository/etendo-snapshot-jars'
+
+    }
+
+    agent {
+        label 'etendo_core' //The id of the slave/agent where the build should be executed, if it doesn't matter use "agent any" instead.
+    }
+
+    stages {
+        stage ('Build Environment Etendo Core') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
+                    withCredentials([usernamePassword(credentialsId: "koodu_credentials", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        sh """
+                        git config user.name "$GIT_USERNAME"
+                        git config user.email "$GIT_USERNAME"
+                        """
+
+                        // Clone Etendo Core
+                        sh 'GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@github.com:etendosoftware/etendo_core.git etendo_core'
+
+                        // Setup environment
+                        sh 'printenv'
+
+                        script {
+                            try {
+                                echo 'Building Etendo Core'
+                                dir("etendo_core") {
+                                    sh """
+                                    echo -e "context.name=${CONTEXT_NAME}\n
+                                    bbdd.sid=${BBDD_SID}\n
+                                    bbdd.port=${BBDD_PORT}\n
+                                    bbdd.systemUser=${BBDD_SYSTEMUSER}\n
+                                    bbdd.systemPassword=${BBDD_SYSTEMPASS}\n
+                                    bbdd.user=${BBDD_USER}\n
+                                    bbdd.password=${BBDD_PASSWORD}\n
+                                    nexusUser=${NEXUS_USER}\n
+                                    nexusPassword=${NEXUS_PASSWORD}\n
+                                    allow.root=true\n
+                                    org.gradle.jvmargs=-Xmx2g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" > gradle.properties
+                                    """
+
+                                    sh './gradlew prepareConfig --info --stacktrace'
+                                    sh 'wget -O apache-tomcat-8.5.75.tar.gz https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.75/bin/apache-tomcat-8.5.75.tar.gz'
+                                    sh 'tar -xvf apache-tomcat-8.5.75.tar.gz -C $WORKSPACE'
+                                    sh './gradlew setup --info --stacktrace'
+                                    sh './gradlew expandModules --info --stacktrace'
+                                    sh './gradlew install --info --stacktrace'
+                                    sh './gradlew smartbuild --info --stacktrace'
+                                    echo 'Build of Etendo Core Finished'
+                                    env.STATUS = "1"
+                                }
+                            } catch (Exception e) {
+                                echo 'Build of Etendo Core FAILED'
+                                currentBuild.result = 'FAILED'
+                                error('Build Etendo Core FAILED!')
+                                env.STATUS = "0"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage ('Build Environment Etendo RX') {
+            when {
+                allOf {
+                    branch 'develop'
+                    expression {
+                        env.STATUS == "1"
+                    }
+                }
+            }
+            steps {
+                script {
+                    try {
+                        echo 'Building Etendo RX'
+                        sh 'printenv'
+                        sh """
+                        echo -e "\n
+                        repositoryUser=${NEXUS_USER}\n
+                        repositoryPassword=${NEXUS_PASSWORD}\n
+                        repositoryUrl=${REPOSITORY_URL}\n
+                        org.gradle.parallel=true\n
+                        org.gradle.daemon=false\n
+                        dasPushImage=\n
+                        authPushImage=\n
+                        edgePushImage=\n
+                        zapierIntegrationPushImage=\n
+                        pushUrl=\n
+                        pushUsername=\n
+                        pushPassword=\n
+                        bbdd.rdbms=POSTGRE\n
+                        bbdd.driver=org.postgresql.Driver\n
+                        bbdd.url=jdbc:postgresql://localhost:5432\n
+                        bbdd.sid=${BBDD_SID}\n
+                        bbdd.systemUser=${BBDD_SYSTEMUSER}\n
+                        bbdd.systemPassword=${BBDD_SYSTEMPASS}\n
+                        bbdd.user=${BBDD_USER}\n
+                        bbdd.password=${BBDD_PASSWORD}\n
+                        bbdd.sessionConfig=select update_dateFormat('DD-MM-YYYY')\n
+                        rx.generateCode=true\n
+                        rx.computedColumns=true\n
+                        rx.views=true" > gradle.properties
+                        """
+                        sh 'sed -i "s/gradle.ext.versionJars = \\(.*\\)\'/gradle.ext.versionJars = \\1-SNAPSHOT\'/g" settings.gradle'
+                        sh './gradlew generate.entities --info'
+                        echo 'Build of Etendo RX Finished'
+                    } catch (Exception e) {
+                        echo 'Build of Etendo RX FAILED'
+                        currentBuild.result = 'FAILED'
+                        error('Build of Etendo RX FAILED!')
+                        env.STATUS = "0"
+                    }
+                }
+            }
+        }
+
+        stage ("Publish JARs") {
+            when {
+                allOf {
+                    branch 'develop'
+                    expression {
+                        env.STATUS == "1"
+                    }
+                }
+            }
+            steps {
+                script {
+                    try {
+                        echo "Publishing Snapshot JARs"
+                        sh './gradlew com.etendorx.asyncprocess:publish --info'
+                        sh './gradlew com.etendorx.auth:publish --info'
+                        sh './gradlew com.etendorx.clientrest_core:publish --info'
+                        sh './gradlew com.etendorx.configserver:publish --info'
+                        sh './gradlew com.etendorx.das:publish --info'
+                        sh './gradlew com.etendorx.das_core:publish --info'
+                        sh './gradlew com.etendorx.edge:publish --info'
+                        sh './gradlew com.etendorx.generate_entities.extradomaintype:publish --info'
+                        sh './gradlew com.etendorx.generate_entities:publish --info'
+                        sh './gradlew com.etendorx.generate_entities.core:publish --info'
+                        echo "Snapshot JARs Published"
+                    } catch (Exception e) {
+                        echo 'Publication of Snapshot JARs FAILED'
+                        currentBuild.result = 'FAILED'
+                        error('Publication FAILED!')
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script{
+                if (fileExists('etendo_core')) {
+                    dir("etendo_core") {
+                        sh './gradlew --stop'
+                        if (env.STATUS == "1") {
+                            sh 'PGPASSWORD=$BBDD_SYSTEMPASS psql -h localhost -d $BBDD_SYSTEMUSER -U $BBDD_SYSTEMUSER -c "DROP DATABASE IF EXISTS ${BBDD_SID};"'
+                        }
+                        deleteDir()
+                    }
+                }
+                cleanWs deleteDirs: true
+            }
+        }
+    }
+}
