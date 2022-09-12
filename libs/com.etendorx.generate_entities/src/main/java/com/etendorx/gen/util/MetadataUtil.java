@@ -22,7 +22,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.etendorx.base.exception.OBException;
-import org.etendorx.base.gen.Utilities;
 import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.Property;
 
@@ -471,12 +470,12 @@ public class MetadataUtil {
             StringBuilder fieldValue = new StringBuilder();
             String getProperty = "";
             String notNullProperty = "";
-            for(var i = 0; i < value.length; i++) {
-              getProperty += ".get" + value[i].substring(0,1).toUpperCase() + value[i].substring(1) + "()";
+            for (var i = 0; i < value.length; i++) {
+              getProperty += ".get" + value[i].substring(0, 1).toUpperCase() + value[i].substring(1) + "()";
               fieldValue.append(getProperty);
-              if(i < value.length -1) {
+              if (i < value.length - 1) {
                 notNullProperty += "#TARGET#" + getProperty + " != null";
-                if(i < value.length - 2) {
+                if (i < value.length - 2) {
                   notNullProperty += " && ";
                 }
               }
