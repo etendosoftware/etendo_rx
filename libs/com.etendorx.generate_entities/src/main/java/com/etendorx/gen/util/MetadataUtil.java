@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -445,6 +446,52 @@ public class MetadataUtil {
     return metadata;
   }
 
+  private static Optional<Property> filterEntityPropertyByName(Entity entity, String entityPropertyName) {
+    return entity.getProperties()
+            .stream()
+            .filter(p -> p.getName().compareTo(entityPropertyName) == 0)
+            .findFirst();
+  }
+
+  /**
+   * Verifies if a property of the 'value' declared in a {@link ProjectionEntityField} is valid.
+   *
+   * Example
+   *  {
+   *    "name": "businessPartnerCategoryName",
+   *    "value": "businessPartner.businessPartnerCategory.name"
+   *  }
+   *
+   *  The 'businessPartner' should be a property of the declared 'baseEntity'
+   *  The 'businessPartnerCategory' should be a property of the 'businessPartner'
+   *  the 'name' should be a property of the 'businessPartnerCategory'
+   *
+   * @param baseEntity
+   * @param baseField
+   * @param parentEntity
+   * @param propertyName
+   * @param isLastValue boolean Flag used to check if the property is the last in the field 'value'
+   * @return A {@link Entity} representing the target entity of the 'propertyName'
+   * @throws CodeGenerationException
+   */
+  private static Entity validateParentEntityValue(ProjectionEntity baseEntity, ProjectionEntityField baseField, Entity parentEntity, String propertyName, boolean isLastValue) throws CodeGenerationException {
+    // Check if the value is a property of the parentEntity
+    var propertyOptional = filterEntityPropertyByName(parentEntity, propertyName);
+
+    if (propertyOptional.isEmpty()) {
+      throw new CodeGenerationException(
+              "The entity Field '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'" +
+                      " contains the value '"+propertyName+"' that does not exists in the parent entity model '"+parentEntity.getName()+"'.");
+    }
+    
+    var targetEntity = propertyOptional.get().getTargetEntity();
+    if (!isLastValue && targetEntity == null) {
+      throw new CodeGenerationException("Error in the value of the entity Field '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'." +
+              "The property '"+propertyOptional.get().getName()+"' does not contain a target entity.");
+    }
+    return targetEntity;
+  }
+
   private static void manageFillTypes(List<Entity> entities, String packageEntities,
                                       ProjectionEntity entity, ProjectionEntityField field) throws CodeGenerationException {
     var entityModel = entities.stream()
@@ -470,7 +517,9 @@ public class MetadataUtil {
             StringBuilder fieldValue = new StringBuilder();
             String getProperty = "";
             String notNullProperty = "";
+            var parentEntityModel = entityModel.get();
             for (var i = 0; i < value.length; i++) {
+              parentEntityModel = validateParentEntityValue(entity, field, parentEntityModel, value[i], i == value.length - 1);
               getProperty += ".get" + value[i].substring(0, 1).toUpperCase() + value[i].substring(1) + "()";
               fieldValue.append(getProperty);
               if (i < value.length - 1) {
