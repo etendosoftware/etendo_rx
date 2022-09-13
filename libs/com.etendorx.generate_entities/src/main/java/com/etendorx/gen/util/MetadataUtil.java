@@ -22,7 +22,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.etendorx.base.exception.OBException;
-import org.etendorx.base.gen.Utilities;
 import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.Property;
 
@@ -467,17 +466,25 @@ public class MetadataUtil {
         field.setClassName("String");
         if (!field.getValue().startsWith("#{")) {
           var value = field.getValue().split("\\.");
-          if (value.length == 2) {
-            field.setProjectedEntity(value[0]);
-            field.setProjectedField(value[1]);
-            field.setValue(null);
+          if (value.length > 1) {
+            StringBuilder fieldValue = new StringBuilder();
+            String getProperty = "";
+            String notNullProperty = "";
+            for (var i = 0; i < value.length; i++) {
+              getProperty += ".get" + value[i].substring(0, 1).toUpperCase() + value[i].substring(1) + "()";
+              fieldValue.append(getProperty);
+              if (i < value.length - 1) {
+                notNullProperty += "#TARGET#" + getProperty + " != null";
+                if (i < value.length - 2) {
+                  notNullProperty += " && ";
+                }
+              }
+            }
+            field.setValue(getProperty);
+            field.setNotNullValue(notNullProperty);
             if (field.getType() == null) {
               field.setType("String");
             }
-          } else {
-            throw new CodeGenerationException(
-                "Entity Field '" + field.getName() + "' declared in entity model '" + entity.getName() +
-                    "': Value generation with this format is not implemented yet");
           }
         }
 

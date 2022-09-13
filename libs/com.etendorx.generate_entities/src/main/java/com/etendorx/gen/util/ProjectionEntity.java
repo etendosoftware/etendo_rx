@@ -63,6 +63,7 @@ public class ProjectionEntity {
         d.put("className", v.getClassName());
         d.put("projectedEntity", v.getProjectedEntity());
         d.put("projectedField", v.getProjectedField());
+        d.put("notNullValue", v.getNotNullValue());
         return d;
       }).collect(Collectors.toList());
   }

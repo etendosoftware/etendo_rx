@@ -22,6 +22,7 @@ public class ProjectionEntityField {
   private String className;
   private String projectedEntity;
   private String projectedField;
+  private String notNullValue;
 
   public ProjectionEntityField(String name, String value, String type) {
     this.name = name;
@@ -82,5 +83,13 @@ public class ProjectionEntityField {
 
   public void setProjectedField(String projectedField) {
     this.projectedField = projectedField;
+  }
+
+  public void setNotNullValue(String notNullValue) {
+    this.notNullValue = notNullValue;
+  }
+
+  public String getNotNullValue() {
+    return notNullValue;
   }
 }
