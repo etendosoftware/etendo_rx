@@ -5,6 +5,18 @@
       "grpc": true,
       "entities": [
         {
+          "name" : "InvoiceLine",
+          "fields" : [
+            {
+              "name": "id"
+            },
+            {
+              "value": "product.name",
+              "name": "product"
+            }
+          ]
+        },
+        {
           "name": "ADUser",
           "fields": [
             {
