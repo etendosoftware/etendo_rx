@@ -480,8 +480,8 @@ public class MetadataUtil {
 
     if (propertyOptional.isEmpty()) {
       throw new CodeGenerationException(
-              "The entity Field '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'" +
-                      " contains the value '"+propertyName+"' that does not exists in the parent entity model '"+parentEntity.getName()+"'.");
+              "The entity Field named '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'" +
+                      " contains the value '"+propertyName+"', which doesn't exists.");
     }
     
     var targetEntity = propertyOptional.get().getTargetEntity();
