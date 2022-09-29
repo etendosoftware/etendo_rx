@@ -56,7 +56,7 @@ public class TemplateUtil {
   }
 
   public static Map<String, Object> getModelData(Entity entity, boolean computedColumns, boolean includeViews) {
-    final String newClassName = Utilities.toCamelCase(entity.getTableName());
+    final String newClassName = entity.getName();
 
     Map<String, Object> data = new HashMap<>();
     // TODO: Create constant and add better descriptions
@@ -72,7 +72,7 @@ public class TemplateUtil {
     data.put("repositoryClassEntityModel", data.get("className")
         .toString()
         .replace(data.get("onlyClassName").toString(),
-            Utilities.toCamelCase(entity.getTableName())) + "Model.java");
+            entity.getName()) + "Model.java");
     //data.put("util", this);
     data.put("tableName", entity.getTableName());
 

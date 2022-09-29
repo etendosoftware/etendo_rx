@@ -104,7 +104,7 @@ public class ${newClassName}${projectionName?cap_first}Model extends Representat
     <#if p.targetEntity?? >
     @JsonGetter("${p.javaName}")
     URI ${p.javaName}() {
-        return Link.of("/${plural(p.targetEntity.tableName)}/" + ${p.javaName}Id, "${p.javaName}").toUri();
+        return Link.of("/${p.targetEntity.name})/" + ${p.javaName}Id, "${p.javaName}").toUri();
     }
 
     </#if>

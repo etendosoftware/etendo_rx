@@ -1,0 +1,297 @@
+pipeline {
+    options {
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        CONTEXT_NAME    = 'etendo'
+        BBDD_SID        = 'etendo'
+        BBDD_PORT       = '5432'
+        BBDD_SYSTEMUSER = 'postgres'
+        BBDD_SYSTEMPASS = 'syspass'
+        BBDD_USER       = 'tad'
+        BBDD_PASSWORD   = 'tad'
+        NEXUS_USER      =  credentials('nexus-admin-user')
+        NEXUS_PASSWORD  =  credentials('nexus-admin-passwd')
+        JAVA_HOME       = '/usr/lib/jvm/java-11-openjdk-amd64'
+        ACCESS_TOKEN    = credentials('access_token_github')
+    }
+
+    agent {
+        label 'etendo_core' //The id of the slave/agent where the build should be executed, if it doesn't matter use "agent any" instead.
+    }
+
+    stages {
+        stage ('Build Environment Etendo Core') {
+            steps {
+                sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
+                sh './pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo Core" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
+                withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
+                    withCredentials([usernamePassword(credentialsId: "koodu_credentials", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        sh """
+                        git config user.name "$GIT_USERNAME"
+                        git config user.email "$GIT_USERNAME"
+                        """
+
+                        // Clone Etendo Core
+                        sh 'GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@github.com:etendosoftware/etendo_core.git etendo_core'
+
+                        // Setup environment
+                        sh 'printenv'
+
+                        script {
+                            try {
+                                echo 'Building Etendo Core'
+                                dir("etendo_core") {
+                                    sh """
+                                    echo -e "context.name=${CONTEXT_NAME}\n
+                                    bbdd.sid=${BBDD_SID}\n
+                                    bbdd.port=${BBDD_PORT}\n
+                                    bbdd.systemUser=${BBDD_SYSTEMUSER}\n
+                                    bbdd.systemPassword=${BBDD_SYSTEMPASS}\n
+                                    bbdd.user=${BBDD_USER}\n
+                                    bbdd.password=${BBDD_PASSWORD}\n
+                                    nexusUser=${NEXUS_USER}\n
+                                    nexusPassword=${NEXUS_PASSWORD}\n
+                                    allow.root=true\n
+                                    org.gradle.jvmargs=-Xmx2g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" > gradle.properties
+                                    """
+                                    sh './gradlew prepareConfig --info --stacktrace'
+                                    sh './gradlew setup --info --stacktrace'
+                                    sh './gradlew expandModules --info --stacktrace'
+                                    sh './gradlew install --info --stacktrace'
+                                    sh './gradlew smartbuild --info --stacktrace'
+                                    echo 'Build of Etendo Core Finished'
+                                    env.STATUSCORE = "1"
+                                    env.STATUSRX = "0"
+                                }
+                            } catch (Exception e) {
+                                echo 'Build of Etendo Core FAILED'
+                                currentBuild.result = 'FAILED'
+                                error('Build Etendo Core FAILED!')
+                                env.STATUSCORE = "0"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage ('Build Environment Etendo RX') {
+            when {
+                expression {
+                    env.STATUSCORE == "1"
+                }
+            }
+            steps {
+                script {
+                    try {
+                        echo 'Building Etendo RX'
+                        sh 'printenv'
+                        sh 'cp gradle.properties.template gradle.properties'
+                        sh './pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo RX" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
+                        sh './gradlew generate.entities --info'
+                        echo 'Build of Etendo RX Finished'
+                        env.STATUSRX = "1"
+                    } catch (Exception e) {
+                        echo 'Build of Etendo RX FAILED'
+                        currentBuild.result = 'FAILED'
+                        error('Build of Etendo RX FAILED!')
+                        env.STATUSRX = "0"
+                    }
+                }
+            }
+        }
+        stage ("Run AsyncProcess Tests") {
+            when {
+                expression {
+                    env.STATUSRX == "1"
+                }
+            }
+            steps {
+                sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
+                sh './pipelines/run-tests/build-update.sh etendo_core pending "Run Tests" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
+                script {
+                    try {
+                        env.STATUSTEST = "1"
+                        echo "Starting AsyncProcess tests"
+                        sh './gradlew :com.etendorx.asyncprocess:test --info'
+                        '...ASYNPROCESS TESTS SUCCESSFUL...'
+                        publishHTML([
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'modules_core/com.etendorx.asyncprocess/build/reports/tests/test',
+                            reportFiles: '*.html',
+                            reportName: 'ASYNPROCESS TESTS REPORT',
+                            reportTitles: ''
+                        ])
+                    } catch (Exception e) {
+                        echo 'Exception occurred: ' + e.toString()
+                        echo '...ASYNPROCESS TESTS FAILED...'
+                        currentBuild.result = 'UNSTABLE'
+                        unstable('ASYNPROCESS TESTS FAILED!')
+                        env.STATUSTEST = "0"
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'modules_core/com.etendorx.asyncprocess/build/reports/tests/test',
+                            reportFiles: '*.html',
+                            reportName: 'ASYNPROCESS TESTS REPORT',
+                            reportTitles: ''
+                        ])
+                    }
+                }
+            }
+        }
+        stage ("Run Auth Tests") {
+            when {
+                expression {
+                    env.STATUSRX == "1"
+                }
+            }
+            steps {
+                script {
+                    try {
+                        echo "Starting Auth tests"
+                        sh './gradlew :com.etendorx.auth:test --info'
+                        '...AUTH TESTS SUCCESSFUL...'
+                        publishHTML([
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'modules_core/com.etendorx.auth/build/reports/tests/test',
+                            reportFiles: '*.html',
+                            reportName: 'AUTH TESTS REPORT',
+                            reportTitles: ''
+                        ])
+                    } catch (Exception e) {
+                        echo 'Exception occurred: ' + e.toString()
+                        echo '...AUTH TESTS FAILED...'
+                        currentBuild.result = 'UNSTABLE'
+                        unstable('AUTH TESTS FAILED!')
+                        env.STATUSTEST = "0"
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'modules_core/com.etendorx.auth/build/reports/tests/test',
+                            reportFiles: '*.html',
+                            reportName: 'AUTH TESTS REPORT',
+                            reportTitles: ''
+                        ])
+                    }
+                }
+            }
+        }
+        stage ("Run Das Tests") {
+            when {
+                expression {
+                    env.STATUSRX == "1"
+                }
+            }
+            steps {
+                script {
+                    try {
+                        echo "Starting Das tests"
+                        sh './gradlew :com.etendorx.das:test --info'
+                        '...DAS TESTS SUCCESSFUL...'
+                        publishHTML([
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'modules_core/com.etendorx.das/build/reports/tests/test',
+                            reportFiles: '*.html',
+                            reportName: 'DAS TESTS REPORT',
+                            reportTitles: ''
+                        ])
+                    } catch (Exception e) {
+                        echo 'Exception occurred: ' + e.toString()
+                        echo '...DAS TEST FAILED...'
+                        currentBuild.result = 'UNSTABLE'
+                        unstable('DAS TESTS FAILED!')
+                        env.STATUSTEST = "0"
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'modules_core/com.etendorx.das/build/reports/tests/test',
+                            reportFiles: '*.html',
+                            reportName: 'DAS TESTS REPORT',
+                            reportTitles: ''
+                        ])
+                    }
+                }
+            }
+        }
+        stage ("Run Edge Tests") {
+            when {
+                expression {
+                    env.STATUSRX == "1"
+                }
+            }
+            steps {
+                script {
+                    try {
+                        echo "Starting Edge tests"
+                        sh './gradlew :com.etendorx.edge:test --info'
+                        '...EDGE TESTS SUCCESSFUL...'
+                        publishHTML([
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'modules_core/com.etendorx.edge/build/reports/tests/test',
+                            reportFiles: '*.html',
+                            reportName: 'EDGE TESTS REPORT',
+                            reportTitles: ''
+                        ])
+                    } catch (Exception e) {
+                        echo 'Exception occurred: ' + e.toString()
+                        echo '...EDGE TEST FAILED...'
+                        currentBuild.result = 'UNSTABLE'
+                        unstable('EDGE TESTS FAILED!')
+                        env.STATUSTEST = "0"
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'modules_core/com.etendorx.edge/build/reports/tests/test',
+                            reportFiles: '*.html',
+                            reportName: 'EDGE TESTS REPORT',
+                            reportTitles: ''
+                        ])
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                if (fileExists('etendo_core')) {
+                    dir("etendo_core") {
+                        sh './gradlew --stop'
+                        if (env.STATUSCORE == "1") {
+                            sh 'PGPASSWORD=$BBDD_SYSTEMPASS psql -h localhost -d $BBDD_SYSTEMUSER -U $BBDD_SYSTEMUSER -c "DROP DATABASE IF EXISTS ${BBDD_SID};"'
+                        }
+                        deleteDir()
+                    }
+                }
+                cleanWs deleteDirs: true
+            }
+        }
+        failure {
+            script {
+                sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Build Environments" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
+                echo "Failed Build Environments"
+            }
+        }
+        unstable {
+            script {
+                sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Tests" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
+                echo "Failed Test"
+            }
+        }
+    }
+}

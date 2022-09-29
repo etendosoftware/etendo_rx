@@ -10,11 +10,11 @@ public class AuthControllerUtils {
     public static String getUsernameNotFoundResponseBody(String port) {
         return "{\n" +
                 "    \"_embedded\": {\n" +
-                "        \"adUsers\": []\n" +
+                "        \"ADUser\": []\n" +
                 "    },\n" +
                 "    \"_links\": {\n" +
                 "        \"self\": {\n" +
-                "            \"href\": \"http://localhost:"+port+"/adUsers/search/searchByUsername?username=admins&page=0&size=20\"\n" +
+                "            \"href\": \"http://localhost:"+port+"/ADUser/search/searchByUsername?username=admins&page=0&size=20\"\n" +
                 "        }\n" +
                 "    },\n" +
                 "    \"page\": {\n" +
@@ -29,7 +29,7 @@ public class AuthControllerUtils {
     public static String getSearchUserResponseBody(String port) {
         return "{\n" +
                 "    \"_embedded\": {\n" +
-                "        \"adUsers\": [\n" +
+                "        \"ADUser\": [\n" +
                 "            {\n" +
                 "                \"id\": \"100\",\n" +
                 "                \"active\": true,\n" +
@@ -62,61 +62,61 @@ public class AuthControllerUtils {
                 "                \"viaemail\": false,\n" +
                 "                \"_links\": {\n" +
                 "                    \"self\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100\"\n" +
                 "                    },\n" +
                 "                    \"adUser\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100{?projection}\",\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100{?projection}\",\n" +
                 "                        \"templated\": true\n" +
                 "                    },\n" +
                 "                    \"defaultOrganization\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/defaultOrganization\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/defaultOrganization\"\n" +
                 "                    },\n" +
                 "                    \"defaultWarehouse\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/defaultWarehouse\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/defaultWarehouse\"\n" +
                 "                    },\n" +
                 "                    \"smfswsDefaultWsRole\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/smfswsDefaultWsRole\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/smfswsDefaultWsRole\"\n" +
                 "                    },\n" +
                 "                    \"partnerAddress\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/partnerAddress\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/partnerAddress\"\n" +
                 "                    },\n" +
                 "                    \"trxOrganization\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/trxOrganization\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/trxOrganization\"\n" +
                 "                    },\n" +
                 "                    \"organization\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/organization\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/organization\"\n" +
                 "                    },\n" +
                 "                    \"image\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/image\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/image\"\n" +
                 "                    },\n" +
                 "                    \"defaultClient\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/defaultClient\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/defaultClient\"\n" +
                 "                    },\n" +
                 "                    \"businessPartner\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/businessPartner\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/businessPartner\"\n" +
                 "                    },\n" +
                 "                    \"greeting\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/greeting\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/greeting\"\n" +
                 "                    },\n" +
                 "                    \"supervisor\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/supervisor{?projection}\",\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/supervisor{?projection}\",\n" +
                 "                        \"templated\": true\n" +
                 "                    },\n" +
                 "                    \"defaultLanguage\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/defaultLanguage\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/defaultLanguage\"\n" +
                 "                    },\n" +
                 "                    \"defaultRole\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/defaultRole\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/defaultRole\"\n" +
                 "                    },\n" +
                 "                    \"client\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/client\"\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/client\"\n" +
                 "                    },\n" +
                 "                    \"updatedBy\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/updatedBy{?projection}\",\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/updatedBy{?projection}\",\n" +
                 "                        \"templated\": true\n" +
                 "                    },\n" +
                 "                    \"createdBy\": {\n" +
-                "                        \"href\": \"http://localhost:"+port+"/adUsers/100/createdBy{?projection}\",\n" +
+                "                        \"href\": \"http://localhost:"+port+"/ADUser/100/createdBy{?projection}\",\n" +
                 "                        \"templated\": true\n" +
                 "                    }\n" +
                 "                }\n" +
@@ -125,7 +125,7 @@ public class AuthControllerUtils {
                 "    },\n" +
                 "    \"_links\": {\n" +
                 "        \"self\": {\n" +
-                "            \"href\": \"http://localhost:"+port+"/adUsers/search/searchByUsername?username=admin&page=0&size=20\"\n" +
+                "            \"href\": \"http://localhost:"+port+"/ADUser/search/searchByUsername?username=admin&page=0&size=20\"\n" +
                 "        }\n" +
                 "    },\n" +
                 "    \"page\": {\n" +

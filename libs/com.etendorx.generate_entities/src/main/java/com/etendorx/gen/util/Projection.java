@@ -72,6 +72,7 @@ public class Projection {
       var d = new HashMap<String, Object>();
       d.put("packageName", v.getPackageName());
       d.put("name", v.getName());
+      d.put("className", v.getClassName());
       d.put("identity", v.getIdentity());
       d.put("fields", v.getFieldsMap());
       return d;

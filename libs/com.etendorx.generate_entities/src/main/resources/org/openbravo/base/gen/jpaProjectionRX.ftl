@@ -68,7 +68,11 @@ public interface ${entity.simpleClassName}${projectionName?cap_first}Projection 
 </#list>
 <#list projectionFields as field>
     <#if field.value??>
-    @Value("${field.value}")
+    <#if field.notNullValue??>
+    @Value("${'#'}{${field.notNullValue?replace('#TARGET#', 'target')} ? target${field.value?replace('#TARGET#', 'target')} : null}")
+    <#else>
+    @Value("${'#'}{${field.value?replace('#TARGET#', 'target')}}")
+    </#if>
     <#if field.type??>${field.type}<#else>String</#if> get${field.name?cap_first}();
 
     <#elseif field.projectedEntity??>

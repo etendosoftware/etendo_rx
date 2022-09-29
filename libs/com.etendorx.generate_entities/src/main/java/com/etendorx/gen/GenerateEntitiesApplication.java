@@ -471,8 +471,7 @@ public class GenerateEntitiesApplication {
 
         String fullPathProjectionRepo = pathEntitiesModelRx + "/src/main/java/" + packageEntities.replace('.', '/');
         final String projectionClass = className.replace(onlyClassName,
-                org.etendorx.base.gen.Utilities.toCamelCase(
-                        entity.getTableName())) + StringUtils.capitalize(projectionName) + "Model.java";
+                        entity.getName()) + StringUtils.capitalize(projectionName) + "Model.java";
 
         String packageEntityModelProjected = packageEntities + "." + entity.getPackageName();
 

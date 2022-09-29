@@ -22,7 +22,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.etendorx.base.exception.OBException;
-import org.etendorx.base.gen.Utilities;
 import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.Property;
 
@@ -35,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -77,10 +77,14 @@ public class MetadataUtil {
     var metadata = new Metadata();
     metadataContainer.setMetadataMix(metadata);
 
-    log.info("Search projections in path {}/{}",
-        pathEtendoRx, "modules");
-    var directories = getMetadataFiles(pathEtendoRx + File.separator + "modules" + File.separator);
-    directories.addAll(getMetadataFiles(pathEtendoRx + File.separator + "modules_core" + File.separator));
+    var modulesDir = List.of("modules", "modules_core", "modules_test");
+
+    List<File> directories = new ArrayList<>();
+    modulesDir.forEach(dir -> {
+      log.info("Search projections in path {}/{}", pathEtendoRx, dir);
+      directories.addAll(getMetadataFiles(pathEtendoRx + File.separator + dir + File.separator));
+    });
+
     for (File dir : directories) {
       var metadataPath = dir + File.separator + "src-db" + File.separator + "das" + File.separator + "metadata.json";
       var projectionsFile = new File(metadataPath);
@@ -141,7 +145,7 @@ public class MetadataUtil {
   public static Map<String, Entity> generateEntitiesMap(List<Entity> entities) {
     Map<String, Entity> entityMap = new HashMap<>();
     entities.forEach(entity -> {
-      String newClassName = Utilities.toCamelCase(entity.getTableName());
+      String newClassName = entity.getName();
       entityMap.put(newClassName, entity);
     });
     return entityMap;
@@ -153,7 +157,7 @@ public class MetadataUtil {
    * @return {@link ProjectionEntity}
    */
   public static ProjectionEntity generateProjectionEntity(Entity entityModel) {
-    String newClassName = Utilities.toCamelCase(entityModel.getTableName());
+    String newClassName = entityModel.getName();
     ProjectionEntity projectionEntity = new ProjectionEntity(newClassName, "");
 
     // Filter the valid properties of the entityModel
@@ -184,8 +188,7 @@ public class MetadataUtil {
 
   static String generateClassName(Property propertyModel) {
     String className = "";
-
-    if (propertyModel.getTargetEntity() != null && propertyModel.getTargetEntity().getTableName() != null) {
+    if (propertyModel.getTargetEntity() != null && propertyModel.getTargetEntity().getName() != null) {
       var tableNameSplit = propertyModel.getTargetEntity().getTableName().split("_");
       var cn = "";
       for (String s : tableNameSplit) {
@@ -443,13 +446,60 @@ public class MetadataUtil {
     return metadata;
   }
 
+  private static Optional<Property> filterEntityPropertyByName(Entity entity, String entityPropertyName) {
+    return entity.getProperties()
+            .stream()
+            .filter(p -> p.getName().compareTo(entityPropertyName) == 0)
+            .findFirst();
+  }
+
+  /**
+   * Verifies if a property of the 'value' declared in a {@link ProjectionEntityField} is valid.
+   *
+   * Example
+   *  {
+   *    "name": "businessPartnerCategoryName",
+   *    "value": "businessPartner.businessPartnerCategory.name"
+   *  }
+   *
+   *  The 'businessPartner' should be a property of the declared 'baseEntity'
+   *  The 'businessPartnerCategory' should be a property of the 'businessPartner'
+   *  the 'name' should be a property of the 'businessPartnerCategory'
+   *
+   * @param baseEntity
+   * @param baseField
+   * @param parentEntity
+   * @param propertyName
+   * @param isLastValue boolean Flag used to check if the property is the last in the field 'value'
+   * @return A {@link Entity} representing the target entity of the 'propertyName'
+   * @throws CodeGenerationException
+   */
+  private static Entity validateParentEntityValue(ProjectionEntity baseEntity, ProjectionEntityField baseField, Entity parentEntity, String propertyName, boolean isLastValue) throws CodeGenerationException {
+    // Check if the value is a property of the parentEntity
+    var propertyOptional = filterEntityPropertyByName(parentEntity, propertyName);
+
+    if (propertyOptional.isEmpty()) {
+      throw new CodeGenerationException(
+              "The entity Field named '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'" +
+                      " contains the value '"+propertyName+"', which doesn't exists.");
+    }
+    
+    var targetEntity = propertyOptional.get().getTargetEntity();
+    if (!isLastValue && targetEntity == null) {
+      throw new CodeGenerationException("Error in the value of the entity Field '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'." +
+              "The property '"+propertyOptional.get().getName()+"' does not contain a target entity.");
+    }
+    return targetEntity;
+  }
+
   private static void manageFillTypes(List<Entity> entities, String packageEntities,
                                       ProjectionEntity entity, ProjectionEntityField field) throws CodeGenerationException {
     var entityModel = entities.stream()
-        .filter(e -> Utilities.toCamelCase(e.getTableName()).compareTo(entity.getName()) == 0)
+        .filter(e -> e.getName().compareTo(entity.getName()) == 0)
         .findFirst();
     if (entityModel.isPresent()) {
-      entity.setPackageName(packageEntities + "." + entityModel.get().getPackageName());
+      entity.setPackageName(entityModel.get().getPackageName());
+      entity.setClassName(entityModel.get().getClassName());
       // TODO Fix identity kind through dictionary
       if (entity.getIdentity() != null && entity.getIdentity().compareTo("NONE") == 0) {
         entityModel.get().setHelp("identity=NONE");
@@ -463,17 +513,27 @@ public class MetadataUtil {
         field.setClassName("String");
         if (!field.getValue().startsWith("#{")) {
           var value = field.getValue().split("\\.");
-          if (value.length == 2) {
-            field.setProjectedEntity(value[0]);
-            field.setProjectedField(value[1]);
-            field.setValue(null);
+          if (value.length > 1) {
+            StringBuilder fieldValue = new StringBuilder();
+            String getProperty = "";
+            String notNullProperty = "";
+            var parentEntityModel = entityModel.get();
+            for (var i = 0; i < value.length; i++) {
+              parentEntityModel = validateParentEntityValue(entity, field, parentEntityModel, value[i], i == value.length - 1);
+              getProperty += ".get" + value[i].substring(0, 1).toUpperCase() + value[i].substring(1) + "()";
+              fieldValue.append(getProperty);
+              if (i < value.length - 1) {
+                notNullProperty += "#TARGET#" + getProperty + " != null";
+                if (i < value.length - 2) {
+                  notNullProperty += " && ";
+                }
+              }
+            }
+            field.setValue(getProperty);
+            field.setNotNullValue(notNullProperty);
             if (field.getType() == null) {
               field.setType("String");
             }
-          } else {
-            throw new CodeGenerationException(
-                "Entity Field '" + field.getName() + "' declared in entity model '" + entity.getName() +
-                    "': Value generation with this format is not implemented yet");
           }
         }
 
@@ -496,13 +556,13 @@ public class MetadataUtil {
     } else {
       // Try to find case typos
       var entityModelIgnoreCase = entities.stream()
-          .filter(e -> Utilities.toCamelCase(e.getTableName())
+          .filter(e -> e.getName()
               .compareToIgnoreCase(entity.getName()) == 0)
           .findFirst();
       if (entityModelIgnoreCase.isPresent()) {
         throw new CodeGenerationException(
-            "Entitiy Model " + entity.getName() + " doesn't exist, maybe you refer to " + Utilities.toCamelCase(
-                entityModelIgnoreCase.get().getTableName()));
+            "Entitiy Model " + entity.getName() + " doesn't exist, maybe you refer to " +
+                entityModelIgnoreCase.get().getName());
       } else {
         throw new CodeGenerationException("Entitiy Model " + entity.getName() + " doesn't exist");
       }

@@ -1,5 +1,5 @@
 <#function is_object string>
-    <#if string == "java.lang.String" || string == "String" || string == "java.math.BigDecimal" || string == "java.lang.Long" || string == "java.util.Date" || string == "java.lang.Boolean"><#return false><#else><#return true></#if>
+    <#if string == "java.lang.String" || string == "String" || string == "java.math.BigDecimal" || string == "java.lang.Long" || string == "java.util.Date" || string == "java.lang.Boolean" || string == "java.sql.Timestamp"><#return false><#else><#return true></#if>
 </#function>
 <#function cast_par p>
     -- ${p.type} --
@@ -23,8 +23,8 @@
 
 package com.etendorx.das.grpcrepo;
 
-import com.etendorx.das.grpc.common.*;
 import com.etendorx.entities.jparepo.${name}Repository;
+import com.etendorx.${projectionName}.grpc.*;
 import com.google.protobuf.util.Timestamps;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class ${name}GrpcService extends ${name}GrpcRepositoryGrpc.${name}GrpcRep
     @Autowired
     ${name}Repository repository;
 
-    private ${name} DTO(${name}.Builder modelBuilder, ${packageName}.${name} p) {
+    private ${name} DTO(${name}.Builder modelBuilder, ${className} p) {
         modelBuilder.clear();
     <#list fields as field>
         <#if field.projectedEntity??>
@@ -49,7 +49,7 @@ public class ${name}GrpcService extends ${name}GrpcRepositoryGrpc.${name}GrpcRep
         <#if field.type == "java.math.BigDecimal">
             modelBuilder.set${field.name?cap_first}(p.get${field.projectedField?cap_first}().doubleValue());
         <#elseif field.type == "java.util.Date">
-            modelBuilder.set${field.name?cap_first}(Timestamps.fromMillis(p.get${field.projectedField?cap_first}().getTime()));
+            modelBuilder.set${field.name?cap_first}(Timestamps.fromMillis(p.get${field.name?cap_first}().getTime()));
         <#else>
             modelBuilder.set${field.name?cap_first}(p.get${field.projectedField?cap_first}());
         </#if>
@@ -67,13 +67,25 @@ public class ${name}GrpcService extends ${name}GrpcRepositoryGrpc.${name}GrpcRep
         if(p.get${field.name?cap_first}() != null)
             modelBuilder.set${field.name?cap_first}Id(p.get${field.name?cap_first}().getId());
         <#else>
-        if(p.get${field.name?cap_first}() != null)
+        // field.value: <#if field.value??>${field.value}<#else>null</#if>
+        <#if field.notNullValue??>
+        if(${field.notNullValue?replace('#TARGET#', 'p')})
         <#if field.type == "java.math.BigDecimal">
-            modelBuilder.set${field.name?cap_first}(p.get${field.name?cap_first}().doubleValue());
+            modelBuilder.set${field.name?cap_first}(p.get${field.value?cap_first}().doubleValue());
         <#elseif field.type == "java.util.Date">
-            modelBuilder.set${field.name?cap_first}(Timestamps.fromMillis(p.get${field.name?cap_first}().getTime()));
+            modelBuilder.set${field.name?cap_first}(Timestamps.fromMillis(p.get${field.value?cap_first}().getTime()));
         <#else>
-            modelBuilder.set${field.name?cap_first}(p.get${field.name?cap_first}());
+            modelBuilder.set${field.name?cap_first}(p${field.value});
+        </#if>
+        <#else>
+        if(p.get<#if field.value??>${field.value?cap_first}<#else>${field.name?cap_first}</#if>() != null)
+        <#if field.type == "java.math.BigDecimal">
+            modelBuilder.set${field.name?cap_first}(p.get<#if field.value??>${field.value?cap_first}<#else>${field.name?cap_first}</#if>().doubleValue());
+        <#elseif field.type == "java.util.Date">
+            modelBuilder.set${field.name?cap_first}(Timestamps.fromMillis(p.get<#if field.value??>${field.value?cap_first?cap_first}<#else>${field.name?cap_first}</#if>().getTime()));
+        <#else>
+            modelBuilder.set${field.name?cap_first}(p.get<#if field.value??>${field.value?cap_first}<#else>${field.name?cap_first}</#if>());
+        </#if>
         </#if>
         </#if>
     </#list>

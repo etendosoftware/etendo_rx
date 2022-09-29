@@ -35,6 +35,7 @@ public class ProjectionEntity {
   private String name;
   private Map<String, ProjectionEntityField> fields = new HashMap<>();
   private String packageName;
+  private String className;
 
   public ProjectionEntity(String name, String identity) {
     this.name = name;
@@ -62,6 +63,7 @@ public class ProjectionEntity {
         d.put("className", v.getClassName());
         d.put("projectedEntity", v.getProjectedEntity());
         d.put("projectedField", v.getProjectedField());
+        d.put("notNullValue", v.getNotNullValue());
         return d;
       }).collect(Collectors.toList());
   }
@@ -77,4 +79,13 @@ public class ProjectionEntity {
   public String getIdentity() {
     return identity;
   }
+
+  public void setClassName(String className) {
+    this.className = className;
+  }
+
+  public String getClassName() {
+    return className;
+  }
+
 }

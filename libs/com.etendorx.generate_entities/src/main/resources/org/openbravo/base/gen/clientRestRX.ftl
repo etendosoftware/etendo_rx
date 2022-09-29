@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name="${newClassName}", url = "${"$"}{das.url}/${newClassNameWithoutS?uncap_first}", configuration = FeignConfiguration.class)
+@FeignClient(name="${newClassName}", url = "${"$"}{das.url}/${entity.name}", configuration = FeignConfiguration.class)
 public interface ${newClassName}ClientRest extends ClientRestBase<${packageEntityModel?lower_case}.${entity.packageName}.${newClassName}Model> {
 <#list entity.properties as p>
     <#if p.targetEntity?? && !p.isOneToMany() && !p.isId() && !p.getTargetEntity().isView() && !p.computedColumn>
