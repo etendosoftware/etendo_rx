@@ -56,7 +56,7 @@ public class RepositoryTest {
 
   @Container
   public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-    DockerImageName.parse("futit/etendodata:latest").asCompatibleSubstituteFor("postgres")
+    DockerImageName.parse("etendo/etendodata:latest").asCompatibleSubstituteFor("postgres")
   )
     .withPassword("syspass")
     .withUsername("postgres")
