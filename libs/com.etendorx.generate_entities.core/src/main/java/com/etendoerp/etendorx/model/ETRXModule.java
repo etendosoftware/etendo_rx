@@ -6,9 +6,10 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import org.openbravo.base.model.Module;
 import java.util.Set;
 
-@JsonIncludeProperties({"projections", "repositories"})
+@JsonIncludeProperties({"projections", "repositories", "react"})
 public class ETRXModule extends Module {
     private Boolean rx = false;
+    private Boolean react = false;
     private Set<ETRXProjection> projections;
     private Set<ETRXRepository> repositories;
 
@@ -35,4 +36,14 @@ public class ETRXModule extends Module {
     public void setRepositories(Set<ETRXRepository> repositories) {
         this.repositories = repositories;
     }
+
+    public Boolean isReact() {
+        return react;
+    }
+
+    public void setReact(Boolean react) {
+        this.react = react;
+    }
+
+
 }

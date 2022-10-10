@@ -79,3 +79,4 @@ Thumbs.db
 /libs/generate_entities_repo/core/bin/main/
 /docs/out/
 /rxconfig/*.yaml
+/logs/

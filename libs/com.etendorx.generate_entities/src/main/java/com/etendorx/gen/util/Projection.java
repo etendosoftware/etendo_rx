@@ -28,8 +28,9 @@ import java.util.stream.Collectors;
  */
 public class Projection {
 
-  private boolean grpc;
   private String name;
+  private boolean grpc;
+  private boolean react;
   private Map<String, ProjectionEntity> entities = new HashMap<>();
 
   private File moduleLocation;
@@ -38,9 +39,10 @@ public class Projection {
     this.name = name;
   }
 
-  public Projection(String name, boolean grpc) {
+  public Projection(String name, boolean grpc, boolean react) {
     this(name);
     this.grpc = grpc;
+    this.react = react;
   }
 
   public File getModuleLocation() {
@@ -53,6 +55,10 @@ public class Projection {
 
   public boolean getGrpc() {
     return this.grpc;
+  }
+
+  public boolean getReact() {
+    return this.react;
   }
 
   public String getName() {
