@@ -36,7 +36,7 @@
                      column="etrx_repository_id"/>
 
         <set name="params" table="etrx_search_param" inverse="true"
-             cascade="save-update" lazy="true" fetch="select">
+             cascade="save-update" lazy="true" fetch="select" order-by="line">
             <key>
                 <column name="etrx_entity_search_id" not-null="true"/>
             </key>
