@@ -59,12 +59,15 @@ pipeline {
                                     allow.root=true\n
                                     org.gradle.jvmargs=-Xmx2g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" > gradle.properties
                                     """
-
                                     sh './gradlew prepareConfig --info --stacktrace'
                                     sh 'wget -O apache-tomcat-8.5.75.tar.gz https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.75/bin/apache-tomcat-8.5.75.tar.gz'
                                     sh 'tar -xvf apache-tomcat-8.5.75.tar.gz -C $WORKSPACE'
                                     sh './gradlew setup --info --stacktrace'
                                     sh './gradlew expandModules --info --stacktrace'
+                                    sh """
+                                    cd modules
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git etendo_core
+                                    """
                                     sh './gradlew install --info --stacktrace'
                                     sh './gradlew smartbuild --info --stacktrace'
                                     echo 'Build of Etendo Core Finished'

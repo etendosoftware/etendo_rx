@@ -59,6 +59,10 @@ pipeline {
                                     sh './gradlew prepareConfig --info --stacktrace'
                                     sh './gradlew setup --info --stacktrace'
                                     sh './gradlew expandModules --info --stacktrace'
+                                    sh """
+                                    cd modules
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git etendo_core
+                                    """
                                     sh './gradlew install --info --stacktrace'
                                     sh './gradlew smartbuild --info --stacktrace'
                                     echo 'Build of Etendo Core Finished'
