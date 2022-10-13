@@ -59,6 +59,10 @@ pipeline {
                                     sh './gradlew prepareConfig --info --stacktrace'
                                     sh './gradlew setup --info --stacktrace'
                                     sh './gradlew expandModules --info --stacktrace'
+                                    sh """
+                                    cd modules
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git etendo_core
+                                    """
                                     sh './gradlew install --info --stacktrace'
                                     sh './gradlew smartbuild --info --stacktrace'
                                     echo 'Build of Etendo Core Finished'
@@ -278,7 +282,6 @@ pipeline {
                         deleteDir()
                     }
                 }
-                cleanWs deleteDirs: true
             }
         }
         failure {
@@ -286,12 +289,21 @@ pipeline {
                 sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Build Environments" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                 echo "Failed Build Environments"
             }
+            cleanWs deleteDirs: true
         }
         unstable {
             script {
                 sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Tests" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                 echo "Failed Test"
             }
+            cleanWs deleteDirs: true
+        }
+        success {
+            script {
+                sh './pipelines/run-tests/build-update.sh etendo_rx success "Successful Test Suites" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
+                echo "Successful Test"
+            }
+            cleanWs deleteDirs: true
         }
     }
 }
