@@ -1,4 +1,5 @@
 {
+  "react" : false,
   "projections": [
     {
       "name": "test",

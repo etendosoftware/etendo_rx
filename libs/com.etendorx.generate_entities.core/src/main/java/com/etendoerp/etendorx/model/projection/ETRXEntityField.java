@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openbravo.base.model.ModelObject;
 
-@JsonIncludeProperties({"name"})
+@JsonIncludeProperties({"name", "value"})
 public class ETRXEntityField extends ModelObject {
 
     private ETRXProjectionEntity entity;
@@ -18,7 +18,7 @@ public class ETRXEntityField extends ModelObject {
         this.entity = entity;
     }
 
-    @JsonProperty("name")
+    @JsonProperty("value")
     public String getProperty() {
         return property;
     }

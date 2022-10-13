@@ -16,7 +16,7 @@ public class GenerateMetadata {
     private static final Logger log = LogManager.getLogger();
     private static GenerateMetadata instance;
 
-    private List<String> modulesDirectories = List.of("modules_core", "modules");
+    private List<String> modulesDirectories = List.of("modules_core", "modules", "../modules_rx");
     private String defaultDirectory = "modules";
 
     private List<String> excludedModules = new ArrayList<>();

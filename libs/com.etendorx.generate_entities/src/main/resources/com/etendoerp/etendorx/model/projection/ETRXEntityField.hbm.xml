@@ -31,6 +31,8 @@
 
         <property name="property"/>
 
+        <property name="name"/>
+
         <many-to-one name="entity" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
                      column="etrx_projection_entity_id"/>
 

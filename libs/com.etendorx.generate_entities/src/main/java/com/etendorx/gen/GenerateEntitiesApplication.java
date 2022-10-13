@@ -263,13 +263,19 @@ public class GenerateEntitiesApplication {
                     for (Projection projection : projections) {
                         if (StringUtils.equals(PROJECTION_DEFAULT, projection.getName()) || projection.getEntities().containsKey(
                             data.get("newClassName").toString())) {
-
                             generateProjections(data, pathJPARepoRx, projection, entity);
 
-                            generateModelProjected(data, pathEntitiesModelRx, projection, entity);
-
                             if (!StringUtils.equals(PROJECTION_DEFAULT, projection.getName())) {
-                                generateClientRestProjected(data, pathEtendoRx, projection, entity, null);
+                                generateModelProjected(data, pathEntitiesModelRx, projection, entity);
+                            }
+                            if(!projection.getReact()) {
+                                if (!StringUtils.equals(PROJECTION_DEFAULT, projection.getName())) {
+                                    generateClientRestProjected(data, pathEtendoRx, projection, entity, null);
+                                }
+                            } else {
+                                // REACT
+                                generateReactModel(data, projection);
+                                generateModelService(data, projection);
                             }
                         }
                     }
@@ -491,6 +497,65 @@ public class GenerateEntitiesApplication {
         data.put("projectionFields",
             projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
         TemplateUtil.processTemplate(templateModelProjectionRX, data, outWriterProjection);
+    }
+
+    /**
+     * Generates the React ts file which declare a model for each entity declared as this kind
+     * @param data
+     * @param projection
+     * @throws FileNotFoundException
+     */
+    private void generateReactModel(
+      Map<String, Object> data, Projection projection) throws FileNotFoundException {
+
+        freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(
+          "/org/openbravo/base/react/model.types.ftl");
+
+        String fullPathClientRestGen = projection.getModuleLocation() + "/lib/data_gen";
+
+        final String modelNameGen = data.get("newClassName").toString().toLowerCase() + ".types.ts";
+
+        var outFileClientRest = new File(fullPathClientRestGen, modelNameGen);
+        new File(outFileClientRest.getParent()).mkdirs();
+        ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(), null);
+
+        data.put("projectionFields",
+          projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
+        data.put("projection", projection);
+        Writer outWriterClientRest = new BufferedWriter(
+          new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
+        TemplateUtil.processTemplate(templateClientRestRX, data, outWriterClientRest);
+
+    }
+
+    /**
+     * Generates the React service file
+     * @param data
+     * @param projection
+     * @throws FileNotFoundException
+     */
+    private void generateModelService(
+      Map<String, Object> data, Projection projection) throws FileNotFoundException {
+
+        freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(
+          "/org/openbravo/base/react/modelservice.ts.ftl");
+
+        String fullPathClientRestGen = projection.getModuleLocation() + "/lib/data_gen";
+        final String clientRestClassNameGen = data.get("newClassName").toString().toLowerCase() + "service.ts";
+
+        var outFileClientRest = new File(fullPathClientRestGen, clientRestClassNameGen);
+        new File(outFileClientRest.getParent()).mkdirs();
+
+        data.put("projectionName", projection.getName());
+        ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(), null);
+
+        data.put("projectionFields",
+          projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
+        data.put("projection", projection);
+        Writer outWriterClientRest = new BufferedWriter(
+          new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
+        TemplateUtil.processTemplate(templateClientRestRX, data, outWriterClientRest);
+
     }
 
     /**

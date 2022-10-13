@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 
 public class MetadataUtil {
   private static final Logger log = LogManager.getLogger();
+  public static final String REACT = "react";
   public static final String REPOSITORIES = "repositories";
   public static final String PROJECTIONS = "projections";
   public static final String ENTITIES = "entities";
@@ -77,7 +78,7 @@ public class MetadataUtil {
     var metadata = new Metadata();
     metadataContainer.setMetadataMix(metadata);
 
-    var modulesDir = List.of("modules", "modules_core", "modules_test");
+    var modulesDir = List.of("modules", "modules_core", "modules_test", "modules_rx");
 
     List<File> directories = new ArrayList<>();
     modulesDir.forEach(dir -> {
@@ -215,6 +216,10 @@ public class MetadataUtil {
       throws IOException, JSONException, CodeGenerationException {
     var content = Files.readString(projectionsFile.toPath());
     var jsonProps = new JSONObject(content);
+    var react = false;
+    if(jsonProps.has(REACT) && !jsonProps.isNull(REACT)) {
+      react = jsonProps.getBoolean(REACT);
+    }
     if (jsonProps.has(PROJECTIONS)) {
       var projs = jsonProps.getJSONArray(PROJECTIONS);
       for (var i = 0; i < projs.length(); i++) {
@@ -224,11 +229,14 @@ public class MetadataUtil {
         if (jsonProjection.has(GRPC)) {
           grpc = jsonProjection.getBoolean(GRPC);
         }
+        if (jsonProjection.has(REACT)) {
+          react = jsonProjection.getBoolean(REACT);
+        }
         // TODO: If different modules use the same name of a projection, then the location module will be incorrect.
 
-        Projection moduleProjection = getProjection(moduleMetadata.getProjections(), name, grpc);
+        Projection moduleProjection = getProjection(moduleMetadata.getProjections(), name, grpc, react);
 
-        Projection projection = getProjection(projections, name, grpc);
+        Projection projection = getProjection(projections, name, grpc, react);
         projection.setModuleLocation(moduleLocation);
         if (jsonProjection.has(ENTITIES)) {
           var entities = jsonProjection.getJSONArray(ENTITIES);
@@ -375,12 +383,12 @@ public class MetadataUtil {
     return projectionMix;
   }
 
-  private static Projection getProjection(Map<String, Projection> projections, String projectionName, boolean grpc) {
+  private static Projection getProjection(Map<String, Projection> projections, String projectionName, boolean grpc, boolean react) {
     Projection projection;
     if (projections.containsKey(projectionName)) {
       projection = projections.get(projectionName);
     } else {
-      projection = new Projection(projectionName, grpc);
+      projection = new Projection(projectionName, grpc, react);
       projections.put(projectionName, projection);
     }
     return projection;
@@ -504,6 +512,10 @@ public class MetadataUtil {
       if (entity.getIdentity() != null && entity.getIdentity().compareTo("NONE") == 0) {
         entityModel.get().setHelp("identity=NONE");
       }
+      if(field.getValue() != null && field.getName().compareTo(field.getValue()) == 0) {
+        field.setValue(null);
+      }
+
       var fieldModel = entityModel.get()
           .getProperties()
           .stream()
