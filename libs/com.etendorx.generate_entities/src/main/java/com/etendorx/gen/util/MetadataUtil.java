@@ -72,13 +72,16 @@ public class MetadataUtil {
   public static final String ENTITY_PACKAGE = "entities";
   public static final String CLIENTREST_PACKAGE = "clientrest";
 
-  public static MetadataContainer analyzeMetadata(String pathEtendoRx) throws OBException {
+  public static MetadataContainer analyzeMetadata(String pathEtendoRx, boolean testFiles) throws OBException {
 
     MetadataContainer metadataContainer = new MetadataContainer();
     var metadata = new Metadata();
     metadataContainer.setMetadataMix(metadata);
 
-    var modulesDir = List.of("modules", "modules_core", "modules_test", "modules_rx");
+    var modulesDir = new ArrayList<>(List.of("modules", "modules_core", "modules_rx"));
+    if (testFiles) {
+      modulesDir.add("modules_test");
+    }
 
     List<File> directories = new ArrayList<>();
     modulesDir.forEach(dir -> {

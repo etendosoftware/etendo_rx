@@ -17,10 +17,12 @@ public class CommandLineProcess {
     public static final String GENERATE_METADATA_OPT = "g";
     public static final String EXCLUDE_MOD_OPT = "e";
     public static final String INCLUDE_MOD_OPT = "i";
+    public static final String TEST_MOD_OPT = "test";
 
     private boolean generateMetadata = true;
     private List<String> excludedModules = new ArrayList<>();
     private List<String> includedModules = new ArrayList<>();
+    private boolean test = false;
 
     public CommandLineProcess(String... args) {
         Optional<CommandLine> cmdOptional = generateCommandLine(args);
@@ -33,6 +35,7 @@ public class CommandLineProcess {
             options.addOption("g", "generate-metadata", true, "Generate the metadata.json file.");
             options.addOption("e", "exclude", true, "List of comma separated modules to exclude from the metadata generation.");
             options.addOption("i", "include", true, "List of comma separated modules to include in the metadata generation.");
+            options.addOption("test", "test", false, "If this process should have to generate classes included in modules located in modules_test");
             CommandLineParser parser = new DefaultParser();
             return Optional.of(parser.parse(options, args));
         } catch (Exception e) {
@@ -62,6 +65,10 @@ public class CommandLineProcess {
                   String i = cmd.getOptionValue(INCLUDE_MOD_OPT);
                   return parseStringToList(i);
                 });
+            }
+
+            if (cmd.hasOption(TEST_MOD_OPT)) {
+                this.test = true;
             }
 
         } catch (CommandLineException cmdException) {
@@ -106,6 +113,10 @@ public class CommandLineProcess {
 
     public void setIncludedModules(List<String> includedModules) {
         this.includedModules = includedModules;
+    }
+
+    public boolean isTest() {
+        return test;
     }
 
 }

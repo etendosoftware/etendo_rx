@@ -165,6 +165,7 @@ public class GenerateEntitiesApplication {
         log.info("Path Entities Rx={}", pathEntitiesRx);
         log.info("Path JPA Repo Rx={}", pathJPARepoRx);
         log.info("DAS Url={}", dasUrl);
+        log.info("Test entitites {}", cmdProcess.isTest());
 
         GenerateMetadata generateMetadata = GenerateMetadata.getInstance();
         boolean shouldGenerateMetadata = true;
@@ -182,7 +183,7 @@ public class GenerateEntitiesApplication {
             log.info("* Generation of metadata skipped.");
         }
 
-        MetadataContainer metadataContainer = MetadataUtil.analyzeMetadata(pathEtendoRx);
+        MetadataContainer metadataContainer = MetadataUtil.analyzeMetadata(pathEtendoRx, cmdProcess.isTest());
         Metadata metadata = metadataContainer.getMetadataMix();
 
         generateAllChildProperties = OBPropertiesProvider.getInstance()
