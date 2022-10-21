@@ -40,18 +40,21 @@ public class DateDomainType extends BasePrimitiveDomainType {
   /**
    * @return class of the {@link Date}
    */
-  @Override public Class<?> getPrimitiveType() {
+  @Override
+  public Class<?> getPrimitiveType() {
     return Date.class;
   }
 
-  @Override public synchronized String convertToString(Object value) {
+  @Override
+  public synchronized String convertToString(Object value) {
     if (value == null) {
       return EMPTY_STRING;
     }
     return xmlDateFormat.format(value);
   }
 
-  @Override public synchronized Object createFromString(String strValue) {
+  @Override
+  public synchronized Object createFromString(String strValue) {
     try {
       if (strValue == null || strValue.trim().length() == 0) {
         return null;
@@ -66,7 +69,8 @@ public class DateDomainType extends BasePrimitiveDomainType {
     }
   }
 
-  @Override public String getXMLSchemaType() {
+  @Override
+  public String getXMLSchemaType() {
     return "ob:dateTime";
   }
 

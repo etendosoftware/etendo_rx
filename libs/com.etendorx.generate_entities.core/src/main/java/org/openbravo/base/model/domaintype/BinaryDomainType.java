@@ -28,11 +28,13 @@ import java.io.UnsupportedEncodingException;
 
 public class BinaryDomainType extends BasePrimitiveDomainType {
 
-  @Override public Class<?> getPrimitiveType() {
+  @Override
+  public Class<?> getPrimitiveType() {
     return byte[].class;
   }
 
-  @Override public String convertToString(Object value) {
+  @Override
+  public String convertToString(Object value) {
     try {
       if (value == null) {
         return EMPTY_STRING;
@@ -43,7 +45,8 @@ public class BinaryDomainType extends BasePrimitiveDomainType {
     }
   }
 
-  @Override public Object createFromString(String strValue) {
+  @Override
+  public Object createFromString(String strValue) {
     try {
       if (strValue == null || strValue.trim().length() == 0) {
         return null;
@@ -54,7 +57,8 @@ public class BinaryDomainType extends BasePrimitiveDomainType {
     }
   }
 
-  @Override public String getXMLSchemaType() {
+  @Override
+  public String getXMLSchemaType() {
     return "ob:base64Binary";
   }
 

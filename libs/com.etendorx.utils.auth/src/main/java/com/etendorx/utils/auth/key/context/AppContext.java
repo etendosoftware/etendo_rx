@@ -19,32 +19,32 @@ package com.etendorx.utils.auth.key.context;
 import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 
 public class AppContext {
-    private static final ThreadLocal<UserContext> currentUser = new ThreadLocal<>();
-    private static String authToken;
+  private static final ThreadLocal<UserContext> currentUser = new ThreadLocal<>();
+  private static String authToken;
 
-    public static void setCurrentUser(UserContext userContext) {
-        currentUser.set(userContext);
-    }
+  public static void setCurrentUser(UserContext userContext) {
+    currentUser.set(userContext);
+  }
 
-    public static UserContext getCurrentUser() {
-        if(currentUser.get() == null) {
-            throw new ForbiddenException();
-        }
-        return currentUser.get();
+  public static UserContext getCurrentUser() {
+    if (currentUser.get() == null) {
+      throw new ForbiddenException();
     }
+    return currentUser.get();
+  }
 
-    public static void clear() {
-        currentUser.remove();
-    }
+  public static void clear() {
+    currentUser.remove();
+  }
 
-    public static void setAuthToken(String authToken) {
-        AppContext.authToken = authToken;
-    }
+  public static void setAuthToken(String authToken) {
+    AppContext.authToken = authToken;
+  }
 
-    public static String getAuthToken() {
-        if(currentUser.get() == null) {
-            throw new ForbiddenException();
-        }
-        return authToken;
+  public static String getAuthToken() {
+    if (currentUser.get() == null) {
+      throw new ForbiddenException();
     }
+    return authToken;
+  }
 }

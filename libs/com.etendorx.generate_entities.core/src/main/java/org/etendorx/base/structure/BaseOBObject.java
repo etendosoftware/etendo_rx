@@ -43,7 +43,7 @@ import java.io.Serializable;
  */
 
 public abstract class BaseOBObject
-    implements BaseOBObjectDef, Identifiable, DynamicEnabled, OBNotSingleton, Serializable {
+  implements BaseOBObjectDef, Identifiable, DynamicEnabled, OBNotSingleton, Serializable {
   public static final String ID = "id";
 
   private static final Logger log = LogManager.getLogger();
@@ -116,22 +116,26 @@ public abstract class BaseOBObject
     final Property p = getEntity().getProperty(propName);
     if (p.getIndexInEntity() >= data.length) {
       throw new IllegalArgumentException(
-          "Property index (" + p.getIndexInEntity() + ") is larger than or equal to property list size (" + data.length + "). " + "This happens when setting property " + propName + " " + p + " with value " + value + " in entity " + getEntity());
+        "Property index (" + p.getIndexInEntity() + ") is larger than or equal to property list size (" + data.length + "). " + "This happens when setting property " + propName + " " + p + " with value " + value + " in entity " + getEntity());
     }
     data[p.getIndexInEntity()] = value;
   }
 
-  @Override public Object getId() {
+  @Override
+  public Object getId() {
     return get(ID);
   }
 
-  @Override public void setId(Object id) {
+  @Override
+  public void setId(Object id) {
     set(ID, id);
   }
 
-  @Override public abstract String getEntityName();
+  @Override
+  public abstract String getEntityName();
 
-  @Override public String getIdentifier() {
+  @Override
+  public String getIdentifier() {
     return IdentifierProvider.getInstance().getIdentifier(this);
   }
 
@@ -140,11 +144,12 @@ public abstract class BaseOBObject
    * security checking. If a security violation occurs then a OBSecurityException is thrown.
    *
    * @param propName
-   *     the name of the {@link Property Property} for which the value is requested
-   * @throws OBSecurityException
+   *   the name of the {@link Property Property} for which the value is requested
+   *
    * @see BaseOBObject#get(String, Language)
    */
-  @Override public Object get(String propName) {
+  @Override
+  public Object get(String propName) {
     //return get(propName, null);
     final Property p = getEntity().getProperty(propName);
     checkDerivedReadable(p);
@@ -156,13 +161,15 @@ public abstract class BaseOBObject
    * the correctness of the value and performs security checks.
    *
    * @param propName
-   *     the name of the {@link Property Property} being set
+   *   the name of the {@link Property Property} being set
    * @param value
-   *     the value being set
-   * @throws OBSecurityException
-   *     , ValidationException
+   *   the value being set
+   *
+   * @exception OBSecurityException
+   *   , ValidationException
    */
-  @Override public void set(String propName, Object value) {
+  @Override
+  public void set(String propName, Object value) {
     final Property p = getEntity().getProperty(propName);
     p.checkIsValidValue(value);
     checkDerivedReadable(p);
@@ -181,7 +188,7 @@ public abstract class BaseOBObject
 
       if (isDerivedReadable && !p.allowDerivedRead()) {
         throw new OBSecurityException(
-            "Entity " + getEntity() + " is not directly readable, only id and identifier properties are readable, property " + p + " is neither of these.");
+          "Entity " + getEntity() + " is not directly readable, only id and identifier properties are readable, property " + p + " is neither of these.");
       }
     }
   }
@@ -191,7 +198,7 @@ public abstract class BaseOBObject
    * care. Is used by the subclasses and system classes.
    *
    * @param propName
-   *     the name of the {@link Property Property} being set
+   *   the name of the {@link Property Property} being set
    * @param value
    */
   public void setValue(String propName, Object value) {
@@ -203,7 +210,8 @@ public abstract class BaseOBObject
    * do security checking.
    *
    * @param propName
-   *     the name of the property for which the value is requested.
+   *   the name of the property for which the value is requested.
+   *
    * @return the value
    */
   public Object getValue(String propName) {
@@ -216,7 +224,8 @@ public abstract class BaseOBObject
    *
    * @return the Entity of this object
    */
-  @Override public Entity getEntity() {
+  @Override
+  public Entity getEntity() {
     if (model == null) {
       model = ModelProvider.getInstance().getEntity(getEntityName());
     }
@@ -225,14 +234,13 @@ public abstract class BaseOBObject
 
   /**
    * Validates the content of this object using the property validators.
-   *
-   * @throws ValidationException
    */
   public void validate() {
     getEntity().validate(this);
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     final Entity e = getEntity();
     final StringBuilder sb = new StringBuilder();
     // and also display all values
@@ -261,6 +269,7 @@ public abstract class BaseOBObject
    * object to the database then new object is set to false.
    *
    * @return false if the id is set and this is not a new object, true otherwise.
+   *
    * @see OBInterceptor#postFlush(java.util.Iterator)
    */
   public boolean isNewOBObject() {

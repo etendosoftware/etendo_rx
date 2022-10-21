@@ -29,15 +29,18 @@ public class ObjectDomainType extends BasePrimitiveDomainType {
   /**
    * @return class of the {@link Timestamp}
    */
-  @Override public Class<?> getPrimitiveType() {
+  @Override
+  public Class<?> getPrimitiveType() {
     return Object.class;
   }
 
-  @Override public Object createFromString(String strValue) {
+  @Override
+  public Object createFromString(String strValue) {
     return strValue;
   }
 
-  @Override public String getXMLSchemaType() {
+  @Override
+  public String getXMLSchemaType() {
     return "xs:anyType";
   }
 }

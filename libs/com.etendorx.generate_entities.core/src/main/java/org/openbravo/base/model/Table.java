@@ -77,7 +77,7 @@ public class Table extends ModelObject {
    * Note the columns are not set by hibernate or through a hibernate mapping. For performance
    * reasons they are set explicitly in the {@link ModelProvider}. See the assignColumnsToTable
    * method in that class.
-   *
+   * <p>
    * This collection is only set and used within the {@link ModelProvider} initialize method. It
    * should not be used in other places. In other cases perform a direct database query to get the
    * columns of a table.
@@ -194,7 +194,8 @@ public class Table extends ModelObject {
     this.entity = entity;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return getTableName();
   }
 

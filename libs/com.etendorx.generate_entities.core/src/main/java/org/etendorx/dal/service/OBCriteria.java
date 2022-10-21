@@ -90,7 +90,9 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    *
    * @return the list of Objects retrieved through this Criteria object
    */
-  @Override @SuppressWarnings("unchecked") public List<E> list() throws HibernateException {
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<E> list() throws HibernateException {
     initialize();
     return super.list();
   }
@@ -119,7 +121,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
   /**
    * See the scroll method on the Hibernate Criteria class.
    */
-  @Override public ScrollableResults scroll() throws HibernateException {
+  @Override
+  public ScrollableResults scroll() throws HibernateException {
     scrolling = true;
     try {
       initialize();
@@ -132,7 +135,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
   /**
    * See the scroll method on the Hibernate Criteria class.
    */
-  @Override public ScrollableResults scroll(ScrollMode scrollMode) throws HibernateException {
+  @Override
+  public ScrollableResults scroll(ScrollMode scrollMode) throws HibernateException {
     scrolling = true;
     try {
       initialize();
@@ -142,7 +146,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
     }
   }
 
-  @Override public String getEntityOrClassName() {
+  @Override
+  public String getEntityOrClassName() {
     if (scrolling && entity != null) {
       // When criteria is used for scrolling, Hibernate expects this method to return the entity
       // name. For listing instead it can accept either entity or implementing class name, if entity
@@ -155,7 +160,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
   /**
    * See the uniqueResult() method on the Hibernate Criteria class.
    */
-  @Override public Object uniqueResult() throws HibernateException {
+  @Override
+  public Object uniqueResult() throws HibernateException {
     initialize();
     return super.uniqueResult();
   }
@@ -166,8 +172,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
         return;
       }
       log.warn(
-          "Detected multiple calls to initialize() in the same OBCriteria instance. " + "This should be fixed in order to prevent adding duplicated filters in the query.",
-          new Exception());
+        "Detected multiple calls to initialize() in the same OBCriteria instance. " + "This should be fixed in order to prevent adding duplicated filters in the query.",
+        new Exception());
     }
     final OBContext obContext = OBContext.getOBContext();
     final Entity e = getEntity();
@@ -222,9 +228,10 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Convenience method not present in the standard Hibernate Criteria object.
    *
    * @param orderOn
-   *     the property on which to order, can also be a property of an associated entity (etc.)
+   *   the property on which to order, can also be a property of an associated entity (etc.)
    * @param ascending
-   *     if true then order ascending, false order descending
+   *   if true then order ascending, false order descending
+   *
    * @return this OBCriteria instance, for method chaining
    */
   public OBCriteria<E> addOrderBy(String orderOn, boolean ascending) {
@@ -235,6 +242,7 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
 
   /**
    * @return the Entity for which is queried
+   *
    * @see Entity
    */
   public Entity getEntity() {
@@ -247,7 +255,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
 
   /**
    * @return true then when querying (for example call list()) a filter on readable organizations is
-   * added to the query, if false then this is not done
+   *   added to the query, if false then this is not done
+   *
    * @see OBContext#getReadableOrganizations()
    */
   public boolean isFilterOnReadableOrganization() {
@@ -259,9 +268,11 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Criteria automatically. The default is true.
    *
    * @param filterOnReadableOrganization
-   *     if true then when querying (for example call list()) a filter on readable
-   *     organizations is added to the query, if false then this is not done
+   *   if true then when querying (for example call list()) a filter on readable
+   *   organizations is added to the query, if false then this is not done
+   *
    * @return this OBCriteria instance, for method chaining
+   *
    * @see OBContext#getReadableOrganizations()
    */
   public OBCriteria<E> setFilterOnReadableOrganization(boolean filterOnReadableOrganization) {
@@ -285,7 +296,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * isActive true are returned by the Criteria object.
    *
    * @param filterOnActive
-   *     if true then only objects with isActive='Y' are returned, false otherwise
+   *   if true then only objects with isActive='Y' are returned, false otherwise
+   *
    * @return this OBCriteria instance, for method chaining
    */
   public OBCriteria<E> setFilterOnActive(boolean filterOnActive) {
@@ -299,7 +311,7 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * true.
    *
    * @return if true then only objects from readable clients are returned, if false then objects
-   * from all clients are returned
+   *   from all clients are returned
    */
   public boolean isFilterOnReadableClients() {
     return filterOnReadableClients;
@@ -310,8 +322,9 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * true.
    *
    * @param filterOnReadableClients
-   *     if true then only objects from readable clients are returned, if false then objects
-   *     from all clients are returned
+   *   if true then only objects from readable clients are returned, if false then objects
+   *   from all clients are returned
+   *
    * @return this OBCriteria instance, for method chaining
    */
   public OBCriteria<E> setFilterOnReadableClients(boolean filterOnReadableClients) {
@@ -324,10 +337,13 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Add a restriction to constrain the results to be retrieved.
    *
    * @param expression
-   *     The criterion object representing the restriction to be applied
+   *   The criterion object representing the restriction to be applied
+   *
    * @return this OBCriteria instance, for method chaining
    */
-  @Override @SuppressWarnings("unchecked") public OBCriteria<E> add(Criterion expression) {
+  @Override
+  @SuppressWarnings("unchecked")
+  public OBCriteria<E> add(Criterion expression) {
     return (OBCriteria<E>) super.add(expression);
   }
 
@@ -335,10 +351,13 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Set a limit upon the number of objects to be retrieved.
    *
    * @param maxResults
-   *     The maximum number of results
+   *   The maximum number of results
+   *
    * @return this OBCriteria instance, for method chaining
    */
-  @Override @SuppressWarnings("unchecked") public OBCriteria<E> setMaxResults(int maxResults) {
+  @Override
+  @SuppressWarnings("unchecked")
+  public OBCriteria<E> setMaxResults(int maxResults) {
     return (OBCriteria<E>) super.setMaxResults(maxResults);
   }
 
@@ -346,10 +365,13 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Set the first result to be retrieved.
    *
    * @param firstResult
-   *     The first result to retrieve, numbered from 0
+   *   The first result to retrieve, numbered from 0
+   *
    * @return this OBCriteria instance, for method chaining
    */
-  @Override @SuppressWarnings("unchecked") public OBCriteria<E> setFirstResult(int firstResult) {
+  @Override
+  @SuppressWarnings("unchecked")
+  public OBCriteria<E> setFirstResult(int firstResult) {
     return (OBCriteria<E>) super.setFirstResult(firstResult);
   }
 
@@ -371,7 +393,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
       return ascending;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
       return getOrderOn() + (isAscending() ? " asc " : " desc ");
     }
   }

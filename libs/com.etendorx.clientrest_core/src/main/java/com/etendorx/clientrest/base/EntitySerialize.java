@@ -13,8 +13,9 @@ import java.util.Optional;
 @Slf4j
 public class EntitySerialize extends JsonSerializer<RepresentationWithId<?>> {
 
-  @Override public void serialize(RepresentationWithId<?> value, JsonGenerator gen,
-    SerializerProvider serializers) throws IOException {
+  @Override
+  public void serialize(RepresentationWithId<?> value, JsonGenerator gen,
+                        SerializerProvider serializers) throws IOException {
     if (Objects.requireNonNull(value).getLink("self").isPresent()) {
       Optional<Link> link = Objects.requireNonNull(value).getLink("self");
       if (link.isPresent()) {

@@ -189,10 +189,10 @@ public class RestCallTest {
 
   public static Stream<Arguments> validInvoiceLineProjection() {
     return Stream.of(
-            Arguments.of("0002165C32244FF382FE46E57C755421", "F8383209982D467EBAA87460953694D1", "Zumo de Pera 0,5L"),
-            Arguments.of("0004ABE4F2B84554868D0F410F0E92E5", "C970393BDF6C43E2B030D23482D88EED", "Zumo de Piña 0,5L"),
-            Arguments.of("000A407AC9BE4FB08AEC78577D1E4FA2", "74D47F21C81746239B1A08ECADC98BF1", "Rose wine"),
-            Arguments.of("0013F39CF44441DD8C62C4810F914323", "BDE2F1CF46B54EF58D33E20A230DA8D2", "Agua sin Gas 1L")
+      Arguments.of("0002165C32244FF382FE46E57C755421", "F8383209982D467EBAA87460953694D1", "Zumo de Pera 0,5L"),
+      Arguments.of("0004ABE4F2B84554868D0F410F0E92E5", "C970393BDF6C43E2B030D23482D88EED", "Zumo de Piña 0,5L"),
+      Arguments.of("000A407AC9BE4FB08AEC78577D1E4FA2", "74D47F21C81746239B1A08ECADC98BF1", "Rose wine"),
+      Arguments.of("0013F39CF44441DD8C62C4810F914323", "BDE2F1CF46B54EF58D33E20A230DA8D2", "Agua sin Gas 1L")
     );
   }
 
@@ -200,7 +200,7 @@ public class RestCallTest {
   @MethodSource("validInvoiceLineProjection")
   public void whenRestReadInvoiceLineCustomProjection(String id, String invoiceLineProductId, String invoiceLineProductName) throws Exception {
     var result = mockMvc.perform(
-            get("/InvoiceLine/" + id + "?projection=test")
+      get("/InvoiceLine/" + id + "?projection=test")
     );
     result.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
     result.andExpect(MockMvcResultMatchers.jsonPath("$.productId").value(invoiceLineProductId));

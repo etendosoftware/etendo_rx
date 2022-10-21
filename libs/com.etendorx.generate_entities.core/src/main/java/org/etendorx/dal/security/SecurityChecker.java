@@ -37,101 +37,102 @@ import org.openbravo.base.model.ModelProvider;
  * </ul>
  *
  * @author mtaal
- *
- * CONTRIBUTORS: androettop
+ *   <p>
+ *   CONTRIBUTORS: androettop
  */
 
 public class SecurityChecker implements OBSingleton {
 
-    private static SecurityChecker instance;
+  private static SecurityChecker instance;
 
-    public static SecurityChecker getInstance() {
-        if (instance == null) {
-            instance = OBProvider.getInstance().get(SecurityChecker.class);
+  public static SecurityChecker getInstance() {
+    if (instance == null) {
+      instance = OBProvider.getInstance().get(SecurityChecker.class);
+    }
+    return instance;
+  }
+
+  public void checkDeleteAllowed(Object o) {
+    final OBContext obContext = OBContext.getOBContext();
+
+    if (obContext.getRecordAccessChecker() != null) {
+      if (!obContext.getRecordAccessChecker().canDelete(o)) {
+        throw new OBSecurityException("The current user does not have delete permissions.");
+      }
+    } else {
+      if (!obContext.isInAdministratorMode() && o instanceof BaseOBObject) {
+        final BaseOBObject bob = (BaseOBObject) o;
+        final Entity entity = ModelProvider.getInstance().getEntity(bob.getEntityName());
+        if (!entity.isDeletable()) {
+          throw new OBSecurityException(
+            "Entity " + entity.getName() + " is not deletable");
         }
-        return instance;
+      }
+      checkWriteAccess(o);
     }
 
-    public void checkDeleteAllowed(Object o) {
-        final OBContext obContext = OBContext.getOBContext();
+  }
 
-        if (obContext.getRecordAccessChecker() != null) {
-            if (!obContext.getRecordAccessChecker().canDelete(o)) {
-                throw new OBSecurityException("The current user does not have delete permissions.");
-            }
-        } else {
-            if (!obContext.isInAdministratorMode() && o instanceof BaseOBObject) {
-                final BaseOBObject bob = (BaseOBObject) o;
-                final Entity entity = ModelProvider.getInstance().getEntity(bob.getEntityName());
-                if (!entity.isDeletable()) {
-                    throw new OBSecurityException(
-                        "Entity " + entity.getName() + " is not deletable");
-                }
-            }
-            checkWriteAccess(o);
+  /**
+   * Performs several write access checks when an object is created or updated:
+   * <ul>
+   * <li>is the organization writable (@see OBContext#getWritableOrganizations())</li>
+   * <li>is the client of the object the same as the client of the user (@see
+   * OBContext#getCurrentClient())</li>
+   * <li>is the Entity writable for this user (@see EntityAccessChecker#isWritable(Entity))
+   * <li>are the client and organization correct from an access level perspective (@see
+   * AccessLevelChecker).
+   * </ul>
+   *
+   * @param obj
+   *   the object to check
+   *
+   * @return true if writable, false otherwise
+   *
+   * @see Entity
+   */
+  public boolean isWritable(Object obj) {
+    try {
+      checkWriteAccess(obj, false);
+    } catch (final OBSecurityException e) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Performs the same checks as {@link #isWritable(Object)}. Does not return true/false but throws
+   * a OBSecurityException if the object is not writable.
+   *
+   * @param obj
+   *   the object to check
+   */
+  public void checkWriteAccess(Object obj) {
+    checkWriteAccess(obj, true);
+  }
+
+  private void checkWriteAccess(Object obj, boolean logError) {
+    final OBContext obContext = OBContext.getOBContext();
+
+    if (obContext.getRecordAccessChecker() != null) {
+      BaseOBObject bob = (BaseOBObject) obj;
+      if (bob.getId() == null) {
+        if (!obContext.getRecordAccessChecker().canCreate(obj)) {
+          throw new OBSecurityException(
+            "The current user does not have create permissions.", logError);
         }
-
-    }
-
-    /**
-     * Performs several write access checks when an object is created or updated:
-     * <ul>
-     * <li>is the organization writable (@see OBContext#getWritableOrganizations())</li>
-     * <li>is the client of the object the same as the client of the user (@see
-     * OBContext#getCurrentClient())</li>
-     * <li>is the Entity writable for this user (@see EntityAccessChecker#isWritable(Entity))
-     * <li>are the client and organization correct from an access level perspective (@see
-     * AccessLevelChecker).
-     * </ul>
-     *
-     * @param obj
-     *     the object to check
-     * @return true if writable, false otherwise
-     * @see Entity
-     */
-    public boolean isWritable(Object obj) {
-        try {
-            checkWriteAccess(obj, false);
-        } catch (final OBSecurityException e) {
-            return false;
+      } else {
+        if (!obContext.getRecordAccessChecker().canUpdate(obj)) {
+          throw new OBSecurityException(
+            "The current user does not have update permissions.", logError);
         }
-        return true;
-    }
-
-    /**
-     * Performs the same checks as {@link #isWritable(Object)}. Does not return true/false but throws
-     * a OBSecurityException if the object is not writable.
-     *
-     * @param obj
-     *     the object to check
-     * @throws OBSecurityException
-     */
-    public void checkWriteAccess(Object obj) {
-        checkWriteAccess(obj, true);
-    }
-
-    private void checkWriteAccess(Object obj, boolean logError) {
-        final OBContext obContext = OBContext.getOBContext();
-
-        if (obContext.getRecordAccessChecker() != null) {
-            BaseOBObject bob = (BaseOBObject) obj;
-            if (bob.getId() == null) {
-                if (!obContext.getRecordAccessChecker().canCreate(obj)) {
-                    throw new OBSecurityException(
-                        "The current user does not have create permissions.", logError);
-                }
-            } else {
-                if (!obContext.getRecordAccessChecker().canUpdate(obj)) {
-                    throw new OBSecurityException(
-                        "The current user does not have update permissions.", logError);
-                }
-            }
-        } else {
-            // check that the client id and organization id are resp. in the list of
-            // user_client and user_org
-            // TODO: throw specific and translated exception, for more info:
-            // Utility.translateError(this, vars, vars.getLanguage(),
-            // Utility.messageBD(this, "NoWriteAccess", vars.getLanguage()))
+      }
+    } else {
+      // check that the client id and organization id are resp. in the list of
+      // user_client and user_org
+      // TODO: throw specific and translated exception, for more info:
+      // Utility.translateError(this, vars, vars.getLanguage(),
+      // Utility.messageBD(this, "NoWriteAccess", vars.getLanguage()))
 /*
             String clientId = "";
             if (obj instanceof ClientEnabled && ((ClientEnabled) obj).getClient() != null) {
@@ -150,7 +151,7 @@ public class SecurityChecker implements OBSingleton {
                 isOrganization = true;
             }
 */
-            final Entity entity = ((BaseOBObject) obj).getEntity();
+      final Entity entity = ((BaseOBObject) obj).getEntity();
             /*
             if ((!obContext.isInAdministratorMode() || obContext.doOrgClientAccessCheck())
                     && clientId.length() > 0) {
@@ -195,16 +196,16 @@ public class SecurityChecker implements OBSingleton {
             // accesslevel check must also be done for administrators
             entity.checkAccessLevel(clientId, orgId);
              */
-        }
     }
+  }
 
-    /**
-     * Checks if there is access to the entity and if the organization is readable. If not, it throws
-     * an OBSecurityException.
-     *
-     * @param organizationEnabledObject a {@link BaseOBObject} that implements the {@link OrganizationEnabled} interface. This
-     *                                  method will check if the user has read access to the provided object
-     */
+  /**
+   * Checks if there is access to the entity and if the organization is readable. If not, it throws
+   * an OBSecurityException.
+   *
+   * @param organizationEnabledObject a {@link BaseOBObject} that implements the {@link OrganizationEnabled} interface. This
+   *                                  method will check if the user has read access to the provided object
+   */
     /*
     public void checkReadableAccess(OrganizationEnabled organizationEnabledObject) {
         OBContext obContext = OBContext.getOBContext();

@@ -19,7 +19,6 @@ package com.etendorx.gen.util;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
-import org.etendorx.base.gen.Utilities;
 import org.openbravo.base.model.Entity;
 
 import java.io.BufferedReader;
@@ -32,7 +31,7 @@ import java.util.Objects;
 
 public class TemplateUtil {
   public static void processTemplate(freemarker.template.Template templateImplementation,
-      Map<String, Object> data, Writer output) {
+                                     Map<String, Object> data, Writer output) {
     try {
       templateImplementation.process(data, output);
     } catch (IOException | TemplateException e) {
@@ -42,7 +41,7 @@ public class TemplateUtil {
 
   public static freemarker.template.Template createTemplateImplementation(String file) {
     try (var stream = new BufferedReader(new InputStreamReader(
-        Objects.requireNonNull(TemplateUtil.class.getResourceAsStream(file))))) {
+      Objects.requireNonNull(TemplateUtil.class.getResourceAsStream(file))))) {
       return new freemarker.template.Template("template", stream, getNewConfiguration());
     } catch (IOException e) {
       throw new IllegalStateException(e);
@@ -67,12 +66,12 @@ public class TemplateUtil {
     data.put("newClassNameWithoutS", getWithoutSS(newClassName));
     data.put("entity", entity);
     data.put("onlyClassName", data.get("className")
-        .toString()
-        .substring(data.get("className").toString().lastIndexOf('/') + 1));
+      .toString()
+      .substring(data.get("className").toString().lastIndexOf('/') + 1));
     data.put("repositoryClassEntityModel", data.get("className")
-        .toString()
-        .replace(data.get("onlyClassName").toString(),
-            entity.getName()) + "Model.java");
+      .toString()
+      .replace(data.get("onlyClassName").toString(),
+        entity.getName()) + "Model.java");
     //data.put("util", this);
     data.put("tableName", entity.getTableName());
 

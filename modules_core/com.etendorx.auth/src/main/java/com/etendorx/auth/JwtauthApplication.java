@@ -10,8 +10,8 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableFeignClients(basePackages = {"com.etendorx.clientrest.*", "com.etendorx.auth.clientrest", "com.etendorx.auth.feign"})
 public class JwtauthApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(JwtauthApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(JwtauthApplication.class, args);
+  }
 
 }

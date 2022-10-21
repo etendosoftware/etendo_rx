@@ -39,7 +39,8 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
   private Column column;
   private String tableName;
 
-  @Override public List<Class<?>> getClasses() {
+  @Override
+  public List<Class<?>> getClasses() {
     List<Class<?>> listOfClasses = new ArrayList<>();
     listOfClasses.add(SelectorDefinition.class);
     listOfClasses.add(DatasourceDefinition.class);
@@ -48,18 +49,19 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
 
   // Note: implementation should clean-up and close database connections or hibernate sessions. If
   // this is not done then the update.database task may hang when disabling foreign keys.
-  @Override public void initialize() {
+  @Override
+  public void initialize() {
 
     Session session = ModelProvider.getInstance().getSession();
 
     //@formatter:off
-    String hql = 
-            "select s " +
-            "  from SelectorDefinition as s " +
-            " where s.referenceId = :referenceId";
+    String hql =
+      "select s " +
+        "  from SelectorDefinition as s " +
+        " where s.referenceId = :referenceId";
     //@formatter:on
     Query<SelectorDefinition> query = session.createQuery(hql, SelectorDefinition.class)
-        .setParameter("referenceId", getReference().getId());
+      .setParameter("referenceId", getReference().getId());
     final List<SelectorDefinition> list = query.list();
     if (list.isEmpty()) {
       // a base reference
@@ -70,7 +72,7 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
       return;
     } else if (list.size() > 1) {
       log.warn(
-          "Reference " + getReference() + " has more than one selector definition, only one is really used");
+        "Reference " + getReference() + " has more than one selector definition, only one is really used");
     }
     final SelectorDefinition selectorDefinition = list.get(0);
     Table table = selectorDefinition.getTable();
@@ -79,7 +81,7 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
     }
     if (table == null) {
       throw new IllegalStateException(
-          "The selector " + selectorDefinition.getIdentifier() + " is used in a foreign key reference but no table has been set");
+        "The selector " + selectorDefinition.getIdentifier() + " is used in a foreign key reference but no table has been set");
     }
     tableName = table.getTableName();
     if (selectorDefinition.getColumn() == null) {
@@ -97,11 +99,11 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
 
   private List<Column> readColumns(Session session, Table table) {
     //@formatter:off
-    String hql = 
-            "select c " +
-            "  from Column as c " +
-            " where c.table = :table " +
-            " order by c.position asc";
+    String hql =
+      "select c " +
+        "  from Column as c " +
+        " where c.table = :table " +
+        " order by c.position asc";
     //@formatter:on
     return session.createQuery(hql, Column.class).setParameter("table", table).list();
   }
@@ -113,10 +115,11 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
    * org.openbravo.base.model.domaintype.BaseForeignKeyDomainType#getForeignKeyColumn(java.lang.
    * String)
    */
-  @Override public Column getForeignKeyColumn(String columnName) {
+  @Override
+  public Column getForeignKeyColumn(String columnName) {
     while (!column.isKey() && column.getDomainType() instanceof ForeignKeyDomainType) {
       column = ((ForeignKeyDomainType) column.getDomainType()).getForeignKeyColumn(
-          column.getColumnName());
+        column.getColumnName());
       tableName = column.getTable().getName();
     }
     return column;
@@ -129,7 +132,8 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
    * org.openbravo.base.model.domaintype.BaseForeignKeyDomainType#getReferedTableName(java.lang.
    * String)
    */
-  @Override protected String getReferedTableName(String columnName) {
+  @Override
+  protected String getReferedTableName(String columnName) {
     return tableName;
   }
 }

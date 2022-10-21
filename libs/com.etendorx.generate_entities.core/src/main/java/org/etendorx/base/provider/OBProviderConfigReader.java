@@ -70,16 +70,16 @@ class OBProviderConfigReader {
       try {
         clz = OBClassLoader.getInstance().loadClass(clzName);
         if (OBModulePrefixRequired.class.isAssignableFrom(clz) && prefix != null && prefix.trim()
-            .length() > 0) {
+          .length() > 0) {
           org.etendorx.base.provider.OBProvider.getInstance()
-              .register(prefix + "." + name, clz, true);
+            .register(prefix + "." + name, clz, true);
         } else {
           OBProvider.getInstance().register(name, clz, true);
         }
       } catch (final ClassNotFoundException e) {
         // catch ClassNotFoundException
         log.warn(
-            "Class " + clzName + " can not be loaded. This can happen " + "when rebuilding after installing new modules. " + "The system needs to be restarted to find " + "new services");
+          "Class " + clzName + " can not be loaded. This can happen " + "when rebuilding after installing new modules. " + "The system needs to be restarted to find " + "new services");
       }
     }
   }
@@ -96,6 +96,6 @@ class OBProviderConfigReader {
 
   private void checkName(Element elem, String expectedName) {
     Check.isTrue(elem.getName().equals(expectedName),
-        "The element should have the name: " + expectedName + " but is has name " + elem.getName());
+      "The element should have the name: " + expectedName + " but is has name " + elem.getName());
   }
 }

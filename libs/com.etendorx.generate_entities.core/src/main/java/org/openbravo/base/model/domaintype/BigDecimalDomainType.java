@@ -29,48 +29,56 @@ public class BigDecimalDomainType extends BasePrimitiveDomainType {
   /**
    * @return class of the {@link BigDecimal}
    */
-  @Override public Class<?> getPrimitiveType() {
+  @Override
+  public Class<?> getPrimitiveType() {
     return BigDecimal.class;
   }
 
   public static class Quantity extends BigDecimalDomainType {
-    @Override public String getFormatId() {
+    @Override
+    public String getFormatId() {
       return "qty";
     }
   }
 
   public static class GeneralQuantity extends BigDecimalDomainType {
-    @Override public String getFormatId() {
+    @Override
+    public String getFormatId() {
       return "generalQty";
     }
   }
 
   public static class Number extends BigDecimalDomainType {
-    @Override public String getFormatId() {
+    @Override
+    public String getFormatId() {
       return "generalQty";
     }
   }
 
   public static class Amount extends BigDecimalDomainType {
-    @Override public String getFormatId() {
+    @Override
+    public String getFormatId() {
       return "euro";
     }
   }
 
   public static class Price extends BigDecimalDomainType {
-    @Override public String getFormatId() {
+    @Override
+    public String getFormatId() {
       return "price";
     }
   }
 
-  @Override public Object createFromString(String strValue) {
+  @Override
+  public Object createFromString(String strValue) {
     if (strValue == null || strValue.trim().length() == 0) {
       return null;
     }
     return new BigDecimal(strValue);
   }
 
-  @Override public String getXMLSchemaType() {
+  @Override
+  public String getXMLSchemaType() {
     return "ob:decimal";
   }
 

@@ -30,23 +30,23 @@ import java.util.Map;
 @Component
 public class FilterContext extends OncePerRequestFilter {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = request.getHeader("X-TOKEN");
-        if (token != null && !token.isBlank()) {
-            setUserContextFromToken(token);
-        }
-        filterChain.doFilter(request, response);
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    String token = request.getHeader("X-TOKEN");
+    if (token != null && !token.isBlank()) {
+      setUserContextFromToken(token);
     }
+    filterChain.doFilter(request, response);
+  }
 
-    public static void setUserContextFromToken(String token) {
-        AppContext.setAuthToken(token);
-        UserContext userContext = new UserContext();
-        Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
+  public static void setUserContextFromToken(String token) {
+    AppContext.setAuthToken(token);
+    UserContext userContext = new UserContext();
+    Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
 
-        userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
-        userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
-        userContext.setOrganizationId((String) tokenValuesMap.get(JwtKeyUtils.ORG_ID_CLAIM));
-        AppContext.setCurrentUser(userContext);
-    }
+    userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
+    userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
+    userContext.setOrganizationId((String) tokenValuesMap.get(JwtKeyUtils.ORG_ID_CLAIM));
+    AppContext.setCurrentUser(userContext);
+  }
 }

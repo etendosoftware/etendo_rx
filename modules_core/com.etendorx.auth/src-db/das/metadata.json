@@ -1,5 +1,5 @@
 {
-  "react" : false,
+  "react": false,
   "projections": [
     {
       "name": "auth",

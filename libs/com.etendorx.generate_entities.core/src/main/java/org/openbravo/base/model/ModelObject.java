@@ -101,7 +101,8 @@ public class ModelObject {
     this.updated = updated;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return this.getClass().getName() + " [id: " + id + ", name: " + name + "]";
   }
 }

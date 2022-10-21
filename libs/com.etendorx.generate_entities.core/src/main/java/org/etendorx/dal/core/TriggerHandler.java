@@ -29,7 +29,7 @@ import java.sql.PreparedStatement;
 
 /**
  * Supports disabling and again enabling of database triggers.
- *
+ * <p>
  * The user of this class should call disable() after beginning the transaction and enable at the
  * end, before committing.
  *
@@ -41,7 +41,7 @@ public class TriggerHandler {
 
   private static TriggerHandler instance;
   private boolean isPostgreSQL = "POSTGRE".equals(
-      OBPropertiesProvider.getInstance().getOpenbravoProperties().getProperty("bbdd.rdbms"));
+    OBPropertiesProvider.getInstance().getOpenbravoProperties().getProperty("bbdd.rdbms"));
 
   public static TriggerHandler getInstance() {
     if (instance == null) {
@@ -58,7 +58,7 @@ public class TriggerHandler {
   public void disable() {
     log.debug("Disabling triggers");
     Check.isNull(sessionStatus.get(),
-        "Triggers were already disabled in this session, call enable before calling disable again");
+      "Triggers were already disabled in this session, call enable before calling disable again");
     Connection con = OBDal.getInstance().getConnection();
     try (PreparedStatement ps = con.prepareStatement(getDisableStatement())) {
       ps.execute();
@@ -88,7 +88,7 @@ public class TriggerHandler {
   public void enable() {
     log.debug("Enabling triggers");
     Check.isNotNull(sessionStatus.get(),
-        "Triggers were not disabled in this session, call disable before calling this method");
+      "Triggers were not disabled in this session, call disable before calling this method");
 
     try {
       Connection con = OBDal.getInstance().getConnection();

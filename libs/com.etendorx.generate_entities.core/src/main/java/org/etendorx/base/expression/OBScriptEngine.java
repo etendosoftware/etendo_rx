@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 
 /**
  * Class that wraps a ScriptEngine and that should be used to evaluate javascript scripts
- *
+ * <p>
  * It is a singleton, and it takes advantage of the thread safety of ScriptEngine
  */
 public class OBScriptEngine {

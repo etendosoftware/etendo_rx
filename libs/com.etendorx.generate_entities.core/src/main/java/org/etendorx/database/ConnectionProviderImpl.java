@@ -60,7 +60,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public ConnectionProviderImpl(String file, boolean isRelative, String _context)
-      throws PoolNotFoundException {
+    throws PoolNotFoundException {
     this.defaultPoolName = "";
     this.bbdd = "";
     this.rdbms = "";
@@ -69,7 +69,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   private void create(String file, boolean isRelative, String _context)
-      throws PoolNotFoundException {
+    throws PoolNotFoundException {
     Properties properties = new Properties();
 
     try {
@@ -82,7 +82,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   private void create(Properties properties, boolean isRelative, String _context)
-      throws PoolNotFoundException {
+    throws PoolNotFoundException {
     log4j.debug("Creating ConnectionProviderImpl");
     if (_context != null && !_context.equals("")) {
       this.contextName = _context;
@@ -137,7 +137,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
 
     try {
       this.addNewPool(dbDriver, dbServer, dbLogin, dbPassword, minConns, maxConns, maxConnTime,
-          dbSessionConfig, _rdbms, poolName);
+        dbSessionConfig, _rdbms, poolName);
     } catch (Exception var16) {
       log4j.error(var16);
       throw new PoolNotFoundException("Failed when creating database connections pool", var16);
@@ -165,8 +165,8 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public void addNewPool(String dbDriver, String dbServer, String dbLogin, String dbPassword,
-      int minConns, int maxConns, double maxConnTime, String dbSessionConfig, String _rdbms,
-      String name) throws Exception {
+                         int minConns, int maxConns, double maxConnTime, String dbSessionConfig, String _rdbms,
+                         String name) throws Exception {
     if (this.defaultPoolName == null || this.defaultPoolName.equals("")) {
       this.defaultPoolName = name;
       this.bbdd = dbServer;
@@ -191,9 +191,9 @@ public class ConnectionProviderImpl implements ConnectionProvider {
       connectionPool.setTestWhileIdle(false);
       KeyedObjectPoolFactory keyedObject = new StackKeyedObjectPoolFactory();
       ConnectionFactory connectionFactory = new OpenbravoDriverManagerConnectionFactory(dbServer,
-          dbLogin, dbPassword, dbSessionConfig, _rdbms);
+        dbLogin, dbPassword, dbSessionConfig, _rdbms);
       new PoolableConnectionFactory(connectionFactory, connectionPool, keyedObject, (String) null,
-          false, true);
+        false, true);
       Class.forName("org.apache.commons.dbcp.PoolingDriver");
       PoolingDriver driver = (PoolingDriver) DriverManager.getDriver("jdbc:apache:commons:dbcp:");
       driver.registerPool(this.contextName + "_" + name, connectionPool);
@@ -246,7 +246,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   private Connection getNewConnection(String poolName) throws NoConnectionAvailableException {
     if (poolName != null && !poolName.equals("")) {
       if (externalConnectionPool == null && this.externalPoolClassName != null && !"".equals(
-          this.externalPoolClassName)) {
+        this.externalPoolClassName)) {
         try {
           externalConnectionPool = ExternalConnectionPool.getInstance(this.externalPoolClassName);
         } catch (Throwable var4) {
@@ -269,18 +269,18 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   private Connection getCommonsDbcpPoolConnection(String poolName)
-      throws NoConnectionAvailableException {
+    throws NoConnectionAvailableException {
     if (poolName != null && !poolName.equals("")) {
       Connection conn = null;
 
       try {
         conn = DriverManager.getConnection(
-            "jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
+          "jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
         return conn;
       } catch (SQLException var4) {
         log4j.error("Error getting connection", var4);
         throw new NoConnectionAvailableException(
-            "There are no connections available in jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
+          "There are no connections available in jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
       }
     } else {
       throw new NoConnectionAvailableException("Couldn´t get a connection for an unnamed pool");
@@ -358,7 +358,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public PreparedStatement getPreparedStatement(String poolName, String SQLPreparedStatement)
-      throws Exception {
+    throws Exception {
     if (poolName != null && !poolName.equals("")) {
       log4j.debug("connection requested");
       Connection conn = this.getConnection(poolName);
@@ -370,7 +370,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public PreparedStatement getPreparedStatement(Connection conn, String SQLPreparedStatement)
-      throws SQLException {
+    throws SQLException {
     if (conn != null && SQLPreparedStatement != null && !SQLPreparedStatement.equals("")) {
       PreparedStatement ps = null;
 
@@ -394,7 +394,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public CallableStatement getCallableStatement(String poolName, String SQLCallableStatement)
-      throws Exception {
+    throws Exception {
     if (poolName != null && !poolName.equals("")) {
       Connection conn = this.getConnection(poolName);
       return this.getCallableStatement(conn, SQLCallableStatement);
@@ -404,7 +404,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public CallableStatement getCallableStatement(Connection conn, String SQLCallableStatement)
-      throws SQLException {
+    throws SQLException {
     if (conn != null && SQLCallableStatement != null && !SQLCallableStatement.equals("")) {
       CallableStatement cs = null;
 
@@ -503,7 +503,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public void releaseTransactionalPreparedStatement(PreparedStatement preparedStatement)
-      throws SQLException {
+    throws SQLException {
     if (preparedStatement != null) {
       preparedStatement.close();
     }

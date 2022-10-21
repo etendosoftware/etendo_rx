@@ -47,7 +47,8 @@ public class AccessLevelChecker {
    * SYSTEM access level, only allows client with id '0' and organization with id '0'.
    */
   public static final AccessLevelChecker SYSTEM = new AccessLevelChecker() {
-    @Override public void checkAccessLevel(String entity, String clientId, String orgId) {
+    @Override
+    public void checkAccessLevel(String entity, String clientId, String orgId) {
       failOnNonZeroClient(entity, clientId);
       failOnNonZeroOrg(entity, orgId);
     }
@@ -57,7 +58,8 @@ public class AccessLevelChecker {
    * SYSTEM_CLIENT access level, allows any client but only allows an organization with id '0'.
    */
   public static final AccessLevelChecker SYSTEM_CLIENT = new AccessLevelChecker() {
-    @Override public void checkAccessLevel(String entity, String clientId, String orgId) {
+    @Override
+    public void checkAccessLevel(String entity, String clientId, String orgId) {
       failOnNonZeroOrg(entity, orgId);
     }
   };
@@ -66,7 +68,8 @@ public class AccessLevelChecker {
    * ORGANIZATION access level, only allows client and organization with id both unequal to id '0'.
    */
   public static final AccessLevelChecker ORGANIZATION = new AccessLevelChecker() {
-    @Override public void checkAccessLevel(String entity, String clientId, String orgId) {
+    @Override
+    public void checkAccessLevel(String entity, String clientId, String orgId) {
       failOnZeroClient(entity, clientId);
       failOnZeroOrg(entity, orgId);
     }
@@ -77,7 +80,8 @@ public class AccessLevelChecker {
    * organization.
    */
   public static final AccessLevelChecker CLIENT_ORGANIZATION = new AccessLevelChecker() {
-    @Override public void checkAccessLevel(String entity, String clientId, String orgId) {
+    @Override
+    public void checkAccessLevel(String entity, String clientId, String orgId) {
       failOnZeroClient(entity, clientId);
     }
   };
@@ -104,7 +108,7 @@ public class AccessLevelChecker {
     // the zero organization
     if (orgId != null && orgId.equals("0")) {
       throw new OBSecurityException(
-          "Entity " + entity + " may not have instances with organization *");
+        "Entity " + entity + " may not have instances with organization *");
     }
   }
 
@@ -113,7 +117,7 @@ public class AccessLevelChecker {
     // the zero organization
     if (orgId == null || !orgId.equals("0")) {
       throw new OBSecurityException(
-          "Entity " + entity + " may only have instances with organization *");
+        "Entity " + entity + " may only have instances with organization *");
     }
   }
 }

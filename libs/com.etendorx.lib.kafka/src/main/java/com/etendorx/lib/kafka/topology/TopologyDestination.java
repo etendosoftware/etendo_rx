@@ -17,5 +17,5 @@
 package com.etendorx.lib.kafka.topology;
 
 public interface TopologyDestination<O, D> {
-  public D process(O value) ;
+  public D process(O value);
 }

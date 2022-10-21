@@ -37,8 +37,7 @@ public class EntityValidator {
    * collected into one ValidationException.
    *
    * @param entityObject
-   *     the entity instance
-   * @throws org.openbravo.base.validation.ValidationException
+   *   the entity instance
    */
   public void validate(Object entityObject) {
     if (!validateRequired) {

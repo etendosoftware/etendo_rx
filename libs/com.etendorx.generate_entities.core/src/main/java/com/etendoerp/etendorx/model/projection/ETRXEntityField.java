@@ -7,24 +7,24 @@ import org.openbravo.base.model.ModelObject;
 @JsonIncludeProperties({"name", "value"})
 public class ETRXEntityField extends ModelObject {
 
-    private ETRXProjectionEntity entity;
-    private String property;
+  private ETRXProjectionEntity entity;
+  private String property;
 
-    public ETRXProjectionEntity getEntity() {
-        return entity;
-    }
+  public ETRXProjectionEntity getEntity() {
+    return entity;
+  }
 
-    public void setEntity(ETRXProjectionEntity entity) {
-        this.entity = entity;
-    }
+  public void setEntity(ETRXProjectionEntity entity) {
+    this.entity = entity;
+  }
 
-    @JsonProperty("value")
-    public String getProperty() {
-        return property;
-    }
+  @JsonProperty("value")
+  public String getProperty() {
+    return property;
+  }
 
-    public void setProperty(String property) {
-        this.property = property;
-    }
+  public void setProperty(String property) {
+    this.property = property;
+  }
 
 }

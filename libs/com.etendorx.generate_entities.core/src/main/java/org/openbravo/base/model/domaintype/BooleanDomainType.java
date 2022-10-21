@@ -27,11 +27,13 @@ public class BooleanDomainType extends BasePrimitiveDomainType {
   /**
    * @return class of the {@link Boolean}
    */
-  @Override public Class<?> getPrimitiveType() {
+  @Override
+  public Class<?> getPrimitiveType() {
     return Boolean.class;
   }
 
-  @Override public Object createFromString(String strValue) {
+  @Override
+  public Object createFromString(String strValue) {
     if (strValue == null || strValue.trim().length() == 0) {
       return null;
     }
@@ -44,7 +46,8 @@ public class BooleanDomainType extends BasePrimitiveDomainType {
     return Boolean.valueOf(strValue);
   }
 
-  @Override public String getXMLSchemaType() {
+  @Override
+  public String getXMLSchemaType() {
     return "ob:boolean";
   }
 

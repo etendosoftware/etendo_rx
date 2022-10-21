@@ -29,10 +29,11 @@
         <property name="active" type="org.etendorx.base.session.OBYesNoType" not-null="true"
                   column="isactive"/>
 
-        <property name="name" />
-        <property name="type" />
+        <property name="name"/>
+        <property name="type"/>
 
-        <many-to-one name="entitySearch" not-null="true" class="com.etendoerp.etendorx.model.repository.ETRXEntitySearch"
+        <many-to-one name="entitySearch" not-null="true"
+                     class="com.etendoerp.etendorx.model.repository.ETRXEntitySearch"
                      column="etrx_entity_search_id"/>
     </class>
 </hibernate-mapping>
