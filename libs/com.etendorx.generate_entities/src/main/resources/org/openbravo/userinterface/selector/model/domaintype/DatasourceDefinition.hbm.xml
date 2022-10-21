@@ -17,7 +17,8 @@
  * Contributor(s):  ______________________________________.
  ************************************************************************
  -->
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="org.openbravo.userinterface.selector.model.domaintype.DatasourceDefinition"
            lazy="false" table="obserds_datasource">

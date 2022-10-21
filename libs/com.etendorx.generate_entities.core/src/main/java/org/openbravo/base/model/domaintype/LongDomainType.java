@@ -32,12 +32,14 @@ public class LongDomainType extends BasePrimitiveDomainType {
   /**
    * @return class of the {@link Long}
    */
-  @Override public Class<?> getPrimitiveType() {
+  @Override
+  public Class<?> getPrimitiveType() {
     return Long.class;
   }
 
-  @Override public void checkIsValidValue(Property property, Object value)
-      throws ValidationException {
+  @Override
+  public void checkIsValidValue(Property property, Object value)
+    throws ValidationException {
     if (value == null) {
       return;
     }
@@ -48,18 +50,21 @@ public class LongDomainType extends BasePrimitiveDomainType {
     super.checkIsValidValue(property, value);
   }
 
-  @Override public String getFormatId() {
+  @Override
+  public String getFormatId() {
     return "integer";
   }
 
-  @Override public Object createFromString(String strValue) {
+  @Override
+  public Object createFromString(String strValue) {
     if (strValue == null || strValue.trim().length() == 0) {
       return null;
     }
     return Long.valueOf(new BigDecimal(strValue).longValueExact());
   }
 
-  @Override public String getXMLSchemaType() {
+  @Override
+  public String getXMLSchemaType() {
     return "ob:long";
   }
 

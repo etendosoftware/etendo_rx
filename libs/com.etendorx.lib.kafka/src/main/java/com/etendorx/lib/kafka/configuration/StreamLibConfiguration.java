@@ -33,13 +33,13 @@ public class StreamLibConfiguration {
   @Bean
   public KafkaProducer<String, String> producer() {
     KafkaProducer<String, String> producer =
-        new KafkaProducer<>(
-            Map.of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer,
-                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class
-            )
-        );
+      new KafkaProducer<>(
+        Map.of(
+          ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer,
+          ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
+          ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class
+        )
+      );
     return producer;
   }
 }

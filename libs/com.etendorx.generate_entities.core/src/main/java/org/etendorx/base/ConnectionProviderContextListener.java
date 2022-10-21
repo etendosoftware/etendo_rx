@@ -72,24 +72,24 @@ public class ConnectionProviderContextListener implements ServletContextListener
       String strPoolFile = configParameters.getPoolFilePath();
       boolean isRelative = !strPoolFile.startsWith("/") && !strPoolFile.substring(1, 1).equals(":");
       ((ConnectionProviderImpl) connectionPool).reload(strPoolFile, isRelative,
-          configParameters.strContext);
+        configParameters.strContext);
     }
 
   }
 
   private ConnectionProvider createPool(ConfigParameters configParameters)
-      throws PoolNotFoundException {
+    throws PoolNotFoundException {
     return createXmlPool(configParameters);
   }
 
   private static ConnectionProvider createXmlPool(ConfigParameters configParameters)
-      throws PoolNotFoundException {
+    throws PoolNotFoundException {
     try {
       String strPoolFile = configParameters.getPoolFilePath();
       boolean isRelative = !strPoolFile.startsWith("/") && !strPoolFile.substring(1, 1).equals(":");
       return (ConnectionProvider) (useJNDIConnProvider(strPoolFile) ?
-          new JNDIConnectionProvider(strPoolFile, isRelative) :
-          new ConnectionProviderImpl(strPoolFile, isRelative, configParameters.strContext));
+        new JNDIConnectionProvider(strPoolFile, isRelative) :
+        new ConnectionProviderImpl(strPoolFile, isRelative, configParameters.strContext));
     } catch (Exception var3) {
       throw new PoolNotFoundException(var3.getMessage(), var3);
     }

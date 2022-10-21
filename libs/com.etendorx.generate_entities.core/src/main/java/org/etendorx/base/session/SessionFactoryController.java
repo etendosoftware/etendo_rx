@@ -78,7 +78,7 @@ public abstract class SessionFactoryController {
    * track if the Dal layer runs within Tomcat or within for example an Ant task.
    *
    * @param runningInWebContainer
-   *     true if running in a webcontainer such as Tomcat
+   *   true if running in a webcontainer such as Tomcat
    */
   public static void setRunningInWebContainer(boolean runningInWebContainer) {
     SessionFactoryController.runningInWebContainer = runningInWebContainer;
@@ -168,12 +168,12 @@ public abstract class SessionFactoryController {
       registerSqlFunctions();
 
       final DalSessionFactory dalSessionFactory = OBProvider.getInstance()
-          .get(DalSessionFactory.class);
+        .get(DalSessionFactory.class);
 
       configuration.getStandardServiceRegistryBuilder()
-          .applySettings(configuration.getProperties());
+        .applySettings(configuration.getProperties());
       StandardServiceRegistry serviceRegistry = configuration.getStandardServiceRegistryBuilder()
-          .build();
+        .build();
       initializeServices(serviceRegistry);
       SessionFactory delegateSessionFactory = configuration.buildSessionFactory(serviceRegistry);
       dalSessionFactory.setDelegateSessionFactory(delegateSessionFactory);
@@ -226,8 +226,8 @@ public abstract class SessionFactoryController {
 
   public void closeHibernatePool() {
     ConnectionProvider hibernatePool = sessionFactory.getSessionFactoryOptions()
-        .getServiceRegistry()
-        .getService(ConnectionProvider.class);
+      .getServiceRegistry()
+      .getService(ConnectionProvider.class);
     if (hibernatePool != null && hibernatePool instanceof DriverManagerConnectionProviderImpl) {
       ((DriverManagerConnectionProviderImpl) hibernatePool).stop();
     }
@@ -254,8 +254,9 @@ public abstract class SessionFactoryController {
     return props;
   }
 
-  @SuppressWarnings("unchecked") private void addCommonHibernateProperties(Properties properties,
-      Properties allProperties) {
+  @SuppressWarnings("unchecked")
+  private void addCommonHibernateProperties(Properties properties,
+                                            Properties allProperties) {
     Enumeration<String> allPropertyNames = (Enumeration<String>) allProperties.propertyNames();
     while (allPropertyNames.hasMoreElements()) {
       String propertyName = allPropertyNames.nextElement();
@@ -274,7 +275,7 @@ public abstract class SessionFactoryController {
     } else {
       props.setProperty(AvailableSettings.DRIVER, "org.postgresql.Driver");
       props.setProperty(AvailableSettings.URL,
-          obProps.getProperty("bbdd.url") + "/" + obProps.getProperty("bbdd.sid"));
+        obProps.getProperty("bbdd.url") + "/" + obProps.getProperty("bbdd.sid"));
 
       props.setProperty(AvailableSettings.USER, obProps.getProperty("bbdd.user"));
       props.setProperty(AvailableSettings.PASS, obProps.getProperty("bbdd.password"));
@@ -300,7 +301,7 @@ public abstract class SessionFactoryController {
   private void setJNDI(Properties obProps, Properties hbProps) {
     log.info("Using JNDI with resource name-> {}", obProps.getProperty("JNDI.resourceName"));
     hbProps.setProperty(AvailableSettings.DATASOURCE,
-        "java:/comp/env/" + obProps.getProperty("JNDI.resourceName"));
+      "java:/comp/env/" + obProps.getProperty("JNDI.resourceName"));
   }
 
   /**

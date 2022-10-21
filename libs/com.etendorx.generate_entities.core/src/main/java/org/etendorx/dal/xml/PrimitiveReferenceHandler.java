@@ -28,8 +28,8 @@ import java.util.List;
  * a specific table but as string/table combinations stored in different fields. Sometimes the table
  * is stored in a separate field, sometimes it needs to be computed (see
  * {@link Tree#PROPERTY_TYPEAREA}).
- *
- *
+ * <p>
+ * <p>
  * This class provides utility methods to find these references and resolve them.
  *
  * @author mtaal

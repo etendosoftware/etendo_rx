@@ -22,6 +22,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RequestModel {
-    String id;
-    String request;
+  String id;
+  String request;
 }

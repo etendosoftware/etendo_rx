@@ -1,7 +1,7 @@
 plugins {
-	id 'org.springframework.boot'
-	id 'io.spring.dependency-management'
-	id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'java'
 }
 
 group = 'com.etendorx.entities'
@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 configurations {
@@ -27,8 +27,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.1'
     implementation 'org.springframework.data:spring-data-rest-core:3.6.1'
     implementation project(':com.etendorx.das_core')
-    bundle (project(':com.etendorx.das_core')) {
-        exclude group:'*', module:"*"
+    bundle(project(':com.etendorx.das_core')) {
+        exclude group: '*', module: "*"
     }
 }
 
@@ -37,7 +37,7 @@ bootJar {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 sourceSets {

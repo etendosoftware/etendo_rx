@@ -18,7 +18,6 @@ package org.etendorx.base.session;
 
 //import com.etendoerp.properties.EtendoPropertiesProvider;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -93,13 +92,13 @@ public class OBPropertiesProvider {
       is.close();
 
       if (OBConfigFileProvider.getInstance() == null || OBConfigFileProvider.getInstance()
-          .getServletContext() == null) {
+        .getServletContext() == null) {
         log.debug("ServletContext is not set, not trying to override Openbravo.properties");
         return;
       }
 
       ConfigParameters.overrideProperties(obProperties,
-          OBConfigFileProvider.getInstance().getServletContext().getRealPath("/WEB-INF"));
+        OBConfigFileProvider.getInstance().getServletContext().getRealPath("/WEB-INF"));
     } catch (final Exception e) {
       throw new OBException(e);
     }
@@ -152,7 +151,7 @@ public class OBPropertiesProvider {
     }
     setProperties(propertiesFile.getAbsolutePath());
     OBConfigFileProvider.getInstance()
-        .setFileLocation(propertiesFile.getParentFile().getAbsolutePath());
+      .setFileLocation(propertiesFile.getParentFile().getAbsolutePath());
   }
 
   private File getFileFromDevelopmentPath(String fileName) {

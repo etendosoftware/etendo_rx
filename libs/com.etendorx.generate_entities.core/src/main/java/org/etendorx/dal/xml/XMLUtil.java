@@ -109,7 +109,8 @@ public class XMLUtil implements OBSingleton {
    * Parses provided InputStream into XML and extracts root element
    *
    * @param in
-   *     InputStream XML
+   *   InputStream XML
+   *
    * @return Element root element
    */
   public Element getRootElement(InputStream in) {
@@ -142,7 +143,7 @@ public class XMLUtil implements OBSingleton {
       factory.setAttribute(attribute, value);
     } catch (IllegalArgumentException ex) {
       log.warn("TransformerFactory implementation {} doesn't recognize the attribute {}",
-          factory.getClass().getName(), attribute);
+        factory.getClass().getName(), attribute);
     }
   }
 
@@ -151,9 +152,10 @@ public class XMLUtil implements OBSingleton {
    * root element to the Dom4j document.
    *
    * @param doc
-   *     the Dom4j document to set the root element
+   *   the Dom4j document to set the root element
    * @param elementName
-   *     the name of the root element
+   *   the name of the root element
+   *
    * @return the new root element
    */
   public Element addRootElement(Document doc, String elementName) {
@@ -169,7 +171,8 @@ public class XMLUtil implements OBSingleton {
    * UTF-8, 2) text nodes are not trimmed
    *
    * @param document
-   *     the Dom4j to convert to a XML string
+   *   the Dom4j to convert to a XML string
+   *
    * @return the XML representation
    */
   public String toString(Document document) {

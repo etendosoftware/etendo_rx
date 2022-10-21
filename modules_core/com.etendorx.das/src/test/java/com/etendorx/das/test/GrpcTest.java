@@ -3,7 +3,6 @@ package com.etendorx.das.test;
 import com.etendorx.das.grpcrepo.ADUserGrpcService;
 import com.etendorx.das.grpcrepo.OrderGrpcService;
 import com.etendorx.das.grpcrepo.PricingAdjustmentGrpcService;
-import com.etendorx.test.grpc.*;
 import com.google.protobuf.Timestamp;
 import io.grpc.internal.testing.StreamRecorder;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -108,7 +107,7 @@ public class GrpcTest {
       Arguments.of("32F782F545FC4F4EBCDE08041DFDD457", "Price adjustment (Discount amount)", 1230775200L),
       Arguments.of("7B7121F368AB4EE6A29586C2B16A70D9", "Price adjustment (Discount %)", 1230775200L),
       Arguments.of("AD3C7B494FF947C4896217BC9830C6EB", "Price adjustment (Fixed Price)", 1230775200L)
-      );
+    );
   }
 
   @ParameterizedTest
@@ -193,14 +192,14 @@ public class GrpcTest {
     ADUserList response = results.get(0);
     var adUser = response.getAduser(0);
 
-    var adUserBuilder= ADUser.newBuilder()
+    var adUserBuilder = ADUser.newBuilder()
       .setId(id);
-    if(businessPartnerName != null)
+    if (businessPartnerName != null)
       adUserBuilder.setBusinessPartnerName(businessPartnerName);
-    if(businessPartnerCategoryName != null)
+    if (businessPartnerCategoryName != null)
       adUserBuilder.setBusinessPartnerCategoryName(businessPartnerCategoryName);
     //
-    if(adUser.getUsername().compareTo("") != 0) {
+    if (adUser.getUsername().compareTo("") != 0) {
       adUserBuilder.setUsername(adUser.getUsername());
     }
     var adUserAssert = adUserBuilder.build();
@@ -246,7 +245,7 @@ public class GrpcTest {
     var ts = Timestamp.newBuilder();
     ts.setSeconds(scheduledDeliveryDate);
 
-    var orderBuilder= Order.newBuilder()
+    var orderBuilder = Order.newBuilder()
       .setId(id);
     orderBuilder.setDatePromised(ts.build());
     var orderAssert = orderBuilder.build();

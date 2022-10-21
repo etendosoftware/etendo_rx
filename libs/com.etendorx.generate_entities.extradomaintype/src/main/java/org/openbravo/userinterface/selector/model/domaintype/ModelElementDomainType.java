@@ -37,8 +37,9 @@ public class ModelElementDomainType extends StringDomainType {
    * org.openbravo.base.model.domaintype.DomainType#checkObjectIsValid(org.openbravo.base.structure
    * .BaseOBObjectDef, org.openbravo.base.model.Property)
    */
-  @Override public void checkObjectIsValid(BaseOBObjectDef obObject, Property property)
-      throws ValidationException {
+  @Override
+  public void checkObjectIsValid(BaseOBObjectDef obObject, Property property)
+    throws ValidationException {
     super.checkObjectIsValid(obObject, property);
   }
 }

@@ -34,7 +34,8 @@ public class ProductCharacteristicsDomainType extends StringDomainType {
    * dbValue property. In that case, return the dbValue property
    *
    * @param value
-   *     the value sent from the client to the datasource
+   *   the value sent from the client to the datasource
+   *
    * @return the String representation of the product characteristics
    */
   public static Object fixValue(Object value) {

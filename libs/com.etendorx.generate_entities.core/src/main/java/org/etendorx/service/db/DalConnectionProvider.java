@@ -32,9 +32,9 @@ import java.util.Properties;
 /**
  * A connection provider which is created on the basis of the current connection of the DAL (see
  * {@link OBDal#getConnection()}).
- *
+ * <p>
  * It read the properties through the {@link OBPropertiesProvider}.
- *
+ * <p>
  * Note: this implementation
  * <ul>
  * <li>does not support connection pooling</li>
@@ -42,7 +42,7 @@ import java.util.Properties;
  * <li>it flushes the hibernate session before returning a connection by default, but this can be
  * overriden by using the constructor with the flush parameter ({@link OBDal#flush()})</li>
  * </ul>
- *
+ * <p>
  * {@code DalConnectionProvider} is not thread safe, the same instance should never be accessed by
  * two different threads.
  *
@@ -57,7 +57,8 @@ public class DalConnectionProvider implements ConnectionProvider {
   private boolean flush = true;
   private String pool;
 
-  @Override public void destroy() throws Exception {
+  @Override
+  public void destroy() throws Exception {
     // never close
   }
 
@@ -76,14 +77,15 @@ public class DalConnectionProvider implements ConnectionProvider {
 
   /**
    * @param flush
-   *     if set to true, the getConnection method will flush the OBDal instance.
+   *   if set to true, the getConnection method will flush the OBDal instance.
    */
   public DalConnectionProvider(boolean flush) {
     pool = ExternalConnectionPool.DEFAULT_POOL;
     this.flush = flush;
   }
 
-  @Override public Connection getConnection() throws NoConnectionAvailableException {
+  @Override
+  public Connection getConnection() throws NoConnectionAvailableException {
     try {
       if (connection == null || connection.isClosed()) {
         connection = OBDal.getInstance(pool).getConnection(false);
@@ -107,7 +109,8 @@ public class DalConnectionProvider implements ConnectionProvider {
     this.connection = connection;
   }
 
-  @Override public String getRDBMS() {
+  @Override
+  public String getRDBMS() {
     return getProperties().getProperty("bbdd.rdbms");
   }
 
@@ -124,8 +127,9 @@ public class DalConnectionProvider implements ConnectionProvider {
     return true;
   }
 
-  @Override public Connection getTransactionConnection()
-      throws NoConnectionAvailableException, SQLException {
+  @Override
+  public Connection getTransactionConnection()
+    throws NoConnectionAvailableException, SQLException {
     Connection conn = SessionHandler.getInstance().getNewConnection(pool);
 
     if (conn == null) {
@@ -135,7 +139,8 @@ public class DalConnectionProvider implements ConnectionProvider {
     return conn;
   }
 
-  @Override public void releaseCommitConnection(Connection conn) throws SQLException {
+  @Override
+  public void releaseCommitConnection(Connection conn) throws SQLException {
     if (conn == null) {
       return;
     }
@@ -143,7 +148,8 @@ public class DalConnectionProvider implements ConnectionProvider {
     closeConnection(conn);
   }
 
-  @Override public void releaseRollbackConnection(Connection conn) throws SQLException {
+  @Override
+  public void releaseRollbackConnection(Connection conn) throws SQLException {
     if (conn == null) {
       return;
     }
@@ -151,36 +157,42 @@ public class DalConnectionProvider implements ConnectionProvider {
     closeConnection(conn);
   }
 
-  @Override public PreparedStatement getPreparedStatement(String SQLPreparedStatement)
-      throws Exception {
+  @Override
+  public PreparedStatement getPreparedStatement(String SQLPreparedStatement)
+    throws Exception {
     return getPreparedStatement(getConnection(), SQLPreparedStatement);
   }
 
-  @Override public PreparedStatement getPreparedStatement(String poolName,
-      String SQLPreparedStatement) throws Exception {
+  @Override
+  public PreparedStatement getPreparedStatement(String poolName,
+                                                String SQLPreparedStatement) throws Exception {
     return getPreparedStatement(getConnection(), SQLPreparedStatement);
   }
 
-  @Override public PreparedStatement getPreparedStatement(Connection conn,
-      String SQLPreparedStatement) throws SQLException {
+  @Override
+  public PreparedStatement getPreparedStatement(Connection conn,
+                                                String SQLPreparedStatement) throws SQLException {
     PreparedStatement ps = conn.prepareStatement(SQLPreparedStatement,
-        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+      ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
     return ps;
   }
 
-  @Override public CallableStatement getCallableStatement(String SQLCallableStatement)
-      throws Exception {
+  @Override
+  public CallableStatement getCallableStatement(String SQLCallableStatement)
+    throws Exception {
     return getCallableStatement("", SQLCallableStatement);
   }
 
-  @Override public CallableStatement getCallableStatement(String poolName,
-      String SQLCallableStatement) throws Exception {
+  @Override
+  public CallableStatement getCallableStatement(String poolName,
+                                                String SQLCallableStatement) throws Exception {
     Connection conn = getConnection();
     return getCallableStatement(conn, SQLCallableStatement);
   }
 
-  @Override public CallableStatement getCallableStatement(Connection conn,
-      String SQLCallableStatement) throws SQLException {
+  @Override
+  public CallableStatement getCallableStatement(Connection conn,
+                                                String SQLCallableStatement) throws SQLException {
     if (conn == null || SQLCallableStatement == null || SQLCallableStatement.equals("")) {
       return null;
     }
@@ -193,16 +205,19 @@ public class DalConnectionProvider implements ConnectionProvider {
     return (cs);
   }
 
-  @Override public Statement getStatement() throws Exception {
+  @Override
+  public Statement getStatement() throws Exception {
     return getStatement("");
   }
 
-  @Override public Statement getStatement(String poolName) throws Exception {
+  @Override
+  public Statement getStatement(String poolName) throws Exception {
     Connection conn = getConnection();
     return getStatement(conn);
   }
 
-  @Override public Statement getStatement(Connection conn) throws SQLException {
+  @Override
+  public Statement getStatement(Connection conn) throws SQLException {
     if (conn == null) {
       return null;
     }
@@ -213,45 +228,51 @@ public class DalConnectionProvider implements ConnectionProvider {
     }
   }
 
-  @Override public void releasePreparedStatement(PreparedStatement preparedStatement)
-      throws SQLException {
+  @Override
+  public void releasePreparedStatement(PreparedStatement preparedStatement)
+    throws SQLException {
     if (preparedStatement == null) {
       return;
     }
     preparedStatement.close();
   }
 
-  @Override public void releaseCallableStatement(CallableStatement callableStatement)
-      throws SQLException {
+  @Override
+  public void releaseCallableStatement(CallableStatement callableStatement)
+    throws SQLException {
     if (callableStatement == null) {
       return;
     }
     callableStatement.close();
   }
 
-  @Override public void releaseStatement(Statement statement) throws SQLException {
+  @Override
+  public void releaseStatement(Statement statement) throws SQLException {
     if (statement == null) {
       return;
     }
     statement.close();
   }
 
-  @Override public void releaseTransactionalStatement(Statement statement) throws SQLException {
+  @Override
+  public void releaseTransactionalStatement(Statement statement) throws SQLException {
     if (statement == null) {
       return;
     }
     statement.close();
   }
 
-  @Override public void releaseTransactionalPreparedStatement(PreparedStatement preparedStatement)
-      throws SQLException {
+  @Override
+  public void releaseTransactionalPreparedStatement(PreparedStatement preparedStatement)
+    throws SQLException {
     if (preparedStatement == null) {
       return;
     }
     preparedStatement.close();
   }
 
-  @Override public String getStatus() {
+  @Override
+  public String getStatus() {
     return "Not implemented";
   }
 

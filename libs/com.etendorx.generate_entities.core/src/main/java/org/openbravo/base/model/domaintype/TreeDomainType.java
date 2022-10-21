@@ -38,24 +38,26 @@ public class TreeDomainType extends BaseForeignKeyDomainType {
   private Column column;
   private String tableName;
 
-  @Override public List<Class<?>> getClasses() {
+  @Override
+  public List<Class<?>> getClasses() {
     List<Class<?>> listOfClasses = new ArrayList<>();
     listOfClasses.add(RefTree.class);
     return listOfClasses;
   }
 
-  @Override public void initialize() {
+  @Override
+  public void initialize() {
 
     Session session = ModelProvider.getInstance().getSession();
 
     //@formatter:off
-    String hql = 
-            "select r " +
-            "  from RefTree as r " +
-            " where r.referenceId = :referenceId";
+    String hql =
+      "select r " +
+        "  from RefTree as r " +
+        " where r.referenceId = :referenceId";
     //@formatter:on
     Query<RefTree> query = session.createQuery(hql, RefTree.class)
-        .setParameter("referenceId", getReference().getId());
+      .setParameter("referenceId", getReference().getId());
     final List<RefTree> list = query.list();
     if (list.isEmpty()) {
       // a base reference
@@ -66,13 +68,13 @@ public class TreeDomainType extends BaseForeignKeyDomainType {
       return;
     } else if (list.size() > 1) {
       log.warn(
-          "Reference " + getReference() + " has more than one tree definition, only one is really used");
+        "Reference " + getReference() + " has more than one tree definition, only one is really used");
     }
     final RefTree treeReference = list.get(0);
     Table table = treeReference.getTable();
     if (table == null) {
       throw new IllegalStateException(
-          "The tree reference " + treeReference.getIdentifier() + " is used in a foreign key reference but no table has been set");
+        "The tree reference " + treeReference.getIdentifier() + " is used in a foreign key reference but no table has been set");
     }
     tableName = table.getTableName();
     if (treeReference.getColumn() == null) {
@@ -87,12 +89,12 @@ public class TreeDomainType extends BaseForeignKeyDomainType {
 
   private Column readKeyColumn(Session session, Table table) {
     //@formatter:off
-    String hql = 
-            "select c " +
-            "  from Column as c " +
-            " where c.table = :table " +
-            "   and c.key = true " +
-            " order by c.position asc";
+    String hql =
+      "select c " +
+        "  from Column as c " +
+        " where c.table = :table " +
+        "   and c.key = true " +
+        " order by c.position asc";
     //@formatter:on
     Query<Column> query = session.createQuery(hql, Column.class).setParameter("table", table);
 
@@ -103,16 +105,18 @@ public class TreeDomainType extends BaseForeignKeyDomainType {
     return keyColumns.get(0);
   }
 
-  @Override public Column getForeignKeyColumn(String columnName) {
+  @Override
+  public Column getForeignKeyColumn(String columnName) {
     while (!column.isKey() && column.getDomainType() instanceof ForeignKeyDomainType) {
       column = ((ForeignKeyDomainType) column.getDomainType()).getForeignKeyColumn(
-          column.getColumnName());
+        column.getColumnName());
       tableName = column.getTable().getName();
     }
     return column;
   }
 
-  @Override protected String getReferedTableName(String columnName) {
+  @Override
+  protected String getReferedTableName(String columnName) {
     return tableName;
   }
 }

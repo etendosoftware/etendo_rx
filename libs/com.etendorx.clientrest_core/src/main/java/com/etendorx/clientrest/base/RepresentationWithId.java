@@ -11,12 +11,16 @@ public abstract class RepresentationWithId<T extends RepresentationModel<T>> ext
   @JsonProperty("updated")
   public Date getUpdated() {
     return null;
-  };
+  }
+
+  ;
 
   @JsonProperty("creationdate")
   public Date getCreationDate() {
     return null;
-  };
+  }
+
+  ;
 
 }
 

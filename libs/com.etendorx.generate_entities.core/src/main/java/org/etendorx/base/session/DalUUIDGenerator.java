@@ -41,8 +41,9 @@ import java.io.Serializable;
  */
 public class DalUUIDGenerator extends UUIDGenerator {
 
-  @Override public Serializable generate(SharedSessionContractImplementor session, Object obj)
-      throws HibernateException {
+  @Override
+  public Serializable generate(SharedSessionContractImplementor session, Object obj)
+    throws HibernateException {
     final BaseOBObjectDef bob = (BaseOBObjectDef) obj;
     if (bob.getId() != null) {
       return ((String) bob.getId()).toUpperCase();

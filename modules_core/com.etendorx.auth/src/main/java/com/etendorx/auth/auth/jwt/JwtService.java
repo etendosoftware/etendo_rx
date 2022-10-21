@@ -14,21 +14,21 @@ import java.time.ZonedDateTime;
 @Component
 public class JwtService {
 
-    private static final String ISS = "EtendoRX Auth";
-    public static final String INVALID_TOKEN = "Invalid token.";
+  private static final String ISS = "EtendoRX Auth";
+  public static final String INVALID_TOKEN = "Invalid token.";
 
-    @Autowired
-    JwtKeyProvider jwtKeyProvider;
+  @Autowired
+  JwtKeyProvider jwtKeyProvider;
 
-    public JwtResponse generateJwtToken(Claims claims) {
-        PrivateKey privateKey = jwtKeyProvider.getPrivateKey();
-        String token = Jwts.builder()
-                .setIssuer(ISS)
-                .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-                .addClaims(claims)
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
-        return new JwtResponse(token);
-    }
+  public JwtResponse generateJwtToken(Claims claims) {
+    PrivateKey privateKey = jwtKeyProvider.getPrivateKey();
+    String token = Jwts.builder()
+      .setIssuer(ISS)
+      .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
+      .addClaims(claims)
+      .signWith(SignatureAlgorithm.RS256, privateKey)
+      .compact();
+    return new JwtResponse(token);
+  }
 
 }

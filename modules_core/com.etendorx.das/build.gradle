@@ -66,7 +66,7 @@ dependencies {
     codegen project(':com.etendorx.grpc.common')
     implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
     implementation 'com.google.protobuf:protobuf-java-util:3.19.4'
-    implementation (project(':com.etendorx.utils.auth')) {
+    implementation(project(':com.etendorx.utils.auth')) {
         exclude group: 'org.slf4j', module: '*'
     }
     implementation "org.springframework.boot:spring-boot-starter-actuator"
@@ -86,13 +86,13 @@ sourceSets.main.compileClasspath += configurations.codegen
 bootJar {
     manifest {
         // Used to allow adding extra JAR files to the executable boot JAR
-        attributes 'Main-Class' : 'org.springframework.boot.loader.PropertiesLauncher'
+        attributes 'Main-Class': 'org.springframework.boot.loader.PropertiesLauncher'
     }
 }
 
 bootRun {
     classpath += configurations.codegen
-    debugOptions{
+    debugOptions {
         port = Integer.valueOf((findProperty('debugPort') ?: port.get()) as String)
     }
 }
