@@ -28,11 +28,13 @@ public class Module extends ModelObject {
   private Integer seqno;
   private String javaPackage;
 
-  @Override public String getName() {
+  @Override
+  public String getName() {
     return name;
   }
 
-  @Override public void setName(String name) {
+  @Override
+  public void setName(String name) {
     this.name = name;
   }
 

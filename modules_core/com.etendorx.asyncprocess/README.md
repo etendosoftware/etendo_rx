@@ -1,4 +1,5 @@
 ### Consume changes
+
 ```shell
 ./bin/kafka-console-consumer \
   --topic bank-balances \

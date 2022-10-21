@@ -86,7 +86,7 @@ public class QueryTimeOutUtil implements OBSingleton {
           value = obProperties.getProperty(propName);
           int intValue = Integer.parseInt(value);
           queryTimeOutMap.put(propName.substring(QUERY_TIMEOUT_PREFIX_PROPERTY_NAME.length()),
-              intValue);
+            intValue);
         } catch (NumberFormatException e) {
           log.error("Invalid value for " + propName + " property: " + value, e);
         }
@@ -128,7 +128,7 @@ public class QueryTimeOutUtil implements OBSingleton {
    *
    * @param query
    * @param type
-   *     query type, it will be used to fetch the proper timeout
+   *   query type, it will be used to fetch the proper timeout
    */
   public void setQueryTimeOut(Query<?> query, String type) {
     if (canApplyTimeOut && checkQueryType(type)) {
@@ -141,7 +141,7 @@ public class QueryTimeOutUtil implements OBSingleton {
    *
    * @param criteria
    * @param type
-   *     query type, it will be used to fetch the proper timeout
+   *   query type, it will be used to fetch the proper timeout
    */
   public void setQueryTimeOut(Criteria criteria, String type) {
     if (canApplyTimeOut && checkQueryType(type)) {
@@ -153,7 +153,7 @@ public class QueryTimeOutUtil implements OBSingleton {
    * Sets a timeout for a sql statement, if possible
    *
    * @param type
-   *     query type, it will be used to fetch the proper timeout
+   *   query type, it will be used to fetch the proper timeout
    */
   public void setQueryTimeOut(Statement statement, String type) {
     if (canApplyTimeOut && checkQueryType(type)) {
@@ -169,6 +169,7 @@ public class QueryTimeOutUtil implements OBSingleton {
    * Checks if the provided query type is included in the queryTimeOutMap
    *
    * @param type
+   *
    * @return true if the provided query type is a key of the queryTimeOutMap map
    */
   private boolean checkQueryType(String type) {

@@ -48,7 +48,7 @@ public class DalUtil {
    * Sorts the passed list according to the identifier of the objects.
    *
    * @param objects
-   *     the objects (must be BaseOBObjects) to sort.
+   *   the objects (must be BaseOBObjects) to sort.
    */
   public static void sortByIdentifier(List<? extends BaseOBObject> objects) {
     Collections.sort(objects, new OBObjectComparator());
@@ -56,7 +56,8 @@ public class DalUtil {
 
   private static class OBObjectComparator implements Comparator<BaseOBObject> {
 
-    @Override public int compare(BaseOBObject arg0, BaseOBObject arg1) {
+    @Override
+    public int compare(BaseOBObject arg0, BaseOBObject arg1) {
       return arg0.getIdentifier().compareTo(arg1.getIdentifier());
     }
   }
@@ -67,9 +68,10 @@ public class DalUtil {
    * Organization.name property to be returned.
    *
    * @param entity
-   *     the start entity for the property path
+   *   the start entity for the property path
    * @param propertyPath
-   *     the property path, dot-separated property names
+   *   the property path, dot-separated property names
+   *
    * @return the found property
    */
   public static Property getPropertyFromPath(Entity entity, String propertyPath) {
@@ -104,9 +106,10 @@ public class DalUtil {
    * Finds a property using the db column name and table name.
    *
    * @param tableName
-   *     the table name, is used to find the {@link Entity}
+   *   the table name, is used to find the {@link Entity}
    * @param dbColumnName
-   *     is used to find the {@link Property}
+   *   is used to find the {@link Property}
+   *
    * @return a Property or null if no property found
    */
   public static Property getProperty(String tableName, String dbColumnName) {
@@ -123,9 +126,10 @@ public class DalUtil {
    * Finds a property using the db column name and table id.
    *
    * @param tableId
-   *     the table id, is used to find the {@link Entity}
+   *   the table id, is used to find the {@link Entity}
    * @param dbColumnName
-   *     is used to find the {@link Property}
+   *   is used to find the {@link Property}
+   *
    * @return a Property or null if no property found
    */
   public static Property getPropertyByTableId(String tableId, String dbColumnName) {
@@ -144,9 +148,10 @@ public class DalUtil {
    * Organization.name property to be returned.
    *
    * @param bob
-   *     the start entity for the property path
+   *   the start entity for the property path
    * @param propertyPath
-   *     the property path, dot-separated property names
+   *   the property path, dot-separated property names
+   *
    * @return the found value
    */
   public static Object getValueFromPath(BaseOBObject bob, String propertyPath) {
@@ -194,7 +199,8 @@ public class DalUtil {
    * Referenced objects are not copied. The id of the copied objects are all set to null.
    *
    * @param source
-   *     the list of BaseOBObject which will be copied
+   *   the list of BaseOBObject which will be copied
+   *
    * @return the copied BaseOBObject, child objects are also copied
    */
   public static List<BaseOBObject> copyAll(List<BaseOBObject> source) {
@@ -207,9 +213,10 @@ public class DalUtil {
    * the id of the copied objects is nullified.
    *
    * @param source
-   *     the list of BaseOBObject which will be copied
+   *   the list of BaseOBObject which will be copied
    * @param resetId
-   *     if true then the id's of the copied objects will be nullified
+   *   if true then the id's of the copied objects will be nullified
+   *
    * @return the copied BaseOBObject, child objects are also copied
    */
   public static List<BaseOBObject> copyAll(List<BaseOBObject> source, boolean resetId) {
@@ -227,7 +234,8 @@ public class DalUtil {
    * null.
    *
    * @param source
-   *     the object to be copied
+   *   the object to be copied
+   *
    * @return the copied object
    */
   public static BaseOBObject copy(BaseOBObject source) {
@@ -239,9 +247,10 @@ public class DalUtil {
    * copied. The id of the copied object (and its children) is set to null.
    *
    * @param source
-   *     the object to be copied
+   *   the object to be copied
    * @param copyChildren
-   *     this parameter controls if the children of the source are also copied (recursively)
+   *   this parameter controls if the children of the source are also copied (recursively)
+   *
    * @return the copied object
    */
   public static BaseOBObject copy(BaseOBObject source, boolean copyChildren) {
@@ -254,11 +263,12 @@ public class DalUtil {
    * to null.
    *
    * @param source
-   *     the object to be copied
+   *   the object to be copied
    * @param copyChildren
-   *     this parameter controls if the children of the source are also copied (recursively)
+   *   this parameter controls if the children of the source are also copied (recursively)
    * @param resetId
-   *     if true then the id's of the copied objects will be nullified
+   *   if true then the id's of the copied objects will be nullified
+   *
    * @return the copied object
    */
   public static BaseOBObject copy(BaseOBObject source, boolean copyChildren, boolean resetId) {
@@ -270,14 +280,14 @@ public class DalUtil {
 
   /**
    * Convenience method usefull for when implementing a custom copy process.
-   *
+   * <p>
    * Walks through all copied objects and if there are references to objects which have been copied
    * then the references are moved to the copied object
-   *
+   * <p>
    * See issue https://issues.openbravo.com/view.php?id=8651 which is related to this method.
    *
    * @param fromTo
-   *     map with copy from - copy to relation
+   *   map with copy from - copy to relation
    */
   public static void repairReferences(Map<BaseOBObject, BaseOBObject> fromTo) {
 
@@ -312,20 +322,22 @@ public class DalUtil {
    * its copy are added to the fromTo map.
    *
    * @param source
-   *     the object to copy
+   *   the object to copy
    * @param copyChildren
-   *     if true then all the child objects (which have this object as parent) are copied
-   *     recursively
+   *   if true then all the child objects (which have this object as parent) are copied
+   *   recursively
    * @param resetId
-   *     if true then the id of the copied object is set to null
+   *   if true then the id of the copied object is set to null
    * @param fromTo
-   *     the map which maintains the relation between the to-copy and the copied object
+   *   the map which maintains the relation between the to-copy and the copied object
+   *
    * @return the copied object
+   *
    * @see #copy(BaseOBObject, boolean, boolean)
    * @see #repairReferences(Map)
    */
   public static BaseOBObject copy(BaseOBObject source, boolean copyChildren, boolean resetId,
-      Map<BaseOBObject, BaseOBObject> fromTo) {
+                                  Map<BaseOBObject, BaseOBObject> fromTo) {
 
     final BaseOBObject target = (BaseOBObject) OBProvider.getInstance().get(source.getEntityName());
     fromTo.put(source, target);
@@ -359,17 +371,18 @@ public class DalUtil {
    * is set to null.
    *
    * @param source
-   *     the object to be copied
+   *   the object to be copied
    * @param target
-   *     the object where the original properties will be copied
+   *   the object where the original properties will be copied
    * @param copyChildren
-   *     this parameter controls if the children of the source are also copied (recursively)
+   *   this parameter controls if the children of the source are also copied (recursively)
    * @param notCopiedProperties
-   *     list of property names that will not be copied into the target
+   *   list of property names that will not be copied into the target
+   *
    * @return the copied object
    */
   public static BaseOBObject copyToTarget(BaseOBObject source, BaseOBObject target,
-      boolean copyChildren, List<String> notCopiedProperties) {
+                                          boolean copyChildren, List<String> notCopiedProperties) {
     final Map<BaseOBObject, BaseOBObject> fromTo = new HashMap<BaseOBObject, BaseOBObject>();
     copyToTarget(source, target, copyChildren, fromTo, notCopiedProperties);
     repairReferences(fromTo);
@@ -382,23 +395,25 @@ public class DalUtil {
    * properties. The source and its copy are added to the fromTo map.
    *
    * @param source
-   *     the object to copy
+   *   the object to copy
    * @param target
-   *     the object where the original properties will be copied
+   *   the object where the original properties will be copied
    * @param copyChildren
-   *     if true then all the child objects (which have this object as parent) are copied
-   *     recursively
+   *   if true then all the child objects (which have this object as parent) are copied
+   *   recursively
    * @param fromTo
-   *     the map which maintains the relation between the to-copy and the copied object
+   *   the map which maintains the relation between the to-copy and the copied object
    * @param notCopiedProperties
-   *     list of property names that will not be copied into the target
+   *   list of property names that will not be copied into the target
+   *
    * @return the copied object
+   *
    * @see #copy(BaseOBObject, boolean, boolean)
    * @see #repairReferences(Map)
    */
   public static BaseOBObject copyToTarget(BaseOBObject source, BaseOBObject target,
-      boolean copyChildren, Map<BaseOBObject, BaseOBObject> fromTo,
-      List<String> notCopiedProperties) {
+                                          boolean copyChildren, Map<BaseOBObject, BaseOBObject> fromTo,
+                                          List<String> notCopiedProperties) {
 
     fromTo.put(source, target);
     for (final Property p : source.getEntity().getProperties()) {
@@ -423,9 +438,10 @@ public class DalUtil {
 
   /**
    * @deprecated It is not needed to used this method for lazy loading of id in a proxy. Kept only
-   * for backwards compatibility.
+   *   for backwards compatibility.
    */
-  @Deprecated public static Serializable getId(Object o) {
+  @Deprecated
+  public static Serializable getId(Object o) {
     if (o instanceof HibernateProxy) {
       return ((HibernateProxy) o).getHibernateLazyInitializer().getIdentifier();
     }
@@ -433,9 +449,9 @@ public class DalUtil {
       return (Serializable) ((BaseOBObject) o).getId();
     }
     throw new ArgumentException(
-        "Argument is not a BaseOBObject and not a HibernateProxy " + (o != null ?
-            o.getClass().getName() :
-            "it is NULL"));
+      "Argument is not a BaseOBObject and not a HibernateProxy " + (o != null ?
+        o.getClass().getName() :
+        "it is NULL"));
   }
 
   /**
@@ -444,8 +460,9 @@ public class DalUtil {
    * directly from the object. This prevent unwanted loading of the object.
    *
    * @param o
-   *     the object to get the entity name for, can be a Hibernate proxy or a
-   *     {@link BaseOBObject}
+   *   the object to get the entity name for, can be a Hibernate proxy or a
+   *   {@link BaseOBObject}
+   *
    * @return the entity name
    */
   // returns the static member containing the entityname
@@ -480,17 +497,18 @@ public class DalUtil {
    * the referenced object needs to be returned.
    *
    * @param referencingProperty
-   *     the property which models the association, it is a property of the refering object
-   *     (the owner)
+   *   the property which models the association, it is a property of the refering object
+   *   (the owner)
    * @param referedObject
-   *     the entity to which is being refered
+   *   the entity to which is being refered
+   *
    * @return the id of the referedObject (most of the time) or if the foreign key is to another
-   * property then the value of that property is returned
+   *   property then the value of that property is returned
    */
   public static Serializable getReferencedPropertyValue(Property referencingProperty,
-      Object referedObject) {
+                                                        Object referedObject) {
     Check.isTrue(referencingProperty.getReferencedProperty() != null,
-        "This property " + referencingProperty + " does not have a referenced Property");
+      "This property " + referencingProperty + " does not have a referenced Property");
     final Property referencedProperty = referencingProperty.getReferencedProperty();
     if (referencedProperty.isId()) {
       if (referedObject instanceof HibernateProxy) {

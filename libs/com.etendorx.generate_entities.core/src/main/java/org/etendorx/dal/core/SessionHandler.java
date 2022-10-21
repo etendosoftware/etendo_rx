@@ -61,8 +61,8 @@ public class SessionHandler implements OBNotSingleton {
 
   {
     String poolClassName = OBPropertiesProvider.getInstance()
-        .getOpenbravoProperties()
-        .getProperty("db.externalPoolClassName");
+      .getOpenbravoProperties()
+      .getProperty("db.externalPoolClassName");
     if (poolClassName != null && !"".equals(poolClassName)) {
       try {
         externalConnectionPool = ExternalConnectionPool.getInstance(poolClassName);
@@ -95,7 +95,7 @@ public class SessionHandler implements OBNotSingleton {
    * pool.
    *
    * @return true if a session handler is present for this thread and available for the default
-   * pool, false otherwise
+   *   pool, false otherwise
    */
   public static boolean isSessionHandlerPresent() {
     return isSessionHandlerPresent(ExternalConnectionPool.DEFAULT_POOL);
@@ -106,9 +106,10 @@ public class SessionHandler implements OBNotSingleton {
    * whose name is passed as parameter.
    *
    * @param pool
-   *     the name of the pool
+   *   the name of the pool
+   *
    * @return true if a session handler is present for this thread and available for the specified
-   * pool, false otherwise
+   *   pool, false otherwise
    */
   public static boolean isSessionHandlerPresent(String pool) {
     return sessionHandler.get() != null && sessionHandler.get().isAvailablePool(pool);
@@ -166,7 +167,8 @@ public class SessionHandler implements OBNotSingleton {
    * not created previously, this methods returns a newly created session from that pool.
    *
    * @param pool
-   *     the name of the pool used to retrieve the session
+   *   the name of the pool used to retrieve the session
+   *
    * @return the session
    */
   public Session getSession(String pool) {
@@ -293,7 +295,8 @@ public class SessionHandler implements OBNotSingleton {
    * Gets a new {@code Connection} from the connection pool.
    *
    * @param pool
-   *     the name of the pool used to retrieve the connection
+   *   the name of the pool used to retrieve the connection
+   *
    * @return a {@code Connection} from the specified pool
    */
   public Connection getNewConnection(String pool) throws SQLException {
@@ -310,7 +313,7 @@ public class SessionHandler implements OBNotSingleton {
     } else {
       // getting connection from Hibernate pool
       DalSessionFactory sf = (DalSessionFactory) SessionFactoryController.getInstance()
-          .getSessionFactory();
+        .getSessionFactory();
       newConnection = sf.getJdbcConnectionAccess().obtainConnection();
       sf.initConnection(newConnection);
     }
@@ -335,7 +338,7 @@ public class SessionHandler implements OBNotSingleton {
    * Sets the connection of the default pool to be used by the handler.
    *
    * @param newConnection
-   *     the connection of the default pool.
+   *   the connection of the default pool.
    */
   public void setConnection(Connection newConnection) {
     setConnection(ExternalConnectionPool.DEFAULT_POOL, newConnection);
@@ -401,8 +404,8 @@ public class SessionHandler implements OBNotSingleton {
   /**
    * Begins a new Transaction on the current HibernateSession and assigns it to the SessionHandler.
    *
-   * @throws OBException
-   *     if there is already an available active transaction.
+   * @exception OBException
+   *   if there is already an available active transaction.
    */
   public void beginNewTransaction() throws OBException {
     beginNewTransaction(ExternalConnectionPool.DEFAULT_POOL);
@@ -411,7 +414,7 @@ public class SessionHandler implements OBNotSingleton {
   private void beginNewTransaction(String pool) throws OBException {
     if (isCurrentTransactionActive(pool)) {
       throw new OBException(
-          "Not possible to start a new transaction while there is still one active.");
+        "Not possible to start a new transaction while there is still one active.");
     }
     Session session = getSession(pool);
     if (!isCurrentTransactionActive(pool)) {
@@ -424,7 +427,7 @@ public class SessionHandler implements OBNotSingleton {
    * Saves the object in this getSession().
    *
    * @param obj
-   *     the object to persist
+   *   the object to persist
    */
   public void save(Object obj) {
     save(ExternalConnectionPool.DEFAULT_POOL, obj);
@@ -434,9 +437,9 @@ public class SessionHandler implements OBNotSingleton {
    * Saves the object in the session of the pool whose name is passed as parameter.
    *
    * @param pool
-   *     the name of the pool used to retrieve the session where the object will be saved
+   *   the name of the pool used to retrieve the session where the object will be saved
    * @param obj
-   *     the object to persist
+   *   the object to persist
    */
   public void save(String pool, Object obj) {
     if (Identifiable.class.isAssignableFrom(obj.getClass())) {
@@ -450,7 +453,7 @@ public class SessionHandler implements OBNotSingleton {
    * Delete the object from the db.
    *
    * @param obj
-   *     the object to remove
+   *   the object to remove
    */
   public void delete(Object obj) {
     delete(ExternalConnectionPool.DEFAULT_POOL, obj);
@@ -460,9 +463,9 @@ public class SessionHandler implements OBNotSingleton {
    * Delete the object from the db.
    *
    * @param pool
-   *     the name of the pool used to retrieve the session where the object will be deleted
+   *   the name of the pool used to retrieve the session where the object will be deleted
    * @param obj
-   *     the object to remove
+   *   the object to remove
    */
   public void delete(String pool, Object obj) {
     if (Identifiable.class.isAssignableFrom(obj.getClass())) {
@@ -476,9 +479,10 @@ public class SessionHandler implements OBNotSingleton {
    * Queries for a certain object using the class and id. If not found then null is returned.
    *
    * @param clazz
-   *     the class to query
+   *   the class to query
    * @param id
-   *     the id to use for querying
+   *   the id to use for querying
+   *
    * @return the retrieved object, can be null
    */
   public <T extends Object> T find(Class<T> clazz, Object id) {
@@ -489,15 +493,17 @@ public class SessionHandler implements OBNotSingleton {
    * Queries for a certain object using the class and id. If not found then null is returned.
    *
    * @param pool
-   *     the name of the pool used to obtain the connection to execute the query
+   *   the name of the pool used to obtain the connection to execute the query
    * @param clazz
-   *     the class to query
+   *   the class to query
    * @param id
-   *     the id to use for querying
+   *   the id to use for querying
+   *
    * @return the retrieved object, can be null
    */
-  @SuppressWarnings("unchecked") public <T extends Object> T find(String pool, Class<T> clazz,
-      Object id) {
+  @SuppressWarnings("unchecked")
+  public <T extends Object> T find(String pool, Class<T> clazz,
+                                   Object id) {
     // translates a class to an entityname because the hibernate
     // getSession().get method can not handle class names if the entity was
     // mapped with entitynames.
@@ -511,10 +517,12 @@ public class SessionHandler implements OBNotSingleton {
    * Queries for a certain object using the entity name and id. If not found then null is returned.
    *
    * @param entityName
-   *     the name of the entity to query
+   *   the name of the entity to query
    * @param id
-   *     the id to use for querying
+   *   the id to use for querying
+   *
    * @return the retrieved object, can be null
+   *
    * @see Entity
    */
   public BaseOBObject find(String entityName, Object id) {
@@ -525,12 +533,14 @@ public class SessionHandler implements OBNotSingleton {
    * Queries for a certain object using the entity name and id. If not found then null is returned.
    *
    * @param pool
-   *     the name of the pool used to obtain the connection to execute the query
+   *   the name of the pool used to obtain the connection to execute the query
    * @param entityName
-   *     the name of the entity to query
+   *   the name of the entity to query
    * @param id
-   *     the id to use for querying
+   *   the id to use for querying
+   *
    * @return the retrieved object, can be null
+   *
    * @see Entity
    */
   public BaseOBObject find(String pool, String entityName, Object id) {
@@ -541,9 +551,10 @@ public class SessionHandler implements OBNotSingleton {
    * Create a query object from the current getSession().
    *
    * @param qryStr
-   *     the HQL query
+   *   the HQL query
    * @param clazz
-   *     the class of the query's resulting objects
+   *   the class of the query's resulting objects
+   *
    * @return a new Query object
    */
   public <T> Query<T> createQuery(String qryStr, Class<T> clazz) {
@@ -554,10 +565,12 @@ public class SessionHandler implements OBNotSingleton {
    * Create a query object from the current getSession().
    *
    * @param qryStr
-   *     the HQL query
+   *   the HQL query
+   *
    * @return a new Query object
    */
-  @SuppressWarnings("unchecked") public <T extends Object> Query<T> createQuery(String qryStr) {
+  @SuppressWarnings("unchecked")
+  public <T extends Object> Query<T> createQuery(String qryStr) {
     return (Query<T>) createQuery(ExternalConnectionPool.DEFAULT_POOL, qryStr, Object.class);
   }
 
@@ -595,13 +608,13 @@ public class SessionHandler implements OBNotSingleton {
    * work.
    *
    * @param pool
-   *     the name of the pool which the transaction belongs.
+   *   the name of the pool which the transaction belongs.
    */
   public void commitAndClose(String pool) {
     boolean err = true;
     try {
       Check.isFalse(TriggerHandler.getInstance().isDisabled(),
-          "Triggers disabled, commit is not allowed when in triggers-disabled mode, " + "call TriggerHandler.enable() before committing");
+        "Triggers disabled, commit is not allowed when in triggers-disabled mode, " + "call TriggerHandler.enable() before committing");
 
       checkInvariant(pool);
       flushRemainingChanges(pool);
@@ -629,8 +642,8 @@ public class SessionHandler implements OBNotSingleton {
         if (trx != null && trx.isActive()) {
           if (trx.getStatus() == TransactionStatus.MARKED_ROLLBACK) {
             log.error(
-                "Hibernate transaction was marked for rollback, its DB transaction is also rolled back.",
-                new Exception("stack trace"));
+              "Hibernate transaction was marked for rollback, its DB transaction is also rolled back.",
+              new Exception("stack trace"));
           }
           trx.commit();
         }
@@ -638,7 +651,7 @@ public class SessionHandler implements OBNotSingleton {
       err = false;
     } catch (SQLException e) {
       log.error("Error while closing the connection in pool " + pool,
-          DbUtility.getUnderlyingSQLException(e));
+        DbUtility.getUnderlyingSQLException(e));
     } finally {
       closeTransaction(pool, err);
     }
@@ -677,7 +690,7 @@ public class SessionHandler implements OBNotSingleton {
 
   private void commitAndStart(String pool) {
     Check.isFalse(TriggerHandler.getInstance().isDisabled(),
-        "Triggers disabled, commit is not allowed when in triggers-disabled mode, " + "call TriggerHandler.enable() before committing");
+      "Triggers disabled, commit is not allowed when in triggers-disabled mode, " + "call TriggerHandler.enable() before committing");
 
     checkInvariant(pool);
     flushRemainingChanges(pool);
@@ -717,7 +730,7 @@ public class SessionHandler implements OBNotSingleton {
    * Rolls back the transaction and closes the session.
    *
    * @param pool
-   *     the name of the pool which the transaction belongs.
+   *   the name of the pool which the transaction belongs.
    */
   public void rollback(String pool) {
     log.debug("Rolling back transaction in pool " + pool);
@@ -759,7 +772,7 @@ public class SessionHandler implements OBNotSingleton {
    * Registers that the transaction should be rolled back. Is used by the {@link DalThreadHandler}.
    *
    * @param setRollback
-   *     if true then the transaction will be rolled back at the end of the thread.
+   *   if true then the transaction will be rolled back at the end of the thread.
    */
   public void setDoRollback(boolean setRollback) {
     if (setRollback) {

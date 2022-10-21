@@ -14,22 +14,26 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<class name="org.openbravo.userinterface.selector.model.domaintype.SelectorDefinition" lazy="false" table="obuisel_selector">
-		<cache usage="read-write"/>
-		
-		<id name="id" type="string" column="obuisel_selector_id">
+    <class name="org.openbravo.userinterface.selector.model.domaintype.SelectorDefinition" lazy="false"
+           table="obuisel_selector">
+        <cache usage="read-write"/>
+
+        <id name="id" type="string" column="obuisel_selector_id">
             <generator class="org.etendorx.base.session.DalUUIDGenerator"/>
-		</id>
+        </id>
 
         <many-to-one name="table" not-null="false" class="org.openbravo.base.model.Table" column="ad_table_id"/>
 
-        <many-to-one name="datasourceDefinition" not-null="false" class="org.openbravo.userinterface.selector.model.domaintype.DatasourceDefinition" column="obserds_datasource_id"/>
+        <many-to-one name="datasourceDefinition" not-null="false"
+                     class="org.openbravo.userinterface.selector.model.domaintype.DatasourceDefinition"
+                     column="obserds_datasource_id"/>
 
         <many-to-one name="column" not-null="false" class="org.openbravo.base.model.Column" column="ad_column_id"/>
-		 
-		<property name="referenceId" not-null="true" column="ad_reference_id"/>
-		
-	</class>
+
+        <property name="referenceId" not-null="true" column="ad_reference_id"/>
+
+    </class>
 </hibernate-mapping>

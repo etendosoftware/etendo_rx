@@ -4,18 +4,19 @@ import java.io.Serializable;
 
 public class JwtResponse implements Serializable {
 
-    private String token;
+  private String token;
 
-    /**
-     * default constructor for JSON Parsing
-     */
-    public JwtResponse() {}
+  /**
+   * default constructor for JSON Parsing
+   */
+  public JwtResponse() {
+  }
 
-    public JwtResponse(String token) {
-        this.token = token;
-    }
+  public JwtResponse(String token) {
+    this.token = token;
+  }
 
-    public String getToken() {
-        return this.token;
-    }
+  public String getToken() {
+    return this.token;
+  }
 }

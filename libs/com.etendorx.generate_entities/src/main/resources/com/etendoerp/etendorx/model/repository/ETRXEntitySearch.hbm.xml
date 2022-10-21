@@ -29,8 +29,8 @@
         <property name="active" type="org.etendorx.base.session.OBYesNoType" not-null="true"
                   column="isactive"/>
 
-        <property name="query" />
-        <property name="method" />
+        <property name="query"/>
+        <property name="method"/>
 
         <many-to-one name="repository" not-null="true" class="com.etendoerp.etendorx.model.repository.ETRXRepository"
                      column="etrx_repository_id"/>

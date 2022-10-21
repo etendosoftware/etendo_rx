@@ -225,11 +225,12 @@ public class DataSetService implements OBSingleton {
    * Determines which objects are exportable using the DataSetTable whereClause.
    *
    * @param dataSetTable
-   *     the dataSetTable defines the Entity and the whereClause to use
+   *   the dataSetTable defines the Entity and the whereClause to use
    * @param moduleId
-   *     the moduleId is a parameter in the whereClause
+   *   the moduleId is a parameter in the whereClause
    * @param parameters
-   *     a collection of named parameters which are used in the whereClause of the dataSetTable
+   *   a collection of named parameters which are used in the whereClause of the dataSetTable
+   *
    * @return the list of exportable business objects
    */
   @SuppressWarnings("unchecked")
@@ -288,17 +289,17 @@ public class DataSetService implements OBSingleton {
    *          New map with found parameters in this where clause
    * @return whereClause ready for execution and existingParams set
    */ private String getWhereClauseWithAliasesReplaced(String moduleId,
-      Map<String, Object> parameters, String whereClauseWithAliases,
-      Map<String, Object> paramsInWhereClause) {
+                                                       Map<String, Object> parameters, String whereClauseWithAliases,
+                                                       Map<String, Object> paramsInWhereClause) {
     String whereClause = whereClauseWithAliases;
     if (whereClauseWithAliases != null) {
       if (parameters != null) {
         String finalWhereClause = whereClause;
         parameters.keySet()
-            .stream()
-            .filter(name -> finalWhereClause.contains(":" + name))
-            .forEach(name -> paramsInWhereClause.put(name,
-                "null".equals(parameters.get(name)) ? null : parameters.get(name)));
+          .stream()
+          .filter(name -> finalWhereClause.contains(":" + name))
+          .forEach(name -> paramsInWhereClause.put(name,
+            "null".equals(parameters.get(name)) ? null : parameters.get(name)));
       }
       if (moduleId != null) {
         // Minimal checking that the moduleId has no spaces and seems to be an alphanumeric string
@@ -422,13 +423,14 @@ public class DataSetService implements OBSingleton {
    * properties are never exported
    *
    * @param bob
-   *     the business object to export
+   *   the business object to export
    * @param dataSetTable
-   *     the dataSetTable to export
+   *   the dataSetTable to export
    * @param dataSetColumns
-   *     the list of potential columns to export
+   *   the list of potential columns to export
    * @param exportTransients
-   *     if true then transient properties are also exportable
+   *   if true then transient properties are also exportable
+   *
    * @return the list of properties which are exportable
    */
   /*
@@ -492,7 +494,8 @@ public class DataSetService implements OBSingleton {
   // compares the content of a list by converting the id to a hex
   public static class BaseOBIDHexComparator implements Comparator<Object> {
 
-    @Override public int compare(Object o1, Object o2) {
+    @Override
+    public int compare(Object o1, Object o2) {
       if (!(o1 instanceof BaseOBObject) || !(o2 instanceof BaseOBObject)) {
         return 0;
       }
@@ -514,7 +517,8 @@ public class DataSetService implements OBSingleton {
 
   public static class BaseStringComparator implements Comparator<Object> {
 
-    @Override public int compare(Object o1, Object o2) {
+    @Override
+    public int compare(Object o1, Object o2) {
       if (!(o1 instanceof BaseOBObject) || !(o2 instanceof BaseOBObject)) {
         return 0;
       }

@@ -45,8 +45,7 @@ public class OBClassLoader implements OBSingleton {
    * found. This exception is logged.
    *
    * @param className
-   *     the name of the class to load
-   * @throws ClassNotFoundException
+   *   the name of the class to load
    */
   public Class<?> loadClass(String className) throws ClassNotFoundException {
     return Thread.currentThread().getContextClassLoader().loadClass(className);
@@ -54,14 +53,15 @@ public class OBClassLoader implements OBSingleton {
 
   /**
    * A class loader which uses the classloader of the Class class.
-   *
+   * <p>
    * To use this classloader do the following:
    * OBProvider.getInstance().register(OBClassLoader.class, OBClassLoader.ClassOBClassLoader.class,
    * false);
    */
   public static class ClassOBClassLoader extends OBClassLoader {
 
-    @Override public Class<?> loadClass(String className) throws ClassNotFoundException {
+    @Override
+    public Class<?> loadClass(String className) throws ClassNotFoundException {
       return Class.forName(className);
     }
   }

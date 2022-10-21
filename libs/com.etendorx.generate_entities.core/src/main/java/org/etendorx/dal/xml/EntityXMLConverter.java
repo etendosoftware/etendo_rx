@@ -149,7 +149,8 @@ public class EntityXMLConverter implements OBNotSingleton {
    * Converts one business object to xml and returns the resulting xml string.
    *
    * @param obObject
-   *     the object to convert to xml
+   *   the object to convert to xml
+   *
    * @return the xml representation of obObject
    */
   public String toXML(BaseOBObject obObject) {
@@ -162,7 +163,8 @@ public class EntityXMLConverter implements OBNotSingleton {
    * Converts a collection of business objects to xml.
    *
    * @param bobs
-   *     the collection to convert
+   *   the collection to convert
+   *
    * @return the resulting xml string
    */
   public String toXML(Collection<BaseOBObject> bobs) {
@@ -181,7 +183,7 @@ public class EntityXMLConverter implements OBNotSingleton {
    * Processes one business object and outputs it to the writer ({@link #setOutput(Writer)}).
    *
    * @param bob
-   *     the business object to convert to xml (dom4j)
+   *   the business object to convert to xml (dom4j)
    */
   public void process(BaseOBObject bob) {
     // set the export list
@@ -197,7 +199,7 @@ public class EntityXMLConverter implements OBNotSingleton {
    * {@link #setOutput(Writer)}).
    *
    * @param bobs
-   *     the business objects to convert to xml (dom4j)
+   *   the business objects to convert to xml (dom4j)
    */
   public void process(Collection<BaseOBObject> bobs) {
     // set the export list
@@ -221,11 +223,11 @@ public class EntityXMLConverter implements OBNotSingleton {
 
       if (defaultValuesData) {
         rootAttrs.addAttribute("", "", XMLConstants.DEFAULT_VALUES_DATA, "boolean",
-            Boolean.toString(defaultValuesData));
+          Boolean.toString(defaultValuesData));
       }
 
       xmlHandler.startElement(XMLConstants.etendorx_NAMESPACE, XMLConstants.OB_ROOT_ELEMENT,
-          "ob:" + XMLConstants.OB_ROOT_ELEMENT, rootAttrs);
+        "ob:" + XMLConstants.OB_ROOT_ELEMENT, rootAttrs);
 
       boolean exportBecauseReferenced = false;
       // do the data scrollers
@@ -259,7 +261,7 @@ public class EntityXMLConverter implements OBNotSingleton {
       replaceToProcess();
       getAllToProcessObjects().clear();
       xmlHandler.endElement("http://www.etendorx.com", XMLConstants.OB_ROOT_ELEMENT,
-          "ob:" + XMLConstants.OB_ROOT_ELEMENT);
+        "ob:" + XMLConstants.OB_ROOT_ELEMENT);
       xmlHandler.endDocument();
     } catch (Exception e) {
       throw new EntityXMLException(e);
@@ -281,21 +283,21 @@ public class EntityXMLConverter implements OBNotSingleton {
   }
 
   protected void export(BaseOBObject obObject, boolean isAddedBecauseReferenced)
-      throws SAXException {
+    throws SAXException {
     export(obObject, isAddedBecauseReferenced, null, null);
   }
 
   protected void export(BaseOBObject obObject, boolean isAddedBecauseReferenced,
-      Boolean excludeAuditInfo) throws SAXException {
+                        Boolean excludeAuditInfo) throws SAXException {
     export(obObject, isAddedBecauseReferenced, excludeAuditInfo, "");
   }
 
   protected void export(BaseOBObject obObject, boolean isAddedBecauseReferenced,
-      Boolean excludeAuditInfo, String exportedPropertyNameParam) throws SAXException {
+                        Boolean excludeAuditInfo, String exportedPropertyNameParam) throws SAXException {
 
     String exportedPropertyName = (exportedPropertyNameParam == null) ?
-        "" :
-        exportedPropertyNameParam;
+      "" :
+      exportedPropertyNameParam;
     final String entityName = DalUtil.getEntityName(obObject);
 
     final AttributesImpl entityAttrs = new AttributesImpl();
@@ -306,7 +308,7 @@ public class EntityXMLConverter implements OBNotSingleton {
     }
     if (!isOptionMinimizeXMLSize()) {
       entityAttrs.addAttribute("", "", XMLConstants.IDENTIFIER_ATTRIBUTE, "CDATA",
-          IdentifierProvider.getInstance().getIdentifier(obObject));
+        IdentifierProvider.getInstance().getIdentifier(obObject));
     }
 
     // if this object has been added as a referenced object
@@ -325,8 +327,8 @@ public class EntityXMLConverter implements OBNotSingleton {
       onlyIdentifierProps = false;
     } else {
       onlyIdentifierProps = OBContext.getOBContext()
-          .getEntityAccessChecker()
-          .isDerivedReadable(obObject.getEntity());
+        .getEntityAccessChecker()
+        .isDerivedReadable(obObject.getEntity());
     }
 
     final List<Property> exportableProperties;
@@ -340,7 +342,7 @@ public class EntityXMLConverter implements OBNotSingleton {
     } else {
     */
     exportableProperties = new ArrayList<Property>(
-        obObject.getEntity().getRealProperties(includedComputedColumns));
+      obObject.getEntity().getRealProperties(includedComputedColumns));
     if (excludeAuditInfo != null && excludeAuditInfo) {
       DataSetService.getInstance().removeAuditInfo(exportableProperties);
     }
@@ -374,7 +376,7 @@ public class EntityXMLConverter implements OBNotSingleton {
       // auditinfo is mandatory but can be ignored for export
       // as it is always set
       if (p.isAuditInfo() && !isOptionExportAuditInfo() && Traceable.class.isAssignableFrom(
-          obObject.getClass())) {
+        obObject.getClass())) {
         continue;
       }
       final boolean isTransientField = p.isTransient(obObject);
@@ -410,7 +412,7 @@ public class EntityXMLConverter implements OBNotSingleton {
 
       if (p.isCompositeId()) {
         log.warn(
-            "Entity " + obObject.getEntity() + " has compositeid, this is not yet supported in the webservice");
+          "Entity " + obObject.getEntity() + " has compositeid, this is not yet supported in the webservice");
         xmlHandler.startElement("", "", p.getName(), propertyAttrs);
         xmlHandler.endElement("", "", p.getName());
         continue;
@@ -519,9 +521,10 @@ public class EntityXMLConverter implements OBNotSingleton {
    * be exported if the property is contained in one of the lists
    *
    * @param p
-   *     the property that might be exported
+   *   the property that might be exported
    * @param exportedPropertyName
-   *     the name of the property in its parent entity of the entity being exported
+   *   the name of the property in its parent entity of the entity being exported
+   *
    * @return true if the property has to be exported, false otherwise
    */
   private boolean propertyShouldBeExported(Property p, String exportedPropertyName) {
@@ -530,11 +533,11 @@ public class EntityXMLConverter implements OBNotSingleton {
       return true;
     }
     if (propertiesToBeFetched != null && !propertiesToBeFetched.isEmpty() && propertiesToBeFetched.get(
-        key) != null && propertiesToBeFetched.get(key).contains(p.getName())) {
+      key) != null && propertiesToBeFetched.get(key).contains(p.getName())) {
       return true;
     }
     if (childPropertiesToBeFetched != null && !childPropertiesToBeFetched.isEmpty() && childPropertiesToBeFetched.get(
-        key) != null && childPropertiesToBeFetched.get(key).contains(p.getName())) {
+      key) != null && childPropertiesToBeFetched.get(key).contains(p.getName())) {
       return true;
     }
     return false;
@@ -560,12 +563,12 @@ public class EntityXMLConverter implements OBNotSingleton {
     // final Element refElement =
     // currentElement.addElement(REFERENCE_ELEMENT_NAME);
     attrs.addAttribute("", "", XMLConstants.ID_ATTRIBUTE, "CDATA",
-        referedObject.getId().toString());
+      referedObject.getId().toString());
     if (!isOptionMinimizeXMLSize()) {
       attrs.addAttribute("", "", XMLConstants.ENTITYNAME_ATTRIBUTE, "CDATA",
-          DalUtil.getEntityName(referedObject));
+        DalUtil.getEntityName(referedObject));
       attrs.addAttribute("", "", XMLConstants.IDENTIFIER_ATTRIBUTE, "CDATA",
-          IdentifierProvider.getInstance().getIdentifier(referedObject));
+        IdentifierProvider.getInstance().getIdentifier(referedObject));
     }
   }
 
@@ -601,7 +604,7 @@ public class EntityXMLConverter implements OBNotSingleton {
    * the root of the xml).
    *
    * @return true the referenced objects are exported, false (the default) referenced objects are
-   * not exported
+   *   not exported
    */
   public boolean isOptionIncludeReferenced() {
     return optionIncludeReferenced;
@@ -612,8 +615,8 @@ public class EntityXMLConverter implements OBNotSingleton {
    * the root of the xml).
    *
    * @param optionIncludeReferenced
-   *     set to true the referenced objects are exported, set to false (the default) referenced
-   *     objects are not exported
+   *   set to true the referenced objects are exported, set to false (the default) referenced
+   *   objects are not exported
    */
   public void setOptionIncludeReferenced(boolean optionIncludeReferenced) {
     this.optionIncludeReferenced = optionIncludeReferenced;
@@ -623,8 +626,8 @@ public class EntityXMLConverter implements OBNotSingleton {
    * Controls if computed columns should also be exported.
    *
    * @param includedComputedColumns
-   *     set to true the computed columns are exported, set to false (the default) computed
-   *     columns are not exported.
+   *   set to true the computed columns are exported, set to false (the default) computed
+   *   columns are not exported.
    */
   public void setIncludedComputedColumns(boolean includedComputedColumns) {
     this.includedComputedColumns = includedComputedColumns;
@@ -647,8 +650,8 @@ public class EntityXMLConverter implements OBNotSingleton {
    * {@link #isOptionEmbedChildren()} option.
    *
    * @param optionIncludeChildren
-   *     set to true children are exported as well, set to false (the default) children are not
-   *     exported
+   *   set to true children are exported as well, set to false (the default) children are not
+   *   exported
    */
   public void setOptionIncludeChildren(boolean optionIncludeChildren) {
     this.optionIncludeChildren = optionIncludeChildren;
@@ -659,7 +662,7 @@ public class EntityXMLConverter implements OBNotSingleton {
    * default is embedded (default value is true).
    *
    * @return true (default) children are embedded in the parent, false children are exported in the
-   * root of the xml
+   *   root of the xml
    */
   public boolean isOptionEmbedChildren() {
     return optionEmbedChildren;
@@ -702,10 +705,10 @@ public class EntityXMLConverter implements OBNotSingleton {
    * client/organization are present in the import xml.
    *
    * @param optionExportClientOrganizationReferences
-   *     if set to true then the client/organization properties are exported, if false then not
+   *   if set to true then the client/organization properties are exported, if false then not
    */
   public void setOptionExportClientOrganizationReferences(
-      boolean optionExportClientOrganizationReferences) {
+    boolean optionExportClientOrganizationReferences) {
     this.optionExportClientOrganizationReferences = optionExportClientOrganizationReferences;
   }
 
@@ -722,8 +725,8 @@ public class EntityXMLConverter implements OBNotSingleton {
    * Controls if transient information should also be exported.
    *
    * @param optionExportTransientInfo
-   *     set to true (the default) the transient information is exported, set to false the
-   *     transient information is not exported.
+   *   set to true (the default) the transient information is exported, set to false the
+   *   transient information is not exported.
    */
   public void setOptionExportTransientInfo(boolean optionExportTransientInfo) {
     this.optionExportTransientInfo = optionExportTransientInfo;
@@ -731,7 +734,7 @@ public class EntityXMLConverter implements OBNotSingleton {
 
   /**
    * @param includedProperties
-   *     set to the Names of the properties to be exported
+   *   set to the Names of the properties to be exported
    */
   public void setIncludedProperties(List<String> includedProperties) {
     this.includedProperties = includedProperties;
@@ -739,7 +742,7 @@ public class EntityXMLConverter implements OBNotSingleton {
 
   /**
    * @param propertiesToBeFetched
-   *     set to the list of the non child properties to be exported for each entity
+   *   set to the list of the non child properties to be exported for each entity
    */
   public void setPropertiesToBeFetched(Map<String, List<String>> propertiesToBeFetched) {
     this.propertiesToBeFetched = propertiesToBeFetched;
@@ -747,7 +750,7 @@ public class EntityXMLConverter implements OBNotSingleton {
 
   /**
    * @param childPropertiesToBeFetched
-   *     set to the list of the non child properties to be exported for each entity
+   *   set to the list of the non child properties to be exported for each entity
    */
   public void setChildPropertiesToBeFetched(Map<String, List<String>> childPropertiesToBeFetched) {
     this.childPropertiesToBeFetched = childPropertiesToBeFetched;
@@ -778,7 +781,7 @@ public class EntityXMLConverter implements OBNotSingleton {
    * client whose ID is included in the array provided to this method.
    *
    * @param readableClients
-   *     An array with the IDs of the readable clients.
+   *   An array with the IDs of the readable clients.
    */
   public void setReadableClients(String[] readableClients) {
     this.readableClients = readableClients;
@@ -797,8 +800,8 @@ public class EntityXMLConverter implements OBNotSingleton {
    * Controls if the audit information should be exported or not.
    *
    * @param optionExportAuditInfo
-   *     set to true (the default) the audit information is exported, set to false the audit
-   *     information is not exported.
+   *   set to true (the default) the audit information is exported, set to false the audit
+   *   information is not exported.
    */
   public void setOptionExportAuditInfo(boolean optionExportAuditInfo) {
     this.optionExportAuditInfo = optionExportAuditInfo;
@@ -818,8 +821,8 @@ public class EntityXMLConverter implements OBNotSingleton {
    * will probably be less readable.
    *
    * @param optionMinimizeXMLSize
-   *     set to true the output size will be minimized, set to false (the default) the output
-   *     size will not be minimized.
+   *   set to true the output size will be minimized, set to false (the default) the output
+   *   size will not be minimized.
    */
   public void setOptionMinimizeXMLSize(boolean optionMinimizeXMLSize) {
     this.optionMinimizeXMLSize = optionMinimizeXMLSize;
@@ -836,7 +839,7 @@ public class EntityXMLConverter implements OBNotSingleton {
    * Sets the output writer to be used by the converter.
    *
    * @param output
-   *     A Writer object that will be used to generate the result.
+   *   A Writer object that will be used to generate the result.
    */
   public void setOutput(Writer output) {
     this.output = output;
@@ -880,7 +883,7 @@ public class EntityXMLConverter implements OBNotSingleton {
    * Sets the iterator (ScrollableResults) used to handle large data sets.
    *
    * @param dataScroller
-   *     A ScrollableResults object used to iterate along the data.
+   *   A ScrollableResults object used to iterate along the data.
    */
   public void setDataScroller(ScrollableResults dataScroller) {
     this.dataScroller = dataScroller;
@@ -890,9 +893,9 @@ public class EntityXMLConverter implements OBNotSingleton {
    * Controls whether the data set is denoted for default values import.
    *
    * @param defaultValuesData
-   *     set to true the data set will be denoted as used for default values import, set to
-   *     false (the default) the data set will not be denoted as used for default values
-   *     import.
+   *   set to true the data set will be denoted as used for default values import, set to
+   *   false (the default) the data set will not be denoted as used for default values
+   *   import.
    */
   public void setDefaultValuesData(boolean defaultValuesData) {
     this.defaultValuesData = defaultValuesData;

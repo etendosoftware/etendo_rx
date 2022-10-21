@@ -4,15 +4,15 @@
  * Version  1.1  (the  "License"),  being   the  Mozilla   Public  License
  * Version 1.1  with a permitted attribution clause; you may not  use this
  * file except in compliance with the License. You  may  obtain  a copy of
- * the License at http://www.openbravo.com/legal/license.html 
+ * the License at http://www.openbravo.com/legal/license.html
  * Software distributed under the License  is  distributed  on  an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
  * License for the specific  language  governing  rights  and  limitations
- * under the License. 
- * The Original Code is Openbravo ERP. 
- * The Initial Developer of the Original Code is Openbravo SLU 
- * All portions are Copyright (C) 2019 Openbravo SLU 
- * All Rights Reserved. 
+ * under the License.
+ * The Original Code is Openbravo ERP.
+ * The Initial Developer of the Original Code is Openbravo SLU
+ * All portions are Copyright (C) 2019 Openbravo SLU
+ * All Rights Reserved.
  * Contributor(s):  ______________________________________.
  ************************************************************************
  */
@@ -23,7 +23,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
 
-/** Algorithm used to hash password to store in Database */
+/**
+ * Algorithm used to hash password to store in Database
+ */
 abstract class HashingAlgorithm {
 
   /**
@@ -43,14 +45,17 @@ abstract class HashingAlgorithm {
   /**
    * Each {@link HashingAlgorithm} must be versioned, passwords hashed in Database with older
    * algorithms can be automatically upgraded to newer ones.
-   *
    */
   protected abstract int getAlgorithmVersion();
 
-  /** Checks whether a plain text password matches with a hashed password */
+  /**
+   * Checks whether a plain text password matches with a hashed password
+   */
   protected abstract boolean check(String plainTextPassword, String hashedPassword);
 
-  /** Returns the low level algorithm used to perform the hashing. */
+  /**
+   * Returns the low level algorithm used to perform the hashing.
+   */
   protected abstract MessageDigest getHashingBaseAlgorithm();
 
   /**

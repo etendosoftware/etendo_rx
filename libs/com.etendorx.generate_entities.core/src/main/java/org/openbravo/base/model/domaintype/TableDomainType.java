@@ -31,7 +31,8 @@ public class TableDomainType extends BaseForeignKeyDomainType {
   /**
    * @return the column based on the RefTable ({@link #setRefTable(RefTable)}).
    */
-  @Override public Column getForeignKeyColumn(String columnName) {
+  @Override
+  public Column getForeignKeyColumn(String columnName) {
     // handles a special case that reference value is not set in a column
     // in that case the reference is the table reference directly
     if (getRefTable() == null) {
@@ -55,7 +56,8 @@ public class TableDomainType extends BaseForeignKeyDomainType {
    * org.etendorx.base.model.domaintype.BaseForeignKeyDomainType#getReferedTableName(java.lang.
    * String)
    */
-  @Override protected String getReferedTableName(String columnName) {
+  @Override
+  protected String getReferedTableName(String columnName) {
     if (getRefTable() == null) {
       return super.getReferedTableName(columnName);
     }

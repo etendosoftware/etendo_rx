@@ -44,7 +44,7 @@ public class RXHal<T extends ClientRestBase<E>, E extends RepresentationWithId<E
   }
 
   public E post(E model, HttpHeaders headers) {
-      return service.post(model, headers).getBody();
+    return service.post(model, headers).getBody();
   }
 
   public PagedModel<E> findAll() {

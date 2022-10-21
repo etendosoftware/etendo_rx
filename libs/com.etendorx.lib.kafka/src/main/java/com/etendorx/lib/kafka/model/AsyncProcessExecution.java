@@ -37,7 +37,7 @@ public class AsyncProcessExecution implements Comparable<AsyncProcessExecution> 
   private String params;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING,
-      pattern = "dd-MM-yyyy hh:mm:ss")
+    pattern = "dd-MM-yyyy hh:mm:ss")
   private Date time;
   @Builder.Default
   private AsyncProcessState state = AsyncProcessState.ACCEPTED;

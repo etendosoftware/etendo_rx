@@ -19,56 +19,56 @@ import java.util.Date;
 @Slf4j
 @Component
 public class EventHandlerEntities {
-    private HttpServletRequest request;
+  private HttpServletRequest request;
 
-    public EventHandlerEntities(HttpServletRequest request) {
-        this.request = request;
+  public EventHandlerEntities(HttpServletRequest request) {
+    this.request = request;
+  }
+
+  private UserContext getUserContext() {
+    UserContext userContext = AppContext.getCurrentUser();
+    if (userContext == null) {
+      throw new IllegalArgumentException("The user context is not defined.");
     }
+    return userContext;
+  }
 
-    private UserContext getUserContext() {
-        UserContext userContext = AppContext.getCurrentUser();
-        if (userContext == null) {
-            throw new IllegalArgumentException("The user context is not defined.");
-        }
-        return userContext;
-    }
+  @HandleBeforeCreate
+  public void handleBeforeCreate(BaseRXObject entity) {
+    log.info("handleBeforeCreate {}", entity);
+    UserContext userContext = getUserContext();
 
-    @HandleBeforeCreate
-    public void handleBeforeCreate(BaseRXObject entity) {
-        log.info("handleBeforeCreate {}", entity);
-        UserContext userContext = getUserContext();
+    // Set client
+    var adClientRepo = SpringContext.getBean(ADClientRepository.class);
+    var adClientOptional = adClientRepo.findById(userContext.getClientId());
+    adClientOptional.ifPresent(entity::setClient);
 
-        // Set client
-        var adClientRepo = SpringContext.getBean(ADClientRepository.class);
-        var adClientOptional = adClientRepo.findById(userContext.getClientId());
-        adClientOptional.ifPresent(entity::setClient);
+    // Set organization
+    var adOrgRepo = SpringContext.getBean(OrganizationRepository.class);
+    var adOrgOptional = adOrgRepo.findById(userContext.getOrganizationId());
+    adOrgOptional.ifPresent(entity::setOrganization);
 
-        // Set organization
-        var adOrgRepo = SpringContext.getBean(OrganizationRepository.class);
-        var adOrgOptional = adOrgRepo.findById(userContext.getOrganizationId());
-        adOrgOptional.ifPresent(entity::setOrganization);
+    // Set user
+    var adUserRepo = SpringContext.getBean(ADUserRepository.class);
+    var adUserOptional = adUserRepo.findById(userContext.getUserId());
+    adUserOptional.ifPresent(entity::setCreatedBy);
+    adUserOptional.ifPresent(entity::setUpdatedBy);
 
-        // Set user
-        var adUserRepo = SpringContext.getBean(ADUserRepository.class);
-        var adUserOptional = adUserRepo.findById(userContext.getUserId());
-        adUserOptional.ifPresent(entity::setCreatedBy);
-        adUserOptional.ifPresent(entity::setUpdatedBy);
+    entity.setCreationDate(new Date());
+    entity.setUpdated(new Date());
+    entity.setActive(true);
+  }
 
-        entity.setCreationDate(new Date());
-        entity.setUpdated(new Date());
-        entity.setActive(true);
-    }
+  @HandleBeforeSave
+  public void handleBeforeSave(BaseRXObject entity) {
+    log.info("handleBeforeSave {}", entity);
+    UserContext userContext = getUserContext();
 
-    @HandleBeforeSave
-    public void handleBeforeSave(BaseRXObject entity) {
-        log.info("handleBeforeSave {}", entity);
-        UserContext userContext = getUserContext();
-
-        // Set user
-        var adUserRepo = SpringContext.getBean(ADUserRepository.class);
-        var adUserOptional = adUserRepo.findById(userContext.getUserId());
-        adUserOptional.ifPresent(entity::setUpdatedBy);
-        entity.setUpdated(new Date());
-    }
+    // Set user
+    var adUserRepo = SpringContext.getBean(ADUserRepository.class);
+    var adUserOptional = adUserRepo.findById(userContext.getUserId());
+    adUserOptional.ifPresent(entity::setUpdatedBy);
+    entity.setUpdated(new Date());
+  }
 
 }

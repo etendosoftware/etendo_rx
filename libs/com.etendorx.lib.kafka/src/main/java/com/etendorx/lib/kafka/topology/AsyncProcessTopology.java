@@ -44,23 +44,23 @@ public class AsyncProcessTopology {
     StreamsBuilder streamsBuilder = new StreamsBuilder();
 
     KStream<String, AsyncProcess> asyncProcessExecutionStream = streamsBuilder.stream(ASYNC_PROCESS_EXECUTION,
-            Consumed.with(Serdes.String(), asyncProcessExecutionSerdes))
-        .groupByKey()
-        .aggregate(AsyncProcess::new,
-            (key, value, aggregate) -> aggregate.process(value),
-            Materialized.<String, AsyncProcess, KeyValueStore<Bytes, byte[]>>as(ASYNC_PROCESS_STORE)
-                .withKeySerde(Serdes.String())
-                .withValueSerde(asyncProcessSerde)
-        )
-        .toStream();
+        Consumed.with(Serdes.String(), asyncProcessExecutionSerdes))
+      .groupByKey()
+      .aggregate(AsyncProcess::new,
+        (key, value, aggregate) -> aggregate.process(value),
+        Materialized.<String, AsyncProcess, KeyValueStore<Bytes, byte[]>>as(ASYNC_PROCESS_STORE)
+          .withKeySerde(Serdes.String())
+          .withValueSerde(asyncProcessSerde)
+      )
+      .toStream();
 
     asyncProcessExecutionStream
-        .to(ASYNC_PROCESS, Produced.with(Serdes.String(), asyncProcessSerde));
+      .to(ASYNC_PROCESS, Produced.with(Serdes.String(), asyncProcessSerde));
 
     asyncProcessExecutionStream
-        .mapValues((readOnlyKey, value) -> value.getExecutions().first())
-        .filter((key, value) -> value.getState() == AsyncProcessState.REJECTED)
-        .to(REJECTED_PROCESS, Produced.with(Serdes.String(), asyncProcessExecutionSerdes));
+      .mapValues((readOnlyKey, value) -> value.getExecutions().first())
+      .filter((key, value) -> value.getState() == AsyncProcessState.REJECTED)
+      .to(REJECTED_PROCESS, Produced.with(Serdes.String(), asyncProcessExecutionSerdes));
 
     return streamsBuilder.build();
   }

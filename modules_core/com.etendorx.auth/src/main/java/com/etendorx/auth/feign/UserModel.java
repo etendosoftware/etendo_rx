@@ -4,19 +4,19 @@ import lombok.Data;
 
 @Data
 public class UserModel {
-    private String id;
+  private String id;
 
-    private Boolean active;
+  private Boolean active;
 
-    private String clientId;
+  private String clientId;
 
-    private String organizationId;
+  private String organizationId;
 
-    private String defaultClientId;
+  private String defaultClientId;
 
-    private String defaultOrganizationId;
+  private String defaultOrganizationId;
 
-    private String username;
+  private String username;
 
-    private String password;
+  private String password;
 }

@@ -1,8 +1,8 @@
 plugins {
-	id 'org.springframework.boot'
-	id 'io.spring.dependency-management'
-	id 'java'
-	id 'maven-publish'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'java'
+    id 'maven-publish'
 }
 
 group = 'com.etendorx'
@@ -10,31 +10,31 @@ version = "$gradle.ext.versionJars"
 sourceCompatibility = '11'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 publishing {
-	publications {
-		bootJava(MavenPublication) {
-			groupId = group
-			artifactId = 'edge'
-			version = version
-			artifact tasks.named("bootJar")
-		}
-	}
-	repositories {
-		maven {
-			url "${repositoryUrl}"
-			credentials {
-				username = "${repositoryUser}"
-				password = "${repositoryPassword}"
-			}
-		}
-	}
+    publications {
+        bootJava(MavenPublication) {
+            groupId = group
+            artifactId = 'edge'
+            version = version
+            artifact tasks.named("bootJar")
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
 }
 
 ext {
-	set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2021.0.2")
 }
 
 dependencies {
@@ -52,35 +52,35 @@ dependencies {
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 bootRun {
-	debugOptions{
-		port = Integer.valueOf((findProperty('debugPort') ?: port.get()) as String)
-	}
+    debugOptions {
+        port = Integer.valueOf((findProperty('debugPort') ?: port.get()) as String)
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 bootBuildImage {
-	imageName = "${edgePushImage}"
-	publish = true
-	docker {
-		publishRegistry {
-			url = "${pushUrl}"
-			username = "${pushUsername}"
-			password = "${pushPassword}"
-		}
-	}
+    imageName = "${edgePushImage}"
+    publish = true
+    docker {
+        publishRegistry {
+            url = "${pushUrl}"
+            username = "${pushUsername}"
+            password = "${pushPassword}"
+        }
+    }
 }
 
 springBoot {
-	buildInfo()
+    buildInfo()
 }
 
-test.onlyIf {false}
+test.onlyIf { false }

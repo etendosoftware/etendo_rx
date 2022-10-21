@@ -37,30 +37,36 @@ import java.io.Serializable;
  * @author mtaal
  */
 public class OBYesNoType extends AbstractSingleColumnStandardBasicType<Boolean>
-    implements PrimitiveType<Boolean>, DiscriminatorType<Boolean> {
+  implements PrimitiveType<Boolean>, DiscriminatorType<Boolean> {
   private static final long serialVersionUID = 1L;
 
   public OBYesNoType() {
     super(CharTypeDescriptor.INSTANCE, new LocalBooleanTypeDescriptor());
   }
 
-  @Override public String getName() {
+  @Override
+  public String getName() {
     return "yes_no";
   }
 
-  @Override @SuppressWarnings("rawtypes") public Class getPrimitiveClass() {
+  @Override
+  @SuppressWarnings("rawtypes")
+  public Class getPrimitiveClass() {
     return boolean.class;
   }
 
-  @Override public Boolean stringToObject(String xml) throws Exception {
+  @Override
+  public Boolean stringToObject(String xml) throws Exception {
     return fromString(xml);
   }
 
-  @Override public Serializable getDefaultValue() {
+  @Override
+  public Serializable getDefaultValue() {
     return Boolean.FALSE;
   }
 
-  @Override public String objectToSQLString(Boolean value, Dialect dialect) throws Exception {
+  @Override
+  public String objectToSQLString(Boolean value, Dialect dialect) throws Exception {
     return StringType.INSTANCE.objectToSQLString(value.booleanValue() ? "Y" : "N", dialect);
   }
 
@@ -68,7 +74,8 @@ public class OBYesNoType extends AbstractSingleColumnStandardBasicType<Boolean>
 
     private static final long serialVersionUID = 1L;
 
-    @Override public boolean areEqual(Boolean x, Boolean y) {
+    @Override
+    public boolean areEqual(Boolean x, Boolean y) {
       if (x == y) {
         return true;
       }

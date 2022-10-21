@@ -20,14 +20,7 @@ import org.etendorx.base.session.OBPropertiesProvider;
 import org.etendorx.base.session.SessionFactoryController;
 import org.etendorx.database.SessionInfo;
 import org.hibernate.Cache;
-import org.hibernate.HibernateException;
-import org.hibernate.Metamodel;
-import org.hibernate.Session;
-import org.hibernate.SessionBuilder;
-import org.hibernate.SessionFactory;
-import org.hibernate.StatelessSession;
-import org.hibernate.StatelessSessionBuilder;
-import org.hibernate.TypeHelper;
+import org.hibernate.*;
 import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.spi.FilterDefinition;
@@ -40,11 +33,8 @@ import org.hibernate.stat.Statistics;
 
 import javax.naming.NamingException;
 import javax.naming.Reference;
-import javax.persistence.EntityGraph;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Query;
-import javax.persistence.SynchronizationType;
+import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -61,8 +51,9 @@ import java.util.Set;
  * @author mtaal
  * @see SessionFactoryController
  */
-@SuppressWarnings({ "deprecation", "rawtypes", "unchecked" }) public class DalSessionFactory
-    implements SessionFactory {
+@SuppressWarnings({"deprecation", "rawtypes", "unchecked"})
+public class DalSessionFactory
+  implements SessionFactory {
 
   private static final long serialVersionUID = 1L;
 
@@ -83,60 +74,73 @@ import java.util.Set;
     this.delegateSessionFactory = delegateSessionFactory;
   }
 
-  @Override public void close() throws HibernateException {
+  @Override
+  public void close() throws HibernateException {
     delegateSessionFactory.close();
   }
 
-  @Override public Map getAllClassMetadata() throws HibernateException {
+  @Override
+  public Map getAllClassMetadata() throws HibernateException {
     return delegateSessionFactory.getAllClassMetadata();
   }
 
-  @Override public Map getAllCollectionMetadata() throws HibernateException {
+  @Override
+  public Map getAllCollectionMetadata() throws HibernateException {
     return delegateSessionFactory.getAllCollectionMetadata();
   }
 
-  @Override public ClassMetadata getClassMetadata(Class persistentClass) throws HibernateException {
+  @Override
+  public ClassMetadata getClassMetadata(Class persistentClass) throws HibernateException {
     return delegateSessionFactory.getClassMetadata(persistentClass);
   }
 
-  @Override public ClassMetadata getClassMetadata(String entityName) throws HibernateException {
+  @Override
+  public ClassMetadata getClassMetadata(String entityName) throws HibernateException {
     return delegateSessionFactory.getClassMetadata(entityName);
   }
 
-  @Override public CollectionMetadata getCollectionMetadata(String roleName)
-      throws HibernateException {
+  @Override
+  public CollectionMetadata getCollectionMetadata(String roleName)
+    throws HibernateException {
     return delegateSessionFactory.getCollectionMetadata(roleName);
   }
 
-  @Override public Session getCurrentSession() throws HibernateException {
+  @Override
+  public Session getCurrentSession() throws HibernateException {
     return delegateSessionFactory.getCurrentSession();
   }
 
-  @Override public Set getDefinedFilterNames() {
+  @Override
+  public Set getDefinedFilterNames() {
     return delegateSessionFactory.getDefinedFilterNames();
   }
 
-  @Override public FilterDefinition getFilterDefinition(String filterName)
-      throws HibernateException {
+  @Override
+  public FilterDefinition getFilterDefinition(String filterName)
+    throws HibernateException {
     return delegateSessionFactory.getFilterDefinition(filterName);
   }
 
-  @Override public Reference getReference() throws NamingException {
+  @Override
+  public Reference getReference() throws NamingException {
     return delegateSessionFactory.getReference();
   }
 
-  @Override public Statistics getStatistics() {
+  @Override
+  public Statistics getStatistics() {
     return delegateSessionFactory.getStatistics();
   }
 
-  @Override public boolean isClosed() {
+  @Override
+  public boolean isClosed() {
     return delegateSessionFactory.isClosed();
   }
 
   /**
    * Note method sets user session information in the database and opens a connection for this.
    */
-  @Override public Session openSession() throws HibernateException {
+  @Override
+  public Session openSession() throws HibernateException {
     final Session session = delegateSessionFactory.openSession();
     Connection conn = ((SessionImplementor) session).connection();
     initConnection(conn);
@@ -157,7 +161,8 @@ import java.util.Set;
   /**
    * Note method sets user session information in the database and opens a connection for this.
    */
-  @Override public StatelessSession openStatelessSession() {
+  @Override
+  public StatelessSession openStatelessSession() {
     final StatelessSession session = delegateSessionFactory.openStatelessSession();
     initializeDBSessionInfo((StatelessSessionImpl) session);
     return session;
@@ -166,7 +171,8 @@ import java.util.Set;
   /**
    * Note method sets user session information in the database and opens a connection for this.
    */
-  @Override public StatelessSession openStatelessSession(Connection connection) {
+  @Override
+  public StatelessSession openStatelessSession(Connection connection) {
     final StatelessSession session = delegateSessionFactory.openStatelessSession(connection);
     initializeDBSessionInfo((StatelessSessionImpl) session);
     return session;
@@ -175,91 +181,110 @@ import java.util.Set;
   private void initializeDBSessionInfo(StatelessSessionImpl session) {
     Connection conn = session.connection();
     SessionInfo.initDB(conn,
-        OBPropertiesProvider.getInstance().getOpenbravoProperties().getProperty("bbdd.rdbms"));
+      OBPropertiesProvider.getInstance().getOpenbravoProperties().getProperty("bbdd.rdbms"));
   }
 
-  @Override public Cache getCache() {
+  @Override
+  public Cache getCache() {
     return delegateSessionFactory.getCache();
   }
 
-  @Override public boolean containsFetchProfileDefinition(String name) {
+  @Override
+  public boolean containsFetchProfileDefinition(String name) {
     return delegateSessionFactory.containsFetchProfileDefinition(name);
   }
 
-  @Override public TypeHelper getTypeHelper() {
+  @Override
+  public TypeHelper getTypeHelper() {
     return delegateSessionFactory.getTypeHelper();
   }
 
   JdbcConnectionAccess getJdbcConnectionAccess() {
     if (jdbcConnectionAccess == null) {
       jdbcConnectionAccess = ((SessionFactoryImpl) delegateSessionFactory).getJdbcServices()
-          .getBootstrapJdbcConnectionAccess();
+        .getBootstrapJdbcConnectionAccess();
     }
     return jdbcConnectionAccess;
   }
 
-  @Override public <T> void addNamedEntityGraph(String graphName, EntityGraph<T> entityGraph) {
+  @Override
+  public <T> void addNamedEntityGraph(String graphName, EntityGraph<T> entityGraph) {
     delegateSessionFactory.addNamedEntityGraph(graphName, entityGraph);
   }
 
-  @Override public void addNamedQuery(String name, Query query) {
+  @Override
+  public void addNamedQuery(String name, Query query) {
     delegateSessionFactory.addNamedQuery(name, query);
   }
 
-  @Override public EntityManager createEntityManager() {
+  @Override
+  public EntityManager createEntityManager() {
     return delegateSessionFactory.createEntityManager();
   }
 
-  @Override public EntityManager createEntityManager(Map map) {
+  @Override
+  public EntityManager createEntityManager(Map map) {
     return delegateSessionFactory.createEntityManager(map);
   }
 
-  @Override public EntityManager createEntityManager(SynchronizationType synchronizationType) {
+  @Override
+  public EntityManager createEntityManager(SynchronizationType synchronizationType) {
     return delegateSessionFactory.createEntityManager(synchronizationType);
   }
 
-  @Override public EntityManager createEntityManager(SynchronizationType synchronizationType,
-      Map map) {
+  @Override
+  public EntityManager createEntityManager(SynchronizationType synchronizationType,
+                                           Map map) {
     return delegateSessionFactory.createEntityManager(synchronizationType, map);
   }
 
-  @Override public CriteriaBuilder getCriteriaBuilder() {
+  @Override
+  public CriteriaBuilder getCriteriaBuilder() {
     return delegateSessionFactory.getCriteriaBuilder();
   }
 
-  @Override public PersistenceUnitUtil getPersistenceUnitUtil() {
+  @Override
+  public PersistenceUnitUtil getPersistenceUnitUtil() {
     return delegateSessionFactory.getPersistenceUnitUtil();
   }
 
-  @Override public Map<String, Object> getProperties() {
+  @Override
+  public Map<String, Object> getProperties() {
     return delegateSessionFactory.getProperties();
   }
 
-  @Override public boolean isOpen() {
+  @Override
+  public boolean isOpen() {
     return delegateSessionFactory.isOpen();
   }
 
-  @Override public <T> T unwrap(Class<T> clazz) {
+  @Override
+  public <T> T unwrap(Class<T> clazz) {
     return delegateSessionFactory.unwrap(clazz);
   }
 
-  @Override public <T> List<EntityGraph<? super T>> findEntityGraphsByType(Class<T> entityClass) {
+  @Override
+  public <T> List<EntityGraph<? super T>> findEntityGraphsByType(Class<T> entityClass) {
     return delegateSessionFactory.findEntityGraphsByType(entityClass);
   }
 
-  @Override public Metamodel getMetamodel() {
+  @Override
+  public Metamodel getMetamodel() {
     return delegateSessionFactory.getMetamodel();
   }
 
-  @Override public SessionFactoryOptions getSessionFactoryOptions() {
+  @Override
+  public SessionFactoryOptions getSessionFactoryOptions() {
     return delegateSessionFactory.getSessionFactoryOptions();
   }
 
-  @Override public SessionBuilder withOptions() {
+  @Override
+  public SessionBuilder withOptions() {
     return delegateSessionFactory.withOptions();
   }
 
-  @Override public StatelessSessionBuilder withStatelessOptions() {
+  @Override
+  public StatelessSessionBuilder withStatelessOptions() {
     return delegateSessionFactory.withStatelessOptions();
   }
 

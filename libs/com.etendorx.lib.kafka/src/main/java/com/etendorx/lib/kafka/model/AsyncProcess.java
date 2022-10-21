@@ -31,7 +31,7 @@ public class AsyncProcess {
 
   private String id;
   @JsonFormat(shape = JsonFormat.Shape.STRING,
-      pattern = "dd-MM-yyyy hh:mm:ss")
+    pattern = "dd-MM-yyyy hh:mm:ss")
   private Date lastUpdate;
   private String description;
   private AsyncProcessState state = AsyncProcessState.WAITING;

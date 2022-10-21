@@ -28,7 +28,7 @@ import java.lang.reflect.Constructor;
  * @author mtaal
  */
 public abstract class BasePrimitiveDomainType extends BaseDomainType
-    implements PrimitiveDomainType {
+  implements PrimitiveDomainType {
 
   private Constructor<Object> constructor;
 
@@ -37,7 +37,8 @@ public abstract class BasePrimitiveDomainType extends BaseDomainType
    *
    * @see org.etendorx.base.model.domaintype.PrimitiveDomainType#getHibernateType()
    */
-  @Override public Class<?> getHibernateType() {
+  @Override
+  public Class<?> getHibernateType() {
     return getPrimitiveType();
   }
 
@@ -47,16 +48,17 @@ public abstract class BasePrimitiveDomainType extends BaseDomainType
    * @see org.etendorx.base.model.domaintype.DomainType#checkIsValidValue(org.etendorx.base.model.
    * Property , java.lang.Object)
    */
-  @Override public void checkIsValidValue(Property property, Object value)
-      throws ValidationException {
+  @Override
+  public void checkIsValidValue(Property property, Object value)
+    throws ValidationException {
     if (value == null) {
       return;
     }
     if (!getPrimitiveType().isInstance(value)) {
       final ValidationException ve = new ValidationException();
       ve.addMessage(property,
-          "Property " + property + " only allows instances of " + getPrimitiveType().getName() + " but the value is an instanceof " + value.getClass()
-              .getName());
+        "Property " + property + " only allows instances of " + getPrimitiveType().getName() + " but the value is an instanceof " + value.getClass()
+          .getName());
       throw ve;
     }
   }
@@ -66,7 +68,8 @@ public abstract class BasePrimitiveDomainType extends BaseDomainType
    *
    * @see org.etendorx.base.model.domaintype.PrimitiveDomainType#getFormatId()
    */
-  @Override public String getFormatId() {
+  @Override
+  public String getFormatId() {
     return null;
   }
 
@@ -75,7 +78,8 @@ public abstract class BasePrimitiveDomainType extends BaseDomainType
    *
    * @see org.etendorx.base.model.domaintype.PrimitiveDomainType#convertToString(java.lang.Object)
    */
-  @Override public String convertToString(Object value) {
+  @Override
+  public String convertToString(Object value) {
     if (value == null) {
       return EMPTY_STRING;
     }
@@ -87,7 +91,9 @@ public abstract class BasePrimitiveDomainType extends BaseDomainType
    *
    * @see org.etendorx.base.model.domaintype.PrimitiveDomainType#createFromString(java.lang.String)
    */
-  @SuppressWarnings("unchecked") @Override public Object createFromString(String strValue) {
+  @SuppressWarnings("unchecked")
+  @Override
+  public Object createFromString(String strValue) {
     if (strValue == null || strValue.length() == 0) {
       return null;
     }

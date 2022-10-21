@@ -1,13 +1,13 @@
 {
-  "react" : false,
+  "react": false,
   "projections": [
     {
       "name": "test",
       "grpc": true,
       "entities": [
         {
-          "name" : "InvoiceLine",
-          "fields" : [
+          "name": "InvoiceLine",
+          "fields": [
             {
               "name": "id"
             },
@@ -130,6 +130,5 @@
         }
       ]
     }
-
   ]
 }

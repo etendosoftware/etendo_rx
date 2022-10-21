@@ -19,7 +19,7 @@ package org.etendorx.dal.core;
 /**
  * Encapsulates a thread so that when the thread returns the session/transaction is
  * closed/committed/rolledback. It also ensures that the OBContext is removed from the thread.
- *
+ * <p>
  * Note that cleaning up the thread is particularly important in webcontainer environments because
  * webcontainers (tomcat) re-use thread instances for new requests (using a threadpool).
  *
@@ -31,13 +31,15 @@ public abstract class DalThreadHandler extends ThreadHandler {
   /**
    * @see ThreadHandler#doBefore
    */
-  @Override public void doBefore() {
+  @Override
+  public void doBefore() {
   }
 
   /**
    * @see ThreadHandler#doFinal
    */
-  @Override public void doFinal(boolean errorOccured) {
+  @Override
+  public void doFinal(boolean errorOccured) {
     try {
       closeDefaultPoolSession(errorOccured);
     } finally {
@@ -55,8 +57,8 @@ public abstract class DalThreadHandler extends ThreadHandler {
 
   private void closeDefaultPoolSession(boolean errorOccured) {
     org.etendorx.dal.core.SessionHandler sessionHandler = org.etendorx.dal.core.SessionHandler.isSessionHandlerPresent() ?
-        org.etendorx.dal.core.SessionHandler.getInstance() :
-        null;
+      org.etendorx.dal.core.SessionHandler.getInstance() :
+      null;
     if (sessionHandler != null && sessionHandler.doSessionInViewPatter()) {
       // application software can force a rollback
       if (sessionHandler.getDoRollback() || errorOccured) {

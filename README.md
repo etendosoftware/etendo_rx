@@ -1,4 +1,5 @@
 ### Gradle properties
+
     Rename the 'gradle.properties.template' to 'gradle.properties'
 
 ### Generation of entities
@@ -14,6 +15,7 @@
 You can set custom properties when running a project to override the default ones.
 
 Example:
+
 ```
 ./gradlew com.etendorx.das:bootRun --info --args='--spring.datasource.url=jdbc:postgresql://localhost:5470/etendo'
 ```

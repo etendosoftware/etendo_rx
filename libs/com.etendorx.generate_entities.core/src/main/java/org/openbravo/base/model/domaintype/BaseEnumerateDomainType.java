@@ -31,14 +31,15 @@ import java.util.Set;
  */
 
 public abstract class BaseEnumerateDomainType<E> extends BasePrimitiveDomainType
-    implements EnumerateDomainType {
+  implements EnumerateDomainType {
 
   private final Set<E> enumerateValues = new HashSet<>();
 
   /**
    * @return the set of enumerate values
    */
-  @Override public Set<E> getEnumerateValues() {
+  @Override
+  public Set<E> getEnumerateValues() {
     return enumerateValues;
   }
 
@@ -49,18 +50,20 @@ public abstract class BaseEnumerateDomainType<E> extends BasePrimitiveDomainType
   /**
    * @return class of {@link Object}.
    */
-  @Override public Class<?> getPrimitiveType() {
+  @Override
+  public Class<?> getPrimitiveType() {
     return Object.class;
   }
 
-  @Override public void checkIsValidValue(Property property, Object value)
-      throws ValidationException {
+  @Override
+  public void checkIsValidValue(Property property, Object value)
+    throws ValidationException {
     super.checkIsValidValue(property, value);
 
     if (!getEnumerateValues().contains(value)) {
       final ValidationException ve = new ValidationException();
       ve.addMessage(property,
-          "Property " + property + ", value (" + value + ") is not allowed, it should be one of the following values: " + getEnumerateValues() + " but it is value " + value);
+        "Property " + property + ", value (" + value + ") is not allowed, it should be one of the following values: " + getEnumerateValues() + " but it is value " + value);
       throw ve;
     }
   }
