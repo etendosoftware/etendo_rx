@@ -21,6 +21,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -62,7 +63,9 @@ public class GrpcTest {
     .withUsername("postgres")
     .withEnv("PGDATA", "/postgres")
     .withDatabaseName("etendo")
-    .waitingFor(new HostPortWaitStrategy());
+    .waitingFor(
+      Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
+    );
 
   public static Stream<Arguments> validRequestParams() {
     return Stream.of(
