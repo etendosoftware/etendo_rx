@@ -3,6 +3,7 @@ package com.etendorx.das.test;
 import com.etendorx.das.grpcrepo.ADUserGrpcService;
 import com.etendorx.das.grpcrepo.OrderGrpcService;
 import com.etendorx.das.grpcrepo.PricingAdjustmentGrpcService;
+import com.etendorx.test.grpc.*;
 import com.google.protobuf.Timestamp;
 import io.grpc.internal.testing.StreamRecorder;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -61,7 +63,9 @@ public class GrpcTest {
     .withUsername("postgres")
     .withEnv("PGDATA", "/postgres")
     .withDatabaseName("etendo")
-    .waitingFor(new HostPortWaitStrategy());
+    .waitingFor(
+      Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
+    );
 
   public static Stream<Arguments> validRequestParams() {
     return Stream.of(

@@ -13,7 +13,7 @@ pluginManagement {
 
 rootProject.name = 'etendorx'
 var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modules"]
-gradle.ext.versionJars = '1.0.6'
+gradle.ext.versionJars = '1.0.7'
 
 directories.each {
     def subDirs = new File(it).listFiles(new FileFilter() {

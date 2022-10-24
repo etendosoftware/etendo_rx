@@ -4,11 +4,11 @@ plugins {
     id 'java'
     id 'java-library'
     id 'groovy'
-    id 'com.etendorx.gradlepluginrx' version '1.0.0-SNAPSHOT'
+    id 'com.etendorx.gradlepluginrx' version '1.0.1-SNAPSHOT'
 }
 
 group = 'com.etendorx'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 sourceCompatibility = '11'
 
 repositories {
