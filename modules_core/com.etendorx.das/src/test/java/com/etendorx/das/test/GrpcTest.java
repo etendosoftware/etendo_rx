@@ -3,6 +3,7 @@ package com.etendorx.das.test;
 import com.etendorx.das.grpcrepo.ADUserGrpcService;
 import com.etendorx.das.grpcrepo.OrderGrpcService;
 import com.etendorx.das.grpcrepo.PricingAdjustmentGrpcService;
+import com.etendorx.test.grpc.*;
 import com.google.protobuf.Timestamp;
 import io.grpc.internal.testing.StreamRecorder;
 import org.junit.jupiter.api.extension.ExtendWith;
