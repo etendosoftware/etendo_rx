@@ -2,6 +2,7 @@ package com.etendorx.gen.process;
 
 import com.etendoerp.etendorx.model.ETRXModelProvider;
 import com.etendoerp.etendorx.model.ETRXModule;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.provider.OBProvider;
@@ -73,13 +74,14 @@ public class GenerateMetadata {
 
     // Filter the excluded or included modules
     List<ETRXModule> filteredModules = ETRXModelProvider.getInstance().getEtendoRxModules().stream()
-      .filter(moduleToGenerate -> {
-        // Filters the excluded modules
-        return excludedModules.stream().noneMatch(s -> s.equalsIgnoreCase(moduleToGenerate.getJavaPackage()));
-      }).filter(moduleToGenerate -> {
-        // Filter the included modules if the 'includedModules' list is not empty and contains the 'moduleToGenerate'
-        return includedModules.isEmpty() || includedModules.stream().anyMatch(s -> s.equalsIgnoreCase(moduleToGenerate.getJavaPackage()));
-      }).collect(Collectors.toList());
+        .filter(moduleToGenerate -> {
+          // Filters the excluded modules
+          return excludedModules.stream().noneMatch(s -> s.equalsIgnoreCase(moduleToGenerate.getJavaPackage()));
+        }).filter(moduleToGenerate -> {
+          // Filter the included modules if the 'includedModules' list is not empty and contains the 'moduleToGenerate'
+          return includedModules.isEmpty() || includedModules.stream().anyMatch(
+              s -> s.equalsIgnoreCase(moduleToGenerate.getJavaPackage()));
+        }).collect(Collectors.toList());
 
     if (!filteredModules.isEmpty()) {
       Map<ETRXModule, String> modulesJsonMap = ETRXModelProvider.getInstance().modulesToJsonMap(filteredModules);
@@ -91,7 +93,13 @@ public class GenerateMetadata {
   }
 
   public boolean createMetadataJson(File etendoRxLocation, ETRXModule module, String jsonMetadata) {
-    String moduleJavaPackage = module.getJavaPackage();
+    String moduleJavaPackage;
+    if (module.getRxJavaPackage() != null && !module.getRxJavaPackage().isBlank()) {
+      moduleJavaPackage = module.getRxJavaPackage();
+    } else {
+      moduleJavaPackage = module.getJavaPackage();
+    }
+
     log.info("* Starting generation of the metadata file for: " + moduleJavaPackage);
 
     try {
@@ -110,7 +118,8 @@ public class GenerateMetadata {
         moduleLocation = new File(etendoRxLocation, defaultDirectory + File.separator + moduleJavaPackage);
       }
 
-      File metadataLocation = new File(moduleLocation, "src-db" + File.separator + "das" + File.separator + "metadata.json");
+      File metadataLocation = new File(moduleLocation,
+          "src-db" + File.separator + "das" + File.separator + "metadata.json");
 
       if (!metadataLocation.exists()) {
         new File(metadataLocation.getParent()).mkdirs();
