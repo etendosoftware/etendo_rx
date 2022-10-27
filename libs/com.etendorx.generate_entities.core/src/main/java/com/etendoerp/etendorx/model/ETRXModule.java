@@ -3,14 +3,16 @@ package com.etendoerp.etendorx.model;
 import com.etendoerp.etendorx.model.projection.ETRXProjection;
 import com.etendoerp.etendorx.model.repository.ETRXRepository;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+
 import org.openbravo.base.model.Module;
 
 import java.util.Set;
 
-@JsonIncludeProperties({"projections", "repositories", "react"})
+@JsonIncludeProperties({ "projections", "repositories", "react" })
 public class ETRXModule extends Module {
   private Boolean rx = false;
   private Boolean react = false;
+  private String rxJavaPackage;
   private Set<ETRXProjection> projections;
   private Set<ETRXRepository> repositories;
 
@@ -46,5 +48,11 @@ public class ETRXModule extends Module {
     this.react = react;
   }
 
+  public String getRxJavaPackage() {
+    return rxJavaPackage;
+  }
 
+  public void setRxJavaPackage(String rxJavaPackage) {
+    this.rxJavaPackage = rxJavaPackage;
+  }
 }
