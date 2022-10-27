@@ -1,11 +1,13 @@
 package com.etendorx.utils.auth.key;
 
 import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,16 +37,15 @@ public class JwtKeyUtils {
    * Generates a {@link PrivateKey} from a key String
    *
    * @param privateKeyStr
-   *   The raw key String
-   *
+   *     The raw key String
    * @return {@link PrivateKey}
    */
   public static PrivateKey readPrivateKey(String privateKeyStr) {
     return readKey(
-      privateKeyStr,
-      "PRIVATE",
-      JwtKeyUtils::privateKeySpec,
-      JwtKeyUtils::privateKeyGenerator
+        privateKeyStr,
+        "PRIVATE",
+        JwtKeyUtils::privateKeySpec,
+        JwtKeyUtils::privateKeyGenerator
     );
   }
 
@@ -52,16 +53,15 @@ public class JwtKeyUtils {
    * Generates a {@link PublicKey} from a key String
    *
    * @param publicKeyStr
-   *   The raw key String
-   *
+   *     The raw key String
    * @return {@link PublicKey}
    */
   public static PublicKey readPublicKey(String publicKeyStr) {
     return readKey(
-      publicKeyStr,
-      "PUBLIC",
-      JwtKeyUtils::publicKeySpec,
-      JwtKeyUtils::publicKeyGenerator
+        publicKeyStr,
+        "PUBLIC",
+        JwtKeyUtils::publicKeySpec,
+        JwtKeyUtils::publicKeyGenerator
     );
   }
 
@@ -81,7 +81,8 @@ public class JwtKeyUtils {
     return Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt).getBody();
   }
 
-  public static <T extends Key> T readKey(String originalKey, String spec, Function<String, EncodedKeySpec> keySpec, BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator) {
+  public static <T extends Key> T readKey(String originalKey, String spec, Function<String, EncodedKeySpec> keySpec,
+      BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator) {
     try {
       String cleanKey = cleanKeyHeaders(originalKey, spec);
       return keyGenerator.apply(KeyFactory.getInstance("RSA"), keySpec.apply(cleanKey));
@@ -127,11 +128,11 @@ public class JwtKeyUtils {
 
   public static String generateJwtToken(PrivateKey privateKey, Claims claims, String iss) {
     return Jwts.builder()
-      .setIssuer(iss)
-      .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-      .addClaims(claims)
-      .signWith(SignatureAlgorithm.RS256, privateKey)
-      .compact();
+        .setIssuer(iss)
+        .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
+        .addClaims(claims)
+        .signWith(SignatureAlgorithm.RS256, privateKey)
+        .compact();
   }
 
   public static Map<String, Object> getTokenValues(String token) {

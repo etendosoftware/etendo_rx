@@ -80,10 +80,9 @@ public class OBInterceptor extends EmptyInterceptor {
    * Determines if the object is transient (==new and not yet persisted in Hibernate).
    *
    * @param entity
-   *   the object for which it is determined if it is new
-   *
+   *     the object for which it is determined if it is new
    * @return true if the object has a null id or has been explicitly set to being new (@see
-   *   BaseOBObject#isNewOBObject()}, returns false otherwise.
+   *     BaseOBObject#isNewOBObject()}, returns false otherwise.
    */
   @Override
   public Boolean isTransient(Object entity) {
@@ -104,23 +103,22 @@ public class OBInterceptor extends EmptyInterceptor {
    * entity and is the entity deletable (@see {@link Entity#isDeletable()}.
    *
    * @param entity
-   *   the business object which is deleted
+   *     the business object which is deleted
    * @param id
-   *   the id of the entity
+   *     the id of the entity
    * @param state
-   *   the value of the properties
+   *     the value of the properties
    * @param propertyNames
-   *   the name of the properties of the entity
+   *     the name of the properties of the entity
    * @param types
-   *   the hibernate type definition of the properties
-   *
+   *     the hibernate type definition of the properties
    * @see BaseOBObject
    * @see Entity
    * @see Property
    */
   @Override
   public void onDelete(Object entity, Serializable id, Object[] state,
-                       String[] propertyNames, Type[] types) {
+      String[] propertyNames, Type[] types) {
     SecurityChecker.getInstance().checkDeleteAllowed(entity);
     if (getInterceptorListener() != null) {
       getInterceptorListener().onDelete(entity, id, state, propertyNames, types);
@@ -133,26 +131,25 @@ public class OBInterceptor extends EmptyInterceptor {
    * updates the audit info fields (updated, updatedBy) and performs security checks.
    *
    * @param entity
-   *   the business object which is deleted
+   *     the business object which is deleted
    * @param id
-   *   the id of the entity
+   *     the id of the entity
    * @param currentState
-   *   the current value of the properties
+   *     the current value of the properties
    * @param previousState
-   *   the previous value of the properties, i.e. the values when the entity was loaded from
-   *   the database
+   *     the previous value of the properties, i.e. the values when the entity was loaded from
+   *     the database
    * @param propertyNames
-   *   the name of the properties of the entity
+   *     the name of the properties of the entity
    * @param types
-   *   the hibernate type definition of the properties
-   *
+   *     the hibernate type definition of the properties
    * @return true if the state of the object has changed, this is the case when the entity has audit
-   *   info because the updated/updatedBy properties are updated here, false is returned in
-   *   other cases
+   *     info because the updated/updatedBy properties are updated here, false is returned in
+   *     other cases
    */
   @Override
   public boolean onFlushDirty(Object entity, Serializable id, Object[] currentState,
-                              Object[] previousState, String[] propertyNames, Type[] types) {
+      Object[] previousState, String[] propertyNames, Type[] types) {
     if (SessionHandler.isCheckingDirtySession()) {
       // onFlushDirty gets invoked on actual flushes but also when checking session dirty, in later
       // case nothing should be done here.
@@ -163,7 +160,7 @@ public class OBInterceptor extends EmptyInterceptor {
     // new object to true
     if (previousState == null) {
       log.warn(
-        "The object " + entity + " is detected as not new (is its id != null?) but it does not have a current state in the database. " + "This can happen when the id is set but not setNewObject(true); has been called.");
+          "The object " + entity + " is detected as not new (is its id != null?) but it does not have a current state in the database. " + "This can happen when the id is set but not setNewObject(true); has been called.");
       return false;
     }
     // disabled for now, checks are all done when a property is set
@@ -179,7 +176,7 @@ public class OBInterceptor extends EmptyInterceptor {
     boolean updated = false;
     if (getInterceptorListener() != null) {
       updated = getInterceptorListener().onFlushDirty(entity, id, currentState, previousState,
-        propertyNames, types);
+          propertyNames, types);
     }
 /*
     if (entity instanceof Traceable || entity instanceof ClientEnabled
@@ -195,23 +192,22 @@ public class OBInterceptor extends EmptyInterceptor {
    * info fields (created/createdBy/updated/updatedBy) and performs several security checks.
    *
    * @param entity
-   *   the business object which is deleted
+   *     the business object which is deleted
    * @param id
-   *   the id of the entity
+   *     the id of the entity
    * @param currentState
-   *   the current value of the properties
+   *     the current value of the properties
    * @param propertyNames
-   *   the name of the properties of the entity
+   *     the name of the properties of the entity
    * @param types
-   *   the hibernate type definition of the properties
-   *
+   *     the hibernate type definition of the properties
    * @return true if the state of the object has changed, this is the case when the entity has audit
-   *   info because the updated/updatedBy properties are updated here, false is returned in
-   *   other cases
+   *     info because the updated/updatedBy properties are updated here, false is returned in
+   *     other cases
    */
   @Override
   public boolean onSave(Object entity, Serializable id, Object[] currentState,
-                        String[] propertyNames, Type[] types) {
+      String[] propertyNames, Type[] types) {
     // disabled for now, checks are all done when a property is set
     // if (entity instanceof BaseOBObject) {
     // ((BaseOBObject) entity).validate();
@@ -231,7 +227,7 @@ public class OBInterceptor extends EmptyInterceptor {
     boolean listenerResult = false;
     if (getInterceptorListener() != null) {
       listenerResult = getInterceptorListener().onSave(entity, id, currentState, propertyNames,
-        types);
+          types);
     }
 
     // audit info fields
@@ -246,7 +242,7 @@ public class OBInterceptor extends EmptyInterceptor {
   }
 
   private void checkReferencedOrganizations(Object entity, Object[] currentState,
-                                            Object[] previousState, String[] propertyNames) {
+      Object[] previousState, String[] propertyNames) {
     /*
     if (!(entity instanceof OrganizationEnabled)) {
       return;
@@ -424,7 +420,7 @@ public class OBInterceptor extends EmptyInterceptor {
   // TODO: can the client/organization change?
   protected void onUpdate(Traceable t, String[] propertyNames, Object[] currentState) {
     if (org.etendorx.dal.core.OBContext.getOBContext()
-      .isInAdministratorMode() && preventUpdateInfoChange.get() != null && preventUpdateInfoChange.get()) {
+        .isInAdministratorMode() && preventUpdateInfoChange.get() != null && preventUpdateInfoChange.get()) {
       return;
     }
     /*
@@ -446,7 +442,7 @@ public class OBInterceptor extends EmptyInterceptor {
 
   // after flushing an object is not new anymore
   @Override
-  @SuppressWarnings({"rawtypes"})
+  @SuppressWarnings({ "rawtypes" })
   public void postFlush(Iterator entities) {
     while (entities.hasNext()) {
       final BaseOBObject bob = (BaseOBObject) entities.next();
@@ -493,7 +489,7 @@ public class OBInterceptor extends EmptyInterceptor {
     super.beforeTransactionCompletion(tx);
   }
 
-  @SuppressWarnings({"rawtypes"})
+  @SuppressWarnings({ "rawtypes" })
   @Override
   public void preFlush(Iterator entities) {
     if (getInterceptorListener() != null) {

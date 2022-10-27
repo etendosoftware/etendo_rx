@@ -27,7 +27,7 @@ public class Check {
    * Always throws a CheckException.
    *
    * @param message
-   *   the message used for the exception
+   *     the message used for the exception
    */
   public static void fail(String message) {
     throw new CheckException(message);
@@ -37,9 +37,9 @@ public class Check {
    * Throws a CheckException if the value is false, the message is used for creating the Exception.
    *
    * @param value
-   *   should be true otherwise an Exception is thrown
+   *     should be true otherwise an Exception is thrown
    * @param message
-   *   the message used for the Exception
+   *     the message used for the Exception
    */
   public static void isTrue(boolean value, String message) {
     if (!value) {
@@ -51,9 +51,9 @@ public class Check {
    * Throws a CheckException if the value is true, the message is used for creating the Exception.
    *
    * @param value
-   *   should be false otherwise an Exception is thrown
+   *     should be false otherwise an Exception is thrown
    * @param message
-   *   the message used for the Exception
+   *     the message used for the Exception
    */
   public static void isFalse(boolean value, String message) {
     if (value) {
@@ -72,9 +72,9 @@ public class Check {
    * Exception.
    *
    * @param value
-   *   should be null otherwise an Exception is thrown
+   *     should be null otherwise an Exception is thrown
    * @param message
-   *   the message used for the Exception
+   *     the message used for the Exception
    */
   public static void isNull(Object value, String message) {
     if (value != null) {
@@ -87,9 +87,9 @@ public class Check {
    * used for creating the Exception.
    *
    * @param value
-   *   should be unequal to null and have length &gt; zero otherwise an Exception is thrown
+   *     should be unequal to null and have length &gt; zero otherwise an Exception is thrown
    * @param message
-   *   the message used for the Exception
+   *     the message used for the Exception
    */
   public static void notEmpty(String value, String message) {
     if (value == null || value.trim().length() == 0) {
@@ -102,9 +102,9 @@ public class Check {
    * used for creating the Exception.
    *
    * @param array
-   *   should be unequal to null and have length &gt; zero otherwise an Exception is thrown
+   *     should be unequal to null and have length &gt; zero otherwise an Exception is thrown
    * @param message
-   *   the message used for the Exception
+   *     the message used for the Exception
    */
   public static void notEmpty(Object[] array, String message) {
     if (array == null || array.length == 0) {
@@ -116,9 +116,9 @@ public class Check {
    * Checks if the passed object is of the class specified, null values are ignored.
    *
    * @param obj
-   *   should be instanceof the expClass
+   *     should be instanceof the expClass
    * @param expClass
-   *   the class used for the check
+   *     the class used for the check
    */
   public static void isInstanceOf(Object obj, Class<?> expClass) {
     if (obj == null) {
@@ -126,8 +126,8 @@ public class Check {
     }
     if (!(expClass.isAssignableFrom(obj.getClass()))) {
       throw new CheckException(
-        "Expected class: " + expClass.getName() + " but object has class: " + obj.getClass()
-          .getName());
+          "Expected class: " + expClass.getName() + " but object has class: " + obj.getClass()
+              .getName());
     }
   }
 
@@ -135,9 +135,9 @@ public class Check {
    * Checks memory equality, the two objects should be the exact same object.
    *
    * @param obj1
-   *   first object checked
+   *     first object checked
    * @param obj2
-   *   second object checked
+   *     second object checked
    */
   public static void isSameObject(Object obj1, Object obj2) {
     if (obj1 != obj2) {
@@ -149,9 +149,9 @@ public class Check {
    * Checks memory equality, the two objects should not be the exact same object.
    *
    * @param obj1
-   *   first object checked
+   *     first object checked
    * @param obj2
-   *   second object checked
+   *     second object checked
    */
   public static void isNotSameObject(Object obj1, Object obj2) {
     if (obj1 == obj2) {

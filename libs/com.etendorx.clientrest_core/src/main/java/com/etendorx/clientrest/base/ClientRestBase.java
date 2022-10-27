@@ -41,10 +41,12 @@ public interface ClientRestBase<T extends RepresentationWithId<T>> {
   public void delete(@PathVariable String id);
 
   @GetMapping("/search/findAllCreated?startDate={startDate}&endDate={endDate}&page={page}&size={size}")
-  PagedModel<T> findAllCreated(@PathVariable String startDate, @PathVariable String endDate, @PathVariable int size, @PathVariable int page);
+  PagedModel<T> findAllCreated(@PathVariable String startDate, @PathVariable String endDate, @PathVariable int size,
+      @PathVariable int page);
 
   @GetMapping("/search/findAllUpdated?startDate={startDate}&endDate={endDate}&page={page}&size={size}")
-  PagedModel<T> findAllUpdated(@PathVariable String startDate, @PathVariable String endDate, @PathVariable int size, @PathVariable int page);
+  PagedModel<T> findAllUpdated(@PathVariable String startDate, @PathVariable String endDate, @PathVariable int size,
+      @PathVariable int page);
 
   @PatchMapping("/{id}/remoteid")
   ResponseEntity<T> updateRemoteId(@RequestBody T entity, @PathVariable String id, @RequestHeader HttpHeaders headers);

@@ -110,7 +110,8 @@ public class MetadataUtil {
    * @param moduleLocation
    */
   public static String getBasePackageGenLocationPath(File moduleLocation) {
-    return getSrcGenLocation(moduleLocation) + File.separator + "/main/java" + File.separator + getBasePackageGenPath(moduleLocation);
+    return getSrcGenLocation(moduleLocation) + File.separator + "/main/java" + File.separator + getBasePackageGenPath(
+        moduleLocation);
   }
 
   /**
@@ -136,8 +137,7 @@ public class MetadataUtil {
    * Generates a Map between the 'newClassname' (the name of the {@link ProjectionEntity} defined in a projection) and the corresponding {@link Entity}.
    *
    * @param entities
-   *   List of entities to map
-   *
+   *     List of entities to map
    * @return Map
    */
   public static Map<String, Entity> generateEntitiesMap(List<Entity> entities) {
@@ -153,8 +153,7 @@ public class MetadataUtil {
    * Creates a new {@link ProjectionEntity} based on a {@link Entity}
    *
    * @param entityModel
-   *   {@link Entity}
-   *
+   *     {@link Entity}
    * @return {@link ProjectionEntity}
    */
   public static ProjectionEntity generateProjectionEntity(Entity entityModel) {
@@ -163,10 +162,10 @@ public class MetadataUtil {
 
     // Filter the valid properties of the entityModel
     var filteredProperties = entityModel.getProperties().stream().filter(property ->
-      !property.isComputedColumn() &&
-        !StringUtils.isBlank(property.getTypeName())
-        && (property.isId() || (property.isPrimitive() && !property.getPrimitiveType().isArray())
-        || (property.getTargetEntity() != null && !property.isOneToMany() && !property.getTargetEntity().isView()))
+        !property.isComputedColumn() &&
+            !StringUtils.isBlank(property.getTypeName())
+            && (property.isId() || (property.isPrimitive() && !property.getPrimitiveType().isArray())
+            || (property.getTargetEntity() != null && !property.isOneToMany() && !property.getTargetEntity().isView()))
     );
 
     // Fill the projectionEntity fields with the entityModel filteredProperties
@@ -182,12 +181,12 @@ public class MetadataUtil {
    * Creates a new {@link ProjectionEntityField} based on a {@link Property}
    *
    * @param propertyModel
-   *   {@link Property}
-   *
+   *     {@link Property}
    * @return {@link ProjectionEntityField}
    */
   public static ProjectionEntityField generateProjectionEntityField(Property propertyModel) {
-    return new ProjectionEntityField(propertyModel.getName(), null, propertyModel.getTypeName(), generateClassName(propertyModel));
+    return new ProjectionEntityField(propertyModel.getName(), null, propertyModel.getTypeName(),
+        generateClassName(propertyModel));
   }
 
   static String generateClassName(Property propertyModel) {
@@ -212,11 +211,12 @@ public class MetadataUtil {
     }
 
     return Arrays.stream(Objects.requireNonNull(new File(path).listFiles(File::isDirectory))).collect(
-      Collectors.toList());
+        Collectors.toList());
   }
 
-  private static void analizeProjections(Map<String, Projection> projections, File projectionsFile, File moduleLocation, Metadata moduleMetadata)
-    throws IOException, JSONException, CodeGenerationException {
+  private static void analizeProjections(Map<String, Projection> projections, File projectionsFile, File moduleLocation,
+      Metadata moduleMetadata)
+      throws IOException, JSONException, CodeGenerationException {
     var content = Files.readString(projectionsFile.toPath());
     var jsonProps = new JSONObject(content);
     var react = false;
@@ -284,7 +284,7 @@ public class MetadataUtil {
   }
 
   private static void analizeRepositories(Map<String, Repository> repositories,
-                                          File projectionsFile, Metadata moduleMetadata) throws IOException, JSONException {
+      File projectionsFile, Metadata moduleMetadata) throws IOException, JSONException {
     var content = Files.readString(projectionsFile.toPath());
     var jsonProps = new JSONObject(content);
     if (jsonProps.has(REPOSITORIES)) {
@@ -313,7 +313,8 @@ public class MetadataUtil {
               fetchAttributes = jsonSearch.getJSONArray(FETCH_ATTRIBUTES);
             }
 
-            RepositorySearch moduleRepositorySearch = getRepositorySearch(moduleRepository, method, query, fetchAttributes);
+            RepositorySearch moduleRepositorySearch = getRepositorySearch(moduleRepository, method, query,
+                fetchAttributes);
 
             repositorySearch = getRepositorySearch(repository, method, query, fetchAttributes);
             if (jsonSearch.has(PARAMS)) {
@@ -336,7 +337,7 @@ public class MetadataUtil {
   }
 
   private static ProjectionEntityField getProjectionEntityField(ProjectionEntity projectionEntity,
-                                                                String fieldName, String fieldValue, String fieldType) {
+      String fieldName, String fieldValue, String fieldType) {
     ProjectionEntityField projectionEntityField;
     if (projectionEntity.getFields().containsKey(fieldName)) {
       projectionEntityField = projectionEntity.getFields().get(fieldName);
@@ -364,25 +365,25 @@ public class MetadataUtil {
    * The entity will contain all the declared fields.
    *
    * @param moduleMetadata
-   *   The module from where the projection will be obtained
+   *     The module from where the projection will be obtained
    * @param projectionFilter
-   *   A lambda function used to filter the module projections
-   *
+   *     A lambda function used to filter the module projections
    * @return A Projection.
    */
   public static Projection generateProjectionMix(Metadata moduleMetadata, Predicate<Projection> projectionFilter) {
     Projection projectionMix = new Projection("mix");
 
-    List<Projection> moduleProjectionFiltered = moduleMetadata.getProjections().values().stream().filter(projectionFilter).collect(Collectors.toList());
+    List<Projection> moduleProjectionFiltered = moduleMetadata.getProjections().values().stream().filter(
+        projectionFilter).collect(Collectors.toList());
     for (Projection moduleProjection : moduleProjectionFiltered) {
       for (ProjectionEntity moduleProjectionEntity : moduleProjection.getEntities().values()) {
         ProjectionEntity projectionEntityMix = getProjectionEntity(projectionMix, moduleProjectionEntity.getName(), "");
         for (ProjectionEntityField moduleProjectionEntityField : moduleProjectionEntity.getFields().values()) {
           getProjectionEntityField(
-            projectionEntityMix,
-            moduleProjectionEntityField.getName(),
-            moduleProjectionEntityField.getValue(),
-            moduleProjectionEntityField.getType()
+              projectionEntityMix,
+              moduleProjectionEntityField.getName(),
+              moduleProjectionEntityField.getValue(),
+              moduleProjectionEntityField.getType()
           );
         }
       }
@@ -390,7 +391,8 @@ public class MetadataUtil {
     return projectionMix;
   }
 
-  private static Projection getProjection(Map<String, Projection> projections, String projectionName, boolean grpc, boolean react) {
+  private static Projection getProjection(Map<String, Projection> projections, String projectionName, boolean grpc,
+      boolean react) {
     Projection projection;
     if (projections.containsKey(projectionName)) {
       projection = projections.get(projectionName);
@@ -402,7 +404,7 @@ public class MetadataUtil {
   }
 
   private static Repository getRepository(Map<String, Repository> repositories, String entityName,
-                                          boolean transactional) {
+      boolean transactional) {
     Repository repository;
     if (repositories.containsKey(entityName)) {
       repository = repositories.get(entityName);
@@ -414,7 +416,7 @@ public class MetadataUtil {
   }
 
   private static RepositorySearch getRepositorySearch(Repository repository, String method,
-                                                      String query, JSONArray fetchAttributes) {
+      String query, JSONArray fetchAttributes) {
     RepositorySearch repositorySearch;
     if (repository.getSearches().containsKey(method)) {
       repositorySearch = repository.getSearches().get(method);
@@ -426,7 +428,7 @@ public class MetadataUtil {
   }
 
   private static RepositorySearchParam getRepositorySearchParam(RepositorySearch repository,
-                                                                String name, String type) {
+      String name, String type) {
     RepositorySearchParam repositorySearchParam;
     if (repository.getSearchParams().containsKey(name)) {
       repositorySearchParam = repository.getSearchParams().get(name);
@@ -438,34 +440,34 @@ public class MetadataUtil {
   }
 
   public static Metadata fillTypes(Metadata metadata, List<Entity> entities, String packageEntities)
-    throws CodeGenerationException {
+      throws CodeGenerationException {
     metadata.getProjections().values()
-      .forEach(HandlingConsumer.handlingConsumerBuilder(p -> {
-        var withoutFields = p.getEntities().values().stream().filter(e -> e.getFields().size() == 0)
-          .collect(Collectors.toList());
-        if (withoutFields.size() > 0) {
-          throw new CodeGenerationException("Entitiy " + withoutFields.stream().map(
-            ProjectionEntity::getName).collect(Collectors.toList()) + " without fields "
-          );
-        }
-      }));
+        .forEach(HandlingConsumer.handlingConsumerBuilder(p -> {
+          var withoutFields = p.getEntities().values().stream().filter(e -> e.getFields().size() == 0)
+              .collect(Collectors.toList());
+          if (withoutFields.size() > 0) {
+            throw new CodeGenerationException("Entitiy " + withoutFields.stream().map(
+                ProjectionEntity::getName).collect(Collectors.toList()) + " without fields "
+            );
+          }
+        }));
 
     metadata.getProjections()
-      .values()
-      .forEach(HandlingConsumer.handlingConsumerBuilder(projection -> projection.getEntities()
         .values()
-        .forEach(HandlingConsumer.handlingConsumerBuilder(entity -> entity.getFields()
-          .values()
-          .forEach(HandlingConsumer.handlingConsumerBuilder(
-            field -> manageFillTypes(entities, packageEntities, entity, field)))))));
+        .forEach(HandlingConsumer.handlingConsumerBuilder(projection -> projection.getEntities()
+            .values()
+            .forEach(HandlingConsumer.handlingConsumerBuilder(entity -> entity.getFields()
+                .values()
+                .forEach(HandlingConsumer.handlingConsumerBuilder(
+                    field -> manageFillTypes(entities, packageEntities, entity, field)))))));
     return metadata;
   }
 
   private static Optional<Property> filterEntityPropertyByName(Entity entity, String entityPropertyName) {
     return entity.getProperties()
-      .stream()
-      .filter(p -> p.getName().compareTo(entityPropertyName) == 0)
-      .findFirst();
+        .stream()
+        .filter(p -> p.getName().compareTo(entityPropertyName) == 0)
+        .findFirst();
   }
 
   /**
@@ -486,33 +488,34 @@ public class MetadataUtil {
    * @param parentEntity
    * @param propertyName
    * @param isLastValue
-   *   boolean Flag used to check if the property is the last in the field 'value'
-   *
+   *     boolean Flag used to check if the property is the last in the field 'value'
    * @return A {@link Entity} representing the target entity of the 'propertyName'
    */
-  private static Entity validateParentEntityValue(ProjectionEntity baseEntity, ProjectionEntityField baseField, Entity parentEntity, String propertyName, boolean isLastValue) throws CodeGenerationException {
+  private static Entity validateParentEntityValue(ProjectionEntity baseEntity, ProjectionEntityField baseField,
+      Entity parentEntity, String propertyName, boolean isLastValue) throws CodeGenerationException {
     // Check if the value is a property of the parentEntity
     var propertyOptional = filterEntityPropertyByName(parentEntity, propertyName);
 
     if (propertyOptional.isEmpty()) {
       throw new CodeGenerationException(
-        "The entity Field named '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'" +
-          " contains the value '" + propertyName + "', which doesn't exists.");
+          "The entity Field named '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'" +
+              " contains the value '" + propertyName + "', which doesn't exists.");
     }
 
     var targetEntity = propertyOptional.get().getTargetEntity();
     if (!isLastValue && targetEntity == null) {
-      throw new CodeGenerationException("Error in the value of the entity Field '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'." +
-        "The property '" + propertyOptional.get().getName() + "' does not contain a target entity.");
+      throw new CodeGenerationException(
+          "Error in the value of the entity Field '" + baseField.getName() + "' declared in entity model '" + baseEntity.getName() + "'." +
+              "The property '" + propertyOptional.get().getName() + "' does not contain a target entity.");
     }
     return targetEntity;
   }
 
   private static void manageFillTypes(List<Entity> entities, String packageEntities,
-                                      ProjectionEntity entity, ProjectionEntityField field) throws CodeGenerationException {
+      ProjectionEntity entity, ProjectionEntityField field) throws CodeGenerationException {
     var entityModel = entities.stream()
-      .filter(e -> e.getName().compareTo(entity.getName()) == 0)
-      .findFirst();
+        .filter(e -> e.getName().compareTo(entity.getName()) == 0)
+        .findFirst();
     if (entityModel.isPresent()) {
       entity.setPackageName(entityModel.get().getPackageName());
       entity.setClassName(entityModel.get().getClassName());
@@ -525,10 +528,10 @@ public class MetadataUtil {
       }
 
       var fieldModel = entityModel.get()
-        .getProperties()
-        .stream()
-        .filter(p -> p.getName().compareTo(field.getName()) == 0)
-        .findFirst();
+          .getProperties()
+          .stream()
+          .filter(p -> p.getName().compareTo(field.getName()) == 0)
+          .findFirst();
       if (field.getValue() != null) {
         field.setClassName("String");
         if (!field.getValue().startsWith("#{")) {
@@ -539,7 +542,8 @@ public class MetadataUtil {
             String notNullProperty = "";
             var parentEntityModel = entityModel.get();
             for (var i = 0; i < value.length; i++) {
-              parentEntityModel = validateParentEntityValue(entity, field, parentEntityModel, value[i], i == value.length - 1);
+              parentEntityModel = validateParentEntityValue(entity, field, parentEntityModel, value[i],
+                  i == value.length - 1);
               getProperty += ".get" + value[i].substring(0, 1).toUpperCase() + value[i].substring(1) + "()";
               fieldValue.append(getProperty);
               if (i < value.length - 1) {
@@ -570,26 +574,26 @@ public class MetadataUtil {
           }
         } else {
           throw new CodeGenerationException(
-            "The entity Field '" + field.getName() + "' declared in entity model '" + entity.getName() + "' doesn't exist");
+              "The entity Field '" + field.getName() + "' declared in entity model '" + entity.getName() + "' doesn't exist");
         }
       }
     } else {
       // Try to find case typos
       var entityModelIgnoreCase = entities.stream()
-        .filter(e -> e.getName()
-          .compareToIgnoreCase(entity.getName()) == 0)
-        .findFirst();
+          .filter(e -> e.getName()
+              .compareToIgnoreCase(entity.getName()) == 0)
+          .findFirst();
       if (entityModelIgnoreCase.isPresent()) {
         throw new CodeGenerationException(
-          "Entitiy Model " + entity.getName() + " doesn't exist, maybe you refer to " +
-            entityModelIgnoreCase.get().getName());
+            "Entitiy Model " + entity.getName() + " doesn't exist, maybe you refer to " +
+                entityModelIgnoreCase.get().getName());
       } else {
         throw new CodeGenerationException("Entitiy Model " + entity.getName() + " doesn't exist");
       }
     }
     if (field.getType() == null) {
       throw new CodeGenerationException(
-        "The entity Field '" + field.getName() + "' declared in entity model '" + entity.getName() + "' has null type");
+          "The entity Field '" + field.getName() + "' declared in entity model '" + entity.getName() + "' has null type");
     }
   }
 
@@ -598,7 +602,7 @@ public class MetadataUtil {
     void accept(T target) throws E;
 
     static <T> Consumer<T> handlingConsumerBuilder(
-      HandlingConsumer<T, CodeGenerationException> handlingConsumer) {
+        HandlingConsumer<T, CodeGenerationException> handlingConsumer) {
       return obj -> {
         try {
           handlingConsumer.accept(obj);

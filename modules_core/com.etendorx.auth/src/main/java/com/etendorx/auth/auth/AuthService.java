@@ -5,9 +5,11 @@ import com.etendorx.auth.auth.jwt.JwtRequest;
 import com.etendorx.auth.feign.UserClient;
 import com.etendorx.auth.feign.UserModel;
 import com.etendorx.utils.auth.key.JwtKeyUtils;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -45,16 +47,16 @@ public class AuthService {
    * Connects with the DAS server to authenticate the user credentials
    *
    * @param username
-   *   The username used to log in.
+   *     The username used to log in.
    * @param password
-   *   The password used to log in.
-   *
+   *     The password used to log in.
    * @return {@link UserModel}
    */
   public UserModel validateCredentials(String username, String password) {
     // Send a request to the DAS server
     log.debug("Sending request to the DAS server.");
-    ResponseEntity<CollectionModel<UserModel>> modelResponseEntity = userClient.searchUserByUsername(username, "true", PROJECTION);
+    ResponseEntity<CollectionModel<UserModel>> modelResponseEntity = userClient.searchUserByUsername(username, "true",
+        PROJECTION);
     if (modelResponseEntity.getStatusCode() != HttpStatus.OK) {
       throw new ResponseStatusException(modelResponseEntity.getStatusCode(), "Unsuccessful DAS connection.");
     }
@@ -82,7 +84,8 @@ public class AuthService {
     Claims claims = new DefaultClaims();
     claims.put(JwtKeyUtils.USER_ID_CLAIM, userModel.getId());
     claims.put(JwtKeyUtils.CLIENT_ID_CLAIM, getOrDefaultValue(userModel.getDefaultClientId(), userModel.getClientId()));
-    claims.put(JwtKeyUtils.ORG_ID_CLAIM, getOrDefaultValue(userModel.getDefaultOrganizationId(), userModel.getOrganizationId()));
+    claims.put(JwtKeyUtils.ORG_ID_CLAIM,
+        getOrDefaultValue(userModel.getDefaultOrganizationId(), userModel.getOrganizationId()));
     return claims;
   }
 

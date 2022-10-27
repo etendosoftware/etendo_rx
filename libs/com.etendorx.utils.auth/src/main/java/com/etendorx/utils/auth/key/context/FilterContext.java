@@ -17,6 +17,7 @@
 package com.etendorx.utils.auth.key.context;
 
 import com.etendorx.utils.auth.key.JwtKeyUtils;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,6 +25,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -31,7 +33,8 @@ import java.util.Map;
 public class FilterContext extends OncePerRequestFilter {
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
     String token = request.getHeader("X-TOKEN");
     if (token != null && !token.isBlank()) {
       setUserContextFromToken(token);

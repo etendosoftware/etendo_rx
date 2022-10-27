@@ -2,13 +2,14 @@ package com.etendoerp.etendorx.model.repository;
 
 import com.etendoerp.etendorx.model.ETRXModule;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+
 import org.apache.commons.lang.StringUtils;
 import org.openbravo.base.model.ModelObject;
 import org.openbravo.base.model.Table;
 
 import java.util.Set;
 
-@JsonIncludeProperties({"entityName", "searches"})
+@JsonIncludeProperties({ "entityName", "searches" })
 public class ETRXRepository extends ModelObject {
 
   private ETRXModule module;

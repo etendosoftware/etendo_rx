@@ -17,6 +17,7 @@
 package com.etendorx.lib.kafka.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,7 +38,7 @@ public class AsyncProcessExecution implements Comparable<AsyncProcessExecution> 
   private String params;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING,
-    pattern = "dd-MM-yyyy hh:mm:ss")
+      pattern = "dd-MM-yyyy hh:mm:ss")
   private Date time;
   @Builder.Default
   private AsyncProcessState state = AsyncProcessState.ACCEPTED;

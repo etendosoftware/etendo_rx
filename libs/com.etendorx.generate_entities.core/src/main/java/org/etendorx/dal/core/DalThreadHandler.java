@@ -57,8 +57,8 @@ public abstract class DalThreadHandler extends ThreadHandler {
 
   private void closeDefaultPoolSession(boolean errorOccured) {
     org.etendorx.dal.core.SessionHandler sessionHandler = org.etendorx.dal.core.SessionHandler.isSessionHandlerPresent() ?
-      org.etendorx.dal.core.SessionHandler.getInstance() :
-      null;
+        org.etendorx.dal.core.SessionHandler.getInstance() :
+        null;
     if (sessionHandler != null && sessionHandler.doSessionInViewPatter()) {
       // application software can force a rollback
       if (sessionHandler.getDoRollback() || errorOccured) {

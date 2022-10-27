@@ -30,29 +30,29 @@ import java.lang.reflect.Field;
  */
 
 public abstract class BaseForeignKeyDomainType extends BaseDomainType
-  implements ForeignKeyDomainType {
+    implements ForeignKeyDomainType {
 
   /**
    * @return the refered to column based on the table encoded in the table name of the passed
-   *   column. This method also handles exceptional column names in a specific way.
+   *     column. This method also handles exceptional column names in a specific way.
    */
   @Override
   public Column getForeignKeyColumn(String columnName) {
 
     try {
       return getModelProvider().getTable(getReferedTableName(columnName))
-        .getPrimaryKeyColumns()
-        .get(0);
+          .getPrimaryKeyColumns()
+          .get(0);
     } catch (final Exception e) {
       if (OBPropertiesProvider.isFriendlyWarnings()) {
         // won't be logged
         throw new IllegalArgumentException(
-          "Reference column for " + columnName + " not found in runtime model [ref: " + getReference().getId() + ", encountered exception " + e.getMessage(),
-          e);
+            "Reference column for " + columnName + " not found in runtime model [ref: " + getReference().getId() + ", encountered exception " + e.getMessage(),
+            e);
       } else {
         throw new OBException(
-          "Reference column for " + columnName + " not found in runtime model [ref: " + getReference().getId() + ", encountered exception " + e.getMessage(),
-          e);
+            "Reference column for " + columnName + " not found in runtime model [ref: " + getReference().getId() + ", encountered exception " + e.getMessage(),
+            e);
       }
     }
   }
@@ -76,7 +76,7 @@ public abstract class BaseForeignKeyDomainType extends BaseDomainType
     }
 
     if (columnName.equals("C_Settlement_Cancel_ID") || columnName.equals(
-      "C_Settlement_Generate_ID")) {
+        "C_Settlement_Generate_ID")) {
       tableName = "C_Settlement";
     }
 
@@ -108,15 +108,15 @@ public abstract class BaseForeignKeyDomainType extends BaseDomainType
 
   @Override
   public void checkIsValidValue(Property property, Object value)
-    throws ValidationException {
+      throws ValidationException {
     if (value == null) {
       return;
     }
     if (!(value instanceof BaseOBObjectDef)) {
       final ValidationException ve = new ValidationException();
       ve.addMessage(property,
-        "Property " + property + " only allows reference instances of type " + BaseOBObjectDef.class.getName() + " but the value is an instanceof " + value.getClass()
-          .getName());
+          "Property " + property + " only allows reference instances of type " + BaseOBObjectDef.class.getName() + " but the value is an instanceof " + value.getClass()
+              .getName());
       throw ve;
     }
 
@@ -131,7 +131,7 @@ public abstract class BaseForeignKeyDomainType extends BaseDomainType
     if (getReferedEntity(property) != null && entity != getReferedEntity(property)) {
       final ValidationException ve = new ValidationException();
       ve.addMessage(property, "Property " + property + " only allows entity: " + getReferedEntity(
-        property) + " but the value (" + value + ") has entity " + obObject.getEntity());
+          property) + " but the value (" + value + ") has entity " + obObject.getEntity());
       throw ve;
     }
     return;
@@ -143,7 +143,7 @@ public abstract class BaseForeignKeyDomainType extends BaseDomainType
     if (o instanceof org.hibernate.proxy.HibernateProxy) {
       try {
         final Class<?> clz = ((org.hibernate.proxy.HibernateProxy) o).getHibernateLazyInitializer()
-          .getPersistentClass();
+            .getPersistentClass();
         final Field fld = clz.getField("ENTITY_NAME");
         return (String) fld.get(null);
       } catch (final Exception e) {
@@ -158,14 +158,13 @@ public abstract class BaseForeignKeyDomainType extends BaseDomainType
    * types this method always returns null.
    *
    * @param property
-   *   property for this domain type, the property is needed because the domain type is
-   *   shared by different properties.
-   *
+   *     property for this domain type, the property is needed because the domain type is
+   *     shared by different properties.
    * @return the entity to which this domain type refers, is null in case of TableDir.
    */
   protected Entity getReferedEntity(Property property) {
     return ModelProvider.getInstance()
-      .getEntityByTableName(getReferedTableName(property.getColumnName()));
+        .getEntityByTableName(getReferedTableName(property.getColumnName()));
   }
 
 }

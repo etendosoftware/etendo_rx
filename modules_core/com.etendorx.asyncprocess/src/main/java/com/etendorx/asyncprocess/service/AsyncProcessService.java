@@ -18,6 +18,7 @@ package com.etendorx.asyncprocess.service;
 
 import com.etendorx.lib.kafka.model.AsyncProcess;
 import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
+
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StoreQueryParameters;
 import org.apache.kafka.streams.state.HostInfo;
@@ -47,8 +48,8 @@ public class AsyncProcessService {
 
   private ReadOnlyKeyValueStore<String, AsyncProcess> getStore() {
     return kafkaStreams.store(
-      StoreQueryParameters.fromNameAndType(
-        AsyncProcessTopology.ASYNC_PROCESS_STORE,
-        QueryableStoreTypes.keyValueStore()));
+        StoreQueryParameters.fromNameAndType(
+            AsyncProcessTopology.ASYNC_PROCESS_STORE,
+            QueryableStoreTypes.keyValueStore()));
   }
 }

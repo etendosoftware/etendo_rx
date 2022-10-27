@@ -3,6 +3,7 @@ package com.etendorx.clientrest.base;
 import feign.Logger;
 import feign.okhttp.OkHttpClient;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

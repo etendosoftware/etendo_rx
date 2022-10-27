@@ -2,6 +2,7 @@ package com.etendorx.auth.controller;
 
 import com.etendorx.auth.auth.AuthService;
 import com.etendorx.auth.auth.jwt.JwtRequest;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -31,14 +32,14 @@ public class AuthControllerInvalidJwtRequestTest {
 
   public static Stream<Arguments> invalidJwtRequestParams() {
     return Stream.of(
-      // Undefined username
-      Arguments.of(null, null, AuthService.UNDEFINED_USERNAME_MESSAGE),
-      Arguments.of("", "", AuthService.UNDEFINED_USERNAME_MESSAGE),
-      Arguments.of("", null, AuthService.UNDEFINED_USERNAME_MESSAGE),
-      Arguments.of("", "pass123", AuthService.UNDEFINED_USERNAME_MESSAGE),
-      // Undefined password
-      Arguments.of("user123", null, AuthService.UNDEFINED_PASSWORD_MESSAGE),
-      Arguments.of("user123", "", AuthService.UNDEFINED_PASSWORD_MESSAGE)
+        // Undefined username
+        Arguments.of(null, null, AuthService.UNDEFINED_USERNAME_MESSAGE),
+        Arguments.of("", "", AuthService.UNDEFINED_USERNAME_MESSAGE),
+        Arguments.of("", null, AuthService.UNDEFINED_USERNAME_MESSAGE),
+        Arguments.of("", "pass123", AuthService.UNDEFINED_USERNAME_MESSAGE),
+        // Undefined password
+        Arguments.of("user123", null, AuthService.UNDEFINED_PASSWORD_MESSAGE),
+        Arguments.of("user123", "", AuthService.UNDEFINED_PASSWORD_MESSAGE)
     );
   }
 
@@ -50,19 +51,19 @@ public class AuthControllerInvalidJwtRequestTest {
     request.setPassword(password);
 
     ResultActions resultActions = this.mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/authenticate")
-      .content(AuthControllerUtils.asJsonString(request))
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON));
+        .post("/api/authenticate")
+        .content(AuthControllerUtils.asJsonString(request))
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON));
 
     resultActions.andDo(print())
-      .andExpect(status().isBadRequest())
-      .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
-      .andExpect(result -> {
-        assertEquals(
-          Objects.requireNonNull((ResponseStatusException) result.getResolvedException()).getReason(),
-          errorMessage);
-      });
+        .andExpect(status().isBadRequest())
+        .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
+        .andExpect(result -> {
+          assertEquals(
+              Objects.requireNonNull((ResponseStatusException) result.getResolvedException()).getReason(),
+              errorMessage);
+        });
   }
 
 }

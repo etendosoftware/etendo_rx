@@ -25,7 +25,7 @@ public class UtilSql {
   }
 
   public static boolean setValue(PreparedStatement ps, int posicion, int tipo, String strDefault,
-                                 String _strValor) {
+      String _strValor) {
     String strValor = _strValor;
 
     try {
@@ -81,7 +81,7 @@ public class UtilSql {
   }
 
   public static String getDateValue(ResultSet result, String strField, String strDateFormat)
-    throws SQLException {
+      throws SQLException {
     Date date = result.getDate(strField);
     String strValueReturn;
     if (result.wasNull()) {
@@ -95,7 +95,7 @@ public class UtilSql {
   }
 
   public static String getDateTimeValue(ResultSet result, String strField, String strDateFormat)
-    throws SQLException {
+      throws SQLException {
     Timestamp timestamp = result.getTimestamp(strField);
     String strValueReturn;
     if (result.wasNull()) {
@@ -128,7 +128,7 @@ public class UtilSql {
   }
 
   public static String getStringCallableStatement(CallableStatement cs, int intField)
-    throws SQLException {
+      throws SQLException {
     String strValueReturn = cs.getString(intField);
     if (strValueReturn == null) {
       strValueReturn = "";

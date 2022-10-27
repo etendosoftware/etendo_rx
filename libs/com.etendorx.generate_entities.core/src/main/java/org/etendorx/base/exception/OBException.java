@@ -82,8 +82,8 @@ public class OBException extends RuntimeException {
     String msg;
     if (StringUtils.isBlank(message)) {
       msg = foundCause == cause ?
-        cause.getMessage() :
-        (cause.getMessage() + "-" + foundCause.getMessage());
+          cause.getMessage() :
+          (cause.getMessage() + "-" + foundCause.getMessage());
     } else {
       msg = message;
     }

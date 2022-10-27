@@ -172,8 +172,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
         return;
       }
       log.warn(
-        "Detected multiple calls to initialize() in the same OBCriteria instance. " + "This should be fixed in order to prevent adding duplicated filters in the query.",
-        new Exception());
+          "Detected multiple calls to initialize() in the same OBCriteria instance. " + "This should be fixed in order to prevent adding duplicated filters in the query.",
+          new Exception());
     }
     final OBContext obContext = OBContext.getOBContext();
     final Entity e = getEntity();
@@ -228,10 +228,9 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Convenience method not present in the standard Hibernate Criteria object.
    *
    * @param orderOn
-   *   the property on which to order, can also be a property of an associated entity (etc.)
+   *     the property on which to order, can also be a property of an associated entity (etc.)
    * @param ascending
-   *   if true then order ascending, false order descending
-   *
+   *     if true then order ascending, false order descending
    * @return this OBCriteria instance, for method chaining
    */
   public OBCriteria<E> addOrderBy(String orderOn, boolean ascending) {
@@ -242,7 +241,6 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
 
   /**
    * @return the Entity for which is queried
-   *
    * @see Entity
    */
   public Entity getEntity() {
@@ -255,8 +253,7 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
 
   /**
    * @return true then when querying (for example call list()) a filter on readable organizations is
-   *   added to the query, if false then this is not done
-   *
+   *     added to the query, if false then this is not done
    * @see OBContext#getReadableOrganizations()
    */
   public boolean isFilterOnReadableOrganization() {
@@ -268,11 +265,9 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Criteria automatically. The default is true.
    *
    * @param filterOnReadableOrganization
-   *   if true then when querying (for example call list()) a filter on readable
-   *   organizations is added to the query, if false then this is not done
-   *
+   *     if true then when querying (for example call list()) a filter on readable
+   *     organizations is added to the query, if false then this is not done
    * @return this OBCriteria instance, for method chaining
-   *
    * @see OBContext#getReadableOrganizations()
    */
   public OBCriteria<E> setFilterOnReadableOrganization(boolean filterOnReadableOrganization) {
@@ -296,8 +291,7 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * isActive true are returned by the Criteria object.
    *
    * @param filterOnActive
-   *   if true then only objects with isActive='Y' are returned, false otherwise
-   *
+   *     if true then only objects with isActive='Y' are returned, false otherwise
    * @return this OBCriteria instance, for method chaining
    */
   public OBCriteria<E> setFilterOnActive(boolean filterOnActive) {
@@ -311,7 +305,7 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * true.
    *
    * @return if true then only objects from readable clients are returned, if false then objects
-   *   from all clients are returned
+   *     from all clients are returned
    */
   public boolean isFilterOnReadableClients() {
     return filterOnReadableClients;
@@ -322,9 +316,8 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * true.
    *
    * @param filterOnReadableClients
-   *   if true then only objects from readable clients are returned, if false then objects
-   *   from all clients are returned
-   *
+   *     if true then only objects from readable clients are returned, if false then objects
+   *     from all clients are returned
    * @return this OBCriteria instance, for method chaining
    */
   public OBCriteria<E> setFilterOnReadableClients(boolean filterOnReadableClients) {
@@ -337,8 +330,7 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Add a restriction to constrain the results to be retrieved.
    *
    * @param expression
-   *   The criterion object representing the restriction to be applied
-   *
+   *     The criterion object representing the restriction to be applied
    * @return this OBCriteria instance, for method chaining
    */
   @Override
@@ -351,8 +343,7 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Set a limit upon the number of objects to be retrieved.
    *
    * @param maxResults
-   *   The maximum number of results
-   *
+   *     The maximum number of results
    * @return this OBCriteria instance, for method chaining
    */
   @Override
@@ -365,8 +356,7 @@ public class OBCriteria<E extends BaseOBObject> extends CriteriaImpl {
    * Set the first result to be retrieved.
    *
    * @param firstResult
-   *   The first result to retrieve, numbered from 0
-   *
+   *     The first result to retrieve, numbered from 0
    * @return this OBCriteria instance, for method chaining
    */
   @Override

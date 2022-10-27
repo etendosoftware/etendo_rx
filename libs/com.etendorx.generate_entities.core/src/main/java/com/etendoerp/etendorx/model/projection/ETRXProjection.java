@@ -2,13 +2,14 @@ package com.etendoerp.etendorx.model.projection;
 
 import com.etendoerp.etendorx.model.ETRXModule;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openbravo.base.model.ModelObject;
 
 import java.util.Set;
 
-@JsonIncludeProperties({"name", "grpc", "entities"})
+@JsonIncludeProperties({ "name", "grpc", "entities" })
 public class ETRXProjection extends ModelObject {
 
   private static final Logger log = LogManager.getLogger();

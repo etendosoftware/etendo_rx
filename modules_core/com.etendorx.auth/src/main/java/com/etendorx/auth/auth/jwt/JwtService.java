@@ -1,9 +1,11 @@
 package com.etendorx.auth.auth.jwt;
 
 import com.etendorx.auth.auth.key.JwtKeyProvider;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,11 +25,11 @@ public class JwtService {
   public JwtResponse generateJwtToken(Claims claims) {
     PrivateKey privateKey = jwtKeyProvider.getPrivateKey();
     String token = Jwts.builder()
-      .setIssuer(ISS)
-      .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-      .addClaims(claims)
-      .signWith(SignatureAlgorithm.RS256, privateKey)
-      .compact();
+        .setIssuer(ISS)
+        .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
+        .addClaims(claims)
+        .signWith(SignatureAlgorithm.RS256, privateKey)
+        .compact();
     return new JwtResponse(token);
   }
 

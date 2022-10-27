@@ -17,6 +17,7 @@
 package com.etendorx.entities.utilities;
 
 import lombok.SneakyThrows;
+
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
@@ -27,7 +28,7 @@ public class UUIDGenerator extends org.hibernate.id.UUIDGenerator {
   @SneakyThrows
   @Override
   public Serializable generate(SharedSessionContractImplementor session, Object obj) throws
-    HibernateException {
+      HibernateException {
     String result = ((String) super.generate(session, obj)).toUpperCase();
     result = result.replace("-", "");
     if (result.length() != 32) {

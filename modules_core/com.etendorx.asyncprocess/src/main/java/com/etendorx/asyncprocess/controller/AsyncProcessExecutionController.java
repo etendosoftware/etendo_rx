@@ -18,7 +18,9 @@ package com.etendorx.asyncprocess.controller;
 
 import com.etendorx.asyncprocess.service.AsyncProcessExecutionService;
 import com.etendorx.lib.kafka.model.AsyncProcessExecution;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,7 +43,8 @@ public class AsyncProcessExecutionController {
   }
 
   @PostMapping(value = "/", produces = "application/json")
-  public ResponseEntity<AsyncProcessExecution> postAsyncProcess(@RequestBody AsyncProcessExecution asyncProcessExecution) {
+  public ResponseEntity<AsyncProcessExecution> postAsyncProcess(
+      @RequestBody AsyncProcessExecution asyncProcessExecution) {
     log.info("exec {}", asyncProcessExecution);
     asyncProcessExecutionService.save(asyncProcessExecution);
     return ResponseEntity.ok(asyncProcessExecution);

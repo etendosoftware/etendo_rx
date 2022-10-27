@@ -17,6 +17,7 @@
 package org.openbravo.base.model;
 
 import com.etendoerp.sequences.model.SequenceConfiguration;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.exception.OBException;
@@ -103,7 +104,7 @@ public class Reference extends ModelObject {
     String modelImplementationClass = getModelImplementationClassName();
     if (modelImplementationClass == null) {
       log.error(
-        "Reference " + this + " has a modelImpl which is null, using String as the default");
+          "Reference " + this + " has a modelImpl which is null, using String as the default");
       modelImplementationClass = StringDomainType.class.getName();
     }
     try {
@@ -112,7 +113,7 @@ public class Reference extends ModelObject {
       domainType.setReference(this);
     } catch (Exception e) {
       throw new OBException(
-        "Not able to create domain type " + getModelImpl() + " for reference " + this, e);
+          "Not able to create domain type " + getModelImpl() + " for reference " + this, e);
     }
     return domainType;
   }

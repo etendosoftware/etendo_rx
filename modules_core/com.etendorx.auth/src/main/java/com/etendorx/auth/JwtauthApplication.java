@@ -6,8 +6,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.etendorx.clientrest.*", "com.etendorx.auth.*"})
-@EnableFeignClients(basePackages = {"com.etendorx.clientrest.*", "com.etendorx.auth.clientrest", "com.etendorx.auth.feign"})
+@ComponentScan(basePackages = { "com.etendorx.clientrest.*", "com.etendorx.auth.*" })
+@EnableFeignClients(basePackages = { "com.etendorx.clientrest.*", "com.etendorx.auth.clientrest", "com.etendorx.auth.feign" })
 public class JwtauthApplication {
 
   public static void main(String[] args) {

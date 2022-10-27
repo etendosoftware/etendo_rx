@@ -17,6 +17,7 @@
 package com.etendorx.lib.kafka.topology;
 
 import com.etendorx.lib.kafka.model.ProcessModel;
+
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -41,10 +42,10 @@ public class EtendoTopology<O, D extends ProcessModel<O, D>> extends EtendoTopol
   String debeziumNamespace;
 
   public EtendoTopology(
-    StreamsBuilder streamsBuilder,
-    String sourceTopic, String destinationTopic, String processTopic,
-    Serde<O> originSerde, Serde<D> destinationSerde,
-    Supplier<D> newInstanceSupplier) {
+      StreamsBuilder streamsBuilder,
+      String sourceTopic, String destinationTopic, String processTopic,
+      Serde<O> originSerde, Serde<D> destinationSerde,
+      Supplier<D> newInstanceSupplier) {
     this.streamsBuilder = streamsBuilder;
     this.sourceTopic = sourceTopic;
     this.destinationTopic = destinationTopic;
@@ -56,7 +57,7 @@ public class EtendoTopology<O, D extends ProcessModel<O, D>> extends EtendoTopol
 
   public EtendoTopology<O, D> build() {
     this.originStream = streamsBuilder
-      .stream(sourceTopic, Consumed.with(Serdes.String(), originSerde));
+        .stream(sourceTopic, Consumed.with(Serdes.String(), originSerde));
     this.groupByKey();
     return this;
   }
@@ -68,9 +69,9 @@ public class EtendoTopology<O, D extends ProcessModel<O, D>> extends EtendoTopol
 
   public EtendoTopology<O, D> aggregate() {
     KTable<String, D> aggr = group.aggregate(
-      getInitializer(),
-      getAggregator(),
-      materialized(destinationSerde, processTopic)
+        getInitializer(),
+        getAggregator(),
+        materialized(destinationSerde, processTopic)
     );
     this.destinationStream = aggr.toStream();
     return this;
@@ -78,7 +79,7 @@ public class EtendoTopology<O, D extends ProcessModel<O, D>> extends EtendoTopol
 
   public void bind(StreamsBuilder streamsBuilder) {
     this.destinationStream
-      .to(this.destinationTopic, Produced.with(Serdes.String(), destinationSerde));
+        .to(this.destinationTopic, Produced.with(Serdes.String(), destinationSerde));
   }
 
 }

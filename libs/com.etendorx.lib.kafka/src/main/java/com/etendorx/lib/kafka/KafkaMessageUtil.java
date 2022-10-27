@@ -19,8 +19,10 @@ package com.etendorx.lib.kafka;
 import com.etendorx.lib.kafka.model.AsyncProcessExecution;
 import com.etendorx.lib.kafka.model.AsyncProcessState;
 import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
+
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.stereotype.Component;
@@ -43,11 +45,14 @@ public class KafkaMessageUtil {
   private void save(AsyncProcessExecution asyncProcessExecution) {
     asyncProcessExecution.setTime(new Date());
     asyncProcessExecution.setId(UUID.randomUUID().toString());
-    send(producer, new ProducerRecord<>(AsyncProcessTopology.ASYNC_PROCESS_EXECUTION, asyncProcessExecution.getAsyncProcessId(), toJson(asyncProcessExecution)));
+    send(producer,
+        new ProducerRecord<>(AsyncProcessTopology.ASYNC_PROCESS_EXECUTION, asyncProcessExecution.getAsyncProcessId(),
+            toJson(asyncProcessExecution)));
   }
 
   @SneakyThrows
-  private static void send(KafkaProducer<String, String> asyncProcessExecutionProducer, ProducerRecord<String, String> record) {
+  private static void send(KafkaProducer<String, String> asyncProcessExecutionProducer,
+      ProducerRecord<String, String> record) {
     log.info("send {} {}", record.key(), record.value());
     asyncProcessExecutionProducer.send(record).get();
   }
@@ -58,17 +63,17 @@ public class KafkaMessageUtil {
   }
 
   public void saveProcessExecution(
-    Object bodyChanges,
-    String mid,
-    String description,
-    AsyncProcessState state) {
+      Object bodyChanges,
+      String mid,
+      String description,
+      AsyncProcessState state) {
     AsyncProcessExecution process = AsyncProcessExecution.builder()
-      .asyncProcessId(mid)
-      .description(description)
-      .params(bodyChanges != null ? bodyChanges.toString() : "")
-      .time(new Date())
-      .state(state)
-      .build();
+        .asyncProcessId(mid)
+        .description(description)
+        .params(bodyChanges != null ? bodyChanges.toString() : "")
+        .time(new Date())
+        .state(state)
+        .build();
     this.save(process);
   }
 

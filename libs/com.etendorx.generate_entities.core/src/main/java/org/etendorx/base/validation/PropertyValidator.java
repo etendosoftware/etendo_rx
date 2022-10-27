@@ -29,8 +29,7 @@ public interface PropertyValidator {
    * message is returned. If validation passes then null is returned.
    *
    * @param value
-   *   the value to check
-   *
+   *     the value to check
    * @return null if validation passes, otherwise a validation message is returned
    */
   public String validate(Object value);

@@ -1,7 +1,9 @@
 package com.etendorx.utils.auth.token;
 
 import com.etendorx.utils.auth.key.JwtKeyUtils;
+
 import io.jsonwebtoken.lang.Assert;
+
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -41,10 +43,10 @@ public class TokenValidationTest {
 
   public static Stream<Arguments> invalidTokens() {
     return Stream.of(
-      Arguments.of(""),
-      Arguments.of("invalidtoken"),
-      Arguments.of(TokenUtils.INVALID_TOKEN_0),
-      Arguments.of(TokenUtils.INVALID_TOKEN_1)
+        Arguments.of(""),
+        Arguments.of("invalidtoken"),
+        Arguments.of(TokenUtils.INVALID_TOKEN_0),
+        Arguments.of(TokenUtils.INVALID_TOKEN_1)
     );
   }
 
@@ -58,8 +60,8 @@ public class TokenValidationTest {
 
   public static Stream<Arguments> validTokens() {
     return Stream.of(
-      Arguments.of(TokenUtils.VALID_TOKEN_0),
-      Arguments.of(TokenUtils.VALID_TOKEN_1)
+        Arguments.of(TokenUtils.VALID_TOKEN_0),
+        Arguments.of(TokenUtils.VALID_TOKEN_1)
     );
   }
 

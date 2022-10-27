@@ -2,9 +2,10 @@ package com.etendoerp.etendorx.model.projection;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.openbravo.base.model.ModelObject;
 
-@JsonIncludeProperties({"name", "value"})
+@JsonIncludeProperties({ "name", "value" })
 public class ETRXEntityField extends ModelObject {
 
   private ETRXProjectionEntity entity;

@@ -20,7 +20,9 @@ import com.etendorx.gen.commandline.CommandLineProcess;
 import com.etendorx.gen.process.GenerateMetadata;
 import com.etendorx.gen.process.GenerateProtoFile;
 import com.etendorx.gen.util.*;
+
 import freemarker.template.Template;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.logging.log4j.Level;
@@ -169,10 +171,10 @@ public class GenerateEntitiesApplication {
     Metadata metadata = metadataContainer.getMetadataMix();
 
     generateAllChildProperties = OBPropertiesProvider.getInstance()
-      .getBooleanProperty("hb.generate.all.parent.child.properties");
+        .getBooleanProperty("hb.generate.all.parent.child.properties");
 
     generateDeprecatedProperties = OBPropertiesProvider.getInstance()
-      .getBooleanProperty("hb.generate.deprecated.properties");
+        .getBooleanProperty("hb.generate.deprecated.properties");
 
     // process template & write file for each entity
     List<Entity> entities = ModelProvider.getInstance().getModel();
@@ -228,7 +230,7 @@ public class GenerateEntitiesApplication {
           data.put("dasUrl", dasUrl);
           if (metadata.getRepositories().containsKey(data.get("newClassName").toString())) {
             data.put("searches",
-              metadata.getRepositories().get(data.get("newClassName").toString()).getSearchesMap());
+                metadata.getRepositories().get(data.get("newClassName").toString()).getSearchesMap());
           }
 
           generateEntityRX(data, pathEntitiesRx);
@@ -237,7 +239,7 @@ public class GenerateEntitiesApplication {
 
           data.put("packageClientRest", "com.etendorx.clientrest");
           data.put("packageEntityModel",
-            pathEntitiesModelRx.substring(pathEntitiesModelRx.lastIndexOf('/') + 1));
+              pathEntitiesModelRx.substring(pathEntitiesModelRx.lastIndexOf('/') + 1));
 
           generateClientRestRX(data, pathEtendoRx);
 
@@ -245,7 +247,7 @@ public class GenerateEntitiesApplication {
 
           for (Projection projection : projections) {
             if (StringUtils.equals(PROJECTION_DEFAULT, projection.getName()) || projection.getEntities().containsKey(
-              data.get("newClassName").toString())) {
+                data.get("newClassName").toString())) {
               generateProjections(data, pathJPARepoRx, projection, entity);
 
               if (!StringUtils.equals(PROJECTION_DEFAULT, projection.getName())) {
@@ -278,7 +280,8 @@ public class GenerateEntitiesApplication {
       GenerateProtoFile generateProtoFile = new GenerateProtoFile();
       generateProtoFile.setEntitiesModel(entities);
       // Generate Proto File
-      generateProtoFile.generate(pathEtendoRx, metadata.getRepositoriesMap(), projections, metadataContainer, computedColumns, includeViews);
+      generateProtoFile.generate(pathEtendoRx, metadata.getRepositoriesMap(), projections, metadataContainer,
+          computedColumns, includeViews);
     } catch (IOException e) {
       log.error(ERROR_GENERATING_FILE + GENERATED_DIR, e);
     }
@@ -288,15 +291,15 @@ public class GenerateEntitiesApplication {
   private void generateEntityScan(List<Entity> entities, String pathEntitiesRx) throws FileNotFoundException {
     Map<String, Object> data = new HashMap<>();
     data.put("packages", entities.stream().map(Entity::getPackageName)
-      .distinct()
-      .collect(Collectors.toList()));
+        .distinct()
+        .collect(Collectors.toList()));
     var outFile = new File(pathEntitiesRx, "src/main/entities/com/etendorx/das/scan/EntityScan.java");
     new File(outFile.getParent()).mkdirs();
     String ftlFileNameRX = "/org/openbravo/base/gen/entityscan.ftl";
     freemarker.template.Template templateRX = TemplateUtil.createTemplateImplementation(
-      ftlFileNameRX);
+        ftlFileNameRX);
     Writer outWriter = new BufferedWriter(
-      new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));
+        new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));
     TemplateUtil.processTemplate(templateRX, data, outWriter);
   }
 
@@ -304,19 +307,19 @@ public class GenerateEntitiesApplication {
 
     String ftlFileNameEntitiesModel = "/org/openbravo/base/gen/entityModel.ftl";
     Template templateEntityModelRX = TemplateUtil.createTemplateImplementation(
-      ftlFileNameEntitiesModel);
+        ftlFileNameEntitiesModel);
 
     final String packageEntityModel = "com.etendorx.entitiesmodel";
     data.put("packageEntityModel", packageEntityModel);
     final String fullPathClientRest = pathClientRestRx + "/modules_gen/com.etendorx.entitiesModel" + "/src/main/java/" + packageEntityModel.toLowerCase().replace(
-      '.', '/');
+        '.', '/');
     final String repositoryClassEntityModel = data.get("repositoryClassEntityModel").toString();
 
     var outFileEntityModel = new File(fullPathClientRest, repositoryClassEntityModel);
     new File(outFileEntityModel.getParent()).mkdirs();
 
     Writer outWriterEntityModel = new BufferedWriter(
-      new OutputStreamWriter(new FileOutputStream(outFileEntityModel), StandardCharsets.UTF_8));
+        new OutputStreamWriter(new FileOutputStream(outFileEntityModel), StandardCharsets.UTF_8));
     TemplateUtil.processTemplate(templateEntityModelRX, data, outWriterEntityModel);
 
   }
@@ -325,18 +328,18 @@ public class GenerateEntitiesApplication {
     String pathClientRestRx = pathEtendoRx + File.separator + "modules_gen" + File.separator + "com.etendorx.entitiesModel";
     String ftlFileNameClientRest = "/org/openbravo/base/gen/clientRestRX.ftl";
     freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(
-      ftlFileNameClientRest);
+        ftlFileNameClientRest);
 
     final String packageClientRest = data.get("packageClientRest").toString();
     final String fullPathClientRest = pathClientRestRx + "/src/main/java/" +
-      packageClientRest.toLowerCase().replace('.', '/') + "/" +
-      ((Entity) data.get("entity")).getPackageName().replace('.', '/');
+        packageClientRest.toLowerCase().replace('.', '/') + "/" +
+        ((Entity) data.get("entity")).getPackageName().replace('.', '/');
     final String repositoryClassClientRest = data.get("newClassName") + "ClientRest.java";
     var outFileClientRest = new File(fullPathClientRest, repositoryClassClientRest);
     new File(outFileClientRest.getParent()).mkdirs();
 
     Writer outWriterClientRest = new BufferedWriter(
-      new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
+        new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
     data.put("packageClientRest", packageClientRest);
     TemplateUtil.processTemplate(templateClientRestRX, data, outWriterClientRest);
   }
@@ -344,31 +347,33 @@ public class GenerateEntitiesApplication {
   private void generateJPARepo(Map<String, Object> data, String pathJPARepoRx) throws FileNotFoundException {
     String ftlFileNameJPARepo = "/org/openbravo/base/gen/jpaRepoRX.ftl";
     freemarker.template.Template templateJPARepoRX = TemplateUtil.createTemplateImplementation(
-      ftlFileNameJPARepo);
+        ftlFileNameJPARepo);
 
     final String packageJPARepo = pathJPARepoRx.substring(pathJPARepoRx.lastIndexOf('/') + 1) + ".jparepo";
     final String fullPathJPARepo = pathJPARepoRx + "/src/main/jparepo/" + packageJPARepo.replace(
-      '.', '/');
+        '.', '/');
     final String repositoryClass =
-      ((Entity) data.get("entity")).getName() + "Repository.java";
+        ((Entity) data.get("entity")).getName() + "Repository.java";
     new File(fullPathJPARepo).mkdirs();
     var outFileRepo = new File(fullPathJPARepo, repositoryClass);
 
     data.put("packageJPARepo", packageJPARepo);
-    Writer outWriterRepo = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileRepo), StandardCharsets.UTF_8));
+    Writer outWriterRepo = new BufferedWriter(
+        new OutputStreamWriter(new FileOutputStream(outFileRepo), StandardCharsets.UTF_8));
     TemplateUtil.processTemplate(templateJPARepoRX, data, outWriterRepo);
   }
 
-  private void generateBaseEntityRx(Map<String, Object> data, String pathEntitiesRx, String className, String packageName) throws FileNotFoundException {
+  private void generateBaseEntityRx(Map<String, Object> data, String pathEntitiesRx, String className,
+      String packageName) throws FileNotFoundException {
     final String fullPathEntities = pathEntitiesRx + "/src/main/entities/" + packageName.replace(".", "/");
     var classfileName = className + ".java";
     var outFile = new File(fullPathEntities, classfileName);
     new File(outFile.getParent()).mkdirs();
     String ftlFileNameRX = "/org/openbravo/base/gen/baseEntityRx.ftl";
     freemarker.template.Template templateRX = TemplateUtil.createTemplateImplementation(
-      ftlFileNameRX);
+        ftlFileNameRX);
     Writer outWriter = new BufferedWriter(
-      new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));
+        new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));
     TemplateUtil.processTemplate(templateRX, data, outWriter);
   }
 
@@ -384,9 +389,9 @@ public class GenerateEntitiesApplication {
     new File(outFile.getParent()).mkdirs();
     String ftlFileNameRX = "/org/openbravo/base/gen/entityRX.ftl";
     freemarker.template.Template templateRX = TemplateUtil.createTemplateImplementation(
-      ftlFileNameRX);
+        ftlFileNameRX);
     Writer outWriter = new BufferedWriter(
-      new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));
+        new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));
     TemplateUtil.processTemplate(templateRX, data, outWriter);
   }
 
@@ -407,14 +412,16 @@ public class GenerateEntitiesApplication {
    * @param entity
    */
   private void generateProjections(
-    Map<String, Object> data, String pathJPARepoRx, Projection projection, Entity entity) throws FileNotFoundException {
+      Map<String, Object> data, String pathJPARepoRx, Projection projection,
+      Entity entity) throws FileNotFoundException {
 
     String ftlFileNameProjectionRepo = "/org/openbravo/base/gen/jpaProjectionRX.ftl";
     Template templateJPAProjectionRX = TemplateUtil.createTemplateImplementation(
-      ftlFileNameProjectionRepo);
+        ftlFileNameProjectionRepo);
 
     String projectionName = projection.getName();
-    ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(), null);
+    ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(),
+        null);
 
     final String className = data.get("className").toString();
     final String onlyClassName = data.get("onlyClassName").toString();
@@ -422,15 +429,16 @@ public class GenerateEntitiesApplication {
     final String packageProjectionRepo = pathJPARepoRx.substring(pathJPARepoRx.lastIndexOf('/') + 1);
     final String fullPathProjectionRepo = pathJPARepoRx + "/src/main/projections/";
     final String projectionClass = className + StringUtils.capitalize(
-      projectionName) + "Projection.java";
+        projectionName) + "Projection.java";
 
     var outFileProjection = new File(fullPathProjectionRepo, projectionClass);
     new File(outFileProjection.getParent()).mkdirs();
 
-    Writer outWriterProjection = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileProjection), StandardCharsets.UTF_8));
+    Writer outWriterProjection = new BufferedWriter(
+        new OutputStreamWriter(new FileOutputStream(outFileProjection), StandardCharsets.UTF_8));
     data.put("projectionName", projectionName);
     data.put("projectionFields",
-      projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
+        projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
     TemplateUtil.processTemplate(templateJPAProjectionRX, data, outWriterProjection);
   }
 
@@ -444,14 +452,16 @@ public class GenerateEntitiesApplication {
    * @param entity
    */
   private void generateModelProjected(
-    Map<String, Object> data, String pathEntitiesModelRx, Projection projection, Entity entity) throws FileNotFoundException {
+      Map<String, Object> data, String pathEntitiesModelRx, Projection projection,
+      Entity entity) throws FileNotFoundException {
 
     String ftlFileNameProjectionRepo = "/org/openbravo/base/gen/entityModelProjected.ftl";
     Template templateModelProjectionRX = TemplateUtil.createTemplateImplementation(
-      ftlFileNameProjectionRepo);
+        ftlFileNameProjectionRepo);
 
     final var projectionName = projection.getName();
-    ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(), null);
+    ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(),
+        null);
 
     final String className = data.get("className").toString();
     final String onlyClassName = data.get("onlyClassName").toString();
@@ -459,12 +469,13 @@ public class GenerateEntitiesApplication {
 
     String fullPathProjectionRepo = pathEntitiesModelRx + "/src/main/java/" + packageEntities.replace('.', '/');
     final String projectionClass = className.replace(onlyClassName,
-      entity.getName()) + StringUtils.capitalize(projectionName) + "Model.java";
+        entity.getName()) + StringUtils.capitalize(projectionName) + "Model.java";
 
     String packageEntityModelProjected = packageEntities + "." + entity.getPackageName();
 
     if (!StringUtils.equals(PROJECTION_DEFAULT, projection.getName())) {
-      fullPathProjectionRepo = MetadataUtil.getBasePackageGenLocationPath(projection.getModuleLocation()) + File.separator + MetadataUtil.ENTITY_PACKAGE;
+      fullPathProjectionRepo = MetadataUtil.getBasePackageGenLocationPath(
+          projection.getModuleLocation()) + File.separator + MetadataUtil.ENTITY_PACKAGE;
       packageEntityModelProjected = projection.getModuleLocation().getName() + "." + MetadataUtil.ENTITY_PACKAGE + "." + entity.getPackageName();
     }
 
@@ -474,10 +485,11 @@ public class GenerateEntitiesApplication {
     var outFileProjection = new File(fullPathProjectionRepo, projectionClass);
     new File(outFileProjection.getParent()).mkdirs();
 
-    Writer outWriterProjection = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileProjection), StandardCharsets.UTF_8));
+    Writer outWriterProjection = new BufferedWriter(
+        new OutputStreamWriter(new FileOutputStream(outFileProjection), StandardCharsets.UTF_8));
     data.put("projectionName", projectionName);
     data.put("projectionFields",
-      projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
+        projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
     TemplateUtil.processTemplate(templateModelProjectionRX, data, outWriterProjection);
   }
 
@@ -488,10 +500,10 @@ public class GenerateEntitiesApplication {
    * @param projection
    */
   private void generateReactModel(
-    Map<String, Object> data, Projection projection) throws FileNotFoundException {
+      Map<String, Object> data, Projection projection) throws FileNotFoundException {
 
     freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(
-      "/org/openbravo/base/react/model.types.ftl");
+        "/org/openbravo/base/react/model.types.ftl");
 
     String fullPathClientRestGen = projection.getModuleLocation() + "/lib/data_gen";
 
@@ -499,13 +511,14 @@ public class GenerateEntitiesApplication {
 
     var outFileClientRest = new File(fullPathClientRestGen, modelNameGen);
     new File(outFileClientRest.getParent()).mkdirs();
-    ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(), null);
+    ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(),
+        null);
 
     data.put("projectionFields",
-      projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
+        projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
     data.put("projection", projection);
     Writer outWriterClientRest = new BufferedWriter(
-      new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
+        new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
     TemplateUtil.processTemplate(templateClientRestRX, data, outWriterClientRest);
 
   }
@@ -517,10 +530,10 @@ public class GenerateEntitiesApplication {
    * @param projection
    */
   private void generateModelService(
-    Map<String, Object> data, Projection projection) throws FileNotFoundException {
+      Map<String, Object> data, Projection projection) throws FileNotFoundException {
 
     freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(
-      "/org/openbravo/base/react/modelservice.ts.ftl");
+        "/org/openbravo/base/react/modelservice.ts.ftl");
 
     String fullPathClientRestGen = projection.getModuleLocation() + "/lib/data_gen";
     final String clientRestClassNameGen = data.get("newClassName").toString().toLowerCase() + "service.ts";
@@ -529,13 +542,14 @@ public class GenerateEntitiesApplication {
     new File(outFileClientRest.getParent()).mkdirs();
 
     data.put("projectionName", projection.getName());
-    ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(), null);
+    ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(),
+        null);
 
     data.put("projectionFields",
-      projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
+        projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
     data.put("projection", projection);
     Writer outWriterClientRest = new BufferedWriter(
-      new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
+        new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
     TemplateUtil.processTemplate(templateClientRestRX, data, outWriterClientRest);
 
   }
@@ -552,7 +566,7 @@ public class GenerateEntitiesApplication {
    * @param repository
    */
   private void generateClientRestProjected(
-    Map<String, Object> data, String pathEntitiesModelRx, Projection projection, Entity entity, Repository repository
+      Map<String, Object> data, String pathEntitiesModelRx, Projection projection, Entity entity, Repository repository
   ) throws FileNotFoundException {
 
     // TODO: Obtain the 'searches' from the repository to create the custom user query's.
@@ -563,9 +577,10 @@ public class GenerateEntitiesApplication {
     // In other case, use the defined 'user' projection entity. (The feign client will extend from the entity defined by the user or a default one.)
 
     freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(
-      FTL_FILE_NAME_CLIENTREST);
+        FTL_FILE_NAME_CLIENTREST);
 
-    String fullPathClientRestGen = MetadataUtil.getBasePackageGenLocationPath(projection.getModuleLocation()) + File.separator + MetadataUtil.CLIENTREST_PACKAGE;
+    String fullPathClientRestGen = MetadataUtil.getBasePackageGenLocationPath(
+        projection.getModuleLocation()) + File.separator + MetadataUtil.CLIENTREST_PACKAGE;
     final String clientRestClassNameGen = data.get("newClassName") + "ClientRest.java";
 
     // Set the parametrized class from where the client rest will extend (ClientRestBase<'classname'>)
@@ -576,7 +591,7 @@ public class GenerateEntitiesApplication {
      * The package and class name are obtained from the {@link Entity}
      */
     final String modelProjectionClass = ((Entity) data.get("entity")).getPackageName() +
-      "." + newClassName + StringUtils.capitalize(projection.getName()) + "Model";
+        "." + newClassName + StringUtils.capitalize(projection.getName()) + "Model";
 
     // Contains the complete package and model class name
     final String locationModelProjectionClass = projection.getModuleLocation().getName() + "." + MetadataUtil.ENTITY_PACKAGE + "." + modelProjectionClass;
@@ -596,7 +611,7 @@ public class GenerateEntitiesApplication {
     data.put("packageClientRestProjected", packageClientRestProjected);
 
     Writer outWriterClientRest = new BufferedWriter(
-      new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
+        new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
     TemplateUtil.processTemplate(templateClientRestRX, data, outWriterClientRest);
   }
 
@@ -622,7 +637,7 @@ public class GenerateEntitiesApplication {
    * added.
    *
    * @return True if deprecation should be added, depending on global properties found in
-   *   Openbravo.properties, else false.
+   *     Openbravo.properties, else false.
    */
   public boolean shouldAddDeprecation() {
     return generateDeprecatedProperties || generateAllChildProperties;
@@ -632,8 +647,7 @@ public class GenerateEntitiesApplication {
    * Checks if an entity is set as deprecated
    *
    * @param e
-   *   Entity to check deprecation
-   *
+   *     Entity to check deprecation
    * @return True if entity is deprecated, false otherwise
    */
   public boolean isDeprecated(Entity e) {
@@ -645,14 +659,13 @@ public class GenerateEntitiesApplication {
    * entity it references could be deprecated
    *
    * @param p
-   *   Property to check deprecation
-   *
+   *     Property to check deprecation
    * @return True if property or property target entity are deprecated and generate deprecate
-   *   property is set to true in Openbravo.properties, false otherwise
+   *     property is set to true in Openbravo.properties, false otherwise
    */
   public boolean isDeprecated(Property p) {
     if ((p.isDeprecated() != null && p.isDeprecated()) || (p.getTargetEntity() != null
-      && p.getTargetEntity().isDeprecated() != null && p.getTargetEntity().isDeprecated())) {
+        && p.getTargetEntity().isDeprecated() != null && p.getTargetEntity().isDeprecated())) {
       return true;
     }
 
@@ -662,10 +675,10 @@ public class GenerateEntitiesApplication {
     }
 
     boolean generatedInAnyCase = ModelProvider.getInstance()
-      .shouldGenerateChildPropertyInParent(refPropery, false);
+        .shouldGenerateChildPropertyInParent(refPropery, false);
 
     boolean generatedDueToPreference = ModelProvider.getInstance()
-      .shouldGenerateChildPropertyInParent(refPropery, true);
+        .shouldGenerateChildPropertyInParent(refPropery, true);
     return !generatedInAnyCase && generatedDueToPreference;
   }
 
@@ -674,9 +687,9 @@ public class GenerateEntitiesApplication {
       return "Property marked as deprecated on field Development Status";
     }
     if (p.getTargetEntity() != null && p.getTargetEntity().isDeprecated() != null
-      && p.getTargetEntity().isDeprecated()) {
+        && p.getTargetEntity().isDeprecated()) {
       return "Target entity {@link " + p.getTargetEntity().getSimpleClassName()
-        + "} is deprecated.";
+          + "} is deprecated.";
     }
     return "Child property in parent entity generated for backward compatibility, it will be removed in future releases.";
   }
@@ -686,7 +699,7 @@ public class GenerateEntitiesApplication {
     // already in the src-gen
     // if not then regenerate anyhow
     final File modelDir = new File(getSrcGenPath(),
-      "org" + File.separator + "openbravo" + File.separator + "model" + File.separator + "ad");
+        "org" + File.separator + "openbravo" + File.separator + "model" + File.separator + "ad");
     if (!modelDir.exists()) {
       return true;
     }
@@ -695,11 +708,11 @@ public class GenerateEntitiesApplication {
     final String sourceDir = getBasePath();
     long lastModifiedPackage = 0;
     lastModifiedPackage = getLastModifiedPackage("org.openbravo.base.model", sourceDir,
-      lastModifiedPackage);
+        lastModifiedPackage);
     lastModifiedPackage = getLastModifiedPackage("org.openbravo.base.gen", sourceDir,
-      lastModifiedPackage);
+        lastModifiedPackage);
     lastModifiedPackage = getLastModifiedPackage("org.openbravo.base.structure", sourceDir,
-      lastModifiedPackage);
+        lastModifiedPackage);
 
     // check if there is a sourcefile which was updated before the last
     // time the model was created. In this case that sourcefile (and

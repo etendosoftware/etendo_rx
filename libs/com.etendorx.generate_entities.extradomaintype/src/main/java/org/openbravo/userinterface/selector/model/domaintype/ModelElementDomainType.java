@@ -39,7 +39,7 @@ public class ModelElementDomainType extends StringDomainType {
    */
   @Override
   public void checkObjectIsValid(BaseOBObjectDef obObject, Property property)
-    throws ValidationException {
+      throws ValidationException {
     super.checkObjectIsValid(obObject, property);
   }
 }

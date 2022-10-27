@@ -5,6 +5,7 @@ import com.etendorx.auth.auth.jwt.JwtRequest;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.UrlPattern;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,21 +58,23 @@ public class AuthControllerDasRequest {
   }
 
   void addMockUrl(String port) {
-    UrlPattern urlSearchUser = WireMock.urlEqualTo("/ADUser/search/searchByUsername?username=admin&active=true&projection=auth");
+    UrlPattern urlSearchUser = WireMock.urlEqualTo(
+        "/ADUser/search/searchByUsername?username=admin&active=true&projection=auth");
     // Mock User
     stubFor(WireMock.get(urlSearchUser)
-      .willReturn(WireMock.aResponse()
-        .withStatus(200)
-        .withHeader("Content-Type", MediaTypes.HAL_JSON_VALUE)
-        .withBody(AuthControllerUtils.getSearchUserResponseBody(port))));
+        .willReturn(WireMock.aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", MediaTypes.HAL_JSON_VALUE)
+            .withBody(AuthControllerUtils.getSearchUserResponseBody(port))));
 
-    UrlPattern urlUndefinedSearchUser = WireMock.urlEqualTo("/ADUser/search/searchByUsername?username=undefined&active=true&projection=auth");
+    UrlPattern urlUndefinedSearchUser = WireMock.urlEqualTo(
+        "/ADUser/search/searchByUsername?username=undefined&active=true&projection=auth");
     // Mock User
     stubFor(WireMock.get(urlUndefinedSearchUser)
-      .willReturn(WireMock.aResponse()
-        .withStatus(200)
-        .withHeader("Content-Type", MediaTypes.HAL_JSON_VALUE)
-        .withBody(AuthControllerUtils.getUsernameNotFoundResponseBody(port))));
+        .willReturn(WireMock.aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", MediaTypes.HAL_JSON_VALUE)
+            .withBody(AuthControllerUtils.getUsernameNotFoundResponseBody(port))));
   }
 
   @Test
@@ -83,23 +86,23 @@ public class AuthControllerDasRequest {
     request.setPassword("admin");
 
     ResultActions resultActions = this.mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/authenticate")
-      .content(AuthControllerUtils.asJsonString(request))
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON));
+        .post("/api/authenticate")
+        .content(AuthControllerUtils.asJsonString(request))
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON));
 
     resultActions.andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$.token").exists());
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.token").exists());
 
     wireMockServer.stop();
   }
 
   public static Stream<Arguments> params() {
     return Stream.of(
-      // Undefined username
-      Arguments.of("undefined", "pass123"),
-      Arguments.of("admin", "und")
+        // Undefined username
+        Arguments.of("undefined", "pass123"),
+        Arguments.of("admin", "und")
 
     );
   }
@@ -114,19 +117,19 @@ public class AuthControllerDasRequest {
     request.setPassword(password);
 
     ResultActions resultActions = this.mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/authenticate")
-      .content(AuthControllerUtils.asJsonString(request))
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON));
+        .post("/api/authenticate")
+        .content(AuthControllerUtils.asJsonString(request))
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON));
 
     resultActions.andDo(print())
-      .andExpect(status().isUnauthorized())
-      .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
-      .andExpect(result -> {
-        Assertions.assertEquals(
-          Objects.requireNonNull((ResponseStatusException) result.getResolvedException()).getReason(),
-          AuthService.UNAUTHORIZED_MESSAGE);
-      });
+        .andExpect(status().isUnauthorized())
+        .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
+        .andExpect(result -> {
+          Assertions.assertEquals(
+              Objects.requireNonNull((ResponseStatusException) result.getResolvedException()).getReason(),
+              AuthService.UNAUTHORIZED_MESSAGE);
+        });
 
     wireMockServer.stop();
   }

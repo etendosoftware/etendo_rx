@@ -34,7 +34,8 @@ public class CommandLineProcess {
     try {
       Options options = new Options();
       options.addOption("g", "generate-metadata", true, "Generate the metadata.json file.");
-      options.addOption("e", "exclude", true, "List of comma separated modules to exclude from the metadata generation.");
+      options.addOption("e", "exclude", true,
+          "List of comma separated modules to exclude from the metadata generation.");
       options.addOption("i", "include", true, "List of comma separated modules to include in the metadata generation.");
       CommandLineParser parser = new DefaultParser();
       return Optional.of(parser.parse(options, args));

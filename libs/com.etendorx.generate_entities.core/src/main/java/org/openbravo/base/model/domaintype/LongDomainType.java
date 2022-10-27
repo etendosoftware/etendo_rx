@@ -39,7 +39,7 @@ public class LongDomainType extends BasePrimitiveDomainType {
 
   @Override
   public void checkIsValidValue(Property property, Object value)
-    throws ValidationException {
+      throws ValidationException {
     if (value == null) {
       return;
     }

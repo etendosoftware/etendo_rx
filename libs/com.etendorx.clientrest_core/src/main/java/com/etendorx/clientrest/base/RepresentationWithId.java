@@ -1,6 +1,7 @@
 package com.etendorx.clientrest.base;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Date;

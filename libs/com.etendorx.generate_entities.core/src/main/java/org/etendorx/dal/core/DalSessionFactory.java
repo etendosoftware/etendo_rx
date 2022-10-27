@@ -36,6 +36,7 @@ import javax.naming.Reference;
 import javax.persistence.Query;
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -51,9 +52,9 @@ import java.util.Set;
  * @author mtaal
  * @see SessionFactoryController
  */
-@SuppressWarnings({"deprecation", "rawtypes", "unchecked"})
+@SuppressWarnings({ "deprecation", "rawtypes", "unchecked" })
 public class DalSessionFactory
-  implements SessionFactory {
+    implements SessionFactory {
 
   private static final long serialVersionUID = 1L;
 
@@ -101,7 +102,7 @@ public class DalSessionFactory
 
   @Override
   public CollectionMetadata getCollectionMetadata(String roleName)
-    throws HibernateException {
+      throws HibernateException {
     return delegateSessionFactory.getCollectionMetadata(roleName);
   }
 
@@ -117,7 +118,7 @@ public class DalSessionFactory
 
   @Override
   public FilterDefinition getFilterDefinition(String filterName)
-    throws HibernateException {
+      throws HibernateException {
     return delegateSessionFactory.getFilterDefinition(filterName);
   }
 
@@ -181,7 +182,7 @@ public class DalSessionFactory
   private void initializeDBSessionInfo(StatelessSessionImpl session) {
     Connection conn = session.connection();
     SessionInfo.initDB(conn,
-      OBPropertiesProvider.getInstance().getOpenbravoProperties().getProperty("bbdd.rdbms"));
+        OBPropertiesProvider.getInstance().getOpenbravoProperties().getProperty("bbdd.rdbms"));
   }
 
   @Override
@@ -202,7 +203,7 @@ public class DalSessionFactory
   JdbcConnectionAccess getJdbcConnectionAccess() {
     if (jdbcConnectionAccess == null) {
       jdbcConnectionAccess = ((SessionFactoryImpl) delegateSessionFactory).getJdbcServices()
-        .getBootstrapJdbcConnectionAccess();
+          .getBootstrapJdbcConnectionAccess();
     }
     return jdbcConnectionAccess;
   }
@@ -234,7 +235,7 @@ public class DalSessionFactory
 
   @Override
   public EntityManager createEntityManager(SynchronizationType synchronizationType,
-                                           Map map) {
+      Map map) {
     return delegateSessionFactory.createEntityManager(synchronizationType, map);
   }
 

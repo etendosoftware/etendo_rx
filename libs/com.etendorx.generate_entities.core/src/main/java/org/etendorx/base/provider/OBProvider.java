@@ -55,8 +55,7 @@ public class OBProvider {
    * Returns true if the clz is registered.
    *
    * @param clz
-   *   the name of this class is used to check if it is already registered
-   *
+   *     the name of this class is used to check if it is already registered
    * @return true if the clz is registered
    */
   public boolean isRegistered(Class<?> clz) {
@@ -67,8 +66,7 @@ public class OBProvider {
    * Checks if a service is registered under the name passed as a parameter.
    *
    * @param name
-   *   is used to search the registry
-   *
+   *     is used to search the registry
    * @return true if a registration exists
    */
   public boolean isRegistered(String name) {
@@ -91,11 +89,11 @@ public class OBProvider {
    * Register an actual instance for an internal Openbravo class (the registrationClass).
    *
    * @param registrationClass
-   *   the original Openbravo class
+   *     the original Openbravo class
    * @param instanceObj
-   *   the instance to use when the class is requested.
+   *     the instance to use when the class is requested.
    * @param overwrite
-   *   true overwrite a current registration, false a current registration is not overwritten
+   *     true overwrite a current registration, false a current registration is not overwritten
    */
   public void registerInstance(Class<?> registrationClass, Object instanceObj, boolean overwrite) {
     register(registrationClass.getName(), instanceObj.getClass(), overwrite);
@@ -107,11 +105,11 @@ public class OBProvider {
    * Register an instance for an internal Openbravo class (the registrationClass).
    *
    * @param registrationClass
-   *   the original Openbravo class
+   *     the original Openbravo class
    * @param instanceClass
-   *   the implementation class
+   *     the implementation class
    * @param overwrite
-   *   true overwrite a current registration, false a current registration is not overwritten
+   *     true overwrite a current registration, false a current registration is not overwritten
    */
   public void register(Class<?> registrationClass, Class<?> instanceClass, boolean overwrite) {
     register(registrationClass.getName(), instanceClass, overwrite);
@@ -121,11 +119,11 @@ public class OBProvider {
    * Register an instance for an internal Openbravo class or service (the name).
    *
    * @param name
-   *   the name of the Openbravo class or service
+   *     the name of the Openbravo class or service
    * @param instanceClass
-   *   the implementation class
+   *     the implementation class
    * @param overwrite
-   *   true overwrite a current registration, false a current registration is not overwritten
+   *     true overwrite a current registration, false a current registration is not overwritten
    */
   public void register(String name, Class<?> instanceClass, boolean overwrite) {
     final Registration reg = new Registration();
@@ -138,7 +136,7 @@ public class OBProvider {
     if (currentReg != null) {
       if (!overwrite || !currentReg.isOverwritable()) {
         log.debug(
-          "A different registration: " + currentReg + " already exists under this name, NOT overwriting it by " + reg);
+            "A different registration: " + currentReg + " already exists under this name, NOT overwriting it by " + reg);
         return;
       } else {
         log.debug(currentReg + " will be replaced by " + reg);
@@ -154,8 +152,7 @@ public class OBProvider {
    * found a new registration is created using the passed clz.
    *
    * @param clz
-   *   the class for which an instance is requested
-   *
+   *     the class for which an instance is requested
    * @return an instance of the clz
    */
   @SuppressWarnings("unchecked")
@@ -164,7 +161,7 @@ public class OBProvider {
     if (reg == null) {
       // register it
       log.debug(
-        "Registration for class " + clz.getName() + " not found, creating a registration automatically");
+          "Registration for class " + clz.getName() + " not found, creating a registration automatically");
       register(clz, clz, false);
 
       reg = registrations.get(clz.getName());
@@ -177,7 +174,7 @@ public class OBProvider {
    * recreated at next request.
    *
    * @param clz
-   *   the instance of this class is removed.
+   *     the instance of this class is removed.
    */
   public void removeInstance(Class<?> clz) {
     log.debug("Removing instance " + clz.getName());
@@ -194,8 +191,7 @@ public class OBProvider {
    * OBProviderException is thrown
    *
    * @param name
-   *   the name of the service
-   *
+   *     the name of the service
    * @return an instance of the service
    */
   public Object get(String name) {
@@ -248,8 +244,8 @@ public class OBProvider {
         return value;
       } catch (final Exception e) {
         throw new OBProviderException(
-          "Exception when instantiating class " + instanceClass.getName() + " for registration " + name,
-          e);
+            "Exception when instantiating class " + instanceClass.getName() + " for registration " + name,
+            e);
 
       }
     }

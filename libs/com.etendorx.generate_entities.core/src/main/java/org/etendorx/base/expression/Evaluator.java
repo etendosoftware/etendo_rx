@@ -27,6 +27,7 @@ import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.Property;
 
 import javax.script.ScriptException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,10 +60,9 @@ public class Evaluator implements OBSingleton {
    * be a boolean.
    *
    * @param contextBob
-   *   the script is executed in the context of this business object
+   *     the script is executed in the context of this business object
    * @param script
-   *   the javascript which much evaluate to a boolean
-   *
+   *     the javascript which much evaluate to a boolean
    * @return the result of the script evaluation
    */
   public Boolean evaluateBoolean(BaseOBObjectDef contextBob, String script) {
@@ -74,7 +74,7 @@ public class Evaluator implements OBSingleton {
 
     try {
       Check.isNotNull(engine,
-        "Scripting engine not found using name js, check for other scripting language names such as Mozilla Rhino");
+          "Scripting engine not found using name js, check for other scripting language names such as Mozilla Rhino");
 
       final Entity e = contextBob.getEntity();
 
@@ -88,7 +88,7 @@ public class Evaluator implements OBSingleton {
       return (Boolean) result;
     } catch (final ScriptException e) {
       throw new OBException(
-        "Exception while executing " + script + " for business object " + contextBob, e);
+          "Exception while executing " + script + " for business object " + contextBob, e);
     }
   }
 }

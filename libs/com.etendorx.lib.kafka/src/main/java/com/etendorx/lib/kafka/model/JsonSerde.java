@@ -17,7 +17,9 @@
 package com.etendorx.lib.kafka.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.SneakyThrows;
+
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;

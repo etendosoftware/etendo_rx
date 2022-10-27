@@ -37,8 +37,8 @@ import org.openbravo.base.model.ModelProvider;
  * </ul>
  *
  * @author mtaal
- *   <p>
- *   CONTRIBUTORS: androettop
+ *     <p>
+ *     CONTRIBUTORS: androettop
  */
 
 public class SecurityChecker implements OBSingleton {
@@ -65,7 +65,7 @@ public class SecurityChecker implements OBSingleton {
         final Entity entity = ModelProvider.getInstance().getEntity(bob.getEntityName());
         if (!entity.isDeletable()) {
           throw new OBSecurityException(
-            "Entity " + entity.getName() + " is not deletable");
+              "Entity " + entity.getName() + " is not deletable");
         }
       }
       checkWriteAccess(o);
@@ -85,10 +85,8 @@ public class SecurityChecker implements OBSingleton {
    * </ul>
    *
    * @param obj
-   *   the object to check
-   *
+   *     the object to check
    * @return true if writable, false otherwise
-   *
    * @see Entity
    */
   public boolean isWritable(Object obj) {
@@ -105,7 +103,7 @@ public class SecurityChecker implements OBSingleton {
    * a OBSecurityException if the object is not writable.
    *
    * @param obj
-   *   the object to check
+   *     the object to check
    */
   public void checkWriteAccess(Object obj) {
     checkWriteAccess(obj, true);
@@ -119,12 +117,12 @@ public class SecurityChecker implements OBSingleton {
       if (bob.getId() == null) {
         if (!obContext.getRecordAccessChecker().canCreate(obj)) {
           throw new OBSecurityException(
-            "The current user does not have create permissions.", logError);
+              "The current user does not have create permissions.", logError);
         }
       } else {
         if (!obContext.getRecordAccessChecker().canUpdate(obj)) {
           throw new OBSecurityException(
-            "The current user does not have update permissions.", logError);
+              "The current user does not have update permissions.", logError);
         }
       }
     } else {

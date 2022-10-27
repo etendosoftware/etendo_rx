@@ -17,6 +17,7 @@
 package com.etendorx.das.test;
 
 import com.etendorx.entities.jparepo.ADUserRepository;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -56,13 +57,13 @@ public class RepositoryTest {
 
   @Container
   public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-    DockerImageName.parse("etendo/etendodata:latest").asCompatibleSubstituteFor("postgres")
+      DockerImageName.parse("etendo/etendodata:latest").asCompatibleSubstituteFor("postgres")
   )
-    .withPassword("syspass")
-    .withUsername("postgres")
-    .withEnv("PGDATA", "/postgres")
-    .withDatabaseName("etendo")
-    .waitingFor(new HostPortWaitStrategy());
+      .withPassword("syspass")
+      .withUsername("postgres")
+      .withEnv("PGDATA", "/postgres")
+      .withDatabaseName("etendo")
+      .waitingFor(new HostPortWaitStrategy());
 
   @Test
   public void whenReadUser() {

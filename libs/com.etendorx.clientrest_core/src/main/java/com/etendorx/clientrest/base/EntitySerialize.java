@@ -3,7 +3,9 @@ package com.etendorx.clientrest.base;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.hateoas.Link;
 
 import java.io.IOException;
@@ -15,7 +17,7 @@ public class EntitySerialize extends JsonSerializer<RepresentationWithId<?>> {
 
   @Override
   public void serialize(RepresentationWithId<?> value, JsonGenerator gen,
-                        SerializerProvider serializers) throws IOException {
+      SerializerProvider serializers) throws IOException {
     if (Objects.requireNonNull(value).getLink("self").isPresent()) {
       Optional<Link> link = Objects.requireNonNull(value).getLink("self");
       if (link.isPresent()) {

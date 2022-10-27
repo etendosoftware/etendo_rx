@@ -8,6 +8,7 @@ import com.etendoerp.etendorx.model.repository.ETRXRepository;
 import com.etendoerp.etendorx.model.repository.ETRXSearchParam;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.provider.OBProvider;
@@ -20,6 +21,7 @@ import org.openbravo.base.model.Module;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,15 +36,15 @@ public class ETRXModelProvider implements OBSingleton {
 
   // Etendo RX Models
   private static final List<Class<? extends ModelObject>> ETRX_MODEL_CLASSES = List.of(
-    ETRXModule.class,
-    // Projections
-    ETRXProjection.class,
-    ETRXProjectionEntity.class,
-    ETRXEntityField.class,
-    // Repositories
-    ETRXRepository.class,
-    ETRXEntitySearch.class,
-    ETRXSearchParam.class
+      ETRXModule.class,
+      // Projections
+      ETRXProjection.class,
+      ETRXProjectionEntity.class,
+      ETRXEntityField.class,
+      // Repositories
+      ETRXRepository.class,
+      ETRXEntitySearch.class,
+      ETRXSearchParam.class
   );
 
   public static synchronized ETRXModelProvider getInstance() {
@@ -90,8 +92,7 @@ public class ETRXModelProvider implements OBSingleton {
    * Generates a Map of ETRXModules with the json representation.
    *
    * @param etrxModules
-   *   List of modules to parse
-   *
+   *     List of modules to parse
    * @return Map of json values
    */
   public Map<ETRXModule, String> modulesToJsonMap(List<ETRXModule> etrxModules) {
@@ -165,10 +166,9 @@ public class ETRXModelProvider implements OBSingleton {
    * Retrieves a list of model objects of the class passed as parameter.
    *
    * @param session
-   *   the session used to query for the objects
+   *     the session used to query for the objects
    * @param clazz
-   *   the class of the model objects to be retrieved
-   *
+   *     the class of the model objects to be retrieved
    * @return a list of model objects
    */
   public <T extends Object> List<T> list(Session session, Class<T> clazz) {
