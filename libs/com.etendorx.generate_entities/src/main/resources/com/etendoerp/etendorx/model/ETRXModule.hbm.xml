@@ -38,6 +38,8 @@
         <property name="react" type="org.etendorx.base.session.OBYesNoType"
                   column="em_etrx_isreact"/>
 
+        <property name="rxJavaPackage" column="em_etrx_rxmodule" not-null="false"/>
+
         <set name="projections" table="etrx_projection" inverse="true"
              cascade="save-update" lazy="true" fetch="select">
             <key>
