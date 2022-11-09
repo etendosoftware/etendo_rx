@@ -66,7 +66,7 @@ pipeline {
                                     sh './gradlew expandModules --info --stacktrace'
                                     sh """
                                     cd modules
-                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git etendo_core
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git
                                     """
                                     sh './gradlew install --info --stacktrace'
                                     sh './gradlew smartbuild --info --stacktrace'
@@ -151,16 +151,7 @@ pipeline {
                 script {
                     try {
                         echo "Publishing Snapshot JARs"
-                        sh './gradlew com.etendorx.asyncprocess:publish --info'
-                        sh './gradlew com.etendorx.auth:publish --info'
-                        sh './gradlew com.etendorx.clientrest_core:publish --info'
-                        sh './gradlew com.etendorx.configserver:publish --info'
-                        sh './gradlew com.etendorx.das:publish --info'
-                        sh './gradlew com.etendorx.das_core:publish --info'
-                        sh './gradlew com.etendorx.edge:publish --info'
-                        sh './gradlew com.etendorx.generate_entities.extradomaintype:publish --info'
-                        sh './gradlew com.etendorx.generate_entities:publish --info'
-                        sh './gradlew com.etendorx.generate_entities.core:publish --info'
+                        sh './gradlew publish --info'
                         echo "Snapshot JARs Published"
                     } catch (Exception e) {
                         echo 'Publication of Snapshot JARs FAILED'

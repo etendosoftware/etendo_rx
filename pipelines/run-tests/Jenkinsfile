@@ -61,7 +61,7 @@ pipeline {
                                     sh './gradlew expandModules --info --stacktrace'
                                     sh """
                                     cd modules
-                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git etendo_core
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git
                                     """
                                     sh './gradlew install --info --stacktrace'
                                     sh './gradlew smartbuild --info --stacktrace'
@@ -93,7 +93,7 @@ pipeline {
                         sh 'printenv'
                         sh 'cp gradle.properties.template gradle.properties'
                         sh './pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo RX" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
-                        sh './gradlew generate.entities --info'
+                        sh './gradlew generate.entities.test --info'
                         echo 'Build of Etendo RX Finished'
                         env.STATUSRX = "1"
                     } catch (Exception e) {
