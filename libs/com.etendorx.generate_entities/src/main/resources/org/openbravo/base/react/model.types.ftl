@@ -5,12 +5,12 @@
  <#switch string>
   <#case "java.lang.String"><#return "string"><#break>
   <#case "String"><#return "string"><#break>
-  <#case "java.math.BigDecimal"><#return "double"><#break>
-  <#case "java.lang.Long"><#return "int64"><#break>
-  <#case "java.util.Date"><#return "google.protobuf.Timestamp"><#break>
-  <#case "java.sql.Timestamp"><#return "google.protobuf.Timestamp"><#break>
-  <#case "java.lang.Boolean"><#return "bool"><#break>
-  <#default><#return string>
+  <#case "java.math.BigDecimal"><#return "number"><#break>
+  <#case "java.lang.Long"><#return "number"><#break>
+  <#case "java.util.Date"><#return "string"><#break>
+  <#case "java.sql.Timestamp"><#return "number"><#break>
+  <#case "java.lang.Boolean"><#return "boolean"><#break>
+  <#default><#return "string">
  </#switch>
 </#function>
 import { DASResponse, EntityType, KV } from "../base/baseservice.types";
@@ -29,10 +29,9 @@ export type ${entity.name}List = Array<${entity.name}>
 export interface ${entity.name} extends EntityType {
 <#list projectionFields as field>
 <#if is_object(field.type)>
-  string ${field.name}Id? = ${field?index + 1};
-<#else>
-  ${field.name}?: ${react_type(field.type)}
+  ${field.name}Id?: string;
 </#if>
+  ${field.name}?: ${react_type(field.type)}
 </#list>
 }
 
