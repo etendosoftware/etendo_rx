@@ -18,6 +18,8 @@ package ${entity.getPackageName()};
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * ${projectionName?cap_first} ${newClassName} Projection Class
  *
@@ -35,14 +37,17 @@ public interface ${entity.simpleClassName}${projectionName?cap_first}Projection 
     <#if showField>
     <#if !p.computedColumn>
     <#if p.isId()>
+    @JsonProperty("${p.javaName}")
     java.lang.String get${p.javaName?cap_first}();
 
     </#if>
     <#if p.isPrimitive() && !p.isId()>
     <#if !p.getPrimitiveType().isArray()>
+    @JsonProperty("${p.javaName}")
     ${p.getObjectTypeName()} get${p.javaName?cap_first}();
 
     <#else>
+    @JsonProperty("${p.javaName}")
     String get${p.javaName?cap_first}();
 
     </#if>
@@ -50,6 +55,7 @@ public interface ${entity.simpleClassName}${projectionName?cap_first}Projection 
     <#if p.targetEntity?? && !p.isOneToMany() && !p.isId() && !p.getTargetEntity().isView()>
     <#if p.targetEntity?? >
     @Value("${'#'}{target.get${p.javaName?cap_first}() != null ? target.get${p.javaName?cap_first}().getId() : null }")
+    @JsonProperty("${p.javaName}Id")
     String get${p.javaName?cap_first}Id();
 
     <#else>
@@ -60,6 +66,7 @@ public interface ${entity.simpleClassName}${projectionName?cap_first}Projection 
     </#if>
     <#else>
     <#if !p.targetEntity?? >
+    @JsonProperty("${p.javaName}")
     ${p.getObjectTypeName()} get${p.javaName?cap_first}();
 
     </#if>
@@ -81,6 +88,7 @@ public interface ${entity.simpleClassName}${projectionName?cap_first}Projection 
     <#else>
     @Value("${'#'}{target.get${field.projectedEntity?cap_first}() != null ? target.get${field.projectedEntity?cap_first}().get${field.projectedField?cap_first}() : null }")
     </#if>
+    @JsonProperty("${field.name}")
     <#if field.type??>${field.type}<#else>String</#if> get${field.name?cap_first}();
 
     </#if>

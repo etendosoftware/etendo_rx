@@ -6,6 +6,8 @@
 package ${entity.packageName};
 
 import com.etendorx.entities.entities.BaseRXObject;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
@@ -38,6 +40,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     )
     </#if>
     @javax.persistence.Column(name = "${p.columnName?lower_case}"<#if entity.isView()>, insertable = false, updatable = false</#if>)
+    @JsonProperty("${p.javaName}")
     java.lang.String ${p.javaName};
 
     </#if>
@@ -49,13 +52,16 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     @javax.persistence.Convert(converter= com.etendorx.entities.utilities.BooleanToStringConverter.class)
     </#if>
     <#if p.javaName == "version">
+    @JsonProperty("${p.javaName}_Etendo")
     ${p.getObjectTypeName()} ${p.javaName}_Etendo;
     <#else>
+    @JsonProperty("${p.javaName}")
     ${p.getObjectTypeName()} ${p.javaName};
     </#if>
 
     <#else>
     @javax.persistence.Column(name = "${p.columnName?lower_case}")
+    @JsonProperty("${p.javaName}")
     ${p.shorterTypeName} ${p.javaName};
 
     </#if>
@@ -76,6 +82,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     @javax.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.getTargetEntity().getTableName()}_id"<#if repeated>, updatable = false, insertable = false</#if>)
     </#if>
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
+    @JsonProperty("${p.javaName}")
     ${p.targetEntity.className} ${p.javaName};
 
     <#else>
@@ -91,6 +98,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     <#else>
     <#if computedColumns && p.computedColumn && !p.targetEntity??><#assign query>${p.sqlLogic}</#assign>
     @Formula("(${query?replace("^\\s+|\\s+$|\\n|\\r", " ", "rm")?replace("\"", "\\\"")})")
+    @JsonProperty("${p.javaName}")
     ${p.getObjectTypeName()} ${p.javaName};
 
     </#if>
