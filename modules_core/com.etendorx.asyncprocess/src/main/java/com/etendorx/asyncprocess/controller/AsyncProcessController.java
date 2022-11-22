@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.PostConstruct;
 
@@ -45,7 +43,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.etendorx.asyncprocess.service.AsyncProcessService;
 import com.etendorx.lib.kafka.KafkaMessageUtil;
@@ -57,7 +54,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
 import reactor.kafka.receiver.KafkaReceiver;
 
 /**
@@ -71,10 +67,7 @@ public class AsyncProcessController {
   private final AsyncProcessService asyncProcessService;
   private final KafkaMessageUtil kafkaMessageUtil;
   private final StreamBridge streamBridge;
-  private final Map<String, Sinks.Many<Object>> sink;
-  private final AtomicLong counter;
   private final KafkaReceiver<String, AsyncProcess> kafkaReceiver;
-  private final Map<String, SseEmitter> emitterMap = new ConcurrentHashMap<>();
   private ConnectableFlux<ServerSentEvent<AsyncProcess>> eventPublisher;
 
   public AsyncProcessController(AsyncProcessService asyncProcessService, KafkaMessageUtil kafkaMessageUtil,
@@ -82,8 +75,7 @@ public class AsyncProcessController {
     this.asyncProcessService = asyncProcessService;
     this.kafkaMessageUtil = kafkaMessageUtil;
     this.streamBridge = streamBridge;
-    this.counter = new AtomicLong();
-    this.sink = new HashMap<>();
+
     this.kafkaReceiver = kafkaReceiver;
   }
 

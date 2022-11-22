@@ -56,7 +56,6 @@ dependencies {
     implementation project(':com.etendorx.lib.asyncprocess')
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    implementation group: 'io.intrepid.commonutils', name: 'commonutils', version: '0.2.3'
 
 }
 
