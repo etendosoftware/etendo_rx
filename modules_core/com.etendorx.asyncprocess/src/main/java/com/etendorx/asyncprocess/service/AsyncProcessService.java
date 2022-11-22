@@ -45,10 +45,11 @@ public class AsyncProcessService {
     return getStore().get(asyncProcessId);
   }
 
-  private ReadOnlyKeyValueStore<String, AsyncProcess> getStore() {
+  public ReadOnlyKeyValueStore<String, AsyncProcess> getStore() {
     return kafkaStreams.store(
       StoreQueryParameters.fromNameAndType(
         AsyncProcessTopology.ASYNC_PROCESS_STORE,
         QueryableStoreTypes.keyValueStore()));
   }
+
 }

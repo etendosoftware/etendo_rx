@@ -16,9 +16,16 @@
 
 package com.etendorx.asyncprocess.config;
 
-import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
+import static com.etendorx.lib.kafka.topology.AsyncProcessTopology.ASYNC_PROCESS;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.state.HostInfo;
@@ -27,7 +34,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Properties;
+import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
+
+import reactor.kafka.receiver.KafkaReceiver;
+import reactor.kafka.receiver.ReceiverOptions;
+import reactor.kafka.receiver.internals.ConsumerFactory;
+import reactor.kafka.receiver.internals.DefaultKafkaReceiver;
 
 /**
  * Initial configuration of stream services
@@ -75,4 +87,22 @@ public class StreamConfiguration {
     var split = kafkaStreamsHostInfo.split(":");
     return new HostInfo(split[0], Integer.parseInt(split[1]));
   }
+
+  @Bean
+  public KafkaReceiver kafkaReceiver() {
+
+    Map<String, Object> props = new HashMap<>();
+
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, "async-group");
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+        com.etendorx.asyncprocess.serdes.AsyncProcessDeserializer.class.getName());
+    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+    return new DefaultKafkaReceiver(ConsumerFactory.INSTANCE, ReceiverOptions.create(props).subscription(
+        Collections.singleton(ASYNC_PROCESS)));
+  }
+
+
 }
