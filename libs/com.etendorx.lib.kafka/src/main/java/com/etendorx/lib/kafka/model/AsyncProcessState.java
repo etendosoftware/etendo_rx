@@ -17,5 +17,5 @@
 package com.etendorx.lib.kafka.model;
 
 public enum AsyncProcessState {
-  WAITING, ACCEPTED, DONE, REJECTED, ERROR
+  WAITING, ACCEPTED, DONE, REJECTED, ERROR, STARTED
 }
