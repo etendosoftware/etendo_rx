@@ -63,6 +63,7 @@ public class StreamConfiguration {
     properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
     properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
     properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+    properties.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, "true");
     properties.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, "0");
     properties.put(StreamsConfig.APPLICATION_SERVER_CONFIG, kafkaStreamsHostInfo);
     properties.put(StreamsConfig.STATE_DIR_CONFIG, kafkaStreamsStateDir);
