@@ -9,7 +9,7 @@
   <#case "java.lang.Long"><#return "int64"><#break>
   <#case "java.util.Date"><#return "google.protobuf.Timestamp"><#break>
   <#case "java.sql.Timestamp"><#return "google.protobuf.Timestamp"><#break>
-  <#case "java.lang.Boolean"><#return "bool"><#break>
+  <#case "java.lang.Boolean"><#return "boolean"><#break>
   <#default><#return string>
  </#switch>
 </#function>
@@ -43,10 +43,10 @@ class BackService extends BaseService<${entity.name}> {
 <#if searches??>
 
 <#list searches as s>
-  async ${s.method}(<#list s.params as p>${p.name}: ${react_type(p.type)}</#list>): Promise<${entity.name}List> {
+  async ${s.method}(<#list s.params as p>${p.name}: ${react_type(p.type)}<#if p?has_next>, </#if></#list>): Promise<${entity.name}List> {
     return this._fetchSearch<${s.method?cap_first}Params>(
       '${s.method}',
-      {<#list s.params as p>${p.name}: ${p.name}</#list>},
+      {<#list s.params as p>${p.name}: ${p.name}<#if p?has_next>, </#if></#list>},
       '${projectionName}',
     )
   }
