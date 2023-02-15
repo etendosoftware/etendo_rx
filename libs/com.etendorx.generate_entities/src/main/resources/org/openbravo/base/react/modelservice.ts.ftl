@@ -34,7 +34,7 @@ class BackService extends BaseService<${entity.name}> {
   mapManyToOne(entity: ${entity.name}): void {
   <#list projectionFields as field>
   <#if is_object(field.type)>
-    if (entity.bpartnerId) {
+    if (entity.${field.name}Id) {
       entity.${field.name} = `${field.name}/${'$'}{entity.${field.name}Id}`;
     }
   </#if>
