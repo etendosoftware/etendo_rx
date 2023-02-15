@@ -19,7 +19,7 @@ import { DASResponse, EntityType, KV } from "../base/baseservice.types";
 
 <#list searches as s>
 export type ${s.method?cap_first}Params = KV & {
-  <#list s.params as p>${p.name}: ${react_type(p.type)}</#list>
+  <#list s.params as p>${p.name}: ${react_type(p.type)}<#if p?has_next>, </#if></#list>
 }
 </#list>
 </#if>
