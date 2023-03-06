@@ -30,66 +30,74 @@ public interface ${entity.simpleClassName}${projectionName?cap_first}Projection 
 <#list entity.properties as p>
     <#assign showField = false><#assign idDbName = ""><#if projectionFields?size == 0><#assign showField = true>
     <#else>
-    <#list projectionFields as field>
-    <#if field.name == p.javaName && (computedColumns || !p.computedColumn)><#assign showField = true></#if>
-    </#list>
+        <#list projectionFields as field>
+            <#if field.name == p.javaName && (computedColumns || !p.computedColumn)><#assign showField = true></#if>
+        </#list>
     </#if>
     <#if showField>
-    <#if !p.computedColumn>
-    <#if p.isId()>
+        <#if !p.computedColumn>
+            <#if p.isId()>
     @JsonProperty("${p.javaName}")
     java.lang.String get${p.javaName?cap_first}();
 
-    </#if>
-    <#if p.isPrimitive() && !p.isId()>
-    <#if !p.getPrimitiveType().isArray()>
+            </#if>
+            <#if p.isPrimitive() && !p.isId()>
+                    <#if !p.getPrimitiveType().isArray()>
     @JsonProperty("${p.javaName}")
     ${p.getObjectTypeName()} get${p.javaName?cap_first}();
 
-    <#else>
+                    <#else>
     @JsonProperty("${p.javaName}")
     String get${p.javaName?cap_first}();
 
-    </#if>
-    <#else>
-    <#if p.targetEntity?? && !p.isOneToMany() && !p.isId() && !p.getTargetEntity().isView()>
-    <#if p.targetEntity?? >
+                </#if>
+            <#else>
+                <#if p.targetEntity?? && !p.isOneToMany() && !p.isId() && !p.getTargetEntity().isView()>
+                    <#if p.targetEntity?? >
     @Value("${'#'}{target.get${p.javaName?cap_first}() != null ? target.get${p.javaName?cap_first}().getId() : null }")
     @JsonProperty("${p.javaName}Id")
     String get${p.javaName?cap_first}Id();
 
-    <#else>
-    <#if p.targetEntity?? && !p.isId() && !p.getTargetEntity().isView()>
-    </#if>
-    </#if>
-    </#if>
-    </#if>
-    <#else>
-    <#if !p.targetEntity?? >
+                    <#else>
+                        <#if p.targetEntity?? && !p.isId() && !p.getTargetEntity().isView()>
+                        </#if>
+                    </#if>
+                <#else>
+                    <#if projectionName != "default">
+                        <#if p.oneToMany?? && p.oneToMany && p.targetEntity?? && !p.getTargetEntity().isView() && !p.targetEntity.className?ends_with("_ComputedColumns")>
+    @JsonProperty("${p.javaName}")
+    java.util.Set<${p.targetEntity.className}> get${p.javaName?cap_first}();
+
+                        </#if>
+                    </#if>
+                </#if>
+            </#if>
+        <#else>
+            <#if !p.targetEntity?? >
     @JsonProperty("${p.javaName}")
     ${p.getObjectTypeName()} get${p.javaName?cap_first}();
 
-    </#if>
-    </#if>
+            </#if>
+        </#if>
     </#if>
 </#list>
 <#list projectionFields as field>
     <#if field.value??>
-    <#if field.notNullValue??>
+        <#if field.notNullValue??>
     @Value("${'#'}{${field.notNullValue?replace('#TARGET#', 'target')} ? target${field.value?replace('#TARGET#', 'target')} : null}")
-    <#else>
+        <#else>
     @Value("${'#'}{${field.value?replace('#TARGET#', 'target')}}")
-    </#if>
-    <#if field.type??>${field.type}<#else>String</#if> get${field.name?cap_first}();
+        </#if>
+        <#if field.type??>${field.type}<#else>String</#if> get${field.name?cap_first}();
 
     <#elseif field.projectedEntity??>
-    <#if field.projectedEntity == "target">
+        <#if field.projectedEntity == "target">
     @Value("${'#'}{target.get${field.projectedField?cap_first}()}")
-    <#else>
+        <#else>
     @Value("${'#'}{target.get${field.projectedEntity?cap_first}() != null ? target.get${field.projectedEntity?cap_first}().get${field.projectedField?cap_first}() : null }")
-    </#if>
+        </#if>
     @JsonProperty("${field.name}")
-    <#if field.type??>${field.type}<#else>String</#if> get${field.name?cap_first}();
+        <#if field.type??>${field.type}<#else>String</#if> get${field.name?cap_first}();
 
     </#if>
 </#list>

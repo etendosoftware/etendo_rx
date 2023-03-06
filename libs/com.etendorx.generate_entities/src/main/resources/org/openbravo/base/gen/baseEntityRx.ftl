@@ -24,20 +24,25 @@ import org.openbravo.model.common.enterprise.Organization;
 
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Getter
 @Setter
 @MappedSuperclass
 public abstract class BaseRXObject {
     @javax.persistence.JoinColumn(name = "ad_client_id", referencedColumnName = "AD_Client_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
+    @JsonBackReference
     Client client;
 
     @javax.persistence.JoinColumn(name = "ad_org_id", referencedColumnName = "AD_Org_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
+    @JsonBackReference
     Organization organization;
 
     @javax.persistence.Column(name = "isactive")
     @javax.persistence.Convert(converter= com.etendorx.entities.utilities.BooleanToStringConverter.class)
+    @JsonBackReference
     java.lang.Boolean active;
 
     @javax.persistence.Column(name = "created")
@@ -45,6 +50,7 @@ public abstract class BaseRXObject {
 
     @javax.persistence.JoinColumn(name = "createdby", referencedColumnName = "AD_User_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
+    @JsonBackReference
     User createdBy;
 
     @javax.persistence.Column(name = "updated")
@@ -52,6 +58,7 @@ public abstract class BaseRXObject {
 
     @javax.persistence.JoinColumn(name = "updatedby", referencedColumnName = "AD_User_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
+    @JsonBackReference
     User updatedBy;
 
 }
