@@ -65,8 +65,19 @@ public interface ${entity.simpleClassName}${projectionName?cap_first}Projection 
                 <#else>
                     <#if projectionName != "default">
                         <#if p.oneToMany?? && p.oneToMany && p.targetEntity?? && !p.getTargetEntity().isView() && !p.targetEntity.className?ends_with("_ComputedColumns")>
+                            <#assign anotherProjection = {}>
+                            <#list anotherEntities as k, anotherEntity>
+                                <#if anotherEntity.className == p.targetEntity.className>
+                                    <#assign anotherProjection = anotherEntity>
+                                </#if>
+                            </#list>
     @JsonProperty("${p.javaName}")
+                            <#if anotherProjection?has_content>
+    @Value("${'#'}{target.${p.javaName}.![new com.etendorx.entities.utilities.KeyValueMap(<#list anotherProjection.fields as k, field>'${field.name}', <#if field.value??>${field.value?substring(1)}<#else>${field.name}</#if><#if !field?is_last>, </#if></#list>)]}")
+    java.util.Set<java.util.Map<String, Object>> get${p.javaName?cap_first}();
+                            <#else>
     java.util.Set<${p.targetEntity.className}> get${p.javaName?cap_first}();
+                            </#if>
 
                         </#if>
                     </#if>

@@ -6,7 +6,6 @@
 package ${entity.packageName};
 
 import com.etendorx.entities.entities.BaseRXObject;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -32,10 +31,6 @@ import java.io.Serializable;
 @javax.persistence.Table(name = "${entity.tableName?lower_case}")
 @javax.persistence.Cacheable
 @EntityScan
-@JsonIdentityInfo(
-    generator = ObjectIdGenerators.PropertyGenerator.class,
-    property = "id"
-)
 public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.tableName?lower_case)>implements Serializable<#else>extends BaseRXObject</#if> {
 <#list entity.properties as p>
     <#if !p.computedColumn>
