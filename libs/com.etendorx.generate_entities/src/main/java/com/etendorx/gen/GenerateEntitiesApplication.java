@@ -245,6 +245,7 @@ public class GenerateEntitiesApplication {
           generateEntityModel(data, pathEtendoRx);
 
           for (Projection projection : projections) {
+            data.put("anotherEntities", projection.getEntities());
             if (StringUtils.equals(PROJECTION_DEFAULT, projection.getName()) || projection.getEntities().containsKey(
               data.get("newClassName").toString())) {
               generateProjections(data, pathJPARepoRx, projection, entity);
@@ -406,6 +407,7 @@ public class GenerateEntitiesApplication {
    * @param pathJPARepoRx
    * @param projection
    * @param entity
+   * @param entities
    */
   private void generateProjections(
     Map<String, Object> data, String pathJPARepoRx, Projection projection, Entity entity) throws FileNotFoundException {
