@@ -6,11 +6,8 @@
 package ${entity.packageName};
 
 import com.etendorx.entities.entities.BaseRXObject;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -80,7 +77,6 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     @javax.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.getTargetEntity().getTableName()}_id"<#if repeated>, updatable = false, insertable = false</#if>)
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
     @JsonProperty("${p.javaName}")
-    @JsonBackReference
     ${p.targetEntity.className} ${p.javaName};
 
                     <#else>
@@ -90,7 +86,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
         <#else>
             <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.getTargetEntity().isView() && !p.targetEntity.className?ends_with("_ComputedColumns")>
     @javax.persistence.OneToMany(mappedBy = "${p.referencedProperty.name}")
-    @JsonManagedReference
+    @JsonIgnoreProperties("${p.referencedProperty.name}")
     java.util.List<${p.targetEntity.className}> ${p.name};
 
             </#if>
