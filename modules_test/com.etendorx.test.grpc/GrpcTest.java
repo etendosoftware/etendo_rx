@@ -1,4 +1,4 @@
-package com.etendorx.das.test;
+package com.etendorx.test.grpc;
 
 import com.etendorx.das.grpcrepo.ADUserGrpcService;
 import com.etendorx.das.grpcrepo.OrderGrpcService;

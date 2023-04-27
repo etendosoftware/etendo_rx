@@ -9,7 +9,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,9 @@ public class AuthService {
 
   @Autowired
   private UserClient userClient;
+
+  @Value("${token}")
+  private String token;
 
   public void validateJwtRequest(JwtRequest jwtRequest) {
     log.debug("Running JWT request validation");
@@ -54,7 +59,9 @@ public class AuthService {
   public UserModel validateCredentials(String username, String password) {
     // Send a request to the DAS server
     log.debug("Sending request to the DAS server.");
-    ResponseEntity<CollectionModel<UserModel>> modelResponseEntity = userClient.searchUserByUsername(username, "true", PROJECTION);
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("X-TOKEN", token);
+    ResponseEntity<CollectionModel<UserModel>> modelResponseEntity = userClient.searchUserByUsername(username, "true", PROJECTION, headers);
     if (modelResponseEntity.getStatusCode() != HttpStatus.OK) {
       throw new ResponseStatusException(modelResponseEntity.getStatusCode(), "Unsuccessful DAS connection.");
     }
