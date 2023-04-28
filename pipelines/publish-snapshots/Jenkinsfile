@@ -128,7 +128,7 @@ pipeline {
                         rx.computedColumns=true\n
                         rx.views=true" > gradle.properties
                         """
-                        sh 'sed -i "s/gradle.ext.versionJars = \\(.*\\)\'/gradle.ext.versionJars = \\1-SNAPSHOT\'/g" settings.gradle'
+                        sh 'sed -i "s/gradle.ext.version = \\(.*\\)\'/gradle.ext.version = \\1-SNAPSHOT\'/g" settings.gradle'
                         sh './gradlew generate.entities --info'
                         echo 'Build of Etendo RX Finished'
                     } catch (Exception e) {
