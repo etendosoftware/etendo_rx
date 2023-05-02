@@ -1,15 +1,10 @@
 package com.etendorx.utils.auth.key;
 
-import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.DefaultClaims;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.security.*;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -23,13 +18,27 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.DefaultClaims;
+
 public class JwtKeyUtils {
 
   final static Logger logger = LoggerFactory.getLogger(JwtKeyUtils.class);
 
   public static final String USER_ID_CLAIM = "ad_user_id";
   public static final String CLIENT_ID_CLAIM = "ad_client_id";
-  public static final String ORG_ID_CLAIM = "ad_org_id";
+  public static final String ORG_ID = "ad_org_id";
+  public static final String ROLE_ID = "ad_role_id";
+  public static final String SERVICE_SEARCH_KEY = "search_key";
+  public static final String SERVICE_ID = "service_id";
 
   /**
    * Generates a {@link PrivateKey} from a key String
@@ -151,11 +160,15 @@ public class JwtKeyUtils {
     }
   }
 
-  public static Claims generateUserClaims(String userId, String clientId, String orgId) {
+  public static Claims generateUserClaims(String userId, String clientId, String orgId,
+                                          String roleId, String searchKey, String serviceId) {
     Claims claims = new DefaultClaims();
     claims.put(USER_ID_CLAIM, userId);
     claims.put(CLIENT_ID_CLAIM, clientId);
-    claims.put(ORG_ID_CLAIM, orgId);
+    claims.put(ORG_ID, orgId);
+    claims.put(ROLE_ID, roleId);
+    claims.put(SERVICE_SEARCH_KEY, searchKey);
+    claims.put(SERVICE_ID, serviceId);
     return claims;
   }
 

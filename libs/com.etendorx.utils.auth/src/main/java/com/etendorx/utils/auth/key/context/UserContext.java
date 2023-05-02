@@ -23,10 +23,19 @@ import lombok.Setter;
 @Getter
 public class UserContext {
 
+  private String userName;
+
   private String userId;
 
   private String clientId;
 
   private String organizationId;
 
+  private String roleId;
+
+  private String searchKey;
+
+  private String serviceId;
+
+  private String active;
 }

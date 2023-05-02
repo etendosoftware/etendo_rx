@@ -1,8 +1,13 @@
-package com.etendorx.auth.feign;
+package com.etendorx.auth.feign.model;
 
+import lombok.Builder;
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.List;
+
 @Data
+@Builder
 public class UserModel {
   private String id;
 
@@ -19,4 +24,6 @@ public class UserModel {
   private String username;
 
   private String password;
+
+  private List<HashMap<String, String>> eTRXRxServicesAccessList;
 }

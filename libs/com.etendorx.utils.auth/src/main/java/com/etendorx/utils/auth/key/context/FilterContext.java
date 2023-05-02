@@ -19,7 +19,6 @@ package com.etendorx.utils.auth.key.context;
 import com.etendorx.utils.auth.key.JwtKeyUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,24 +28,29 @@ import java.util.Map;
 
 @Component
 public class FilterContext extends OncePerRequestFilter {
+  public static final String HEADER_TOKEN = "X-TOKEN";
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    String token = request.getHeader("X-TOKEN");
+    String token = request.getHeader(HEADER_TOKEN);
+
     if (token != null && !token.isBlank()) {
-      setUserContextFromToken(token);
+      setUserContextFromToken(token, request);
     }
     filterChain.doFilter(request, response);
   }
 
-  public static void setUserContextFromToken(String token) {
+  public static void setUserContextFromToken(String token, HttpServletRequest request) {
     AppContext.setAuthToken(token);
     UserContext userContext = new UserContext();
     Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
-
     userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
     userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
-    userContext.setOrganizationId((String) tokenValuesMap.get(JwtKeyUtils.ORG_ID_CLAIM));
+    userContext.setOrganizationId((String) tokenValuesMap.get(JwtKeyUtils.ORG_ID));
+    userContext.setRoleId((String) tokenValuesMap.get(JwtKeyUtils.ROLE_ID));
+    userContext.setSearchKey((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
+    userContext.setServiceId((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_ID));
+    userContext.setActive(request.getParameter("active"));
     AppContext.setCurrentUser(userContext);
   }
 }

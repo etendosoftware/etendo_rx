@@ -54,18 +54,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19091")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @AutoConfigureMockMvc
 public class RepositoryTest {
-  public static final String TOKEN = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjgwMTExOTc2LCJhZF91" +
+  private static final String TOKEN = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjgwMTExOTc2LCJhZF91" +
       "c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAifQ.b7-ooaDHbPvyOlT-1eZ3cKlhaSOuhHAoEv6eHElpNeSKR" +
       "dxZHgeiCSCc5mO-FhEygJhtPWhCOQvqGzDTBqPx8pKp32NoyLhiSHIuI13WZMnkW6r7pcbkmTqZ7xocktHvjQfIf6s3nxK0bIc5NG8aQzhrR-6Un" +
       "FIuF3k5OYspQVKqX0etld5nJ0W126c2ZqXXScNAGSshFulEhyiK7WvuJ0ciRE6lHf_qRA2Etv67SXfStIgprbT5mcpyJv8HZFatlU88_AdWh7CaC" +
       "4RdqEmx46TRQJHTKTU8Pl7LqLDY9dGNFBDeov2Wajuu6q5VMS6F_cG95q2AxsZ-3Cw9BM7CWA";
 
+  private HttpServletRequest httpServletRequest;
   @Autowired
   private ADUserRepository userRepository;
   @Autowired
@@ -75,7 +78,7 @@ public class RepositoryTest {
 
   @Test
   public void whenReadUser() {
-    setUserContextFromToken(TOKEN);
+    setUserContextFromToken(TOKEN, httpServletRequest);
     var allUsers = userRepository.findAll();
     assert allUsers.iterator().hasNext();
     var userRetrieved = allUsers.iterator().next();
@@ -84,7 +87,7 @@ public class RepositoryTest {
 
   @Test
   public void whenFindByName() {
-    setUserContextFromToken(TOKEN);
+    setUserContextFromToken(TOKEN, httpServletRequest);
     var userList = userRepository.searchByUsername("admin", true, null);
     assert userList.getSize() == 1;
     assert userList.getContent().get(0) != null;
