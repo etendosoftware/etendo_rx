@@ -51,10 +51,14 @@ dependencies {
     // Feign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    implementation project(path: ':com.etendorx.entities')
+    implementation project(path: ':com.etendorx.entities')
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     implementation 'io.github.openfeign:feign-okhttp'
     implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
 
     // Test
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

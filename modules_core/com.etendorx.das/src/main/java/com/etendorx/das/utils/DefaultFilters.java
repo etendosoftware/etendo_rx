@@ -21,41 +21,41 @@ public class DefaultFilters {
 
 
     public static String addFilters(String sql, String userId, String clientId, String orgId, String isActive) {
-            //SUPERUSER BY PASS FILTERS
-            if (isSuperUser(userId, clientId, orgId)) {
-                return sql;
-            }
+        //AUTH SERVICE BY PASS FILTERS
+        if (isAuthService(userId, clientId, orgId)) {
+            return sql;
+        }
+        //SUPERUSER BY PASS FILTERS
+        if (isSuperUser(userId, clientId, orgId)) {
+            return sql;
+        }
 
-            boolean containsWhere = sql.contains(WHERE);
-            //GET THE TABLE NAME USING REGULAR EXPRESSION
-            String tableAlias = getTableAlias(sql);
+        boolean containsWhere = sql.contains(WHERE);
+        //GET THE TABLE NAME USING REGULAR EXPRESSION
+        String tableAlias = getTableAlias(sql);
 
-            //RETURN DEFAULT FILTERS
-            return replaceInQuery(sql, clientId, orgId, isActive, containsWhere, tableAlias);
+        //RETURN DEFAULT FILTERS
+        return replaceInQuery(sql, clientId, orgId, isActive, containsWhere, tableAlias);
     }
 
     @NotNull
     private static String replaceInQuery(String sql, String clientId, String orgId, String isActive, boolean containsWhere, String tableAlias) {
-        String resultSql;
-        if (containsWhere) {
-            resultSql = sql.replace(WHERE, WHERE + tableAlias +".ad_client_id = '"+ clientId +"' " +
-                    "and "+ tableAlias +".ad_org_id = ANY (etrx_org_tree('"+ orgId +"')) " +
-                    "and "+ tableAlias +".isactive = '"+ isActive +"' and ");
-        } else {
-            resultSql = sql.replace(LIMIT, WHERE + tableAlias +".ad_client_id = '"+ clientId +"' " +
-                    "and "+ tableAlias +".ad_org_id = ANY (etrx_org_tree('"+ orgId +"')) " +
-                    "and "+ tableAlias +".isactive = '"+ isActive +"' limit ");
-        }
-        return resultSql;
+        return sql.replace((containsWhere? WHERE:LIMIT), WHERE + tableAlias +".isactive = '"+ isActive +"' " +
+                "AND " + tableAlias +".ad_client_id = '"+ clientId +"' " +
+                "AND (" + tableAlias + ".ad_org_id =  '"+ orgId +"' OR ((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '"+ orgId +"', '1')) = 1))" +
+                (containsWhere? " AND ":"' limit ") );
     }
 
     private static boolean isSuperUser(String userId, String clientId, String orgId) {
-        if ((StringUtils.equals(userId, SUPER_USER_ID)) && (StringUtils.equals(clientId, SUPER_USER_CLIENT_ID))
-                && (StringUtils.equals(orgId, SUPER_USER_ORG_ID))) {
-            return true;
-        }
-        return false;
+        return (StringUtils.equals(userId, SUPER_USER_ID)) && (StringUtils.equals(clientId, SUPER_USER_CLIENT_ID))
+                && (StringUtils.equals(orgId, SUPER_USER_ORG_ID));
     }
+
+    //IS_AUTH_SERVICE CONDITION NEEDS IMPROVE
+    private static boolean isAuthService(String userId, String clientId, String orgId) {
+        return (userId == null || clientId == null || orgId == null);
+    }
+
 
     private static String getTableAlias(String sql) {
         Pattern qryPattern = Pattern.compile(REG_EXP);

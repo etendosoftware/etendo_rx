@@ -32,7 +32,8 @@ public class ContextUtils {
   public static Map<String, Object> getTokenValues(String token) {
     Map<String, Object> tokenValuesMap = JwtKeyUtils.getTokenValues(token);
     JwtKeyUtils.validateTokenValues(tokenValuesMap,
-      List.of(JwtKeyUtils.USER_ID_CLAIM, JwtKeyUtils.CLIENT_ID_CLAIM, JwtKeyUtils.ORG_ID_CLAIM));
+      List.of(JwtKeyUtils.USER_ID_CLAIM, JwtKeyUtils.CLIENT_ID_CLAIM, JwtKeyUtils.ORG_ID,
+              JwtKeyUtils.ROLE_ID, JwtKeyUtils.SERVICE_ID));
     return tokenValuesMap;
   }
 

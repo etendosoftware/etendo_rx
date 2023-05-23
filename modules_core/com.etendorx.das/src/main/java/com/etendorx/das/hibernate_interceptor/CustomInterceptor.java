@@ -17,7 +17,7 @@ public class CustomInterceptor extends EmptyInterceptor {
         String userId = getCurrentUser().getUserId();
         String clientId = getCurrentUser().getClientId();
         String orgId = getCurrentUser().getOrganizationId();
-        String isActive = "Y";
+        String isActive = getCurrentUser().getActive();
         String finalQuery = DefaultFilters.addFilters(sql, userId, clientId, orgId, isActive);
         return super.onPrepareStatement(finalQuery);
     }

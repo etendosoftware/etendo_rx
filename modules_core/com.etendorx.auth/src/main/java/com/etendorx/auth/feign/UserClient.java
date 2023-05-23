@@ -1,5 +1,6 @@
 package com.etendorx.auth.feign;
 
+import com.etendorx.auth.feign.model.UserModel;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpHeaders;
