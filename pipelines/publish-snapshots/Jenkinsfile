@@ -11,12 +11,14 @@ pipeline {
         BBDD_SYSTEMPASS     = 'syspass'
         BBDD_USER           = 'tad'
         BBDD_PASSWORD       = 'tad'
-        NEXUS_USER          =  credentials('nexus-admin-user')
-        NEXUS_PASSWORD      =  credentials('nexus-admin-passwd')
+        NEXUS_USER          = credentials('nexus-admin-user')
+        NEXUS_PASSWORD      = credentials('nexus-admin-passwd')
+        GITHUB_USER         = 'etendobot'
+        GITHUB_TOKEN        = credentials('github-read-package-token')
         JAVA_HOME           = '/usr/lib/jvm/java-11-openjdk-amd64'
         CATALINA_HOME       = "${WORKSPACE}/apache-tomcat-8.5.75"
         REPOSITORY_URL      = 'https://repo.futit.cloud/repository/etendo-snapshot-jars'
-        EMAIL_ADDRESS       =  credentials('email_builds')
+        EMAIL_ADDRESS       = credentials('email_builds')
         URL_REPO_GIT        = 'https://github.com/etendosoftware/etendo_rx'
         COMMIT_AUTHOR_NAME  = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
         COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
@@ -59,6 +61,8 @@ pipeline {
                                     bbdd.password=${BBDD_PASSWORD}\n
                                     nexusUser=${NEXUS_USER}\n
                                     nexusPassword=${NEXUS_PASSWORD}\n
+                                    githubUser=${GITHUB_USER}\n
+                                    githubToken=${GITHUB_TOKEN}\n
                                     allow.root=true\n
                                     org.gradle.jvmargs=-Xmx2g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" > gradle.properties
                                     """
