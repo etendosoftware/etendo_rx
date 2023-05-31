@@ -1,10 +1,10 @@
 package com.etendorx.auth.auth;
 
-import com.etendoerp.etendorx.data.RxServices;
 import com.etendorx.auth.auth.hashing.PasswordHash;
 import com.etendorx.auth.auth.jwt.JwtRequest;
 import com.etendorx.auth.feign.ServiceClient;
 import com.etendorx.auth.feign.UserClient;
+import com.etendorx.auth.feign.model.RxService;
 import com.etendorx.auth.feign.model.ServicesAccessModel;
 import com.etendorx.auth.feign.model.UserModel;
 import com.etendorx.utils.auth.key.JwtKeyUtils;
@@ -138,12 +138,12 @@ public class AuthService {
         throw new ResponseStatusException(HttpStatus.NO_CONTENT, "DAS server respond with not content.");
       }
 
-      List<RxServices> rxServicesList = servicesAccessModel.get_embedded().getRxServiceses();
+      List<RxService> rxServicesList = servicesAccessModel.get_embedded().getRxServiceses();
       if (rxServicesList.isEmpty()) {
         throw new ResponseStatusException(HttpStatus.NO_CONTENT, "RxServices list is empty.");
       }
 
-      RxServices rxService = rxServicesList.get(0);
+      RxService rxService = rxServicesList.get(0);
       if (!StringUtils.equals(rxService.getSearchkey(), authRequest.getService())) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_SERVICE_MESSAGE);
       }

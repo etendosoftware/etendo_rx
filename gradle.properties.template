@@ -2,6 +2,9 @@ repositoryUser=
 repositoryPassword=
 repositoryUrl=https://repo.futit.cloud/repository/etendo-public-jars
 
+githubUser=
+githubToken=
+
 org.gradle.parallel=true
 org.gradle.daemon=false
 
