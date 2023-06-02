@@ -8,7 +8,7 @@ public class RxService {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private String secret;
-    private String searchKey;
+    private String searchkey;
 }
 
 

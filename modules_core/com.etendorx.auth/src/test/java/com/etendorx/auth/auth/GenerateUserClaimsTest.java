@@ -6,13 +6,9 @@ import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.openbravo.model.ad.access.User;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.etendorx.utils.auth.key.JwtKeyUtils.generateUserClaims;
 
 public class GenerateUserClaimsTest {
 
