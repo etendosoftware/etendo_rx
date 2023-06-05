@@ -51,6 +51,7 @@ public class FilterContext extends OncePerRequestFilter {
     userContext.setSearchKey((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
     userContext.setServiceId((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_ID));
     userContext.setActive(request.getParameter("active"));
+    userContext.setRestMethod(request.getMethod());
     AppContext.setCurrentUser(userContext);
   }
 }
