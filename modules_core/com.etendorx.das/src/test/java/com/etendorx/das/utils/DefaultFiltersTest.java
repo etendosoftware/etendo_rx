@@ -27,7 +27,7 @@ public class DefaultFiltersTest {
     @DisplayName("Test addFilters method when not a superuser and not contains count")
     @Test
     void testAddFiltersWhenNotSuperuserAndNotContainsCount() {
-        String resultSql = DefaultFilters.addFilters(sql, adUser, clientId, orgId, isActive);
+        String resultSql = DefaultFilters.addFilters("GET", sql, adUser, clientId, orgId, isActive);
         Assertions.assertNotNull(resultSql);
         Assertions.assertNotEquals(sql, resultSql);
         Assertions.assertTrue(resultSql.contains("ad_client_id = '"+ clientId +"'"));
@@ -39,7 +39,7 @@ public class DefaultFiltersTest {
     @Test
     void testAddFiltersWhenNotSuperuserAndContainsCount() {
         sql = "select count(user0_.ad_user_id) as ad_user_1_129_ from ad_user user0_ limit ?";
-        String resultSql = DefaultFilters.addFilters(sql, adUser, clientId, orgId, isActive);
+        String resultSql = DefaultFilters.addFilters("GET", sql, adUser, clientId, orgId, isActive);
         Assertions.assertNotNull(resultSql);
         Assertions.assertNotEquals(sql, resultSql);
         Assertions.assertTrue(resultSql.contains("ad_client_id = '"+ clientId +"'"));
@@ -52,7 +52,7 @@ public class DefaultFiltersTest {
     void testGetTableNameWhenPatternError() {
         sql = "from(user0_.ad_user_id as ad_user_1_129_)from_ad_user user0_from ?";
         Assertions.assertThrows(QueryException.class, () -> {
-            DefaultFilters.addFilters(sql, adUser, clientId, orgId, isActive);
+            DefaultFilters.addFilters("GET", sql, adUser, clientId, orgId, isActive);
         });
     }
 
@@ -62,7 +62,7 @@ public class DefaultFiltersTest {
         adUser = "100";
         clientId = "0";
         orgId = "0";
-        String resultSql = DefaultFilters.addFilters(sql, adUser, clientId, orgId, isActive);
+        String resultSql = DefaultFilters.addFilters("GET", sql, adUser, clientId, orgId, isActive);
         Assertions.assertEquals(sql, resultSql);
     }
 }

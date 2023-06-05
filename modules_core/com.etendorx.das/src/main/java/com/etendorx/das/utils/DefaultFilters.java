@@ -20,13 +20,17 @@ public class DefaultFilters {
     public static final String LIMIT = " limit ";
 
 
-    public static String addFilters(String sql, String userId, String clientId, String orgId, String isActive) {
+    public static String addFilters(String restMethod, String sql, String userId, String clientId, String orgId, String isActive) {
         //AUTH SERVICE BY PASS FILTERS
         if (isAuthService(userId, clientId, orgId)) {
             return sql;
         }
         //SUPERUSER BY PASS FILTERS
         if (isSuperUser(userId, clientId, orgId)) {
+            return sql;
+        }
+
+        if (restMethod.equals("POST") || restMethod.equals("PUT") || restMethod.equals("PATCH")) {
             return sql;
         }
 
