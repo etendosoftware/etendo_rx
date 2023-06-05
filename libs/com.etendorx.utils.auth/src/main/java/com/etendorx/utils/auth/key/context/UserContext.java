@@ -38,4 +38,6 @@ public class UserContext {
   private String serviceId;
 
   private String active;
+
+  private String restMethod;
 }
