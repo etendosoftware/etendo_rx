@@ -1,19 +1,22 @@
 package com.etendorx.das.handler;
 
-import com.etendorx.entities.entities.BaseRXObject;
-import com.etendorx.entities.jparepo.ADClientRepository;
-import com.etendorx.entities.jparepo.ADUserRepository;
-import com.etendorx.entities.jparepo.OrganizationRepository;
-import com.etendorx.utils.auth.key.context.AppContext;
-import com.etendorx.utils.auth.key.context.UserContext;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Date;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
+import com.etendorx.entities.entities.BaseRXObject;
+import com.etendorx.entities.jparepo.ADClientRepository;
+import com.etendorx.entities.jparepo.ADUserRepository;
+import com.etendorx.entities.jparepo.OrganizationRepository;
+import com.etendorx.utils.auth.key.context.UserContext;
+
+import lombok.extern.slf4j.Slf4j;
 
 @RepositoryEventHandler
 @Slf4j
@@ -25,8 +28,10 @@ public class EventHandlerEntities {
     this.request = request;
   }
 
+  @Resource(name = "userContextBean")
+  private UserContext userContext;
+
   private UserContext getUserContext() {
-    UserContext userContext = AppContext.getCurrentUser();
     if (userContext == null) {
       throw new IllegalArgumentException("The user context is not defined.");
     }

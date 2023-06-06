@@ -12,7 +12,7 @@ public class DefaultFiltersTest {
     private String adUser;
     private String clientId;
     private String orgId;
-    private String isActive;
+    private boolean isActive;
 
     @BeforeEach
     void setUp() {
@@ -21,7 +21,7 @@ public class DefaultFiltersTest {
         adUser = "101";
         clientId = "1";
         orgId = "1";
-        isActive = "Y";
+        isActive = true;
     }
 
     @DisplayName("Test addFilters method when not a superuser and not contains count")

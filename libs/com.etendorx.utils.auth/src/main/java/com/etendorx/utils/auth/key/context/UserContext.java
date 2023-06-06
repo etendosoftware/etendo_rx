@@ -37,7 +37,10 @@ public class UserContext {
 
   private String serviceId;
 
-  private String active;
+  private boolean active;
+
+  private String authToken;
 
   private String restMethod;
+
 }

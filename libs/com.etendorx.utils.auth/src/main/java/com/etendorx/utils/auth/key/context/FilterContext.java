@@ -17,32 +17,47 @@
 package com.etendorx.utils.auth.key.context;
 
 import com.etendorx.utils.auth.key.JwtKeyUtils;
+import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class FilterContext extends OncePerRequestFilter {
   public static final String HEADER_TOKEN = "X-TOKEN";
 
-  @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    String token = request.getHeader(HEADER_TOKEN);
+  @Autowired
+  private UserContext userContext;
 
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
+    String token = request.getHeader(HEADER_TOKEN);
     if (token != null && !token.isBlank()) {
       setUserContextFromToken(token, request);
+    } else {
+      throw new ForbiddenException();
     }
+    AppContext.setCurrentUser(userContext);
     filterChain.doFilter(request, response);
   }
 
-  public static void setUserContextFromToken(String token, HttpServletRequest request) {
-    AppContext.setAuthToken(token);
-    UserContext userContext = new UserContext();
+  public void setUserContextFromToken(String token, HttpServletRequest request) {
+    setUserContextFromToken(userContext, token, request.getParameter("active"), request.getMethod());
+  }
+
+  public static void setUserContextFromToken(UserContext userContext, String token, String activeParam,
+      String restMethod) {
     Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
     userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
     userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
@@ -50,8 +65,12 @@ public class FilterContext extends OncePerRequestFilter {
     userContext.setRoleId((String) tokenValuesMap.get(JwtKeyUtils.ROLE_ID));
     userContext.setSearchKey((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
     userContext.setServiceId((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_ID));
-    userContext.setActive(request.getParameter("active"));
-    userContext.setRestMethod(request.getMethod());
-    AppContext.setCurrentUser(userContext);
+    String active = Optional.ofNullable(activeParam).orElse("true");
+    if (!active.equals("true") && !active.equals("false")) {
+      throw new IllegalArgumentException("Invalid value for 'active' parameter: " + active);
+    }
+    userContext.setActive("true".equals(active));
+    userContext.setAuthToken(token);
+    userContext.setRestMethod(restMethod);
   }
 }

@@ -16,6 +16,7 @@
 
 package com.etendorx.das.test;
 
+
 import static com.etendorx.utils.auth.key.context.FilterContext.setUserContextFromToken;
 
 import java.io.FileWriter;
@@ -34,6 +35,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,6 +46,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
@@ -50,11 +54,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.etendorx.entities.jparepo.ADUserRepository;
+import com.etendorx.utils.auth.key.context.AppContext;
+import com.etendorx.utils.auth.key.context.UserContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.servlet.http.HttpServletRequest;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19091")
@@ -62,12 +66,14 @@ import javax.servlet.http.HttpServletRequest;
 @ContextConfiguration
 @AutoConfigureMockMvc
 public class RepositoryTest {
-  private static final String TOKEN = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjgwMTExOTc2LCJhZF91" +
-      "c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAifQ.b7-ooaDHbPvyOlT-1eZ3cKlhaSOuhHAoEv6eHElpNeSKR" +
-      "dxZHgeiCSCc5mO-FhEygJhtPWhCOQvqGzDTBqPx8pKp32NoyLhiSHIuI13WZMnkW6r7pcbkmTqZ7xocktHvjQfIf6s3nxK0bIc5NG8aQzhrR-6Un" +
-      "FIuF3k5OYspQVKqX0etld5nJ0W126c2ZqXXScNAGSshFulEhyiK7WvuJ0ciRE6lHf_qRA2Etv67SXfStIgprbT5mcpyJv8HZFatlU88_AdWh7CaC" +
-      "4RdqEmx46TRQJHTKTU8Pl7LqLDY9dGNFBDeov2Wajuu6q5VMS6F_cG95q2AxsZ-3Cw9BM7CWA";
+  private static final String TOKEN = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjg2MDc2NjE2LCJhZF" +
+      "91c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAiLCJhZF9yb2xlX2lkIjoiMCIsInNlYXJjaF9rZXkiOiIi" +
+      "LCJzZXJ2aWNlX2lkIjoiIn0.oBxwXw3Td0q1wNGVK4vSli4VGMGeRdfajwtzLCh9dVlLNFBFLJZ6EjJLUCFbZXTsxnwYHJfsHOQYcr7iWejdnP" +
+      "Djy3l0CqGKFGxI-bNm_73Ky48fRdBakqzwFQExit9HfPDHd_iojp0hlpH736CWvh11v0QGja9Q0LdY4W69Np1waxUI2Qf4z2WfJaoQhIjdOq4B" +
+      "cFoqqCBknVougK0J7ZMmxcOnSe6MSQ7UDzKgwunSSuT-iVeF4sxLb80hWu5dInfvn8iJVC8krJ9telWVqbo-dPoFbnFw9CtmTHpK153b4nj5U6" +
+      "ZOTFP4kZqsqhvWo7wKg03O1emGmCKo1vg9Cg";
 
+  @Autowired
   private HttpServletRequest httpServletRequest;
   @Autowired
   private ADUserRepository userRepository;
@@ -76,9 +82,21 @@ public class RepositoryTest {
   @Autowired
   private MockMvc mockMvc;
 
+  @org.springframework.boot.test.context.TestConfiguration
+  static class RepositoryTestConfiguration {
+    @Bean
+    public UserContext userContext() {
+      return new UserContext();
+    }
+  }
+
+  @Autowired
+  private UserContext userContext;
+
   @Test
   public void whenReadUser() {
-    setUserContextFromToken(TOKEN, httpServletRequest);
+    setUserContextFromToken(userContext, TOKEN, "true", "GET");
+    AppContext.setCurrentUser(userContext);
     var allUsers = userRepository.findAll();
     assert allUsers.iterator().hasNext();
     var userRetrieved = allUsers.iterator().next();
@@ -87,8 +105,9 @@ public class RepositoryTest {
 
   @Test
   public void whenFindByName() {
-    setUserContextFromToken(TOKEN, httpServletRequest);
-    var userList = userRepository.searchByUsername("admin", true, null);
+    UserContext userContext = new UserContext();
+    setUserContextFromToken(userContext, TOKEN, "true", "GET");
+    var userList = userRepository.searchByUsername("admin", null);
     assert userList.getSize() == 1;
     assert userList.getContent().get(0) != null;
   }

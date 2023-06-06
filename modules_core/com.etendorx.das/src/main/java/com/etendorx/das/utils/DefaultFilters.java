@@ -1,5 +1,7 @@
 package com.etendorx.das.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,9 +20,11 @@ public class DefaultFilters {
     public static final String SUPER_USER_ORG_ID = "0";
     public static final String REG_EXP = "\\sfrom\\s\\w+\\s(\\w+_)";
     public static final String LIMIT = " limit ";
+    public static final String AND = " and ";
 
 
-    public static String addFilters(String restMethod, String sql, String userId, String clientId, String orgId, String isActive) {
+    public static String addFilters(String restMethod, String sql, String userId, String clientId, String orgId,
+        boolean isActive) {
         //AUTH SERVICE BY PASS FILTERS
         if (isAuthService(userId, clientId, orgId)) {
             return sql;
@@ -43,11 +47,18 @@ public class DefaultFilters {
     }
 
     @NotNull
-    private static String replaceInQuery(String sql, String clientId, String orgId, String isActive, boolean containsWhere, String tableAlias) {
-        return sql.replace((containsWhere? WHERE:LIMIT), WHERE + tableAlias +".isactive = '"+ isActive +"' " +
-                "AND " + tableAlias +".ad_client_id = '"+ clientId +"' " +
-                "AND (" + tableAlias + ".ad_org_id =  '"+ orgId +"' OR ((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '"+ orgId +"', '1')) = 1))" +
-                (containsWhere? " AND ":"' limit ") );
+    private static String replaceInQuery(String sql, String clientId, String orgId, boolean isActive,
+        boolean containsWhere, String tableAlias) {
+        List<String> conditions = new ArrayList<>();
+        if (isActive) {
+            conditions.add(tableAlias + ".isactive = 'Y'");
+        }
+        conditions.add(tableAlias + ".ad_client_id = '" + clientId + "'");
+        conditions.add("(" + tableAlias + ".ad_org_id =  '" + orgId + "' OR " +
+            "((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '" + orgId + "', '1')) = 1))");
+        String whereClause = String.join(AND, conditions);
+        return sql.replace((containsWhere ? WHERE : LIMIT),
+            WHERE + whereClause + (containsWhere ? AND : LIMIT));
     }
 
     private static boolean isSuperUser(String userId, String clientId, String orgId) {

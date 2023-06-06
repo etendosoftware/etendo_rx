@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,7 @@ import com.etendorx.asyncprocess.service.AsyncProcessService;
 import com.etendorx.lib.kafka.KafkaMessageUtil;
 import com.etendorx.lib.kafka.model.AsyncProcess;
 import com.etendorx.lib.kafka.model.AsyncProcessState;
-import com.etendorx.utils.auth.key.context.AppContext;
+import com.etendorx.utils.auth.key.context.UserContext;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +70,9 @@ public class AsyncProcessController {
   private final StreamBridge streamBridge;
   private final KafkaReceiver<String, AsyncProcess> kafkaReceiver;
   private ConnectableFlux<ServerSentEvent<AsyncProcess>> eventPublisher;
+
+  @Resource(name = "userContextBean")
+  private UserContext currentUser;
 
   public AsyncProcessController(AsyncProcessService asyncProcessService, KafkaMessageUtil kafkaMessageUtil,
       StreamBridge streamBridge, KafkaReceiver<String, AsyncProcess> kafkaReceiver) {
@@ -101,7 +105,7 @@ public class AsyncProcessController {
     Map<String, String> ret = new HashMap<>();
     Map<String, Object> session = new HashMap<>();
 
-    session.put("X-TOKEN", AppContext.getAuthToken());
+    session.put("X-TOKEN", currentUser.getAuthToken());
     bodyChanges.put("session", session);
 
     try {
