@@ -29,6 +29,7 @@ public class DefaultFilters {
     public static final String INSERT = "insert into";
     public static final String UPDATE = "update";
     public static final String DELETE_FROM = "delete";
+    public static final String ROWNUM = "rownum";
 
     public static String addFilters(String sql, String userId, String clientId, String orgId, String roleId, String isActive, String restMethod) {
         // AUTH SERVICE BYPASS FILTERS
@@ -76,10 +77,14 @@ public class DefaultFilters {
 
     @NotNull
     private static String replaceInQueryForSelect(String sql, String clientId, String orgId, String isActive, boolean containsWhere, String tableAlias) {
-        return sql.replace((containsWhere ? WHERE : LIMIT), WHERE + tableAlias + ".isactive = '" + isActive + "' " +
+        String databaseReservedWord = LIMIT;
+        if (sql.contains(ROWNUM)) {
+            databaseReservedWord = ROWNUM;
+        }
+        return sql.replace((containsWhere ? WHERE : databaseReservedWord), WHERE + tableAlias + ".isactive = '" + isActive + "' " +
                 "AND " + tableAlias + ".ad_client_id = '" + clientId + "' " +
                 "AND (" + tableAlias + ".ad_org_id = '" + orgId + "' OR ((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '" + orgId + "', '1')) = 1))" +
-                (containsWhere ? " AND " : "") + LIMIT);
+                (containsWhere ? " AND " : "") + databaseReservedWord);
     }
 
     private static String replaceInQueryForUpdate(String sql, String clientId, String orgId, boolean containsWhere, String tableAlias) {
