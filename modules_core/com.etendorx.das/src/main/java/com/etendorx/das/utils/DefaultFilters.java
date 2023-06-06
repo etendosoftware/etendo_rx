@@ -40,6 +40,10 @@ public class DefaultFilters {
             return sql;
         }
 
+        if (restMethod.equals("POST") || restMethod.equals("PUT") || restMethod.equals("PATCH")) {
+            return sql;
+        }
+
         boolean containsWhere = sql.contains(WHERE);
 
         // GET THE TABLE NAME USING REGULAR EXPRESSION
