@@ -1,15 +1,14 @@
 package com.etendorx.das.utils;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.QueryException;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.codec.binary.StringUtils;
-import org.hibernate.QueryException;
-import org.jetbrains.annotations.NotNull;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DefaultFilters {
@@ -18,18 +17,29 @@ public class DefaultFilters {
     public static final String SUPER_USER_ID = "100";
     public static final String SUPER_USER_CLIENT_ID = "0";
     public static final String SUPER_USER_ORG_ID = "0";
-    public static final String REG_EXP = "\\sfrom\\s\\w+\\s(\\w+_)";
+    public static final String REG_EXP_SELECT = "\\sfrom\\s\\w+\\s(\\w+_)";
+    public static final String REG_EXP_INSERT = "insert into\\s+(\\w+)";
+    public static final String REG_EXP_UPDATE = "update\\s+(\\w+)";
+    public static final String REG_EXP_DELETE = "delete from\\s+(\\w+)";
     public static final String LIMIT = " limit ";
     public static final String AND = " and ";
+    public static final String GET = "GET";
+    public static final String POST = "POST";
+    public static final String PUT = "PUT";
+    public static final String PATCH = "PATCH";
+    public static final String DELETE = "DELETE";
+    public static final String SELECT = "select";
+    public static final String INSERT = "insert into";
+    public static final String UPDATE = "update";
+    public static final String DELETE_FROM = "delete";
+    public static final String ROWNUM = "rownum";
 
-
-    public static String addFilters(String restMethod, String sql, String userId, String clientId, String orgId,
-        boolean isActive) {
-        //AUTH SERVICE BY PASS FILTERS
+    public static String addFilters(String sql, String userId, String clientId, String orgId, String roleId, String isActive, String restMethod) {
+        // AUTH SERVICE BYPASS FILTERS
         if (isAuthService(userId, clientId, orgId)) {
             return sql;
         }
-        //SUPERUSER BY PASS FILTERS
+        // SUPERUSER BYPASS FILTERS
         if (isSuperUser(userId, clientId, orgId)) {
             return sql;
         }
@@ -39,16 +49,41 @@ public class DefaultFilters {
         }
 
         boolean containsWhere = sql.contains(WHERE);
-        //GET THE TABLE NAME USING REGULAR EXPRESSION
+
+        // GET THE TABLE NAME USING REGULAR EXPRESSION
         String tableAlias = getTableAlias(sql);
 
-        //RETURN DEFAULT FILTERS
-        return replaceInQuery(sql, clientId, orgId, isActive, containsWhere, tableAlias);
+        checkAccessByRole(sql, userId, clientId, orgId, roleId);
+
+        switch (restMethod) {
+            case GET:
+                return replaceInQueryForSelect(sql, clientId, orgId, isActive, containsWhere, tableAlias);
+            case POST:
+                return sql;
+            case PUT:
+            case PATCH: {
+                if(sql.startsWith("update")) {
+                    return replaceInQueryForUpdate(sql, clientId, orgId, containsWhere, tableAlias);
+                }
+                return sql;
+            }
+            case DELETE:
+                if(sql.startsWith("delete")) {
+                    return replaceInQueryForDelete(sql, clientId, orgId, containsWhere, tableAlias);
+                }
+                return sql;
+            default:
+                log.error("[ processSql ] - Unknown HTTP method: " + restMethod);
+                throw new IllegalArgumentException("Unknown HTTP method: " + restMethod);
+        }
     }
 
     @NotNull
-    private static String replaceInQuery(String sql, String clientId, String orgId, boolean isActive,
-        boolean containsWhere, String tableAlias) {
+    private static String replaceInQueryForSelect(String sql, String clientId, String orgId, boolean isActive, boolean containsWhere, String tableAlias) {
+        String databaseReservedWord = LIMIT;
+        if (sql.contains(ROWNUM)) {
+            databaseReservedWord = ROWNUM;
+        }
         List<String> conditions = new ArrayList<>();
         if (isActive) {
             conditions.add(tableAlias + ".isactive = 'Y'");
@@ -61,25 +96,62 @@ public class DefaultFilters {
             WHERE + whereClause + (containsWhere ? AND : LIMIT));
     }
 
+    private static String replaceInQueryForUpdate(String sql, String clientId, String orgId, boolean containsWhere, String tableAlias) {
+        String whereCondition = tableAlias + ".ad_client_id = '" + clientId + "' " +
+                "AND (" + tableAlias + ".ad_org_id = '" + orgId + "' OR ((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '" + orgId + "', '1')) = 1))";
+
+        if (containsWhere) {
+            return sql.replace(WHERE, WHERE + whereCondition + " AND ");
+        } else {
+            return sql + WHERE + whereCondition;
+        }
+    }
+
+
+    private static String replaceInQueryForDelete(String sql, String clientId, String orgId, boolean containsWhere, String tableAlias) {
+        String whereCondition = tableAlias + ".ad_client_id = '" + clientId + "' " +
+                "AND (" + tableAlias + ".ad_org_id = '" + orgId + "' OR ((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '" + orgId + "', '1')) = 1))";
+
+        if (containsWhere) {
+            return sql.replace(WHERE, WHERE + whereCondition + " AND ");
+        } else {
+            return sql + " WHERE " + whereCondition;
+        }
+    }
+
+
+    private static void checkAccessByRole(String sql, String userId, String clientId, String orgId, String roleId) {
+    }
+
     private static boolean isSuperUser(String userId, String clientId, String orgId) {
-        return (StringUtils.equals(userId, SUPER_USER_ID)) && (StringUtils.equals(clientId, SUPER_USER_CLIENT_ID))
-                && (StringUtils.equals(orgId, SUPER_USER_ORG_ID));
+        return StringUtils.equals(userId, SUPER_USER_ID) &&
+               StringUtils.equals(clientId, SUPER_USER_CLIENT_ID) &&
+               StringUtils.equals(orgId, SUPER_USER_ORG_ID);
     }
 
-    //IS_AUTH_SERVICE CONDITION NEEDS IMPROVE
+    // IS_AUTH_SERVICE CONDITION NEEDS IMPROVEMENT
     private static boolean isAuthService(String userId, String clientId, String orgId) {
-        return (userId == null || clientId == null || orgId == null);
+        return StringUtils.isEmpty(userId) || StringUtils.isEmpty(clientId) || StringUtils.isEmpty(orgId);
     }
-
 
     private static String getTableAlias(String sql) {
-        Pattern qryPattern = Pattern.compile(REG_EXP);
-        Matcher qryMatcher = qryPattern.matcher(sql);
-        if (qryMatcher.find()) {
-            return qryMatcher.group(1);
-        } else {
-            log.error("[ getTableAlias ] - PATTERN ERROR");
-            throw new QueryException("getTableAlias ERROR ");
+        Pattern qryPattern = null;
+        if (sql.startsWith(SELECT)) {
+            qryPattern = Pattern.compile(REG_EXP_SELECT);
+        } else if (sql.startsWith(INSERT)) {
+            qryPattern = Pattern.compile(REG_EXP_INSERT);
+        } else if (sql.startsWith(UPDATE)) {
+            qryPattern = Pattern.compile(REG_EXP_UPDATE);
+        } else if (sql.startsWith(DELETE_FROM)) {
+        qryPattern = Pattern.compile(REG_EXP_DELETE);
         }
+        if (qryPattern != null) {
+            Matcher qryMatcher = qryPattern.matcher(sql);
+            if (qryMatcher.find()) {
+                return qryMatcher.group(1);
+            }
+        }
+        log.error("[getTableAlias] - PATTERN ERROR");
+        throw new QueryException("getTableAlias ERROR");
     }
 }
