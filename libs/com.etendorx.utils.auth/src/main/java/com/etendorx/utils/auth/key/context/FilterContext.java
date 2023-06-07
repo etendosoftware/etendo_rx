@@ -19,6 +19,8 @@ package com.etendorx.utils.auth.key.context;
 import com.etendorx.utils.auth.key.JwtKeyUtils;
 import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -35,6 +37,8 @@ import java.util.Optional;
 @Component
 public class FilterContext extends OncePerRequestFilter {
   public static final String HEADER_TOKEN = "X-TOKEN";
+  public static final String TRUE = "true";
+  public static final String FALSE = "false";
 
   @Autowired
   private UserContext userContext;
@@ -65,11 +69,16 @@ public class FilterContext extends OncePerRequestFilter {
     userContext.setRoleId((String) tokenValuesMap.get(JwtKeyUtils.ROLE_ID));
     userContext.setSearchKey((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
     userContext.setServiceId((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_ID));
-    String active = Optional.ofNullable(activeParam).orElse("true");
-    if (!active.equals("true") && !active.equals("false")) {
-      throw new IllegalArgumentException("Invalid value for 'active' parameter: " + active);
+    boolean active = false;
+    if(activeParam == null) {
+        active = true;
+    } else {
+      if (!StringUtils.equalsAny(activeParam, TRUE, FALSE)) {
+        throw new IllegalArgumentException("Invalid value for 'active' parameter: " + active);
+      }
+      active = activeParam.equals(TRUE);
     }
-    userContext.setActive("true".equals(active));
+    userContext.setActive(active);
     userContext.setAuthToken(token);
     userContext.setRestMethod(restMethod);
   }
