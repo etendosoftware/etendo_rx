@@ -34,7 +34,7 @@ public class DefaultFilters {
     public static final String DELETE_FROM = "delete";
     public static final String ROWNUM = "rownum";
 
-    public static String addFilters(String sql, String userId, String clientId, String orgId, String roleId, String isActive, String restMethod) {
+    public static String addFilters(String sql, String userId, String clientId, String orgId, String roleId, boolean isActive, String restMethod) {
         // AUTH SERVICE BYPASS FILTERS
         if (isAuthService(userId, clientId, orgId)) {
             return sql;
@@ -78,44 +78,47 @@ public class DefaultFilters {
         }
     }
 
+    private static List<String> getDefaultWhereClause(String tableAlias, String clientId, String orgId) {
+        List<String> conditions = new ArrayList<>();
+        conditions.add(tableAlias + ".ad_client_id = '" + clientId + "'");
+        conditions.add("(" + tableAlias + ".ad_org_id =  '" + orgId + "' OR " +
+            "((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '" + orgId + "', '1')) = 1))");
+        return conditions;
+    }
+
     @NotNull
     private static String replaceInQueryForSelect(String sql, String clientId, String orgId, boolean isActive, boolean containsWhere, String tableAlias) {
         String databaseReservedWord = LIMIT;
         if (sql.contains(ROWNUM)) {
             databaseReservedWord = ROWNUM;
         }
-        List<String> conditions = new ArrayList<>();
+        List<String> conditions = getDefaultWhereClause(tableAlias, clientId, orgId);
         if (isActive) {
             conditions.add(tableAlias + ".isactive = 'Y'");
         }
-        conditions.add(tableAlias + ".ad_client_id = '" + clientId + "'");
-        conditions.add("(" + tableAlias + ".ad_org_id =  '" + orgId + "' OR " +
-            "((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '" + orgId + "', '1')) = 1))");
         String whereClause = String.join(AND, conditions);
-        return sql.replace((containsWhere ? WHERE : LIMIT),
-            WHERE + whereClause + (containsWhere ? AND : LIMIT));
+        return sql.replace((containsWhere ? WHERE : databaseReservedWord),
+            WHERE + whereClause + (containsWhere ? AND : databaseReservedWord));
     }
 
     private static String replaceInQueryForUpdate(String sql, String clientId, String orgId, boolean containsWhere, String tableAlias) {
-        String whereCondition = tableAlias + ".ad_client_id = '" + clientId + "' " +
-                "AND (" + tableAlias + ".ad_org_id = '" + orgId + "' OR ((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '" + orgId + "', '1')) = 1))";
-
+        List<String> conditions = getDefaultWhereClause(tableAlias, clientId, orgId);
+        String whereClause = String.join(AND, conditions);
         if (containsWhere) {
-            return sql.replace(WHERE, WHERE + whereCondition + " AND ");
+            return sql.replace(WHERE, WHERE + whereClause + " AND ");
         } else {
-            return sql + WHERE + whereCondition;
+            return sql + WHERE + whereClause;
         }
     }
 
 
     private static String replaceInQueryForDelete(String sql, String clientId, String orgId, boolean containsWhere, String tableAlias) {
-        String whereCondition = tableAlias + ".ad_client_id = '" + clientId + "' " +
-                "AND (" + tableAlias + ".ad_org_id = '" + orgId + "' OR ((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '" + orgId + "', '1')) = 1))";
-
+        List<String> conditions = getDefaultWhereClause(tableAlias, clientId, orgId);
+        String whereClause = String.join(AND, conditions);
         if (containsWhere) {
-            return sql.replace(WHERE, WHERE + whereCondition + " AND ");
+            return sql.replace(WHERE, WHERE + whereClause + " AND ");
         } else {
-            return sql + " WHERE " + whereCondition;
+            return sql + " WHERE " + whereClause;
         }
     }
 
