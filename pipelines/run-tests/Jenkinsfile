@@ -262,7 +262,7 @@ spec:
                 script {
                     try {
                         echo "Starting Das tests"
-                        echo "./gradlew :com.etendorx.das:test --info"
+                        sh "./gradlew :com.etendorx.das:test --info"
                         '...DAS TESTS SUCCESSFUL...'
                     } catch (Exception e) {
                         echo 'Exception occurred: ' + e.toString()
