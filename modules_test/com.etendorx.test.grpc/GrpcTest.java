@@ -81,11 +81,10 @@ public class GrpcTest {
 
   @ParameterizedTest
   @MethodSource("validRequestParams")
-  void testGetUser(String id, String username, boolean active) throws Exception {
+  void testGetUser(String id, String username) throws Exception {
 
     var search = ADUser_searchByUsernameSearch.newBuilder();
     search.setUsername(username);
-    search.setActive(active);
     StreamRecorder<ADUserList> observer = StreamRecorder.create();
 
     adUserGrpcService.searchByUsername(search.build(), observer);
