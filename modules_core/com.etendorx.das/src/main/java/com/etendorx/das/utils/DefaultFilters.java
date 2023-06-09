@@ -44,10 +44,6 @@ public class DefaultFilters {
             return sql;
         }
 
-        if (restMethod.equals("POST") || restMethod.equals("PUT") || restMethod.equals("PATCH")) {
-            return sql;
-        }
-
         boolean containsWhere = sql.contains(WHERE);
 
         // GET THE TABLE NAME USING REGULAR EXPRESSION
@@ -81,7 +77,7 @@ public class DefaultFilters {
     private static List<String> getDefaultWhereClause(String tableAlias, String clientId, String orgId) {
         List<String> conditions = new ArrayList<>();
         conditions.add(tableAlias + ".ad_client_id = '" + clientId + "'");
-        conditions.add("(" + tableAlias + ".ad_org_id =  '" + orgId + "' OR " +
+        conditions.add("(" + tableAlias + ".ad_org_id = '" + orgId + "' OR " +
             "((etrx_is_org_in_org_tree(" + tableAlias + ".ad_org_id, '" + orgId + "', '1')) = 1))");
         return conditions;
     }

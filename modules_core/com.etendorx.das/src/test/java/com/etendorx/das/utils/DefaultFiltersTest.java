@@ -2,8 +2,11 @@ package com.etendorx.das.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class DefaultFiltersTest {
 
     private static final String select_QUERY = "select * from table table0_ limit 10";
@@ -59,9 +62,10 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, roleId, isActive, restMethod);
 
         // Assert
-        String expected = "select * from table table0_ where table0_.isactive = '1' " +
-                "AND table0_.ad_client_id = '456' " +
-                "AND (table0_.ad_org_id = '789' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, '789', '1')) = 1)) limit 10";
+        String expected = "select * from table table0_ where " +
+            "table0_.ad_client_id = '456' " +
+            "and (table0_.ad_org_id = '789' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, '789', '1')) = 1)) " +
+            "and table0_.isactive = 'Y' limit 10";
         Assertions.assertEquals(expected, result);
     }
 
@@ -80,7 +84,7 @@ class DefaultFiltersTest {
 
         // Assert
         String expected = "update table0_ set column = 'value' where table0_.ad_client_id = '456' " +
-                "AND (table0_.ad_org_id = '789' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, '789', '1')) = 1))";
+            "and (table0_.ad_org_id = '789' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, '789', '1')) = 1))";
         Assertions.assertEquals(expected, result);
     }
 
@@ -109,7 +113,7 @@ class DefaultFiltersTest {
 
         String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, orgId, roleId, isActive, restMethod);
 
-        String expected = "update table0_ set column = 'value' where table0_.ad_client_id = 'client1' AND (table0_.ad_org_id = 'org1' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, 'org1', '1')) = 1))";
+        String expected = "update table0_ set column = 'value' where table0_.ad_client_id = 'client1' and (table0_.ad_org_id = 'org1' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, 'org1', '1')) = 1))";
         assertEquals(expected, result);
     }
 
@@ -138,7 +142,7 @@ class DefaultFiltersTest {
 
         String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, orgId, roleId, isActive, restMethod);
 
-        String expected = "update table0_ set column = 'value' where table0_.ad_client_id = 'client1' AND (table0_.ad_org_id = 'org1' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, 'org1', '1')) = 1))";
+        String expected = "update table0_ set column = 'value' where table0_.ad_client_id = 'client1' and (table0_.ad_org_id = 'org1' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, 'org1', '1')) = 1))";
         assertEquals(expected, result);
     }
 
@@ -167,7 +171,7 @@ class DefaultFiltersTest {
 
         String result = DefaultFilters.addFilters(delete_QUERY, userId, clientId, orgId, roleId, isActive, restMethod);
 
-        String expected = "delete from table0_ WHERE table0_.ad_client_id = 'client1' AND (table0_.ad_org_id = 'org1' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, 'org1', '1')) = 1))";
+        String expected = "delete from table0_ WHERE table0_.ad_client_id = 'client1' and (table0_.ad_org_id = 'org1' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, 'org1', '1')) = 1))";
         assertEquals(expected, result);
     }
 
@@ -195,7 +199,7 @@ class DefaultFiltersTest {
         String restMethod = "UNKNOWN";
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, roleId, isActive, restMethod));
+            DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, roleId, isActive, restMethod));
 
         String expectedMessage = "Unknown HTTP method: " + restMethod;
         assertEquals(expectedMessage, exception.getMessage());

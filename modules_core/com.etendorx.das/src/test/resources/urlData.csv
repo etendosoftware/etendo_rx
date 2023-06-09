@@ -342,7 +342,6 @@ http://localhost:8092/ManufacturingProductionRunInvoiceLine
 http://localhost:8092/DocumentTypeTrl
 http://localhost:8092/FinancialMgmtDimension
 http://localhost:8092/OBCLKER_UIDefinition
-http://localhost:8092/ADSystem
 http://localhost:8092/MaterialMgmtStorageStockAux
 http://localhost:8092/FinancialMgmtCashJournal
 http://localhost:8092/ManufacturingTest
@@ -537,7 +536,6 @@ http://localhost:8092/ReturnReason
 http://localhost:8092/MaterialMgmtStoragePending
 http://localhost:8092/OBUIAPP_GC_System
 http://localhost:8092/ADFieldGroup
-http://localhost:8092/OBSCHEDTriggers
 http://localhost:8092/UserDimension2
 http://localhost:8092/ManufacturingCheckPointShift
 http://localhost:8092/ADLanguage
