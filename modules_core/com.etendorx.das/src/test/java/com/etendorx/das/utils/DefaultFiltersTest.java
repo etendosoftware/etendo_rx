@@ -2,17 +2,49 @@ package com.etendorx.das.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@Testcontainers
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19090")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration
+@AutoConfigureMockMvc
 class DefaultFiltersTest {
 
     private static final String select_QUERY = "select * from table table0_ limit 10";
     private static final String update_QUERY = "update table0_ set column = 'value'";
     private static final String delete_QUERY = "delete from table0_";
 
+    @DynamicPropertySource
+    static void postgresqlProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+    }
+
+    @Container
+    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
+        DockerImageName.parse("etendo/etendodata:rx-1.2.1").asCompatibleSubstituteFor("postgres")
+    )
+        .withPassword("syspass")
+        .withUsername("postgres")
+        .withEnv("PGDATA", "/postgres")
+        .withDatabaseName("etendo")
+        .waitingFor(
+            Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
+        );
 
     @Test
     void testAddFilters_AuthServiceBypass() {
