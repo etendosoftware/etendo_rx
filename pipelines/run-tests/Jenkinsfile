@@ -262,6 +262,7 @@ spec:
                 script {
                     try {
                         echo "Starting Das tests"
+                        sh "./gradlew :setup --info"
                         sh "./gradlew :com.etendorx.das:test --info"
                         '...DAS TESTS SUCCESSFUL...'
                     } catch (Exception e) {
@@ -270,6 +271,15 @@ spec:
                         currentBuild.result = 'UNSTABLE'
                         unstable('DAS TESTS FAILED!')
                         env.STATUSTEST = "0"
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'logs',
+                            reportFiles: '*.log',
+                            reportName: 'DAS LOGS',
+                            reportTitles: ''
+                        ])
                         publishHTML([
                             allowMissing: false,
                             alwaysLinkToLastBuild: false,

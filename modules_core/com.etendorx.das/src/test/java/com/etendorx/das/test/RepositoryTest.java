@@ -46,12 +46,19 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import com.etendorx.entities.jparepo.ADUserRepository;
 import com.etendorx.utils.auth.key.context.AppContext;
@@ -73,6 +80,8 @@ public class RepositoryTest {
       "cFoqqCBknVougK0J7ZMmxcOnSe6MSQ7UDzKgwunSSuT-iVeF4sxLb80hWu5dInfvn8iJVC8krJ9telWVqbo-dPoFbnFw9CtmTHpK153b4nj5U6" +
       "ZOTFP4kZqsqhvWo7wKg03O1emGmCKo1vg9Cg";
 
+  @LocalServerPort
+  private int port;
   @Autowired
   private HttpServletRequest httpServletRequest;
   @Autowired
@@ -92,6 +101,25 @@ public class RepositoryTest {
 
   @Autowired
   private UserContext userContext;
+
+  @DynamicPropertySource
+  static void postgresqlProperties(DynamicPropertyRegistry registry) {
+    registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+    registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+    registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+  }
+
+  @Container
+  public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
+      DockerImageName.parse("etendo/etendodata:rx-1.2.1").asCompatibleSubstituteFor("postgres")
+  )
+      .withPassword("syspass")
+      .withUsername("postgres")
+      .withEnv("PGDATA", "/postgres")
+      .withDatabaseName("etendo")
+      .waitingFor(
+          Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
+      );
 
   @Test
   public void whenReadUser() {
@@ -114,7 +142,7 @@ public class RepositoryTest {
 
   @Test
   public void generateCsvFileForQueryIsOkWhenDefaultFiltersIsApplyWithCsvParameterTest() throws Exception {
-    String endpoint = "http://localhost:8092/";
+    String endpoint = "http://localhost:" + port + "/";
     List<String> resultUrls = extractHrefsFromEtendoPath(endpoint);
     List<String> cleanUrls = new ArrayList<>();
     for (String url : resultUrls) {
@@ -139,36 +167,16 @@ public class RepositoryTest {
   @ParameterizedTest
   @CsvFileSource(resources = "/urlData.csv", numLinesToSkip = 1)
   public void queryIsOkWhenDefaultFiltersIsApplyWithCsvParameter(String parametrizedUrl) throws IOException, InterruptedException {
-    //URL with bugs in ETENDO
-    List<String> excludeUrls = new ArrayList<>(Arrays.asList(
-        "http://localhost:8092/OrganizationModuleV",
-        "http://localhost:8092/OBSCHEDSimpropTriggers",
-        "http://localhost:8092/OBSCHEDSchedulerState",
-        "http://localhost:8092/ADOrgModule",
-        "http://localhost:8092/OBSCHEDPausedTriggerGrps",
-        "http://localhost:8092/OBSCHEDSimpleTriggers",
-        "http://localhost:8092/ADModule",
-        "http://localhost:8092/OBSCHEDFiredTriggers",
-        "http://localhost:8092/OBSCHEDCalendars",
-        "http://localhost:8092/OBSCHEDBlobTriggers",
-        "http://localhost:8092/SQLScript",
-        "http://localhost:8092/ProcessPlanTotalized",
-        "http://localhost:8092/ADEPInstancePara",
-        "http://localhost:8092/OBSCHEDLocks",
-        "http://localhost:8092/ManufacturingCostc"));
 
-    if (!excludeUrls.contains(parametrizedUrl)) {
-      HttpClient client = HttpClient.newHttpClient();
-      HttpRequest request = HttpRequest.newBuilder()
-          .uri(URI.create(parametrizedUrl))
-          .GET()
-          .header("X-TOKEN", TOKEN)
-          .build();
-      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-      Assertions.assertEquals(200, response.statusCode());
-    } else {
-      Assertions.assertEquals(true, excludeUrls.contains(parametrizedUrl));
-    }
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(parametrizedUrl.replace("8092", String.valueOf(port))))
+        .GET()
+        .header("X-TOKEN", TOKEN)
+        .build();
+    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    Assertions.assertEquals(200, response.statusCode());
+
   }
 
 
