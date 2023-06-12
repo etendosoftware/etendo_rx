@@ -101,6 +101,7 @@ spec:
     }
 
     stages {
+    /*
         stage ('Build Environment Etendo Core') {
             steps {
                 sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
@@ -162,6 +163,7 @@ spec:
                 }
             }
         }
+        */
         stage ('Build Environment Etendo RX') {
             when {
                 expression {
