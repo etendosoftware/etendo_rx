@@ -263,10 +263,6 @@ spec:
                     try {
                         echo "Starting Das tests"
                         sh "./gradlew :setup --info"
-                        withEnv ( ['JENKINS_NODE_COOKIE=do_not_kill'] ) {
-                            sh "nohup ./gradlew :rx --info &"
-                        }
-                        sh "sleep 15"
                         sh "./gradlew :com.etendorx.das:test --info"
                         '...DAS TESTS SUCCESSFUL...'
                     } catch (Exception e) {

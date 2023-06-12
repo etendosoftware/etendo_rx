@@ -12,7 +12,6 @@ http://localhost:8092/PrereservationManualPickEdit
 http://localhost:8092/ADFormAccess
 http://localhost:8092/LandedCostMatched
 http://localhost:8092/ADPreference
-http://localhost:8092/OBSCHEDLocks
 http://localhost:8092/MaterialMgmtStorageDetail
 http://localhost:8092/FinancialMgmtBankStatementLine
 http://localhost:8092/ADElement
@@ -28,7 +27,6 @@ http://localhost:8092/PricingAdjustmentBusinessPartnerGroup
 http://localhost:8092/SalaryCategoryCost
 http://localhost:8092/MaterialMgmtShipmentInOut
 http://localhost:8092/FinancialMgmtPeriodControlV
-http://localhost:8092/OBSCHEDSimpropTriggers
 http://localhost:8092/OrderlineServiceRelation
 http://localhost:8092/FinancialMgmtPeriodControl
 http://localhost:8092/FinancialMgmtAcctSchemaTable
@@ -38,7 +36,6 @@ http://localhost:8092/JOBS_JobLine
 http://localhost:8092/ExternalPOSProduct
 http://localhost:8092/OBUIAPP_NavbarRoleaccess
 http://localhost:8092/ADAlertRecipient
-http://localhost:8092/SQLScript
 http://localhost:8092/ShippingShippingCompany
 http://localhost:8092/FinancialMgmtTaxPayment
 http://localhost:8092/ProcessGroup
@@ -73,7 +70,6 @@ http://localhost:8092/ProcurementReceiptInvoiceMatch
 http://localhost:8092/OBUIAPP_GC_Tab
 http://localhost:8092/ManufacturingCostCenter
 http://localhost:8092/ADModuleDependencyInst
-http://localhost:8092/ADOrgModule
 http://localhost:8092/ContactEmailInteraction
 http://localhost:8092/PricingPriceList
 http://localhost:8092/PricingAdjustmentPriceList
@@ -199,7 +195,6 @@ http://localhost:8092/ManufacturingGlobalUse
 http://localhost:8092/FinancialMgmtJournalLine
 http://localhost:8092/ProjectIssue
 http://localhost:8092/BusinessPartnerCategory
-http://localhost:8092/ADEPInstancePara
 http://localhost:8092/CostAdjustmentLine
 http://localhost:8092/ProjectType
 http://localhost:8092/FinancialMgmtAcctRptNode
@@ -215,7 +210,6 @@ http://localhost:8092/ADForm
 http://localhost:8092/ADReferencedTreeField
 http://localhost:8092/OrderLineAccountingDimension
 http://localhost:8092/CreatePOLinesPE
-http://localhost:8092/AttributeSetInstance
 http://localhost:8092/PricingPriceListVersion
 http://localhost:8092/OrganizationClosing
 http://localhost:8092/ProductStatus
@@ -238,7 +232,6 @@ http://localhost:8092/ProjectStandardPhase
 http://localhost:8092/MaterialMgmtInventoryCountLine
 http://localhost:8092/DataPackage
 http://localhost:8092/ETRX_Entity_Field
-http://localhost:8092/Product
 http://localhost:8092/PricingVolumeDiscountProduct
 http://localhost:8092/PricingAdjustmentProduct
 http://localhost:8092/SalesRegion
@@ -268,7 +261,6 @@ http://localhost:8092/ADMessageTrl
 http://localhost:8092/ADRole
 http://localhost:8092/CharacteristicSubsetValue
 http://localhost:8092/Bank
-http://localhost:8092/Organization
 http://localhost:8092/ProcessGroupExecution
 http://localhost:8092/VendorAccounts
 http://localhost:8092/ADMonthTrl
@@ -289,10 +281,8 @@ http://localhost:8092/FinancialMgmtTaxReport
 http://localhost:8092/ApprovedVendor
 http://localhost:8092/ADProcessInstance
 http://localhost:8092/InvoiceSchedule
-http://localhost:8092/OBSCHEDSchedulerState
 http://localhost:8092/FIN_Doubtful_Debt_V
 http://localhost:8092/Color
-http://localhost:8092/OBSCHEDSimpleTriggers
 http://localhost:8092/TransactionCost
 http://localhost:8092/ADMenuTrl
 http://localhost:8092/ExternalPOSCategory
@@ -305,7 +295,6 @@ http://localhost:8092/ADSelector
 http://localhost:8092/ManufacturingMachineType
 http://localhost:8092/OBWCL_StockByWarehouseView
 http://localhost:8092/OrganizationWarehouse
-http://localhost:8092/OBSCHEDFiredTriggers
 http://localhost:8092/ADModuleMerge
 http://localhost:8092/MaterialMgmtABCActivity
 http://localhost:8092/C_ExtBP_Config_Property
@@ -399,7 +388,6 @@ http://localhost:8092/FinancialMgmtPaymentExecutionHistoryV
 http://localhost:8092/APRM_FinAcc_Transaction_acct_v
 http://localhost:8092/AD_CreateFact_template
 http://localhost:8092/OBKMO_WidgetClass
-http://localhost:8092/ADClient
 http://localhost:8092/FIN_Doubtful_Debt
 http://localhost:8092/FinancialMgmtDebtPaymentBalReplace
 http://localhost:8092/ADParameter
@@ -422,11 +410,9 @@ http://localhost:8092/ProductWithCharacteristics
 http://localhost:8092/MaterialMgmtInternalConsumption
 http://localhost:8092/Resource
 http://localhost:8092/FinancialMgmtElementValueOperand
-http://localhost:8092/ProcessPlanTotalized
 http://localhost:8092/FIN_Payment_Detail
 http://localhost:8092/OBUIAPP_UIPersonalization
 http://localhost:8092/ModuleDBPrefix
-http://localhost:8092/ADModule
 http://localhost:8092/OrderLineTax
 http://localhost:8092/Brand
 http://localhost:8092/Lot
@@ -449,7 +435,6 @@ http://localhost:8092/ADList
 http://localhost:8092/ad_cluster_instance
 http://localhost:8092/ManufacturingWorkCenter
 http://localhost:8092/MaterialMgmtProductionPlan
-http://localhost:8092/OBSCHEDPausedTriggerGrps
 http://localhost:8092/FinancialMgmtTaxRegisterline
 http://localhost:8092/ADClientModule
 http://localhost:8092/PricingProductPrice
@@ -485,7 +470,6 @@ http://localhost:8092/ADFieldAccess
 http://localhost:8092/OrderTax
 http://localhost:8092/FinancialMgmtGLItem
 http://localhost:8092/ADAcctProcess
-http://localhost:8092/OBSCHEDCalendars
 http://localhost:8092/ADModuleDBPrefixInstall
 http://localhost:8092/FinancialMgmtRemittanceLine
 http://localhost:8092/FinancialMgmtRemittanceParameter
@@ -561,7 +545,6 @@ http://localhost:8092/MaterialMgmtInternalMovement
 http://localhost:8092/PricingAdjustmentBusinessPartnerExtRef
 http://localhost:8092/M_Stock_Valuation
 http://localhost:8092/ManufacturingProcessPlan
-http://localhost:8092/OBSCHEDBlobTriggers
 http://localhost:8092/CharacteristicValue
 http://localhost:8092/ManufacturingToolsetType
 http://localhost:8092/ManufacturingToolset
@@ -570,6 +553,5 @@ http://localhost:8092/ProcessGroupList
 http://localhost:8092/ServicePriceRule
 http://localhost:8092/FinancialMgmtIncoterms
 http://localhost:8092/APRM_PendingPaymentInvoice
-http://localhost:8092/OrganizationModuleV
 http://localhost:8092/ADAuxiliaryInput
 http://localhost:8092/CostingRuleProductV
