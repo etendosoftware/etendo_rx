@@ -30,7 +30,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -46,12 +48,16 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -148,8 +154,10 @@ public class RepositoryTest {
     for (String url : resultUrls) {
       cleanUrls.add(cleanUrl(url));
     }
-    FileWriter writer = new FileWriter("src/test/resources/urlData.csv");
-    Path path = Paths.get("src/test/resources/urlData.csv");
+
+    Path tmpDir = Files.createTempDirectory("csv");
+    FileWriter writer = new FileWriter(tmpDir + "/urlData.csv");
+    Path path = Paths.get(tmpDir + "/urlData.csv");
     try {
       String collect = cleanUrls.stream().collect(Collectors.joining("\n"));
       writer.append("parametrizedUrl");
@@ -181,7 +189,12 @@ public class RepositoryTest {
 
 
   public List<String> extractHrefsFromEtendoPath(String endpointUrl) throws JsonProcessingException {
-    RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = new RestTemplateBuilder(rt -> {
+      rt.getInterceptors().add(((request, body, execution) -> {
+        request.getHeaders().add("X-TOKEN", TOKEN);
+        return execution.execute(request, body);
+      }));
+    }).build();
     URI uri = UriComponentsBuilder.fromHttpUrl(endpointUrl).build().encode().toUri();
     String response = restTemplate.getForObject(uri, String.class);
     return extractHrefsFromResponse(response);
