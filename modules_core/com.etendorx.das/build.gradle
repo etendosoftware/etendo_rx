@@ -71,6 +71,8 @@ dependencies {
         exclude group: 'org.slf4j', module: '*'
     }
     implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.apache.kafka:kafka-clients'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:postgresql:1.17.3'

@@ -23,7 +23,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableJpaRepositories("com.etendorx.entities.jparepo")
-@ComponentScan({"com.etendorx.das.hibernate_interceptor", "com.etendorx.das.handler", "com.etendorx.das.grpcrepo", "com.etendorx.utils.auth.key.context", "com.etendorx.das.services", "com.etendorx.das.scan"})
+@ComponentScan({"com.etendorx.das.connector", "com.etendorx.das.hibernate_interceptor", "com.etendorx.das.handler", "com.etendorx.das.grpcrepo", "com.etendorx.utils.auth.key.context", "com.etendorx.das.services", "com.etendorx.das.scan"})
 public class EtendorxDasApplication {
 
   public static void main(String[] args) {
