@@ -22,7 +22,10 @@ pipeline {
         COMMIT_AUTHOR_NAME  = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
         COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
         CATALINA_HOME       = "${WORKSPACE}/apache-tomcat-8.5.75"
-        DOCKER_HOST         = "unix:///var/run/docker.sock"
+        STATUSCORE          = "1"
+        BUILD_CLASSIC       = false
+        DOCKER_HOST = 'tcp://localhost:2375'
+        DOCKER_TLS_VERIFY = 0
     }
 
     agent {
@@ -39,7 +42,7 @@ metadata:
     app.kubernetes.io/name: jenkins-node-core-unittests-rx
 spec:
   containers:
-    - name: compiler
+    - name: builder
       image: etendo/compiler_jenkins:1.0.4
       ports:
         - name: ssh
@@ -101,8 +104,21 @@ spec:
     }
 
     stages {
-    /*
+        stage ('Test environment') {
+            steps {
+                sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
+                sh 'cp gradle.properties.template gradle.properties'
+                sh './gradlew :setup'
+                sh './gradlew :com.etendorx.test.testcontainer:test'
+            }
+        }
         stage ('Build Environment Etendo Core') {
+            when {
+                expression {
+                    env.BUILD_CLASSIC == "true"
+                }
+            }
+
             steps {
                 sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
                 sh './pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo Core" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
@@ -119,7 +135,6 @@ spec:
 
                         // Setup environment
                         sh 'printenv'
-
                         script {
                             try {
                                 echo 'Building Etendo Core'
@@ -163,7 +178,6 @@ spec:
                 }
             }
         }
-        */
         stage ('Build Environment Etendo RX') {
             when {
                 expression {
@@ -175,7 +189,6 @@ spec:
                     try {
                         echo 'Building Etendo RX'
                         sh 'printenv'
-                        sh 'cp gradle.properties.template gradle.properties'
                         sh './pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo RX" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                         sh './gradlew generate.entities.test --info'
                         echo 'Build of Etendo RX Finished'
@@ -264,7 +277,6 @@ spec:
                 script {
                     try {
                         echo "Starting Das tests"
-                        sh "./gradlew :setup --info"
                         sh "./gradlew :com.etendorx.das:test --info"
                         '...DAS TESTS SUCCESSFUL...'
                     } catch (Exception e) {
