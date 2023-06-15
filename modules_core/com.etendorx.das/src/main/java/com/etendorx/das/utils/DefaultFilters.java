@@ -29,7 +29,7 @@ public class DefaultFilters {
     public static final String SUPER_USER_ORG_ID = "0";
     public static final String REG_EXP_SELECT = "\\sfrom\\s(\\w*)\\s(\\w*0_)\\s?(where)?";
     public static final String REG_EXP_INSERT = "insert\\sinto\\s(\\w*)";
-    public static final String REG_EXP_UPDATE = "update\\s(\\w*)()?.*(where)";
+    public static final String REG_EXP_UPDATE = "update\\s(\\w*)()?.*(where)?";
     public static final String REG_EXP_DELETE = "delete\\sfrom\\s(\\w*)\\s(\\w*0_)\\s?(where)?";
     public static final String GET_METHOD = "GET";
     public static final String POST_METHOD = "POST";
@@ -71,7 +71,7 @@ public class DefaultFilters {
         List<String> conditions = new ArrayList<>();
         conditions.add(String.format("%s.ad_client_id in ('0', '%s')", tableAlias, clientId));
         conditions.add(
-            String.format("%s.ad_org_id in (select unnest(get_readable_organizations('%s', '%s')))", tableAlias,
+            String.format("%s.ad_org_id in (select unnest(etrx_role_organizations('%s', '%s', 'r')))", tableAlias,
                 clientId, roleId));
         return conditions;
     }

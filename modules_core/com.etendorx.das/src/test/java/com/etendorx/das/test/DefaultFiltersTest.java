@@ -1,4 +1,4 @@
-package com.etendorx.das.utils;
+package com.etendorx.das.test;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,9 @@ import org.testcontainers.utility.DockerImageName;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.etendorx.das.utils.DefaultFilters;
+import com.etendorx.das.utils.TestcontainersUtils;
+
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19090")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -24,31 +27,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class DefaultFiltersTest {
 
     private static final String select_QUERY = "select * from table table0_ limit 10";
-    private static final String update_QUERY = "update table0_ set column = 'value'";
-    private static final String delete_QUERY = "delete from table0_";
+    private static final String update_QUERY = "update table0_ set column = 'value' where table0_.table0_id = 1";
+    private static final String delete_QUERY = "delete from table table0_ where table0_.table0_id = 1";
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> {
-            return "jdbc:postgresql://" + postgreSQLContainer.getCurrentContainerInfo().getNetworkSettings().getNetworks().entrySet().stream().findFirst().get().getValue().getGateway() + ":" + postgreSQLContainer.getMappedPort(
-                5432) + "/etendo";
-        });
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        TestcontainersUtils.setProperties(registry, postgreSQLContainer);
     }
 
     @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-        DockerImageName.parse("etendo/etendodata:rx-1.2.1").asCompatibleSubstituteFor("postgres")
-    )
-        .withPassword("syspass")
-        .withUsername("postgres")
-        .withEnv("PGDATA", "/postgres")
-        .withDatabaseName("etendo")
-        .withExposedPorts(5432)
-        .waitingFor(
-            Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
-        );
+    public static PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
     @Test
     void testAddFilters_AuthServiceBypass() {
@@ -61,10 +49,11 @@ class DefaultFiltersTest {
         String restMethod = "GET";
 
         // Act
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
 
+        String expected = "select * from table table0_ limit 10";
         // Assert
-        Assertions.assertEquals(select_QUERY, result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -78,10 +67,11 @@ class DefaultFiltersTest {
         String restMethod = "GET";
 
         // Act
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
 
+        String expected = "select * from table table0_ limit 10";
         // Assert
-        Assertions.assertEquals(select_QUERY, result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -95,13 +85,11 @@ class DefaultFiltersTest {
         String restMethod = "GET";
 
         // Act
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
 
         // Assert
-        String expected = "select * from table table0_ where " +
-            "table0_.ad_client_id = '456' " +
-            "and (table0_.ad_org_id = '789' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, '789', '1')) = 1)) " +
-            "and table0_.isactive = 'Y' limit 10";
+        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', '456') " +
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('456', '101112', 'r'))) limit 10";
         Assertions.assertEquals(expected, result);
     }
 
@@ -116,11 +104,11 @@ class DefaultFiltersTest {
         String restMethod = "PUT";
 
         // Act
-        String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, roleId, isActive, restMethod);
 
         // Assert
-        String expected = "update table0_ set column = 'value' where table0_.ad_client_id = '456' " +
-            "and (table0_.ad_org_id = '789' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, '789', '1')) = 1))";
+        String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', '456') " +
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('456', '101112', 'r'))) and table0_.table0_id = 1";
         Assertions.assertEquals(expected, result);
     }
 
@@ -133,9 +121,11 @@ class DefaultFiltersTest {
         boolean isActive = true;
         String restMethod = "POST";
 
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
 
-        assertEquals(select_QUERY, result);
+        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
+        assertEquals(expected, result);
     }
 
     @Test
@@ -147,9 +137,11 @@ class DefaultFiltersTest {
         boolean isActive = true;
         String restMethod = "PUT";
 
-        String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, roleId, isActive, restMethod);
 
-        String expected = "update table0_ set column = 'value' where table0_.ad_client_id = 'client1' and (table0_.ad_org_id = 'org1' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, 'org1', '1')) = 1))";
+        String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') and " +
+            "table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) and " +
+            "table0_.table0_id = 1";
         assertEquals(expected, result);
     }
 
@@ -162,9 +154,11 @@ class DefaultFiltersTest {
         boolean isActive = true;
         String restMethod = "PUT";
 
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
 
-        assertEquals(select_QUERY, result);
+        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
+        assertEquals(expected, result);
     }
 
     @Test
@@ -176,9 +170,11 @@ class DefaultFiltersTest {
         boolean isActive = true;
         String restMethod = "PATCH";
 
-        String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, roleId, isActive, restMethod);
 
-        String expected = "update table0_ set column = 'value' where table0_.ad_client_id = 'client1' and (table0_.ad_org_id = 'org1' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, 'org1', '1')) = 1))";
+        String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') " +
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
+            "and table0_.table0_id = 1";
         assertEquals(expected, result);
     }
 
@@ -191,9 +187,11 @@ class DefaultFiltersTest {
         boolean isActive = true;
         String restMethod = "PATCH";
 
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
 
-        assertEquals(select_QUERY, result);
+        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
+        assertEquals(expected, result);
     }
 
     @Test
@@ -205,9 +203,11 @@ class DefaultFiltersTest {
         boolean isActive = true;
         String restMethod = "DELETE";
 
-        String result = DefaultFilters.addFilters(delete_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(delete_QUERY, userId, clientId, roleId, isActive, restMethod);
 
-        String expected = "delete from table0_ WHERE table0_.ad_client_id = 'client1' and (table0_.ad_org_id = 'org1' OR ((etrx_is_org_in_org_tree(table0_.ad_org_id, 'org1', '1')) = 1))";
+        String expected = "delete from table table0_ where table0_.ad_client_id in ('0', 'client1') and " +
+            "table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) and " +
+            "table0_.table0_id = 1";
         assertEquals(expected, result);
     }
 
@@ -220,9 +220,11 @@ class DefaultFiltersTest {
         boolean isActive = true;
         String restMethod = "DELETE";
 
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
 
-        assertEquals(select_QUERY, result);
+        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
+        assertEquals(expected, result);
     }
 
     @Test
