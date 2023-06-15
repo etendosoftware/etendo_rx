@@ -123,6 +123,7 @@ public class RepositoryTest {
       .withUsername("postgres")
       .withEnv("PGDATA", "/postgres")
       .withDatabaseName("etendo")
+      .withExposedPorts(5432)
       .waitingFor(
           Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
       );

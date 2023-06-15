@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 
@@ -14,7 +15,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 public class TestcontainerTest {
 
-  private static final PostgreSQLContainer<?> postgreSqlContainer = new PostgreSQLContainer<>("postgres:14");
+  private static final PostgreSQLContainer<?> postgreSqlContainer = new PostgreSQLContainer<>("postgres:14").withExposedPorts(5432)
+      .withUsername("postgres").withPassword("postgres").withDatabaseName("postgres")
+      .waitingFor(Wait.forListeningPort());
 
   @BeforeAll
   static void beforeAll() {
