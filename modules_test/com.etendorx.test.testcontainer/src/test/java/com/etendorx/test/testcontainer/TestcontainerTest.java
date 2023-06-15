@@ -15,9 +15,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 public class TestcontainerTest {
 
-  private static final PostgreSQLContainer<?> postgreSqlContainer = new PostgreSQLContainer<>("postgres:14").withExposedPorts(5432)
+  private static final PostgreSQLContainer<?> postgreSqlContainer = new PostgreSQLContainer<>(
+      "postgres:14").withExposedPorts(5432)
       .withUsername("postgres").withPassword("postgres").withDatabaseName("postgres")
-      .waitingFor(Wait.forListeningPort());
+      .waitingFor(
+          Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
+      );
 
   @BeforeAll
   static void beforeAll() {
