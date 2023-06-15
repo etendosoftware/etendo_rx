@@ -19,7 +19,6 @@ package com.etendorx.utils.auth.key.context;
 import com.etendorx.utils.auth.key.JwtKeyUtils;
 import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class FilterContext extends OncePerRequestFilter {
@@ -70,8 +68,8 @@ public class FilterContext extends OncePerRequestFilter {
     userContext.setSearchKey((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
     userContext.setServiceId((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_ID));
     boolean active = false;
-    if(activeParam == null) {
-        active = true;
+    if (activeParam == null) {
+      active = true;
     } else {
       if (!StringUtils.equalsAny(activeParam, TRUE, FALSE)) {
         throw new IllegalArgumentException("Invalid value for 'active' parameter: " + active);
