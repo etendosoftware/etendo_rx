@@ -65,7 +65,10 @@ public class RestCallTest {
 
   @DynamicPropertySource
   static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+    registry.add("spring.datasource.url", () -> {
+      return "jdbc:postgresql://" + postgreSQLContainer.getCurrentContainerInfo().getNetworkSettings().getNetworks().entrySet().stream().findFirst().get().getValue().getGateway() + ":" + postgreSQLContainer.getMappedPort(
+          5432) + "/etendo";
+    });
     registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
     registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
   }
@@ -78,6 +81,7 @@ public class RestCallTest {
     .withUsername("postgres")
     .withEnv("PGDATA", "/postgres")
     .withDatabaseName("etendo")
+    .withExposedPorts(5432)
     .waitingFor(
       Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
     );
