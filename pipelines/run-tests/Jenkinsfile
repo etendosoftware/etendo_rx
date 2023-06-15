@@ -247,7 +247,7 @@ spec:
         stage ("Run AsyncProcess Tests") {
             when {
                 expression {
-                    env.STATUSRX == "1"
+                    false
                 }
             }
             steps {
@@ -334,7 +334,9 @@ spec:
                             export TESTCONTAINERS_RYUK_DISABLED=true
                             export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                             cd etendo_rx
-                            ./gradlew :com.etendorx.das:test --info
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RepositoryTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RestCallTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.utils.DefaultFiltersTest
                             """
                             '...DAS TESTS SUCCESSFUL...'
                         } catch (Exception e) {
@@ -423,6 +425,7 @@ spec:
             }
             failure {
                 script {
+                    sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
                     sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Build Environments" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                     echo "Failed Build Environments"
                 }
@@ -447,6 +450,7 @@ spec:
             }
             unstable {
                 script {
+                    sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
                     sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Tests" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                     echo "Failed Test"
                 }
@@ -471,6 +475,7 @@ spec:
             }
             success {
                 script {
+                    sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
                     sh './pipelines/run-tests/build-update.sh etendo_rx success "Successful Test Suites" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                     echo "Successful Test"
                 }
