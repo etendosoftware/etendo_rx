@@ -20,7 +20,6 @@ import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 
 public class AppContext {
   private static final ThreadLocal<UserContext> currentUser = new ThreadLocal<>();
-  private static String authToken;
 
   public static void setCurrentUser(UserContext userContext) {
     currentUser.set(userContext);
@@ -33,18 +32,5 @@ public class AppContext {
     return currentUser.get();
   }
 
-  public static void clear() {
-    currentUser.remove();
-  }
 
-  public static void setAuthToken(String authToken) {
-    AppContext.authToken = authToken;
-  }
-
-  public static String getAuthToken() {
-    if (currentUser.get() == null) {
-      throw new ForbiddenException();
-    }
-    return authToken;
-  }
 }

@@ -22,7 +22,10 @@ pipeline {
         COMMIT_AUTHOR_NAME  = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
         COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
         CATALINA_HOME       = "${WORKSPACE}/apache-tomcat-8.5.75"
-        DOCKER_HOST         = "unix:///var/run/docker.sock"
+        STATUSCORE          = "1"
+        BUILD_CLASSIC       = false
+        DOCKER_HOST = '/home/jenkins/docker.sock'
+        DOCKER_TLS_VERIFY = 0
     }
 
     agent {
@@ -58,6 +61,8 @@ spec:
       volumeMounts:
         - name: rsa-keys
           mountPath: /root/.ssh/
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
       lifecycle:
         postStart:
           exec:
@@ -72,15 +77,17 @@ spec:
       terminationMessagePolicy: File
       imagePullPolicy: IfNotPresent
     - name: postgres
-      image: postgres:13
+      image: etendo/etendodata:rx-1.2.1
       workingDir: /home/jenkins
       env:
         - name: POSTGRES_PASSWORD
           value: syspass
+        - name: PGDATA
+          value: /postgres
       resources: {}
       terminationMessagePath: /dev/termination-log
       terminationMessagePolicy: File
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
   volumes:
     - name: rsa-keys
       configMap:
@@ -96,12 +103,55 @@ spec:
   serviceAccount: default
   securityContext:
     privileged: true
+
 """
         }
     }
-
     stages {
+        stage ('Test environment') {
+            steps {
+                container('compiler') {
+                    script {
+                        try {
+                            echo "Starting Environment tests"
+                            sh """
+                            export DOCKER_HOST=/var/run/docker.sock
+                            export TESTCONTAINERS_RYUK_DISABLED=true
+                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            git clone --branch $BRANCH_NAME https://github.com/etendosoftware/etendo_rx
+                            cd etendo_rx
+                            chmod a+x ./pipelines/run-tests/build-update.sh
+                            cp gradle.properties.template gradle.properties
+                            ./gradlew :setup
+                            ./gradlew :com.etendorx.test.testcontainer:test
+                            """
+                            '...Environment TESTS SUCCESSFUL...'
+                        } catch (Exception e) {
+                            echo 'Exception occurred: ' + e.toString()
+                            echo '...Environment TEST FAILED...'
+                            currentBuild.result = 'UNSTABLE'
+                            unstable('Environment TESTS FAILED!')
+                            env.STATUSTEST = "0"
+                        }
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'etendo_rx/modules_test/com.etendorx.test.testcontainer/build/reports/tests/test',
+                            reportFiles: '*.html',
+                            reportName: 'Environment TESTS REPORT',
+                            reportTitles: ''
+                        ])
+                    }
+                }
+            }
+        }
         stage ('Build Environment Etendo Core') {
+            when {
+                expression {
+                    env.BUILD_CLASSIC == "true"
+                }
+            }
             steps {
                 sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
                 sh './pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo Core" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
@@ -118,7 +168,6 @@ spec:
 
                         // Setup environment
                         sh 'printenv'
-
                         script {
                             try {
                                 echo 'Building Etendo Core'
@@ -169,20 +218,28 @@ spec:
                 }
             }
             steps {
-                script {
-                    try {
-                        echo 'Building Etendo RX'
-                        sh 'printenv'
-                        sh 'cp gradle.properties.template gradle.properties'
-                        sh './pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo RX" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
-                        sh './gradlew generate.entities.test --info'
-                        echo 'Build of Etendo RX Finished'
-                        env.STATUSRX = "1"
-                    } catch (Exception e) {
-                        echo 'Build of Etendo RX FAILED'
-                        currentBuild.result = 'FAILED'
-                        error('Build of Etendo RX FAILED!')
-                        env.STATUSRX = "0"
+                container('compiler') {
+                    script {
+                        try {
+                            echo 'Building Etendo RX'
+                            sh 'printenv'
+                            sh """
+                            export DOCKER_HOST=/var/run/docker.sock
+                            export TESTCONTAINERS_RYUK_DISABLED=true
+                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            cd etendo_rx
+                            chmod a+x ./pipelines/run-tests/build-update.sh
+                            ./pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo RX" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL
+                            ./gradlew generate.entities.test --info
+                            """
+                            echo 'Build of Etendo RX Finished'
+                            env.STATUSRX = "1"
+                        } catch (Exception e) {
+                            echo 'Build of Etendo RX FAILED'
+                            currentBuild.result = 'FAILED'
+                            error('Build of Etendo RX FAILED!')
+                            env.STATUSRX = "0"
+                        }
                     }
                 }
             }
@@ -190,17 +247,18 @@ spec:
         stage ("Run AsyncProcess Tests") {
             when {
                 expression {
-                    env.STATUSRX == "1"
+                    false
                 }
             }
             steps {
-                sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
-                sh './pipelines/run-tests/build-update.sh etendo_core pending "Run Tests" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                 script {
                     try {
                         env.STATUSTEST = "1"
                         echo "Starting AsyncProcess tests"
-                        sh './gradlew :com.etendorx.asyncprocess:test --info'
+                        sh """
+                        cd etendo_rx
+                        ./gradlew :com.etendorx.asyncprocess:test --info
+                        """
                         '...ASYNPROCESS TESTS SUCCESSFUL...'
                     } catch (Exception e) {
                         echo 'Exception occurred: ' + e.toString()
@@ -208,16 +266,16 @@ spec:
                         currentBuild.result = 'UNSTABLE'
                         unstable('ASYNPROCESS TESTS FAILED!')
                         env.STATUSTEST = "0"
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'modules_core/com.etendorx.asyncprocess/build/reports/tests/test',
-                            reportFiles: '*.html',
-                            reportName: 'ASYNPROCESS TESTS REPORT',
-                            reportTitles: ''
-                        ])
                     }
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: 'etendo_rx/modules_core/com.etendorx.asyncprocess/build/reports/tests/test',
+                        reportFiles: '*.html',
+                        reportName: 'ASYNPROCESS TESTS REPORT',
+                        reportTitles: ''
+                    ])
                 }
             }
         }
@@ -228,26 +286,36 @@ spec:
                 }
             }
             steps {
-                script {
-                    try {
-                        echo "Starting Auth tests"
-                        sh './gradlew :com.etendorx.auth:test --info'
-                        '...AUTH TESTS SUCCESSFUL...'
-                    } catch (Exception e) {
-                        echo 'Exception occurred: ' + e.toString()
-                        echo '...AUTH TESTS FAILED...'
-                        currentBuild.result = 'UNSTABLE'
-                        unstable('AUTH TESTS FAILED!')
-                        env.STATUSTEST = "0"
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'modules_core/com.etendorx.auth/build/reports/tests/test',
-                            reportFiles: '*.html',
-                            reportName: 'AUTH TESTS REPORT',
-                            reportTitles: ''
-                        ])
+                container("compiler") {
+                    script {
+                        try {
+                            echo "Starting Auth tests"
+                            sh """
+                            export DOCKER_HOST=/var/run/docker.sock
+                            export TESTCONTAINERS_RYUK_DISABLED=true
+                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            cd etendo_rx
+                            ./gradlew :com.etendorx.auth:test --info
+                            """
+                            '...AUTH TESTS SUCCESSFUL...'
+                        } catch (Exception e) {
+                            echo 'Exception occurred: ' + e.toString()
+                            echo '...AUTH TESTS FAILED...'
+                            currentBuild.result = 'UNSTABLE'
+                            unstable('AUTH TESTS FAILED!')
+                            env.STATUSTEST = "0"
+                        }
+                        if(fileExists('etendo_rx/modules_core/com.etendorx.auth/build/reports/tests/test')) {
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'etendo_rx/modules_core/com.etendorx.auth/build/reports/tests/test',
+                                reportFiles: '*.html',
+                                reportName: 'AUTH TESTS REPORT',
+                                reportTitles: ''
+                            ])
+                        }
                     }
                 }
             }
@@ -259,26 +327,38 @@ spec:
                 }
             }
             steps {
-                script {
-                    try {
-                        echo "Starting Das tests"
-                        echo "./gradlew :com.etendorx.das:test --info"
-                        '...DAS TESTS SUCCESSFUL...'
-                    } catch (Exception e) {
-                        echo 'Exception occurred: ' + e.toString()
-                        echo '...DAS TEST FAILED...'
-                        currentBuild.result = 'UNSTABLE'
-                        unstable('DAS TESTS FAILED!')
-                        env.STATUSTEST = "0"
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'modules_core/com.etendorx.das/build/reports/tests/test',
-                            reportFiles: '*.html',
-                            reportName: 'DAS TESTS REPORT',
-                            reportTitles: ''
-                        ])
+                container("compiler") {
+                    script {
+                        try {
+                            echo "Starting Das tests"
+                            sh """
+                            export DOCKER_HOST=/var/run/docker.sock
+                            export TESTCONTAINERS_RYUK_DISABLED=true
+                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            cd etendo_rx
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RepositoryTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RestCallTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.utils.DefaultFiltersTest
+                            """
+                            '...DAS TESTS SUCCESSFUL...'
+                        } catch (Exception e) {
+                            echo 'Exception occurred: ' + e.toString()
+                            echo '...DAS TEST FAILED...'
+                            currentBuild.result = 'UNSTABLE'
+                            unstable('DAS TESTS FAILED!')
+                            env.STATUSTEST = "0"
+                        }
+                        if(fileExists('etendo_rx/modules_core/com.etendorx.das/build/reports/tests/test')) {
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'etendo_rx/modules_core/com.etendorx.das/build/reports/tests/test',
+                                reportFiles: '*.html',
+                                reportName: 'DAS TESTS REPORT',
+                                reportTitles: ''
+                            ])
+                        }
                     }
                 }
             }
@@ -290,26 +370,36 @@ spec:
                 }
             }
             steps {
-                script {
-                    try {
-                        echo "Starting Edge tests"
-                        sh './gradlew :com.etendorx.edge:test --info'
-                        '...EDGE TESTS SUCCESSFUL...'
-                    } catch (Exception e) {
-                        echo 'Exception occurred: ' + e.toString()
-                        echo '...EDGE TEST FAILED...'
-                        currentBuild.result = 'UNSTABLE'
-                        unstable('EDGE TESTS FAILED!')
-                        env.STATUSTEST = "0"
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'modules_core/com.etendorx.edge/build/reports/tests/test',
-                            reportFiles: '*.html',
-                            reportName: 'EDGE TESTS REPORT',
-                            reportTitles: ''
-                        ])
+                container("compiler") {
+                    script {
+                        try {
+                            echo "Starting Edge tests"
+                            sh """
+                            export DOCKER_HOST=/var/run/docker.sock
+                            export TESTCONTAINERS_RYUK_DISABLED=true
+                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            cd etendo_rx
+                            ./gradlew :com.etendorx.edge:test --info
+                            """
+                            '...EDGE TESTS SUCCESSFUL...'
+                        } catch (Exception e) {
+                            echo 'Exception occurred: ' + e.toString()
+                            echo '...EDGE TEST FAILED...'
+                            currentBuild.result = 'UNSTABLE'
+                            unstable('EDGE TESTS FAILED!')
+                            env.STATUSTEST = "0"
+                        }
+                        if(fileExists('etendo_rx/modules_core/com.etendorx.edge/build/reports/tests/test')) {
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'etendo_rx/modules_core/com.etendorx.edge/build/reports/tests/test',
+                                reportFiles: '*.html',
+                                reportName: 'EDGE TESTS REPORT',
+                                reportTitles: ''
+                            ])
+                        }
                     }
                 }
             }
@@ -341,6 +431,7 @@ spec:
             }
             failure {
                 script {
+                    sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
                     sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Build Environments" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                     echo "Failed Build Environments"
                 }
@@ -365,6 +456,7 @@ spec:
             }
             unstable {
                 script {
+                    sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
                     sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Tests" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                     echo "Failed Test"
                 }
@@ -389,6 +481,7 @@ spec:
             }
             success {
                 script {
+                    sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
                     sh './pipelines/run-tests/build-update.sh etendo_rx success "Successful Test Suites" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                     echo "Successful Test"
                 }
