@@ -305,15 +305,17 @@ spec:
                             unstable('AUTH TESTS FAILED!')
                             env.STATUSTEST = "0"
                         }
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'etendo_rx/modules_core/com.etendorx.auth/build/reports/tests/test',
-                            reportFiles: '*.html',
-                            reportName: 'AUTH TESTS REPORT',
-                            reportTitles: ''
-                        ])
+                        if(fileExists('etendo_rx/modules_core/com.etendorx.auth/build/reports/tests/test')) {
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'etendo_rx/modules_core/com.etendorx.auth/build/reports/tests/test',
+                                reportFiles: '*.html',
+                                reportName: 'AUTH TESTS REPORT',
+                                reportTitles: ''
+                            ])
+                        }
                     }
                 }
             }
@@ -346,15 +348,17 @@ spec:
                             unstable('DAS TESTS FAILED!')
                             env.STATUSTEST = "0"
                         }
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'etendo_rx/modules_core/com.etendorx.das/build/reports/tests/test',
-                            reportFiles: '*.html',
-                            reportName: 'DAS TESTS REPORT',
-                            reportTitles: ''
-                        ])
+                        if(fileExists('etendo_rx/modules_core/com.etendorx.das/build/reports/tests/test')) {
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'etendo_rx/modules_core/com.etendorx.das/build/reports/tests/test',
+                                reportFiles: '*.html',
+                                reportName: 'DAS TESTS REPORT',
+                                reportTitles: ''
+                            ])
+                        }
                     }
                 }
             }
@@ -385,15 +389,17 @@ spec:
                             unstable('EDGE TESTS FAILED!')
                             env.STATUSTEST = "0"
                         }
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'etendo_rx/modules_core/com.etendorx.edge/build/reports/tests/test',
-                            reportFiles: '*.html',
-                            reportName: 'EDGE TESTS REPORT',
-                            reportTitles: ''
-                        ])
+                        if(fileExists('etendo_rx/modules_core/com.etendorx.edge/build/reports/tests/test')) {
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'etendo_rx/modules_core/com.etendorx.edge/build/reports/tests/test',
+                                reportFiles: '*.html',
+                                reportName: 'EDGE TESTS REPORT',
+                                reportTitles: ''
+                            ])
+                        }
                     }
                 }
             }
