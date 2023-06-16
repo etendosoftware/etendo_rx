@@ -9,10 +9,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,9 +24,21 @@ import com.etendorx.das.utils.TestcontainersUtils;
 @AutoConfigureMockMvc
 class DefaultFiltersTest {
 
-    private static final String select_QUERY = "select * from table table0_ limit 10";
-    private static final String update_QUERY = "update table0_ set column = 'value' where table0_.table0_id = 1";
-    private static final String delete_QUERY = "delete from table table0_ where table0_.table0_id = 1";
+    public static final String REST_METHOD_PATCH = "PATCH";
+    private static final String SELECT_QUERY = "select * from table table0_ limit 10";
+    private static final String UPDATE_QUERY = "update table0_ set column = 'value' where table0_.table0_id = 1";
+    private static final String DELETE_QUERY = "delete from table table0_ where table0_.table0_id = 1";
+    public static final String USER_1 = "user1";
+    public static final String CLIENT_1 = "client1";
+    public static final String ROLE_1 = "role1";
+    public static final String REST_METHOD_POST = "POST";
+    public static final String REST_METHOD_PUT = "PUT";
+    public static final String REST_METHOD_DELETE = "DELETE";
+    public static final String USER_ID_123 = "123";
+    public static final String CLIENT_ID_456 = "456";
+    public static final String ROLE_ID_101112 = "101112";
+    public static final String REST_METHOD_GET = "GET";
+    public static final String ROLE_ID_789 = "789";
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -36,38 +46,31 @@ class DefaultFiltersTest {
     }
 
     @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
+    public final static PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
     @Test
-    void testAddFilters_AuthServiceBypass() {
+    void testAddFiltersAuthServiceBypass() {
         // Arrange
         String userId = null;
-        String clientId = "123";
-        String orgId = "456";
-        String roleId = "789";
         boolean isActive = true;
-        String restMethod = "GET";
 
         // Act
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(SELECT_QUERY, userId, USER_ID_123, ROLE_ID_789, isActive, REST_METHOD_GET);
 
-        String expected = "select * from table table0_ limit 10";
         // Assert
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(SELECT_QUERY, result);
     }
 
     @Test
-    void testAddFilters_SuperUserBypass() {
+    void testAddFiltersSuperUserBypass() {
         // Arrange
         String userId = DefaultFilters.SUPER_USER_ID;
         String clientId = DefaultFilters.SUPER_USER_CLIENT_ID;
-        String orgId = DefaultFilters.SUPER_USER_ORG_ID;
-        String roleId = "789";
         boolean isActive = true;
-        String restMethod = "GET";
 
         // Act
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(SELECT_QUERY, userId, clientId, ROLE_ID_789, isActive,
+            REST_METHOD_GET);
 
         String expected = "select * from table table0_ limit 10";
         // Assert
@@ -75,17 +78,13 @@ class DefaultFiltersTest {
     }
 
     @Test
-    void testAddFilters_GetMethod() {
+    void testAddFiltersGetMethod() {
         // Arrange
-        String userId = "123";
-        String clientId = "456";
-        String orgId = "789";
-        String roleId = "101112";
         boolean isActive = true;
-        String restMethod = "GET";
 
         // Act
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_ID_123, CLIENT_ID_456, ROLE_ID_101112, isActive,
+            REST_METHOD_GET);
 
         // Assert
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', '456') " +
@@ -94,17 +93,12 @@ class DefaultFiltersTest {
     }
 
     @Test
-    void testAddFilters_PutMethod() {
+    void testAddFiltersPutMethod() {
         // Arrange
-        String userId = "123";
-        String clientId = "456";
-        String orgId = "789";
-        String roleId = "101112";
         boolean isActive = true;
-        String restMethod = "PUT";
 
         // Act
-        String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_ID_123, CLIENT_ID_456, ROLE_ID_101112, isActive, REST_METHOD_PUT);
 
         // Assert
         String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', '456') " +
@@ -113,15 +107,10 @@ class DefaultFiltersTest {
     }
 
     @Test
-    void testAddFilters_PostMethod() {
-        String userId = "user1";
-        String clientId = "client1";
-        String orgId = "org1";
-        String roleId = "role1";
+    void testAddFiltersPostMethod() {
         boolean isActive = true;
-        String restMethod = "POST";
 
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_POST);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
@@ -130,14 +119,9 @@ class DefaultFiltersTest {
 
     @Test
     void testAddFilters_PutMethod_StartingWithUpdate() {
-        String userId = "user1";
-        String clientId = "client1";
-        String orgId = "org1";
-        String roleId = "role1";
         boolean isActive = true;
-        String restMethod = "PUT";
 
-        String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PUT);
 
         String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') and " +
             "table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) and " +
@@ -147,14 +131,9 @@ class DefaultFiltersTest {
 
     @Test
     void testAddFilters_PutMethod_NotStartingWithUpdate() {
-        String userId = "user1";
-        String clientId = "client1";
-        String orgId = "org1";
-        String roleId = "role1";
         boolean isActive = true;
-        String restMethod = "PUT";
 
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PUT);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
@@ -163,14 +142,9 @@ class DefaultFiltersTest {
 
     @Test
     void testAddFilters_PatchMethod_StartingWithUpdate() {
-        String userId = "user1";
-        String clientId = "client1";
-        String orgId = "org1";
-        String roleId = "role1";
         boolean isActive = true;
-        String restMethod = "PATCH";
 
-        String result = DefaultFilters.addFilters(update_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PATCH);
 
         String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') " +
             "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
@@ -180,14 +154,9 @@ class DefaultFiltersTest {
 
     @Test
     void testAddFilters_PatchMethod_NotStartingWithUpdate() {
-        String userId = "user1";
-        String clientId = "client1";
-        String orgId = "org1";
-        String roleId = "role1";
         boolean isActive = true;
-        String restMethod = "PATCH";
 
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PATCH);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
@@ -196,14 +165,9 @@ class DefaultFiltersTest {
 
     @Test
     void testAddFilters_deleteMethod_StartingWithDelete() {
-        String userId = "user1";
-        String clientId = "client1";
-        String orgId = "org1";
-        String roleId = "role1";
         boolean isActive = true;
-        String restMethod = "DELETE";
 
-        String result = DefaultFilters.addFilters(delete_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(DELETE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_DELETE);
 
         String expected = "delete from table table0_ where table0_.ad_client_id in ('0', 'client1') and " +
             "table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) and " +
@@ -213,14 +177,9 @@ class DefaultFiltersTest {
 
     @Test
     void testAddFilters_deleteMethod_NotStartingWithDelete() {
-        String userId = "user1";
-        String clientId = "client1";
-        String orgId = "org1";
-        String roleId = "role1";
         boolean isActive = true;
-        String restMethod = "DELETE";
 
-        String result = DefaultFilters.addFilters(select_QUERY, userId, clientId, roleId, isActive, restMethod);
+        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_DELETE);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
@@ -229,15 +188,11 @@ class DefaultFiltersTest {
 
     @Test
     void testAddFilters_UnknownMethod() {
-        String userId = "user1";
-        String clientId = "client1";
-        String orgId = "org1";
-        String roleId = "role1";
         boolean isActive = true;
         String restMethod = "UNKNOWN";
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-            DefaultFilters.addFilters(select_QUERY, userId, clientId, orgId, isActive, restMethod));
+            DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, restMethod));
 
         String expectedMessage = "Unknown HTTP method: " + restMethod;
         assertEquals(expectedMessage, exception.getMessage());

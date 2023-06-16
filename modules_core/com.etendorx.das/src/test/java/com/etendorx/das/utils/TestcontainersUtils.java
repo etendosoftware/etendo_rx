@@ -38,14 +38,15 @@ public class TestcontainersUtils {
     String envEtendodataTag = System.getenv("ETENDODATA_TAG");
     if(envEtendodataTag == null) {
       try {
-        Process process = Runtime.getRuntime().exec("git rev-parse --abbrev-ref HEAD");
+        Process process = Runtime.getRuntime().exec("git rev-parse --abbrev-ref HEAD"); //NOSONAR
         process.waitFor();
 
         BufferedReader reader = new BufferedReader(
             new InputStreamReader(process.getInputStream()));
-
-        envEtendodataTag = "rx-" + reader.readLine();
-      } catch (Exception e) {}
+        envEtendodataTag = "rx-" + reader.readLine().replaceAll("/", "-");
+      } catch (Exception e) {
+        throw new RuntimeException("Error getting git branch name");
+      }
     }
     return new PostgreSQLContainer<>(
         DockerImageName.parse("etendo/etendodata:" + envEtendodataTag).asCompatibleSubstituteFor("postgres")
