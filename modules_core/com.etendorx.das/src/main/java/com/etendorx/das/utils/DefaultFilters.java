@@ -37,6 +37,10 @@ public class DefaultFilters {
     public static final String PATCH_METHOD = "PATCH";
     public static final String DELETE_METHOD = "DELETE";
 
+    private DefaultFilters() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String addFilters(String sql, String userId, String clientId, String roleId, boolean isActive,
         String restMethod) {
         // AUTH SERVICE BYPASS FILTERS
@@ -157,13 +161,49 @@ public class DefaultFilters {
         throw new QueryException("getQueryInfo ERROR");
     }
 
-    @Getter
-    @AllArgsConstructor
-    static
-    class QueryInfo {
+    static class QueryInfo {
         private String sqlAction;
         private String tableName;
         private String tableAlias;
         private boolean containsWhere;
+
+        public QueryInfo(String sqlAction, String tableName, String tableAlias, boolean containsWhere) {
+            this.sqlAction = sqlAction;
+            this.tableName = tableName;
+            this.tableAlias = tableAlias;
+            this.containsWhere = containsWhere;
+        }
+
+        public String getSqlAction() {
+            return sqlAction;
+        }
+
+        public void setSqlAction(String sqlAction) {
+            this.sqlAction = sqlAction;
+        }
+
+        public String getTableName() {
+            return tableName;
+        }
+
+        public void setTableName(String tableName) {
+            this.tableName = tableName;
+        }
+
+        public String getTableAlias() {
+            return tableAlias;
+        }
+
+        public void setTableAlias(String tableAlias) {
+            this.tableAlias = tableAlias;
+        }
+
+        public boolean isContainsWhere() {
+            return containsWhere;
+        }
+
+        public void setContainsWhere(boolean containsWhere) {
+            this.containsWhere = containsWhere;
+        }
     }
 }

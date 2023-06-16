@@ -46,7 +46,7 @@ class DefaultFiltersTest {
     }
 
     @Container
-    public final static PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
+    public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
     @Test
     void testAddFiltersAuthServiceBypass() {
@@ -72,9 +72,8 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(SELECT_QUERY, userId, clientId, ROLE_ID_789, isActive,
             REST_METHOD_GET);
 
-        String expected = "select * from table table0_ limit 10";
         // Assert
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(SELECT_QUERY, result);
     }
 
     @Test
@@ -88,7 +87,7 @@ class DefaultFiltersTest {
 
         // Assert
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', '456') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('456', '101112', 'r'))) limit 10";
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('456', '101112', 'r'))) limit 10"; //NOSONAR
         Assertions.assertEquals(expected, result);
     }
 
@@ -102,7 +101,8 @@ class DefaultFiltersTest {
 
         // Assert
         String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', '456') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('456', '101112', 'r'))) and table0_.table0_id = 1";
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('456', '101112', 'r'))) " +
+            "and table0_.table0_id = 1"; //NOSONAR
         Assertions.assertEquals(expected, result);
     }
 
@@ -113,30 +113,31 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_POST);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
     @Test
-    void testAddFilters_PutMethod_StartingWithUpdate() {
+    void testAddFiltersPutMethodStartingWithUpdate() {
         boolean isActive = true;
 
         String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PUT);
 
         String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') and " +
             "table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) and " +
-            "table0_.table0_id = 1";
+            "table0_.table0_id = 1"; //NOSONAR
         assertEquals(expected, result);
     }
 
     @Test
-    void testAddFilters_PutMethod_NotStartingWithUpdate() {
+    void testAddFiltersPutMethodNotStartingWithUpdate() {
         boolean isActive = true;
 
         String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PUT);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
+            "limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -148,7 +149,7 @@ class DefaultFiltersTest {
 
         String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') " +
             "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
-            "and table0_.table0_id = 1";
+            "and table0_.table0_id = 1"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -159,7 +160,8 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PATCH);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
+            "limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -171,7 +173,7 @@ class DefaultFiltersTest {
 
         String expected = "delete from table table0_ where table0_.ad_client_id in ('0', 'client1') and " +
             "table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) and " +
-            "table0_.table0_id = 1";
+            "table0_.table0_id = 1"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -182,7 +184,8 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_DELETE);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10";
+            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
+            "limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 

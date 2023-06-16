@@ -10,25 +10,28 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 public class TestcontainersUtils {
+  private TestcontainersUtils() {
+  }
+
   public static void setProperties(DynamicPropertyRegistry registry, PostgreSQLContainer<?> postgreSQLContainer) {
     registry.add("spring.datasource.url", () -> {
-          String envTestcontainerIp = System.getenv("TESTCONTAINERS_IP");
-          if (ObjectUtils.isEmpty(envTestcontainerIp)) {
-            return postgreSQLContainer.getJdbcUrl();
-          } else {
-            if (envTestcontainerIp.compareTo("GATEWAY") == 0) {
-              return "jdbc:postgresql://" + postgreSQLContainer.getCurrentContainerInfo()
-                  .getNetworkSettings()
-                  .getNetworks()
-                  .entrySet()
-                  .stream()
-                  .findFirst()
-                  .get()
-                  .getValue()
-                  .getGateway() + ":" + postgreSQLContainer.getMappedPort(5432) + "/etendo";
-            }
-          }
-          throw new RuntimeException("TESTCONTAINERS_IP method has and invalid value");
+      String envTestcontainerIp = System.getenv("TESTCONTAINERS_IP");
+      if (ObjectUtils.isEmpty(envTestcontainerIp)) {
+        return postgreSQLContainer.getJdbcUrl();
+      } else {
+        if (envTestcontainerIp.compareTo("GATEWAY") == 0) {
+          return "jdbc:postgresql://" + postgreSQLContainer.getCurrentContainerInfo()
+              .getNetworkSettings()
+              .getNetworks()
+              .entrySet()
+              .stream()
+              .findFirst()
+              .get()
+              .getValue()
+              .getGateway() + ":" + postgreSQLContainer.getMappedPort(5432) + "/etendo";
+        }
+      }
+      throw new RuntimeException("TESTCONTAINERS_IP method has and invalid value");
         });
     registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
     registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
@@ -43,9 +46,12 @@ public class TestcontainersUtils {
 
         BufferedReader reader = new BufferedReader(
             new InputStreamReader(process.getInputStream()));
-        envEtendodataTag = "rx-" + reader.readLine().replaceAll("/", "-");
+        envEtendodataTag = "rx-" + reader.readLine().replace("/", "-");
+      } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException("Error getting git branch name"); //NOSONAR
       } catch (Exception e) {
-        throw new RuntimeException("Error getting git branch name");
+        throw new RuntimeException("Error getting git branch name"); //NOSONAR
       }
     }
     return new PostgreSQLContainer<>(
