@@ -56,27 +56,32 @@ public class RestCallTest {
   @Autowired
   private MockMvc mockMvc;
 
-  private String token = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjgwMTExOTc2LCJhZF91c2VyX2lkIj" +
-          "oiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAifQ.b7-ooaDHbPvyOlT-1eZ3cKlhaSOuhHAoEv6eHElpNeSKRdxZH" +
-          "geiCSCc5mO-FhEygJhtPWhCOQvqGzDTBqPx8pKp32NoyLhiSHIuI13WZMnkW6r7pcbkmTqZ7xocktHvjQfIf6s3nxK0bIc5NG8aQzhrR-6" +
-          "UnFIuF3k5OYspQVKqX0etld5nJ0W126c2ZqXXScNAGSshFulEhyiK7WvuJ0ciRE6lHf_qRA2Etv67SXfStIgprbT5mcpyJv8HZFatlU88_A" +
-          "dWh7CaC4RdqEmx46TRQJHTKTU8Pl7LqLDY9dGNFBDeov2Wajuu6q5VMS6F_cG95q2AxsZ-3Cw9BM7CWA";
+  private final String token = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjg2MDc2NjE2LCJhZF" +
+      "91c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAiLCJhZF9yb2xlX2lkIjoiMCIsInNlYXJjaF9rZXkiOiIi" +
+      "LCJzZXJ2aWNlX2lkIjoiIn0.oBxwXw3Td0q1wNGVK4vSli4VGMGeRdfajwtzLCh9dVlLNFBFLJZ6EjJLUCFbZXTsxnwYHJfsHOQYcr7iWejdnP" +
+      "Djy3l0CqGKFGxI-bNm_73Ky48fRdBakqzwFQExit9HfPDHd_iojp0hlpH736CWvh11v0QGja9Q0LdY4W69Np1waxUI2Qf4z2WfJaoQhIjdOq4B" +
+      "cFoqqCBknVougK0J7ZMmxcOnSe6MSQ7UDzKgwunSSuT-iVeF4sxLb80hWu5dInfvn8iJVC8krJ9telWVqbo-dPoFbnFw9CtmTHpK153b4nj5U6" +
+      "ZOTFP4kZqsqhvWo7wKg03O1emGmCKo1vg9Cg";
 
   @DynamicPropertySource
   static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+    registry.add("spring.datasource.url", () -> {
+      return "jdbc:postgresql://" + postgreSQLContainer.getCurrentContainerInfo().getNetworkSettings().getNetworks().entrySet().stream().findFirst().get().getValue().getGateway() + ":" + postgreSQLContainer.getMappedPort(
+          5432) + "/etendo";
+    });
     registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
     registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
   }
 
   @Container
   public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-    DockerImageName.parse("etendo/etendodata:latest").asCompatibleSubstituteFor("postgres")
+      DockerImageName.parse("etendo/etendodata:rx-1.2.1").asCompatibleSubstituteFor("postgres")
   )
     .withPassword("syspass")
     .withUsername("postgres")
     .withEnv("PGDATA", "/postgres")
     .withDatabaseName("etendo")
+    .withExposedPorts(5432)
     .waitingFor(
       Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
     );
