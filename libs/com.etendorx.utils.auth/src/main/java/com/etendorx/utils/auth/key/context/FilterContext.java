@@ -37,17 +37,16 @@ public class FilterContext extends OncePerRequestFilter {
   public static final String HEADER_TOKEN = "X-TOKEN";
   public static final String TRUE = "true";
   public static final String FALSE = "false";
-
+  public static final String AUTH_PATH_URI = "/api/authenticate";
   @Autowired
   private UserContext userContext;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     String token = request.getHeader(HEADER_TOKEN);
-    if (token != null && !token.isBlank()) {
+    if (!token.isBlank()) {
       setUserContextFromToken(token, request);
-    } else {
+    } else if (!StringUtils.equals(request.getRequestURI(), AUTH_PATH_URI)) {
       throw new ForbiddenException();
     }
     AppContext.setCurrentUser(userContext);
