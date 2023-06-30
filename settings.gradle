@@ -16,17 +16,29 @@ var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modul
 gradle.ext.version = '1.0.7'
 
 directories.each {
-    def subDirs = new File(it).listFiles(new FileFilter() {
-        boolean accept(File file) {
-            if (!file.isDirectory()) {
-                return false
+    def subDirs = []
+    def queue = new LinkedList()
+    queue.add(new File(it))
+
+    while (!queue.isEmpty()) {
+        def dir = queue.remove()
+        if (new File(dir, 'build.gradle').isFile()) {
+            subDirs.add(dir)
+        } else {
+            dir.listFiles(new FileFilter() {
+                boolean accept(File file) {
+                    return file.isDirectory()
+                }
+            })?.each {
+                queue.add(it)
             }
-            return new File(file, 'build.gradle').isFile()
         }
-    })
+    }
+
     println subDirs.toString()
     subDirs.each { File dir ->
         include dir.name
+
         project(":" + dir.name).projectDir = dir
     }
 }

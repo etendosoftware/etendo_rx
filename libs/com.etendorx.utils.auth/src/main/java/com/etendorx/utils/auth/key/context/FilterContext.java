@@ -16,37 +16,39 @@
 
 package com.etendorx.utils.auth.key.context;
 
-import com.etendorx.utils.auth.key.JwtKeyUtils;
-import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
+import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.etendorx.utils.auth.key.JwtKeyUtils;
+import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 
 @Component
 public class FilterContext extends OncePerRequestFilter {
   public static final String HEADER_TOKEN = "X-TOKEN";
   public static final String TRUE = "true";
   public static final String FALSE = "false";
-  public static final String AUTH_PATH_URI = "/api/authenticate";
   @Autowired
   private UserContext userContext;
+  @Autowired(required = false)
+  private AllowedURIS allowedURIS;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
     String token = request.getHeader(HEADER_TOKEN);
-    if (!token.isBlank()) {
+    if (!StringUtils.isEmpty(token)) {
       setUserContextFromToken(token, request);
-    } else if (!StringUtils.equals(request.getRequestURI(), AUTH_PATH_URI)) {
+    } else if (allowedURIS == null || !allowedURIS.isAllowed(request.getRequestURI())) {
       throw new ForbiddenException();
     }
     AppContext.setCurrentUser(userContext);
