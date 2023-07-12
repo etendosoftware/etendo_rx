@@ -75,8 +75,8 @@ public class DefaultFilters {
         List<String> conditions = new ArrayList<>();
         conditions.add(String.format("%s.ad_client_id in ('0', '%s')", tableAlias, clientId));
         conditions.add(
-            String.format("%s.ad_org_id in (select unnest(etrx_role_organizations('%s', '%s', 'r')))", tableAlias,
-                clientId, roleId));
+            String.format("etrx_role_organizations('%s', '%s', 'r') like concat('%%|', %s.ad_org_id, '|%%')",
+                clientId, roleId, tableAlias));
         return conditions;
     }
 
