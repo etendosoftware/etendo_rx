@@ -1,5 +1,6 @@
 package com.etendorx.auth.auth;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.etendorx.utils.auth.key.context.AllowedURIS;
@@ -10,6 +11,6 @@ public class AuthAllowedURIs implements AllowedURIS {
 
   @Override
   public boolean isAllowed(String requestURI) {
-    return requestURI.startsWith(AUTH_PATH_URI);
+    return StringUtils.startsWith(requestURI, AUTH_PATH_URI));
   }
 }
