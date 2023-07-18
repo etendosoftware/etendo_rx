@@ -39,6 +39,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import com.etendorx.das.utils.TestcontainersUtils;
 import com.etendorx.entities.jparepo.ADUserRepository;
 
 @Testcontainers
@@ -65,12 +66,7 @@ public class RestCallTest {
 
   @DynamicPropertySource
   static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.datasource.url", () -> {
-      return "jdbc:postgresql://" + postgreSQLContainer.getCurrentContainerInfo().getNetworkSettings().getNetworks().entrySet().stream().findFirst().get().getValue().getGateway() + ":" + postgreSQLContainer.getMappedPort(
-          5432) + "/etendo";
-    });
-    registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-    registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+    TestcontainersUtils.setProperties(registry, postgreSQLContainer);
   }
 
   @Container
