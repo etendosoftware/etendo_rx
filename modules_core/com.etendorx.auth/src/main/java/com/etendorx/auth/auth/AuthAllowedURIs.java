@@ -7,10 +7,10 @@ import com.etendorx.utils.auth.key.context.AllowedURIS;
 
 @Component
 public class AuthAllowedURIs implements AllowedURIS {
-  public static final String AUTH_PATH_URI = "/api/authenticate"; // nosonar
+  public static final String AUTH_PATH_URI = "/api/authenticate"; //NOSONAR
 
   @Override
   public boolean isAllowed(String requestURI) {
-    return StringUtils.startsWith(requestURI, AUTH_PATH_URI));
+    return StringUtils.startsWith(requestURI, AUTH_PATH_URI);
   }
 }
