@@ -87,7 +87,8 @@ class DefaultFiltersTest {
 
         // Assert
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', '456') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('456', '101112', 'r'))) limit 10"; //NOSONAR
+            "and etrx_role_organizations('456', '101112', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
+            "limit 10"; //NOSONAR
         Assertions.assertEquals(expected, result);
     }
 
@@ -101,7 +102,7 @@ class DefaultFiltersTest {
 
         // Assert
         String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', '456') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('456', '101112', 'r'))) " +
+            "and etrx_role_organizations('456', '101112', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
             "and table0_.table0_id = 1"; //NOSONAR
         Assertions.assertEquals(expected, result);
     }
@@ -113,7 +114,8 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_POST);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) limit 10"; //NOSONAR
+            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
+            "limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -123,9 +125,10 @@ class DefaultFiltersTest {
 
         String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PUT);
 
-        String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') and " +
-            "table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) and " +
-            "table0_.table0_id = 1"; //NOSONAR
+        String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') " +
+            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
+            "and table0_.table0_id = 1"; //NOSONAR
+
         assertEquals(expected, result);
     }
 
@@ -136,7 +139,7 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PUT);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
+            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
             "limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
@@ -148,7 +151,7 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PATCH);
 
         String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
+            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
             "and table0_.table0_id = 1"; //NOSONAR
         assertEquals(expected, result);
     }
@@ -160,7 +163,7 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PATCH);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
+            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
             "limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
@@ -171,9 +174,9 @@ class DefaultFiltersTest {
 
         String result = DefaultFilters.addFilters(DELETE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_DELETE);
 
-        String expected = "delete from table table0_ where table0_.ad_client_id in ('0', 'client1') and " +
-            "table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) and " +
-            "table0_.table0_id = 1"; //NOSONAR
+        String expected = "delete from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
+            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
+            "and table0_.table0_id = 1"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -184,7 +187,7 @@ class DefaultFiltersTest {
         String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_DELETE);
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and table0_.ad_org_id in (select unnest(etrx_role_organizations('client1', 'role1', 'r'))) " +
+            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
             "limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
