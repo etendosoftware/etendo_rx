@@ -17,11 +17,10 @@ public class CustomInterceptor extends EmptyInterceptor {
         UserContext userContext = AppContext.getCurrentUser();
         String userId = userContext.getUserId();
         String clientId = userContext.getClientId();
-        String orgId = userContext.getOrganizationId();
         String roleId = userContext.getRoleId();
         boolean isActive = userContext.isActive();
         String restMethod = userContext.getRestMethod();
-        String finalQuery = DefaultFilters.addFilters(sql, userId, clientId, orgId, roleId, isActive, restMethod);
+        String finalQuery = DefaultFilters.addFilters(sql, userId, clientId, roleId, isActive, restMethod);
         return super.onPrepareStatement(finalQuery);
     }
 }

@@ -24,8 +24,8 @@ pipeline {
         CATALINA_HOME       = "${WORKSPACE}/apache-tomcat-8.5.75"
         STATUSCORE          = "1"
         BUILD_CLASSIC       = false
-        DOCKER_HOST = '/home/jenkins/docker.sock'
-        DOCKER_TLS_VERIFY = 0
+        DOCKER_HOST         = '/home/jenkins/docker.sock'
+        DOCKER_TLS_VERIFY   = 0
     }
 
     agent {
@@ -63,6 +63,9 @@ spec:
           mountPath: /root/.ssh/
         - name: docker-sock
           mountPath: /var/run/docker.sock
+      env:
+        - name: TESTCONTAINERS_IP
+          value: GATEWAY
       lifecycle:
         postStart:
           exec:
@@ -77,7 +80,7 @@ spec:
       terminationMessagePolicy: File
       imagePullPolicy: IfNotPresent
     - name: postgres
-      image: etendo/etendodata:rx-1.2.1
+      image: etendo/etendodata:rx-${BRANCH_NAME.replaceAll('/', '-')}
       workingDir: /home/jenkins
       env:
         - name: POSTGRES_PASSWORD
@@ -117,6 +120,7 @@ spec:
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
+                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                             git clone --branch $BRANCH_NAME https://github.com/etendosoftware/etendo_rx
                             cd etendo_rx
@@ -226,6 +230,7 @@ spec:
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
+                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                             cd etendo_rx
                             chmod a+x ./pipelines/run-tests/build-update.sh
@@ -293,6 +298,7 @@ spec:
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
+                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.auth:test --info
@@ -334,11 +340,12 @@ spec:
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
+                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RepositoryTest
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RestCallTest
-                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.utils.DefaultFiltersTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.DefaultFiltersTest
                             """
                             '...DAS TESTS SUCCESSFUL...'
                         } catch (Exception e) {
@@ -377,6 +384,7 @@ spec:
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
+                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.edge:test --info
