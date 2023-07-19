@@ -28,8 +28,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
     "com.etendorx.das.handler",
     "com.etendorx.das.grpcrepo",
     "com.etendorx.utils.auth.key.context",
-    "com.etendorx.das.services",
-    "com.etendorx.das.scan"
+    "com.etendorx.das.*"
 })
 public class EtendorxDasApplication {
 

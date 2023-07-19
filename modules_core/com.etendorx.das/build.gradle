@@ -72,6 +72,7 @@ dependencies {
     }
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation (project(':com.etendorx.das_core'))
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:postgresql:1.17.3'
@@ -81,6 +82,7 @@ dependencies {
     testImplementation 'io.grpc:grpc-testing:1.49.0'
     testImplementation 'io.github.lognet:grpc-spring-boot-starter:4.6.0'
     testImplementation 'net.java.dev.jna:jna:5.7.0'
+    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
 
 }
 
