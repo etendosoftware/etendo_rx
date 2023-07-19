@@ -61,8 +61,8 @@ import org.junit.runner.RunWith;
 
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 //@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//@ContextConfiguration
-//@AutoConfigureMockMvc
+@ContextConfiguration
+@AutoConfigureMockMvc
 //@ExtendWith(MockitoExtension.class)
 //@ExtendWith(SpringExtension.class)
 //@RunWith(SpringRunner.class)
@@ -70,15 +70,14 @@ import org.junit.runner.RunWith;
 //@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 //@Import(Config.class)
 //@EnableJpaRepositories(basePackages = "com.etendorx.das.test.eventhandlertest.repository")
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class AnnotationTests {
 
-  @Autowired
+  @Mock
   private ParentEntityRepository parentEntityRepository;
 
-//  @SpyBean
-  @Autowired
+  @SpyBean
   private HibernateEventListenerComponent component;
 
   @DynamicPropertySource
@@ -92,9 +91,9 @@ public class AnnotationTests {
   @Test
   public void createParentShouldCallInsertMethod() {
     ParentEntity parentEntity = new ParentEntity();
-//    parentEntity = parentEntityRepository.save(parentEntity);
-//    assertNotNull(parentEntity.getId());
-//    verify(component).handlePreInsert(eq(parentEntity), any(PreInsertEvent.class));
+    parentEntity = parentEntityRepository.save(parentEntity);
+    assertNotNull(parentEntity.getId());
+    verify(component).handlePreInsert(eq(parentEntity), any(PreInsertEvent.class));
     System.out.println("Test");
   }
 
