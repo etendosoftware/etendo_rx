@@ -26,11 +26,8 @@ import com.etendorx.das.test.eventhandlertest.component.HibernateEventListenerCo
 import com.etendorx.das.test.eventhandlertest.domain.ParentEntity;
 import com.etendorx.das.test.eventhandlertest.repository.ParentEntityRepository;
 
-@ContextConfiguration
-@AutoConfigureMockMvc
 @EntityScan(basePackages = {"com.etendorx.das.test.eventhandlertest.*"})
 @EnableJpaRepositories(basePackages = "com.etendorx.das.test.eventhandlertest.*")
-@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class AnnotationTests {
 
