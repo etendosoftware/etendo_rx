@@ -3,12 +3,10 @@ package com.etendorx.das.test.eventhandlertest.component;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreUpdateEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.etendorx.das.test.eventhandlertest.domain.ParentEntity;
-import com.etendorx.das.test.eventhandlertest.repository.ParentEntityRepository;
 import com.etendorx.eventhandler.annotation.EventHandlerListener;
 
 @Component

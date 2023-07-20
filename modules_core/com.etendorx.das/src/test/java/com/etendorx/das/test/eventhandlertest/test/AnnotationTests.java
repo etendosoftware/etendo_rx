@@ -3,78 +3,38 @@ package com.etendorx.das.test.eventhandlertest.test;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PreInsertEvent;
-import org.hibernate.event.spi.PreUpdateEvent;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
-import org.springframework.boot.test.mock.mockito.SpyBeans;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
-import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.etendorx.das.test.eventhandlertest.component.HibernateEventListenerComponent;
 import com.etendorx.das.test.eventhandlertest.domain.ParentEntity;
 import com.etendorx.das.test.eventhandlertest.repository.ParentEntityRepository;
-import org.junit.runner.RunWith;
 
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @AutoConfigureMockMvc
-//@ExtendWith(MockitoExtension.class)
-//@ExtendWith(SpringExtension.class)
-//@RunWith(SpringRunner.class)
-//@DataJpaTest
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//@Import(Config.class)
-//@EnableJpaRepositories(basePackages = "com.etendorx.das.test.eventhandlertest.repository")
+@EntityScan(basePackages = {"com.etendorx.das.test.eventhandlertest.*"})
+@EnableJpaRepositories(basePackages = "com.etendorx.das.test.eventhandlertest.*")
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class AnnotationTests {
 
-  @Mock
+  @Autowired
   private ParentEntityRepository parentEntityRepository;
 
   @SpyBean
