@@ -85,6 +85,7 @@ dependencies {
     testImplementation 'net.java.dev.jna:jna:5.7.0'
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
 
+    codescan(project(':com.etendorx.test.eventhandler'))
 
 }
 
