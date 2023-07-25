@@ -75,7 +75,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
                                 <#assign repeated=true/>
                             </#if>
                         </#list>
-    @javax.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.getTargetEntity().getTableName()}_id"<#if repeated>, updatable = false, insertable = false</#if>)
+    @javax.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.referencedProperty.columnName?lower_case}"<#if repeated>, updatable = false, insertable = false</#if>)
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
     @JsonProperty("${p.javaName}")
     ${p.targetEntity.className} ${p.javaName};

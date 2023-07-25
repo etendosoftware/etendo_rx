@@ -16,22 +16,27 @@
 
 package com.etendorx.gen.util;
 
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.TemplateException;
-import org.openbravo.base.model.Entity;
-
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.openbravo.base.model.Entity;
+
+import com.etendorx.gen.generation.GeneratePaths;
+
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.TemplateException;
+
 public class TemplateUtil {
   public static void processTemplate(freemarker.template.Template templateImplementation,
-                                     Map<String, Object> data, Writer output) {
+      Map<String, Object> data, Writer output) {
     try {
       templateImplementation.process(data, output);
     } catch (IOException | TemplateException e) {
@@ -41,7 +46,7 @@ public class TemplateUtil {
 
   public static freemarker.template.Template createTemplateImplementation(String file) {
     try (var stream = new BufferedReader(new InputStreamReader(
-      Objects.requireNonNull(TemplateUtil.class.getResourceAsStream(file))))) {
+        Objects.requireNonNull(TemplateUtil.class.getResourceAsStream(file))))) {
       return new freemarker.template.Template("template", stream, getNewConfiguration());
     } catch (IOException e) {
       throw new IllegalStateException(e);
@@ -54,7 +59,8 @@ public class TemplateUtil {
     return cfg;
   }
 
-  public static Map<String, Object> getModelData(Entity entity, boolean computedColumns, boolean includeViews) {
+  public static Map<String, Object> getModelData(GeneratePaths paths, Entity entity,
+      List<HashMap<String, Object>> searchesMap, boolean computedColumns, boolean includeViews) {
     final String newClassName = entity.getName();
 
     Map<String, Object> data = new HashMap<>();
@@ -66,15 +72,19 @@ public class TemplateUtil {
     data.put("newClassNameWithoutS", getWithoutSS(newClassName));
     data.put("entity", entity);
     data.put("onlyClassName", data.get("className")
-      .toString()
-      .substring(data.get("className").toString().lastIndexOf('/') + 1));
+        .toString()
+        .substring(data.get("className").toString().lastIndexOf('/') + 1));
     data.put("repositoryClassEntityModel", data.get("className")
-      .toString()
-      .replace(data.get("onlyClassName").toString(),
-        entity.getName()) + "Model.java");
-    //data.put("util", this);
+        .toString()
+        .replace(data.get("onlyClassName").toString(),
+            entity.getName()) + "Model.java");
     data.put("tableName", entity.getTableName());
-
+    data.put("packageEntities", paths.packageEntities);
+    data.put("packageName", data.get("packageEntities").toString());
+    data.put("searches", searchesMap);
+    data.put("packageClientRest", "com.etendorx.clientrest");
+    data.put("packageEntityModel",
+        paths.pathEntitiesModelRx.substring(paths.pathEntitiesModelRx.lastIndexOf('/') + 1));
     return data;
 
   }
@@ -92,4 +102,11 @@ public class TemplateUtil {
     }
     return param;
   }
+
+  public static File prepareOutputFile(String fullPath, String fileName) {
+    var outFile = new File(fullPath, fileName);
+    new File(outFile.getParent()).mkdirs();
+    return outFile;
+  }
+
 }

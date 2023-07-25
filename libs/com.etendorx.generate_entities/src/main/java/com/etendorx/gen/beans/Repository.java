@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.gen.util;
+package com.etendorx.gen.beans;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,16 +59,7 @@ public class Repository {
       d.put("query", v.getQuery());
       d.put("method", v.getMethod());
       d.put("params", v.getSearchParamsMap());
-      List<String> list = new ArrayList<>();
-      if (v.getFetchAttributes() != null) {
-        for (int i = 0; i < v.getFetchAttributes().length(); i++) {
-          try {
-            list.add(v.getFetchAttributes().getString(i));
-          } catch (Exception ignored) {
-          }
-        }
-      }
-      d.put("fetchAttributes", list);
+      d.put("fetchAttributes", new ArrayList<>());
       return d;
     }).collect(Collectors.toList());
   }

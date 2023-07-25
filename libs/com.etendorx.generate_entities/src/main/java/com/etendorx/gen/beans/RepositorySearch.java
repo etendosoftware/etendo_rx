@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.gen.util;
-
-import org.codehaus.jettison.json.JSONArray;
+package com.etendorx.gen.beans;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,15 +27,14 @@ import java.util.stream.Collectors;
  * @author Sebastian Barrozo
  */
 public class RepositorySearch {
-  private final JSONArray fetchAttributes;
   private String query;
   private String method;
-  private final Map<String, RepositorySearchParam> searchParams = new LinkedHashMap<>();
+  private Map<String, RepositorySearchParam> searchParams = new LinkedHashMap<>();
 
-  public RepositorySearch(String method, String query, JSONArray fetchAttributes) {
+  public RepositorySearch(String method, String query, Map<String, RepositorySearchParam> searchParams) {
     this.method = method;
     this.query = query;
-    this.fetchAttributes = fetchAttributes;
+    this.searchParams = searchParams;
   }
 
   public String getQuery() {
@@ -60,9 +57,6 @@ public class RepositorySearch {
     return searchParams;
   }
 
-  public JSONArray getFetchAttributes() {
-    return fetchAttributes;
-  }
 
   public List<Map<String, String>> getSearchParamsMap() {
     return searchParams.values().stream().map(v -> {

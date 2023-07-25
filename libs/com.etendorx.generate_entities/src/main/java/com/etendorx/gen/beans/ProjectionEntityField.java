@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.gen.util;
+package com.etendorx.gen.beans;
 
 public class ProjectionEntityField {
   private String name;
