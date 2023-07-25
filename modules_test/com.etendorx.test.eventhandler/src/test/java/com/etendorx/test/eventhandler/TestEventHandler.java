@@ -26,6 +26,7 @@ import org.hibernate.event.spi.PreUpdateEvent;
 import org.junit.jupiter.api.Test;
 import org.openbravo.model.ad.access.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,10 +47,9 @@ import com.etendorx.test.eventhandler.component.EventHandlerUser;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19091")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @Import(EtendorxDasApplication.class)
-@AutoConfigureMockMvc
+@SpringBootConfiguration
 public class TestEventHandler {
   @SpyBean
   private EventHandlerUser component;

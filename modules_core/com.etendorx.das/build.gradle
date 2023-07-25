@@ -84,6 +84,7 @@ dependencies {
     testImplementation 'io.github.lognet:grpc-spring-boot-starter:4.6.0'
     testImplementation 'net.java.dev.jna:jna:5.7.0'
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    testImplementation 'org.projectlombok:lombok:1.18.26'
 
     codescan(project(':com.etendorx.test.eventhandler'))
 

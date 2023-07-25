@@ -52,7 +52,6 @@ public class AnnotationTests {
     parentEntity = parentEntityRepository.save(parentEntity);
     assertNotNull(parentEntity.getId());
     verify(component).handlePreInsert(eq(parentEntity), any(PreInsertEvent.class));
-    System.out.println("Test");
   }
 
   @Test
