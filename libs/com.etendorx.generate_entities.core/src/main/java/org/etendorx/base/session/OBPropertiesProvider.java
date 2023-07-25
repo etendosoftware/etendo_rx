@@ -16,8 +16,6 @@
 
 package org.etendorx.base.session;
 
-//import com.etendoerp.properties.EtendoPropertiesProvider;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

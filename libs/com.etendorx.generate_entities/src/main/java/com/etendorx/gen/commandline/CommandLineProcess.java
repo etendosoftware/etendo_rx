@@ -1,17 +1,17 @@
 package com.etendorx.gen.commandline;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 public class CommandLineProcess {
 
@@ -36,9 +36,11 @@ public class CommandLineProcess {
     try {
       Options options = new Options();
       options.addOption("g", "generate-metadata", true, "Generate the metadata.json file.");
-      options.addOption("e", "exclude", true, "List of comma separated modules to exclude from the metadata generation.");
+      options.addOption("e", "exclude", true,
+          "List of comma separated modules to exclude from the metadata generation.");
       options.addOption("i", "include", true, "List of comma separated modules to include in the metadata generation.");
-      options.addOption("test", "test", false, "If this process should have to generate classes included in modules located in modules_test");
+      options.addOption("test", "test", false,
+          "If this process should have to generate classes included in modules located in modules_test");
       CommandLineParser parser = new DefaultParser();
       return Optional.of(parser.parse(options, args));
     } catch (Exception e) {

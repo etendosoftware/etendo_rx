@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.gen.util;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+package com.etendorx.gen.beans;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Projection Entity class needed for code generation
@@ -30,14 +30,14 @@ import java.util.stream.Collectors;
  */
 public class ProjectionEntity {
   private static final Logger log = LogManager.getLogger();
-  private final String identity;
+  private final Boolean identity;
 
   private String name;
   private Map<String, ProjectionEntityField> fields = new HashMap<>();
   private String packageName;
   private String className;
 
-  public ProjectionEntity(String name, String identity) {
+  public ProjectionEntity(String name, Boolean identity) {
     this.name = name;
     this.identity = identity;
   }
@@ -54,7 +54,7 @@ public class ProjectionEntity {
     return fields;
   }
 
-  public List<HashMap<String, String>> getFieldsMap() {
+  public List<Map<String, String>> getFieldsMap() {
     return fields.values().stream().map(v -> {
       var d = new HashMap<String, String>();
       d.put("name", v.getName());
@@ -76,7 +76,7 @@ public class ProjectionEntity {
     return packageName;
   }
 
-  public String getIdentity() {
+  public Boolean getIdentity() {
     return identity;
   }
 

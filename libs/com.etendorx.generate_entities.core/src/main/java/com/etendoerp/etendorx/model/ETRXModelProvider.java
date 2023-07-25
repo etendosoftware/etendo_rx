@@ -12,10 +12,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.provider.OBProvider;
 import org.etendorx.base.provider.OBSingleton;
+import org.etendorx.dal.service.OBDal;
 import org.hibernate.Session;
+import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.ModelObject;
 import org.openbravo.base.model.ModelSessionFactoryController;
 import org.openbravo.base.model.Module;
+import org.openbravo.base.model.Table;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -23,6 +26,7 @@ import javax.persistence.criteria.Root;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class ETRXModelProvider implements OBSingleton {
 
@@ -34,6 +38,7 @@ public class ETRXModelProvider implements OBSingleton {
 
   // Etendo RX Models
   private static final List<Class<? extends ModelObject>> ETRX_MODEL_CLASSES = List.of(
+    //
     ETRXModule.class,
     // Projections
     ETRXProjection.class,
@@ -56,23 +61,29 @@ public class ETRXModelProvider implements OBSingleton {
     return localInstance;
   }
 
-  public List<ETRXModule> getEtendoRxModules() {
-    // Verify Etendo RX module is installed
-    verifyModule(ETENDO_RX_MODULE);
+  public void close() {
+    log.debug("Closing session and sessionfactory used during Etendo RX model read.");
+    initSession.close();
+  }
 
-    log.info("Building Etendo RX projections model");
-    final ModelSessionFactoryController sessionFactoryController = getETRXSessionFactoryController();
-    initSession = sessionFactoryController.getSessionFactory().openSession();
+  private <T> List<T> getData(Class<T> tClass, Function<Session, List<T>> retrieve) {
+    // Verify Etendo RX module is installed
+    if(initSession == null) {
+      final ModelSessionFactoryController sessionFactoryController = getETRXSessionFactoryController();
+      initSession = sessionFactoryController.getSessionFactory().openSession();
+    }
     try {
-      return retrieveRXModules(initSession);
+      return retrieve.apply(initSession);
     } catch (Exception e) {
       log.error("Error loading Etendo RX model.", e);
       throw e;
-    } finally {
-      log.debug("Closing session and sessionfactory used during Etendo RX model read.");
-      initSession.close();
-      sessionFactoryController.getSessionFactory().close();
     }
+  }
+
+  public List<ETRXModule> getEtendoRxModules() {
+    verifyModule(ETENDO_RX_MODULE);
+    log.info("Building Etendo RX projections model");
+    return getData(ETRXModule.class, this::retrieveRXModules);
   }
 
   /**
@@ -180,4 +191,54 @@ public class ETRXModelProvider implements OBSingleton {
     return session.createQuery(criteria).list();
   }
 
+  private List<ETRXProjection> retrieveRXProjection(Session session) {
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaQuery<ETRXProjection> criteria = builder.createQuery(ETRXProjection.class);
+    Root<ETRXProjection> root = criteria.from(ETRXProjection.class);
+    criteria.select(root);
+    criteria.where(builder.equal(root.get("active"), true));
+    return session.createQuery(criteria).list();
+  }
+
+  public List<ETRXProjection> getETRXProjection() {
+    return getData(ETRXProjection.class, this::retrieveRXProjection);
+  }
+
+  public List<ETRXRepository> getETRXRepositories(Entity entity) {
+    return getData(ETRXRepository.class, session -> retrieveETRXRepositories(session, entity));
+  }
+
+  private Table retrieveTable(Session session, String tableId) {
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaQuery<Table> criteria = builder.createQuery(Table.class);
+    Root<Table> root = criteria.from(Table.class);
+    criteria.select(root);
+    criteria.where(builder.equal(root.get("id"), tableId));
+    return session.createQuery(criteria).uniqueResult();
+  }
+
+  private List<ETRXRepository> retrieveETRXRepositories(Session session, Entity entity) {
+    Table table = retrieveTable(session, entity.getTableId());
+
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaQuery<ETRXRepository> criteria = builder.createQuery(ETRXRepository.class);
+    Root<ETRXRepository> root = criteria.from(ETRXRepository.class);
+    criteria.select(root);
+    criteria.where(builder.equal(root.get("active"), true));
+    criteria.where(builder.equal(root.get("table"), table));
+    return session.createQuery(criteria).list();
+  }
+
+  private List<ETRXRepository> retrieveETRXRepositories(Session session) {
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaQuery<ETRXRepository> criteria = builder.createQuery(ETRXRepository.class);
+    Root<ETRXRepository> root = criteria.from(ETRXRepository.class);
+    criteria.select(root);
+    criteria.where(builder.equal(root.get("active"), true));
+    return session.createQuery(criteria).list();
+  }
+
+  public List<ETRXRepository> getETRXRepositories() {
+    return getData(ETRXRepository.class, this::retrieveETRXRepositories);
+  }
 }
