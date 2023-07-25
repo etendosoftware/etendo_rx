@@ -10,33 +10,36 @@ import org.springframework.stereotype.Component;
 import com.etendorx.das.test.eventhandlertest.domain.ParentEntity;
 import com.etendorx.eventhandler.annotation.EventHandlerListener;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class HibernateEventListenerComponent {
 
     @EventHandlerListener
     public void handlePreInsert(ParentEntity entity, PreInsertEvent event){
-        System.out.println("Pre Insert execute");
+        log.info("Pre Insert execute");
     }
 
     @EventHandlerListener
     public void handlePostInsert(ParentEntity entity, PostInsertEvent event){
-        System.out.println("Post Insert execute");
+        log.info("Post Insert execute");
     }
 
     @Order(2)
     @EventHandlerListener
     public void handlePreUpdateSecond(ParentEntity entity, PreUpdateEvent event){
-        System.out.println("Pre Update execute in second order");
+        log.info("Pre Update execute in second order");
     }
 
     @Order(1)
     @EventHandlerListener
     public void handlePreUpdateFirst(ParentEntity entity, PreUpdateEvent event){
-        System.out.println("Pre Update execute in first order");
+        log.info("Pre Update execute in first order");
     }
 
     @EventHandlerListener
     public void handlePostUpdate(ParentEntity entity, PostUpdateEvent event){
-        System.out.println("Post Update execute");
+        log.info("Post Update execute");
     }
 }
