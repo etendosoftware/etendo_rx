@@ -18,30 +18,6 @@ public class EventHandlerUtils {
     return getPropertyIndex(event.getPersister(), property);
   }
 
-  public static int getPropertyIndex(PreUpdateEvent event, String property) {
-    return getPropertyIndex(event.getPersister(), property);
-  }
-
-  public static int getPropertyIndex(PreInsertEvent event, String property) {
-    return getPropertyIndex(event.getPersister(), property);
-  }
-
-  public static int getPropertyIndex(PreDeleteEvent event, String property) {
-    return getPropertyIndex(event.getPersister(), property);
-  }
-
-  public static int getPropertyIndex(PostUpdateEvent event, String property) {
-    return getPropertyIndex(event.getPersister(), property);
-  }
-
-  public static int getPropertyIndex(PostInsertEvent event, String property) {
-    return getPropertyIndex(event.getPersister(), property);
-  }
-
-  public static int getPropertyIndex(PostDeleteEvent event, String property) {
-    return getPropertyIndex(event.getPersister(), property);
-  }
-
   public static int getPropertyIndex(SaveOrUpdateEvent event, String property) {
     return getPropertyIndex(event.getEntry().getPersister(), property);
   }
