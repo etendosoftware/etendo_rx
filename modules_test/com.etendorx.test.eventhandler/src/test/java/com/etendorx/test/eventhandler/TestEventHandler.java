@@ -31,6 +31,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -44,6 +45,8 @@ import org.testcontainers.utility.DockerImageName;
 import com.etendorx.das.EtendorxDasApplication;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import com.etendorx.test.eventhandler.component.EventHandlerUser;
+import com.etendorx.utils.auth.key.context.AppContext;
+import com.etendorx.utils.auth.key.context.UserContext;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19091")
@@ -56,6 +59,17 @@ public class TestEventHandler {
 
   @Autowired
   private ADUserRepository userRepository;
+
+  @org.springframework.boot.test.context.TestConfiguration
+  static class RepositoryTestConfiguration {
+    @Bean
+    public UserContext userContext() {
+      return new UserContext();
+    }
+  }
+
+  @Autowired
+  private UserContext userContext;
 
   @DynamicPropertySource
   static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -82,7 +96,8 @@ public class TestEventHandler {
       );
 
   @Test
-  void test() {
+  void testUpdateUserAndExecuteEventHandler() {
+    AppContext.setCurrentUser(userContext);
     User user = userRepository.findById("100").orElse(null);
     if (user != null) {
       user.setLastName("Test eventHandler");
