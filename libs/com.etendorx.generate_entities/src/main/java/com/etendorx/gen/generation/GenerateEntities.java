@@ -29,16 +29,15 @@ import com.etendorx.gen.beans.Projection;
 import com.etendorx.gen.beans.Repository;
 import com.etendorx.gen.commandline.CommandLineProcess;
 import com.etendorx.gen.metadata.MetadataContainer;
-import com.etendorx.gen.process.GenerateMetadata;
 import com.etendorx.gen.process.GenerateProtoFile;
 import com.etendorx.gen.util.TemplateUtil;
 
 public class GenerateEntities {
-  private static final Logger log = LogManager.getLogger();
   public static final String ERROR_GENERATING_FILE = "Error generating file: ";
   public static final String GENERATING_FILE = "Generating file: ";
   public static final String MODULES_GEN = "modules_gen";
   public final static String GENERATED_DIR = "/../build/tmp/generated";
+  private static final Logger log = LogManager.getLogger();
   private String basePath;
   private String propertiesFile;
 
@@ -149,7 +148,8 @@ public class GenerateEntities {
     GenerateProtoFile generateProtoFile = new GenerateProtoFile();
     generateProtoFile.setEntitiesModel(entities);
     // Generate Proto File
-    generateProtoFile.generate(paths.pathEtendoRx,metadata.getRepositoriesMap(), projections, metadataContainer, computedColumns, includeViews);
+    generateProtoFile.generate(paths.pathEtendoRx, metadata.getRepositoriesMap(), projections, metadataContainer,
+        computedColumns, includeViews);
 
   }
 
@@ -179,6 +179,7 @@ public class GenerateEntities {
         ETRXModelProvider.getInstance().getETRXRepositories()
     );
   }
+
   private List<Projection> getProjections(GeneratePaths paths) {
     return new ProjectionsConverter().convert(
         paths,

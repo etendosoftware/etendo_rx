@@ -28,9 +28,8 @@ import java.util.stream.Collectors;
  */
 public class Repository {
   private final boolean transactional;
-
-  private String entityName;
   private final Map<String, RepositorySearch> searches = new HashMap<>();
+  private String entityName;
 
   public Repository(String entityName, boolean transactional) {
     this.entityName = entityName;

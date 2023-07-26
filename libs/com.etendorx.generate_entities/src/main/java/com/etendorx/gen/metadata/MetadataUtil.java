@@ -159,8 +159,6 @@ public class MetadataUtil {
 
   @FunctionalInterface
   public interface HandlingConsumer<T, E extends CodeGenerationException> {
-    void accept(T target) throws E;
-
     static <T> Consumer<T> handlingConsumerBuilder(
         HandlingConsumer<T, CodeGenerationException> handlingConsumer) {
       return obj -> {
@@ -171,6 +169,8 @@ public class MetadataUtil {
         }
       };
     }
+
+    void accept(T target) throws E;
   }
 
 }

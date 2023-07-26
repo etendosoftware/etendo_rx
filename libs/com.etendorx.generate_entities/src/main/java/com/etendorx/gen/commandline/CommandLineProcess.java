@@ -15,13 +15,11 @@ import org.apache.logging.log4j.Logger;
 
 public class CommandLineProcess {
 
-  private static final Logger log = LogManager.getLogger();
-
   public static final String GENERATE_METADATA_OPT = "g";
   public static final String EXCLUDE_MOD_OPT = "e";
   public static final String INCLUDE_MOD_OPT = "i";
   public static final String TEST_MOD_OPT = "test";
-
+  private static final Logger log = LogManager.getLogger();
   private boolean generateMetadata = true;
   private List<String> excludedModules = new ArrayList<>();
   private List<String> includedModules = new ArrayList<>();
@@ -30,6 +28,18 @@ public class CommandLineProcess {
   public CommandLineProcess(String... args) {
     Optional<CommandLine> cmdOptional = generateCommandLine(args);
     cmdOptional.ifPresent(this::parseCommandLine);
+  }
+
+  static List<String> parseStringToList(String str) {
+    return Arrays.asList(str.split(","));
+  }
+
+  static <T> T getCommandLineOptionWrapper(Supplier<T> s) {
+    try {
+      return s.get();
+    } catch (Exception e) {
+      throw new CommandLineException(e);
+    }
   }
 
   public Optional<CommandLine> generateCommandLine(String... args) {
@@ -81,18 +91,6 @@ public class CommandLineProcess {
       throw cmdException;
     } catch (Exception e) {
       log.debug("Error parsing command line", e);
-    }
-  }
-
-  static List<String> parseStringToList(String str) {
-    return Arrays.asList(str.split(","));
-  }
-
-  static <T> T getCommandLineOptionWrapper(Supplier<T> s) {
-    try {
-      return s.get();
-    } catch (Exception e) {
-      throw new CommandLineException(e);
     }
   }
 

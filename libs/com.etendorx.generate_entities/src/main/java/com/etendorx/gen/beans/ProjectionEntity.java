@@ -54,6 +54,26 @@ public class ProjectionEntity {
     return fields;
   }
 
+  public String getPackageName() {
+    return packageName;
+  }
+
+  public void setPackageName(String packageName) {
+    this.packageName = packageName;
+  }
+
+  public Boolean getIdentity() {
+    return identity;
+  }
+
+  public String getClassName() {
+    return className;
+  }
+
+  public void setClassName(String className) {
+    this.className = className;
+  }
+
   public List<Map<String, String>> getFieldsMap() {
     return fields.values().stream().map(v -> {
       var d = new HashMap<String, String>();
@@ -66,26 +86,6 @@ public class ProjectionEntity {
       d.put("notNullValue", v.getNotNullValue());
       return d;
     }).collect(Collectors.toList());
-  }
-
-  public void setPackageName(String packageName) {
-    this.packageName = packageName;
-  }
-
-  public String getPackageName() {
-    return packageName;
-  }
-
-  public Boolean getIdentity() {
-    return identity;
-  }
-
-  public void setClassName(String className) {
-    this.className = className;
-  }
-
-  public String getClassName() {
-    return className;
   }
 
 }
