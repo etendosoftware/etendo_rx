@@ -65,6 +65,7 @@ public class TestEventHandler {
     });
     registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
     registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+    registry.add("scan.basePackage", () -> "com.etendorx.test.eventhandler");
   }
 
   @Container

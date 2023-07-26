@@ -40,7 +40,6 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.17.3'
     testImplementation(project(path: ':com.etendorx.das')) {
         transitive = false
-        //exclude group: 'com.etendorx', module: 'test.grpc'
         exclude group: 'com.etendorx.test.grpc'
     }
     testImplementation(project(':com.etendorx.utils.auth')) {
