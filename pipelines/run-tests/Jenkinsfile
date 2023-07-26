@@ -348,6 +348,7 @@ spec:
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RepositoryTest
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RestCallTest
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.DefaultFiltersTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.eventhandlertest.test.AnnotationTests
                             """
                             '...DAS TESTS SUCCESSFUL...'
                         } catch (Exception e) {
@@ -414,6 +415,47 @@ spec:
                 }
             }
         }
+        stage ("Run Event Handler Tests") {
+                    when {
+                        expression {
+                            env.STATUSRX == "1"
+                        }
+                    }
+                    steps {
+                        container("compiler") {
+                            script {
+                                try {
+                                    echo "Starting Event Handler tests"
+                                    sh """
+                                    export DOCKER_HOST=/var/run/docker.sock
+                                    export TESTCONTAINERS_RYUK_DISABLED=true
+                                    export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                                    cd etendo_rx
+                                    ./gradlew :com.etendorx.test.eventhandler:test --info
+                                    """
+                                    '...EVENT HANDLER TESTS SUCCESSFUL...'
+                                } catch (Exception e) {
+                                    echo 'Exception occurred: ' + e.toString()
+                                    echo '...EVENT HANDLER TEST FAILED...'
+                                    currentBuild.result = 'UNSTABLE'
+                                    unstable('EVENT HANDLER TESTS FAILED!')
+                                    env.STATUSTEST = "0"
+                                }
+                                if(fileExists('etendo_rx/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test')) {
+                                    publishHTML([
+                                        allowMissing: false,
+                                        alwaysLinkToLastBuild: false,
+                                        keepAll: true,
+                                        reportDir: 'etendo_rx/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test',
+                                        reportFiles: '*.html',
+                                        reportName: 'EVENT HANDLER TESTS REPORT',
+                                        reportTitles: ''
+                                    ])
+                                }
+                            }
+                        }
+                    }
+                }
     }
     post {
             always {
