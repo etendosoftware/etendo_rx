@@ -131,6 +131,11 @@ public class MetadataUtil {
         generateClassName(propertyModel));
   }
 
+  /**
+   * Generates the class name of a {@link Property}
+   * @param propertyModel
+   * @return
+   */
   static String generateClassName(Property propertyModel) {
     String className = "";
     if (propertyModel.getTargetEntity() != null && propertyModel.getTargetEntity().getName() != null) {
@@ -143,19 +148,6 @@ public class MetadataUtil {
     }
     return className;
   }
-
-  public static List<File> getMetadataFiles(String path) {
-    File location = new File(path);
-
-    if (!location.exists()) {
-      log.info("The location to search Metadata files '" + path + "' does not exists.");
-      return new ArrayList<>();
-    }
-
-    return Arrays.stream(Objects.requireNonNull(new File(path).listFiles(File::isDirectory))).collect(
-        Collectors.toList());
-  }
-
 
   @FunctionalInterface
   public interface HandlingConsumer<T, E extends CodeGenerationException> {

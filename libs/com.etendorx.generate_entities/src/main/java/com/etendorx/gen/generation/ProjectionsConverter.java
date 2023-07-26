@@ -14,6 +14,13 @@ import com.etendorx.gen.beans.Projection;
 import com.etendorx.gen.beans.ProjectionEntity;
 
 public class ProjectionsConverter {
+
+  /**
+   * Converts the ETRX projections to projections
+   * @param paths
+   * @param etrxProjections
+   * @return
+   */
   public List<Projection> convert(GeneratePaths paths, List<ETRXProjection> etrxProjections) {
     List<Projection> projections = new ArrayList<>();
     for (ETRXProjection etrxProjection : etrxProjections) {
@@ -30,22 +37,42 @@ public class ProjectionsConverter {
     return projections;
   }
 
+  /**
+   * Converts the ETRX projections to projections and adds the entities to the projection
+   * @param projection
+   * @param entities
+   */
   public void convert(Projection projection, Set<ETRXProjectionEntity> entities) {
     for (ETRXProjectionEntity entity : entities) {
       projection.getEntities().put(entity.getTable().getName(), convertEntity(entity));
     }
   }
 
+  /**
+   * Converts the entities to projections and adds the entities to the projection
+   * @param projection
+   * @param entities
+   */
   public void convert(Projection projection, List<Entity> entities) {
     for (Entity entity : entities) {
       projection.getEntities().put(entity.getName(), convertEntity(entity));
     }
   }
 
+  /**
+   * Converts the ETRX projection entity to projection entity
+   * @param entity
+   * @return
+   */
   private ProjectionEntity convertEntity(ETRXProjectionEntity entity) {
     return new ProjectionEntity(entity.getTable().getName(), entity.getIdentity());
   }
 
+  /**
+   * Converts the entity to projection entity
+   * @param entity
+   * @return
+   */
   private ProjectionEntity convertEntity(Entity entity) {
     var projectionEntity = new ProjectionEntity(entity.getName(), false);
     projectionEntity.setPackageName(entity.getPackageName());
@@ -53,6 +80,11 @@ public class ProjectionsConverter {
     return projectionEntity;
   }
 
+  /**
+   * Gets the entities map from the entities list
+   * @param entities
+   * @return
+   */
   public Map<String, ProjectionEntity> getEntitiesMap(List<Entity> entities) {
     Projection projection = new Projection("default");
     convert(projection, entities);

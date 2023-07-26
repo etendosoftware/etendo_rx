@@ -28,6 +28,7 @@ import com.etendorx.gen.beans.Metadata;
 import com.etendorx.gen.beans.Projection;
 import com.etendorx.gen.beans.Repository;
 import com.etendorx.gen.commandline.CommandLineProcess;
+import com.etendorx.gen.generation.interfaces.EntityGenerator;
 import com.etendorx.gen.metadata.MetadataContainer;
 import com.etendorx.gen.process.GenerateProtoFile;
 import com.etendorx.gen.util.TemplateUtil;
@@ -61,6 +62,10 @@ public class GenerateEntities {
     this.propertiesFile = propertiesFile;
   }
 
+  /**
+   * Executes the command
+   * @param cmdProcess the command line process
+   */
   public void execute(CommandLineProcess cmdProcess) {
     if (getBasePath() == null) {
       setBasePath(".");
@@ -113,6 +118,12 @@ public class GenerateEntities {
     log.info("Generated {} entities", entities.size());
   }
 
+  /**
+   * Generates the projections
+   * @param paths the paths
+   * @param entities the entities
+   * @return the projections
+   */
   private ArrayList<Projection> getProjections(GeneratePaths paths, List<Entity> entities) {
     var projections = new ArrayList<Projection>();
     var projectionDefault = getDefaultProjection(entities);
@@ -121,6 +132,11 @@ public class GenerateEntities {
     return projections;
   }
 
+  /**
+   * Generates the generators
+   * @param projections the projections
+   * @return the generators
+   */
   private List<EntityGenerator> getGenerators(ArrayList<Projection> projections) {
     List<EntityGenerator> generators = new ArrayList<>();
     generators.add(new GenerateEntityRX());
@@ -131,6 +147,15 @@ public class GenerateEntities {
     return generators;
   }
 
+  /**
+   * Generates the protofile
+   * @param projections the projections
+   * @param entities the entities
+   * @param paths the paths
+   * @param computedColumns the computed columns
+   * @param includeViews the include views
+   * @throws FileNotFoundException the file not found exception
+   */
   private void generateProtofile(ArrayList<Projection> projections, List<Entity> entities, GeneratePaths paths,
       boolean computedColumns, boolean includeViews) throws FileNotFoundException {
     List<Repository> repositories = new ArrayList<>();
@@ -153,12 +178,22 @@ public class GenerateEntities {
 
   }
 
+  /**
+   * Gets the default projection
+   * @param entities the entities
+   * @return the generated projections
+   */
   private Projection getDefaultProjection(List<Entity> entities) {
     var projection = new Projection(PROJECTION_DEFAULT);
     new ProjectionsConverter().convert(projection, entities);
     return projection;
   }
 
+  /**
+   * Get the search map
+   * @param entity the entity
+   * @return the search map
+   */
   private List<HashMap<String, Object>> getSearchesMap(Entity entity) {
     List<Repository> repositories = getRepositories(entity);
     List<HashMap<String, Object>> searchesMap = new ArrayList<>();
@@ -168,18 +203,32 @@ public class GenerateEntities {
     return searchesMap;
   }
 
+  /**
+   * Get repositories from entity
+   * @param entity the entity
+   * @return the repository list
+   */
   private List<Repository> getRepositories(Entity entity) {
     return new RepositoriesConverter().convert(
         ETRXModelProvider.getInstance().getETRXRepositories(entity)
     );
   }
 
+  /**
+   * Get repositories
+   * @return the repository list
+   */
   private List<Repository> getRepositories() {
     return new RepositoriesConverter().convert(
         ETRXModelProvider.getInstance().getETRXRepositories()
     );
   }
 
+  /**
+   * Get projections
+   * @param paths the paths
+   * @return the projections
+   */
   private List<Projection> getProjections(GeneratePaths paths) {
     return new ProjectionsConverter().convert(
         paths,
@@ -187,6 +236,12 @@ public class GenerateEntities {
     );
   }
 
+  /**
+   * Generates the entity scan
+   * @param entities the entities
+   * @param pathEntitiesRx the path entities rx
+   * @throws FileNotFoundException
+   */
   private void generateEntityScan(List<Entity> entities, String pathEntitiesRx) throws FileNotFoundException {
     Map<String, Object> data = new HashMap<>();
     data.put("packages", entities.stream().map(Entity::getPackageName)
@@ -202,7 +257,14 @@ public class GenerateEntities {
     TemplateUtil.processTemplate(templateRX, data, outWriter);
   }
 
-
+  /**
+   * Generates the base entity rx
+   * @param data the data
+   * @param pathEntitiesRx the path entities rx
+   * @param className the class name
+   * @param packageName the package name
+   * @throws FileNotFoundException the file not found exception
+   */
   private void generateBaseEntityRx(Map<String, Object> data, String pathEntitiesRx, String className,
       String packageName) throws FileNotFoundException {
     final String fullPathEntities = pathEntitiesRx + "/src/main/entities/" + packageName.replace(".", "/");

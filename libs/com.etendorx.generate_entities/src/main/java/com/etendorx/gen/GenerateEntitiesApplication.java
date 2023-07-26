@@ -35,11 +35,14 @@ public class GenerateEntitiesApplication {
   private static final Logger log = LogManager.getLogger();
 
   public static void main(String[] args) {
-    // TODO: Allow the user to set the log level
     Configurator.setRootLevel(Level.INFO);
     new GenerateEntitiesApplication().run(args);
   }
 
+  /**
+   * Run the task based on the command line arguments
+   * @param args
+   */
   public void run(String... args) {
     // Parse args
     CommandLineProcess commandLineProcess = new CommandLineProcess(args);

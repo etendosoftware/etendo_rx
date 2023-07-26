@@ -11,9 +11,18 @@ import java.util.Map;
 
 import com.etendorx.gen.beans.Projection;
 import com.etendorx.gen.beans.ProjectionEntity;
+import com.etendorx.gen.generation.interfaces.ProjectionGenerator;
 import com.etendorx.gen.util.TemplateUtil;
 
 public class GenerateReactCode implements ProjectionGenerator {
+
+  /**
+   * Generates the projections and the model projected for a React module
+   * @param paths
+   * @param data
+   * @param projection
+   * @throws FileNotFoundException
+   */
   @Override
   public void generate(GeneratePaths paths, Map<String, Object> data,
       Projection projection) throws FileNotFoundException {

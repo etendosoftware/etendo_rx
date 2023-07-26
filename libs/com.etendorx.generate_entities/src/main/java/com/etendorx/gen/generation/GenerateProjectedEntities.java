@@ -18,11 +18,20 @@ import org.openbravo.base.model.Entity;
 
 import com.etendorx.gen.beans.Projection;
 import com.etendorx.gen.beans.ProjectionEntity;
+import com.etendorx.gen.generation.interfaces.ProjectionGenerator;
 import com.etendorx.gen.util.TemplateUtil;
 
 import freemarker.template.Template;
 
 public class GenerateProjectedEntities implements ProjectionGenerator {
+
+  /**
+   * Generates the projections and the model projected
+   * @param paths
+   * @param data
+   * @param projection
+   * @throws FileNotFoundException
+   */
   @Override
   public void generate(GeneratePaths paths, Map<String, Object> data,
       Projection projection) throws FileNotFoundException {
@@ -32,6 +41,14 @@ public class GenerateProjectedEntities implements ProjectionGenerator {
     }
   }
 
+  /**
+   * Generates the projections
+   * @param data
+   * @param path
+   * @param ftlFileName
+   * @param projection
+   * @throws FileNotFoundException
+   */
   private void generateProjections(Map<String, Object> data, String path, String ftlFileName,
       Projection projection) throws FileNotFoundException {
     Template template = TemplateUtil.createTemplateImplementation(ftlFileName);

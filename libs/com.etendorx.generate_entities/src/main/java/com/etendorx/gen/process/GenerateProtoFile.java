@@ -82,6 +82,16 @@ public class GenerateProtoFile {
     return projectionMix;
   }
 
+  /**
+   * Generates the proto files for the given projections.
+   * @param pathEtendoRx
+   * @param repositories
+   * @param projections
+   * @param metadataContainer
+   * @param computedColumns
+   * @param includeViews
+   * @throws FileNotFoundException
+   */
   public void generate(String pathEtendoRx, List<HashMap<String, Object>> repositories,
       Collection<Projection> projections, MetadataContainer metadataContainer, boolean computedColumns,
       boolean includeViews) throws FileNotFoundException {
@@ -108,7 +118,15 @@ public class GenerateProtoFile {
     }
   }
 
-  public void generate(String pathEtendoRx, MetadataContainer metadataContainer, boolean computedColumns,
+  /**
+   * Generates the proto files for the given projections.
+   * @param pathEtendoRx
+   * @param metadataContainer
+   * @param computedColumns
+   * @param includeViews
+   * @throws FileNotFoundException
+   */
+  private void generate(String pathEtendoRx, MetadataContainer metadataContainer, boolean computedColumns,
       boolean includeViews) throws FileNotFoundException {
 
     // Filter the metadata modules which contains a projection with the 'grpc' set to true.
@@ -121,6 +139,14 @@ public class GenerateProtoFile {
     }
   }
 
+  /**
+   * Generates the proto file for the given module metadata.
+   * @param pathEtendoRx
+   * @param moduleMetadata
+   * @param computedColumns
+   * @param includeViews
+   * @throws FileNotFoundException
+   */
   private void generateProtoFile(String pathEtendoRx, Metadata moduleMetadata, boolean computedColumns,
       boolean includeViews) throws FileNotFoundException {
 
@@ -162,6 +188,19 @@ public class GenerateProtoFile {
     TemplateUtil.processTemplate(template, globalData, outWriterProjection);
   }
 
+  /**
+   * Generates the source files for the given projections.
+   * @param pathEtendoRx
+   * @param projection
+   * @param repositories
+   * @param computedColumns
+   * @param includeViews
+   * @param sourcefilePath
+   * @param templatePath
+   * @param prefix
+   * @param sufix
+   * @throws FileNotFoundException
+   */
   private void generateSourcefile(String pathEtendoRx, Projection projection,
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews, String sourcefilePath,
       String templatePath,
@@ -170,6 +209,20 @@ public class GenerateProtoFile {
         templatePath, prefix, sufix, null);
   }
 
+  /**
+   * Generates the source files for the given projections.
+   * @param pathEtendoRx
+   * @param projection
+   * @param repositories
+   * @param computedColumns
+   * @param includeViews
+   * @param sourcefilePath
+   * @param templatePath
+   * @param prefix
+   * @param sufix
+   * @param packageName
+   * @throws FileNotFoundException
+   */
   private void generateSourcefile(String pathEtendoRx, Projection projection,
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews, String sourcefilePath,
       String templatePath,
@@ -220,6 +273,15 @@ public class GenerateProtoFile {
 
   }
 
+  /**
+   * Generates the source files for the given projections.
+   * @param pathEtendoRx
+   * @param projection
+   * @param repositories
+   * @param computedColumns
+   * @param includeViews
+   * @throws FileNotFoundException
+   */
   private void generateGrpcService(String pathEtendoRx, Projection projection,
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
@@ -232,6 +294,15 @@ public class GenerateProtoFile {
 
   }
 
+  /**
+   * Generates the DTO source files for the given projections.
+   * @param pathEtendoRx
+   * @param projection
+   * @param repositories
+   * @param computedColumns
+   * @param includeViews
+   * @throws FileNotFoundException
+   */
   private void generateGRPCDto(String pathEtendoRx, Projection projection,
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
@@ -245,6 +316,15 @@ public class GenerateProtoFile {
 
   }
 
+  /**
+   * Generates the DTO projection source files for the given projections.
+   * @param pathEtendoRx
+   * @param projection
+   * @param repositories
+   * @param computedColumns
+   * @param includeViews
+   * @throws FileNotFoundException
+   */
   private void generateGRPCDtoProjection(String pathEtendoRx, Projection projection,
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
@@ -262,6 +342,15 @@ public class GenerateProtoFile {
     );
   }
 
+  /**
+   * Generates the DTO projection source files for the given projections.
+   * @param pathEtendoRx
+   * @param projection
+   * @param repositories
+   * @param computedColumns
+   * @param includeViews
+   * @throws FileNotFoundException
+   */
   private void generateProjectionDTO2Grpc(String pathEtendoRx, Projection projection,
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
@@ -279,6 +368,15 @@ public class GenerateProtoFile {
 
   }
 
+  /**
+   * Generates the client service source files for the given projections.
+   * @param pathEtendoRx
+   * @param projection
+   * @param repositories
+   * @param computedColumns
+   * @param includeViews
+   * @throws FileNotFoundException
+   */
   private void generateClientGrpcService(String pathEtendoRx, Projection projection,
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
@@ -296,6 +394,15 @@ public class GenerateProtoFile {
 
   }
 
+  /**
+   * Generates the client service interface source files for the given projections.
+   * @param pathEtendoRx
+   * @param projection
+   * @param repositories
+   * @param computedColumns
+   * @param includeViews
+   * @throws FileNotFoundException
+   */
   private void generateClientServiceInterface(String pathEtendoRx, Projection projection,
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
@@ -313,17 +420,9 @@ public class GenerateProtoFile {
 
   }
 
-  public List<Entity> getEntitiesModel() {
-    return entitiesModel;
-  }
-
   public void setEntitiesModel(List<Entity> entitiesModel) {
     this.entitiesModel = entitiesModel;
     this.setEntitiesModelMap(MetadataUtil.generateEntitiesMap(entitiesModel));
-  }
-
-  public Map<String, Entity> getEntitiesModelMap() {
-    return entitiesModelMap;
   }
 
   public void setEntitiesModelMap(Map<String, Entity> entitiesModelMap) {

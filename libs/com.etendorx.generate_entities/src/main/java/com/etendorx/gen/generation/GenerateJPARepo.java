@@ -11,9 +11,17 @@ import java.util.Map;
 
 import org.openbravo.base.model.Entity;
 
+import com.etendorx.gen.generation.interfaces.EntityGenerator;
 import com.etendorx.gen.util.TemplateUtil;
 
 public class GenerateJPARepo implements EntityGenerator {
+
+  /**
+   * Generates the entity jpa repo
+   * @param data
+   * @param path
+   * @throws FileNotFoundException
+   */
   @Override
   public void generate(Map<String, Object> data, GeneratePaths path) throws FileNotFoundException {
     String ftlFileNameJPARepo = "/org/openbravo/base/gen/jpaRepoRX.ftl";

@@ -13,9 +13,17 @@ import java.util.Map;
 
 import org.openbravo.base.model.Entity;
 
+import com.etendorx.gen.generation.interfaces.EntityGenerator;
 import com.etendorx.gen.util.TemplateUtil;
 
 public class GenerateClientRestRX implements EntityGenerator {
+
+  /**
+   * Generates the entity
+   * @param data
+   * @param path
+   * @throws FileNotFoundException
+   */
   @Override
   public void generate(Map<String, Object> data, GeneratePaths path) throws FileNotFoundException {
     String pathClientRestRx = path.pathEtendoRx + File.separator + MODULES_GEN + File.separator + "com.etendorx.entitiesModel";

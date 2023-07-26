@@ -13,10 +13,15 @@ import com.etendorx.gen.beans.RepositorySearch;
 import com.etendorx.gen.beans.RepositorySearchParam;
 
 public class RepositoriesConverter {
+
+  /**
+   * Converts the ETRX repositories to repositories
+   * @param etrxRepositories
+   * @return
+   */
   public List<Repository> convert(List<ETRXRepository> etrxRepositories) {
     List<Repository> repositories = new ArrayList<>();
     for (ETRXRepository etrxRepository : etrxRepositories) {
-      // TODO Review transactional case
       Repository repository = new Repository(
           etrxRepository.getEntityName(),
           true

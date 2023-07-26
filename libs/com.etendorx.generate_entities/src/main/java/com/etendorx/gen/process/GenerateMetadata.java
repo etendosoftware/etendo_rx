@@ -65,6 +65,10 @@ public class GenerateMetadata {
     this.defaultDirectory = defaultDirectory;
   }
 
+  /**
+   * Generates the metadata.json files for all the modules
+   * @param pathEtendoRx
+   */
   public void generate(String pathEtendoRx) {
     // Search the module location
     File etendoRxLocation = new File(pathEtendoRx);
