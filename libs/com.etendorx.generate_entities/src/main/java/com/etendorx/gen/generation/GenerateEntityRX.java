@@ -12,11 +12,18 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.etendorx.gen.generation.interfaces.EntityGenerator;
 import com.etendorx.gen.util.TemplateUtil;
 
 public class GenerateEntityRX implements EntityGenerator {
   private static final Logger log = LogManager.getLogger();
 
+  /**
+   * Generates the entity RX
+   * @param data
+   * @param paths
+   * @throws FileNotFoundException
+   */
   @Override
   public void generate(Map<String, Object> data, GeneratePaths paths) throws FileNotFoundException {
     final String className = data.get(GenerateEntitiesConstants.CLASS_NAME).toString();

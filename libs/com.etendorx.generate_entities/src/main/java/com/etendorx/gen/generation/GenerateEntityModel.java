@@ -9,11 +9,19 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import com.etendorx.gen.generation.interfaces.EntityGenerator;
 import com.etendorx.gen.util.TemplateUtil;
 
 import freemarker.template.Template;
 
 public class GenerateEntityModel implements EntityGenerator {
+
+  /**
+   * Generates the entity model
+   * @param data
+   * @param path
+   * @throws FileNotFoundException
+   */
   @Override
   public void generate(Map<String, Object> data, GeneratePaths path) throws FileNotFoundException {
 

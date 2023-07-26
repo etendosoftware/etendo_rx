@@ -10,6 +10,7 @@ import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.ModelProvider;
 
 import com.etendorx.gen.beans.Projection;
+import com.etendorx.gen.generation.interfaces.EntityGenerator;
 
 public class GenerateProjections implements EntityGenerator {
   private final ArrayList<Projection> projections;
@@ -18,14 +19,20 @@ public class GenerateProjections implements EntityGenerator {
     this.projections = projections;
   }
 
+  /**
+   * Generates the projections
+   * @param data
+   * @param path
+   * @throws FileNotFoundException
+   */
   @Override
   public void generate(Map<String, Object> data, GeneratePaths path) throws FileNotFoundException {
     for (Projection projection : projections) {
-      List<Entity> entities = ModelProvider.getInstance().getModel();
-      data.put("anotherEntities", new ProjectionsConverter().getEntitiesMap(entities));
       if (StringUtils.equals(GenerateEntitiesConstants.PROJECTION_DEFAULT,
           projection.getName()) || projection.getEntities().containsKey(
           data.get("newClassName").toString())) {
+        List<Entity> entities = ModelProvider.getInstance().getModel();
+        data.put("anotherEntities", new ProjectionsConverter().getEntitiesMap(entities));
         new GenerateProjectedEntities().generate(path, data, projection);
         if (!projection.getReact()) {
           if (!StringUtils.equals(GenerateEntitiesConstants.PROJECTION_DEFAULT, projection.getName())) {

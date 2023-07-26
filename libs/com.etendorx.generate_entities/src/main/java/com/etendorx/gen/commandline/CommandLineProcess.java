@@ -42,6 +42,12 @@ public class CommandLineProcess {
     }
   }
 
+  /**
+   * Generates the command line options
+   *
+   * @param args
+   * @return the command line options
+   */
   public Optional<CommandLine> generateCommandLine(String... args) {
     try {
       Options options = new Options();
@@ -59,6 +65,11 @@ public class CommandLineProcess {
     return Optional.empty();
   }
 
+  /**
+   * Parses the command line options
+   *
+   * @param cmd the command line options
+   */
   public void parseCommandLine(CommandLine cmd) {
     try {
       if (cmd.hasOption(GENERATE_METADATA_OPT)) {
@@ -92,30 +103,6 @@ public class CommandLineProcess {
     } catch (Exception e) {
       log.debug("Error parsing command line", e);
     }
-  }
-
-  public boolean isGenerateMetadata() {
-    return generateMetadata;
-  }
-
-  public void setGenerateMetadata(boolean generateMetadata) {
-    this.generateMetadata = generateMetadata;
-  }
-
-  public List<String> getExcludedModules() {
-    return excludedModules;
-  }
-
-  public void setExcludedModules(List<String> excludedModules) {
-    this.excludedModules = excludedModules;
-  }
-
-  public List<String> getIncludedModules() {
-    return includedModules;
-  }
-
-  public void setIncludedModules(List<String> includedModules) {
-    this.includedModules = includedModules;
   }
 
   public boolean isTest() {

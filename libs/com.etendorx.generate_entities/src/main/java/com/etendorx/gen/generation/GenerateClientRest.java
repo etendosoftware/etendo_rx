@@ -16,11 +16,19 @@ import org.apache.commons.lang.StringUtils;
 import org.openbravo.base.model.Entity;
 
 import com.etendorx.gen.beans.Projection;
+import com.etendorx.gen.generation.interfaces.ProjectionGenerator;
 import com.etendorx.gen.metadata.MetadataUtil;
 import com.etendorx.gen.util.TemplateUtil;
 
 public class GenerateClientRest implements ProjectionGenerator {
 
+  /**
+   * Generates the projection
+   * @param paths
+   * @param data
+   * @param projection
+   * @throws FileNotFoundException
+   */
   @Override
   public void generate(GeneratePaths paths, Map<String, Object> data,
       Projection projection) throws FileNotFoundException {
@@ -37,6 +45,12 @@ public class GenerateClientRest implements ProjectionGenerator {
         new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8)));
   }
 
+  /**
+   * Obtains the model projection class
+   * @param data
+   * @param projection
+   * @return
+   */
   private String getModelProjectionClass(Map<String, Object> data, Projection projection) {
     final String newClassName = data.get("newClassName").toString();
     final String modelProjectionClass = ((Entity) data.get(
@@ -44,6 +58,12 @@ public class GenerateClientRest implements ProjectionGenerator {
     return projection.getModuleLocation().getName() + "." + ENTITY_PACKAGE + "." + modelProjectionClass;
   }
 
+  /**
+   * Obtains the feign client name
+   * @param data
+   * @param projection
+   * @return feign client name
+   */
   private String getFeignClientName(Map<String, Object> data, Projection projection) {
     String moduleName = projection.getModuleLocation().getName();
     return data.get("newClassName") + "-" + moduleName;
