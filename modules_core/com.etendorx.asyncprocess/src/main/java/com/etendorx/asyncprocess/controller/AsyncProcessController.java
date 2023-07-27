@@ -100,7 +100,8 @@ public class AsyncProcessController {
   @ResponseStatus(HttpStatus.ACCEPTED)
   public Map<String, String> index(
       @RequestBody Map<String, Map<String, ?>> bodyChanges,
-      @RequestParam(required = false, name = "process") String processName
+      @RequestParam(required = false, name = "process") String processName,
+      @RequestParam(required = false, name = "run_id") String runId
   ) throws Exception {
     Map<String, String> ret = new HashMap<>();
     Map<String, Object> session = new HashMap<>();
@@ -109,7 +110,7 @@ public class AsyncProcessController {
     bodyChanges.put("session", session);
 
     try {
-      var uuid = message(kafkaMessageUtil, streamBridge, null, processName, bodyChanges);
+      String uuid = message(kafkaMessageUtil, streamBridge, runId, processName, bodyChanges);
       if (uuid != null) {
         ret.put("status", "OK");
         ret.put("id", uuid);
