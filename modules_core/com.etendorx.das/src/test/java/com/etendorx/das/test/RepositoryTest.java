@@ -49,6 +49,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -95,6 +96,7 @@ public class RepositoryTest {
   private MockMvc mockMvc;
 
   @org.springframework.boot.test.context.TestConfiguration
+  @ComponentScan("com.etendorx.das.test.projections")
   static class RepositoryTestConfiguration {
     @Bean
     public UserContext userContext() {
@@ -111,17 +113,7 @@ public class RepositoryTest {
   }
 
   @Container
-  public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-      DockerImageName.parse("etendo/etendodata:rx-1.2.1").asCompatibleSubstituteFor("postgres")
-  )
-      .withPassword("syspass")
-      .withUsername("postgres")
-      .withEnv("PGDATA", "/postgres")
-      .withDatabaseName("etendo")
-      .withExposedPorts(5432)
-      .waitingFor(
-          Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
-      );
+  public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
   @Test
   public void whenReadUser() {

@@ -16,20 +16,21 @@
 
 package com.etendorx.entities.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.io.Serializable;
+
+import javax.persistence.MappedSuperclass;
+
 import org.openbravo.model.ad.access.User;
 import org.openbravo.model.ad.system.Client;
 import org.openbravo.model.common.enterprise.Organization;
 
-import javax.persistence.MappedSuperclass;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class BaseRXObject {
+public abstract class BaseRXObject implements Serializable {
     @javax.persistence.JoinColumn(name = "ad_client_id", referencedColumnName = "AD_Client_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
     Client client;

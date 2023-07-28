@@ -86,7 +86,7 @@ public class GenerateEntities {
     final boolean generateRxCode = Boolean.parseBoolean(obProperties.getProperty("rx.generateCode"));
     final boolean computedColumns = Boolean.parseBoolean(obProperties.getProperty("rx.computedColumns"));
     final boolean includeViews = Boolean.parseBoolean(obProperties.getProperty("rx.views"));
-    //
+
     log.info("Generate Etendo Rx Code={}", generateRxCode);
     log.info("Path Project Rx={}", pathEtendoRx);
     log.info("Test entitites {}", cmdProcess.isTest());

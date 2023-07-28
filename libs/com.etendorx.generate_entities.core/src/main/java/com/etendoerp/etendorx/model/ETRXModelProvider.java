@@ -1,5 +1,25 @@
 package com.etendoerp.etendorx.model;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.etendorx.base.provider.OBProvider;
+import org.etendorx.base.provider.OBSingleton;
+import org.hibernate.Session;
+import org.openbravo.base.model.Entity;
+import org.openbravo.base.model.ModelObject;
+import org.openbravo.base.model.ModelSessionFactoryController;
+import org.openbravo.base.model.Module;
+import org.openbravo.base.model.Table;
+
 import com.etendoerp.etendorx.model.projection.ETRXEntityField;
 import com.etendoerp.etendorx.model.projection.ETRXProjection;
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
@@ -8,25 +28,6 @@ import com.etendoerp.etendorx.model.repository.ETRXRepository;
 import com.etendoerp.etendorx.model.repository.ETRXSearchParam;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.etendorx.base.provider.OBProvider;
-import org.etendorx.base.provider.OBSingleton;
-import org.etendorx.dal.service.OBDal;
-import org.hibernate.Session;
-import org.openbravo.base.model.Entity;
-import org.openbravo.base.model.ModelObject;
-import org.openbravo.base.model.ModelSessionFactoryController;
-import org.openbravo.base.model.Module;
-import org.openbravo.base.model.Table;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 public class ETRXModelProvider implements OBSingleton {
 
@@ -38,7 +39,7 @@ public class ETRXModelProvider implements OBSingleton {
 
   // Etendo RX Models
   private static final List<Class<? extends ModelObject>> ETRX_MODEL_CLASSES = List.of(
-    //
+    // Modules
     ETRXModule.class,
     // Projections
     ETRXProjection.class,
