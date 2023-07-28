@@ -54,12 +54,12 @@ public class Repository {
 
   public List<HashMap<String, Object>> getSearchesMap() {
     return searches.values().stream().map(v -> {
-      var d = new HashMap<String, Object>();
-      d.put("query", v.getQuery());
-      d.put("method", v.getMethod());
-      d.put("params", v.getSearchParamsMap());
-      d.put("fetchAttributes", new ArrayList<>());
-      return d;
+      var searchesMap = new HashMap<String, Object>();
+      searchesMap.put("query", v.getQuery());
+      searchesMap.put("method", v.getMethod());
+      searchesMap.put("params", v.getSearchParamsMap());
+      searchesMap.put("fetchAttributes", new ArrayList<>());
+      return searchesMap;
     }).collect(Collectors.toList());
   }
 }

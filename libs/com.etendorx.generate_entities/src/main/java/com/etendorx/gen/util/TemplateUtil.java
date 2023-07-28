@@ -38,6 +38,7 @@ public class TemplateUtil {
 
   /**
    * Process a template with the given data and write the result to the given output
+   *
    * @param templateImplementation
    * @param data
    * @param output
@@ -54,8 +55,8 @@ public class TemplateUtil {
 
   /**
    * Create a template implementation from the given file
+   *
    * @param file
-   * @return
    */
   public static freemarker.template.Template createTemplateImplementation(String file) {
     try (var stream = new BufferedReader(new InputStreamReader(
@@ -68,7 +69,6 @@ public class TemplateUtil {
 
   /**
    * Create a configuration for the template engine
-   * @return
    */
   private static Configuration getNewConfiguration() {
     final Configuration cfg = new Configuration();
@@ -78,12 +78,12 @@ public class TemplateUtil {
 
   /**
    * Get the data needed for the template
+   *
    * @param paths
    * @param entity
    * @param searchesMap
    * @param computedColumns
    * @param includeViews
-   * @return
    */
   public static Map<String, Object> getModelData(GeneratePaths paths, Entity entity,
       List<HashMap<String, Object>> searchesMap, boolean computedColumns, boolean includeViews) {
@@ -116,8 +116,8 @@ public class TemplateUtil {
 
   /**
    * Remove the last s from the given string
+   *
    * @param param
-   * @return
    */
   public static String getWithoutSS(String param) {
     if (param != null && param.length() > 0) {
@@ -135,9 +135,9 @@ public class TemplateUtil {
 
   /**
    * Prepare the output file
+   *
    * @param fullPath
    * @param fileName
-   * @return
    */
   public static File prepareOutputFile(String fullPath, String fileName) {
     var outFile = new File(fullPath, fileName);

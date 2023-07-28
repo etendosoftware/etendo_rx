@@ -84,6 +84,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the proto files for the given projections.
+   *
    * @param pathEtendoRx
    * @param repositories
    * @param projections
@@ -120,6 +121,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the proto files for the given projections.
+   *
    * @param pathEtendoRx
    * @param metadataContainer
    * @param computedColumns
@@ -141,6 +143,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the proto file for the given module metadata.
+   *
    * @param pathEtendoRx
    * @param moduleMetadata
    * @param computedColumns
@@ -190,6 +193,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the source files for the given projections.
+   *
    * @param pathEtendoRx
    * @param projection
    * @param repositories
@@ -211,6 +215,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the source files for the given projections.
+   *
    * @param pathEtendoRx
    * @param projection
    * @param repositories
@@ -275,6 +280,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the source files for the given projections.
+   *
    * @param pathEtendoRx
    * @param projection
    * @param repositories
@@ -296,6 +302,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the DTO source files for the given projections.
+   *
    * @param pathEtendoRx
    * @param projection
    * @param repositories
@@ -318,6 +325,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the DTO projection source files for the given projections.
+   *
    * @param pathEtendoRx
    * @param projection
    * @param repositories
@@ -344,6 +352,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the DTO projection source files for the given projections.
+   *
    * @param pathEtendoRx
    * @param projection
    * @param repositories
@@ -370,6 +379,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the client service source files for the given projections.
+   *
    * @param pathEtendoRx
    * @param projection
    * @param repositories
@@ -396,6 +406,7 @@ public class GenerateProtoFile {
 
   /**
    * Generates the client service interface source files for the given projections.
+   *
    * @param pathEtendoRx
    * @param projection
    * @param repositories
@@ -412,8 +423,7 @@ public class GenerateProtoFile {
         "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/service/",
         "/org/openbravo/base/process/grpcclientinterface.ftl",
         "",
-        "" +
-            projection.getName().substring(0, 1).toUpperCase() + projection.getName().substring(1) +
+        projection.getName().substring(0, 1).toUpperCase() + projection.getName().substring(1) +
             "DasService",
         "com.etendorx.integration.mobilesync.entities"
     );

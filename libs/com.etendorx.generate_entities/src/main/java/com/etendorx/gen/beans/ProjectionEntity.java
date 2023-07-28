@@ -76,15 +76,15 @@ public class ProjectionEntity {
 
   public List<Map<String, String>> getFieldsMap() {
     return fields.values().stream().map(v -> {
-      var d = new HashMap<String, String>();
-      d.put("name", v.getName());
-      d.put("value", v.getValue());
-      d.put("type", v.getType());
-      d.put("className", v.getClassName());
-      d.put("projectedEntity", v.getProjectedEntity());
-      d.put("projectedField", v.getProjectedField());
-      d.put("notNullValue", v.getNotNullValue());
-      return d;
+      var fieldsMap = new HashMap<String, String>();
+      fieldsMap.put("name", v.getName());
+      fieldsMap.put("value", v.getValue());
+      fieldsMap.put("type", v.getType());
+      fieldsMap.put("className", v.getClassName());
+      fieldsMap.put("projectedEntity", v.getProjectedEntity());
+      fieldsMap.put("projectedField", v.getProjectedField());
+      fieldsMap.put("notNullValue", v.getNotNullValue());
+      return fieldsMap;
     }).collect(Collectors.toList());
   }
 
