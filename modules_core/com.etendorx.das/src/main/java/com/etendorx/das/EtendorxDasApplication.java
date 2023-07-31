@@ -20,6 +20,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootApplication
 @EnableJpaRepositories("com.etendorx.entities.jparepo")
@@ -29,7 +30,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
     "com.etendorx.das.grpcrepo",
     "com.etendorx.utils.auth.key.context",
     "com.etendorx.das.services",
-    "com.etendorx.das.scan"
+    "com.etendorx.das.scan",
+    "com.etendorx.das.mapper"
 })
 public class EtendorxDasApplication {
 
