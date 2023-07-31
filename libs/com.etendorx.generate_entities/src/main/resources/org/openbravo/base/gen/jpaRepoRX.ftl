@@ -8,7 +8,7 @@
     </#if>
 </#function>
 /**
- * Copyright 2022 Futit Services SL
+ * Copyright 2022-2023 Futit Services SL
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
  */
 package ${packageJPARepo};
 
+import com.etendorx.entities.entities.BaseDASRepository;
 import ${entity.getPackageName()}.${entity.simpleClassName}DefaultProjection;
 import ${entity.getPackageName()}.${entity.simpleClassName};
 import org.springframework.data.domain.Page;
@@ -40,7 +41,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  *
  */
 @RepositoryRestResource(excerptProjection = ${entity.simpleClassName}DefaultProjection.class, path = "${entity.name}")
-public interface ${entity.name}Repository extends PagingAndSortingRepository<${entity.simpleClassName}, String>{
+public interface ${entity.name}Repository extends BaseDASRepository<${entity.simpleClassName}>{
     <#if searches??>
 
     <#list searches as s>

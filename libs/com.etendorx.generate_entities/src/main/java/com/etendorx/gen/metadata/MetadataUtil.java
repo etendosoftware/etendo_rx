@@ -1,5 +1,5 @@
 /*
- * Copyright 2022  Futit Services SL
+ * Copyright 2022-2023  Futit Services SL
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,20 @@
  */
 package com.etendorx.gen.metadata;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
+import com.etendorx.gen.beans.ProjectionEntity;
+import com.etendorx.gen.beans.ProjectionEntityField;
+import com.etendorx.gen.util.CodeGenerationException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.Property;
 
-import com.etendorx.gen.beans.ProjectionEntity;
-import com.etendorx.gen.beans.ProjectionEntityField;
-import com.etendorx.gen.util.CodeGenerationException;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Util class needed for code generation
@@ -45,7 +40,7 @@ public class MetadataUtil {
   private static final Logger log = LogManager.getLogger();
 
   /**
-   * Obtains the absolute path of the base package where all the java files will be created.
+   * Obtains the absolute path of the baseRestController.ftl package where all the java files will be created.
    * Ex: given the module 'com.test.mymodule'
    * returns 'module.absolutePath + /src-gen/main/java/com/test/mymodule'
    *
@@ -80,6 +75,7 @@ public class MetadataUtil {
    *
    * @param entities
    *     List of entities to map
+   *
    * @return Map
    */
   public static Map<String, Entity> generateEntitiesMap(List<Entity> entities) {
@@ -96,6 +92,7 @@ public class MetadataUtil {
    *
    * @param entityModel
    *     {@link Entity}
+   *
    * @return {@link ProjectionEntity}
    */
   public static ProjectionEntity generateProjectionEntity(Entity entityModel) {
@@ -124,6 +121,7 @@ public class MetadataUtil {
    *
    * @param propertyModel
    *     {@link Property}
+   *
    * @return {@link ProjectionEntityField}
    */
   public static ProjectionEntityField generateProjectionEntityField(Property propertyModel) {
@@ -133,8 +131,8 @@ public class MetadataUtil {
 
   /**
    * Generates the class name of a {@link Property}
+   *
    * @param propertyModel
-   * @return
    */
   static String generateClassName(Property propertyModel) {
     String className = "";

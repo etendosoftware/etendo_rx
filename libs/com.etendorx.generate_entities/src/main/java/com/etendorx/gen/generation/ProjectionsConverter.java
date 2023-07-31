@@ -1,25 +1,25 @@
 package com.etendorx.gen.generation;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.openbravo.base.model.Entity;
-
 import com.etendoerp.etendorx.model.projection.ETRXProjection;
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.beans.Projection;
 import com.etendorx.gen.beans.ProjectionEntity;
+import org.openbravo.base.model.Entity;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ProjectionsConverter {
 
   /**
    * Converts the ETRX projections to projections
+   *
    * @param paths
    * @param etrxProjections
-   * @return
    */
   public List<Projection> convert(GeneratePaths paths, List<ETRXProjection> etrxProjections) {
     List<Projection> projections = new ArrayList<>();
@@ -29,16 +29,33 @@ public class ProjectionsConverter {
           etrxProjection.isGrpc(),
           etrxProjection.getModule().isReact()
       );
-      projection.setModuleLocation(
-          new File(paths.pathEtendoRx + File.separator + etrxProjection.getModule().getRxJavaPackage()));
+      File moduleLocation = getModuleLocation(paths.pathEtendoRx, etrxProjection.getModule().getRxJavaPackage());
+      projection.setModuleLocation(moduleLocation);
       convert(projection, etrxProjection.getEntities());
       projections.add(projection);
     }
     return projections;
   }
 
+  private File getModuleLocation(String pathEtendoRx, String rxJavaPackage) {
+    var directories = new ArrayList<>(Arrays.asList("../modules_rx", "./modules"));
+    String defaultDir = null;
+    for (String directory : directories) {
+      if (new File(directory).exists()) {
+        defaultDir = directory;
+        break;
+      }
+    }
+    var moduleLocation = new File(pathEtendoRx + File.separator + defaultDir + File.separator + rxJavaPackage);
+    if (moduleLocation.exists()) {
+      var ignored = moduleLocation.mkdirs();
+    }
+    return moduleLocation;
+  }
+
   /**
    * Converts the ETRX projections to projections and adds the entities to the projection
+   *
    * @param projection
    * @param entities
    */
@@ -50,6 +67,7 @@ public class ProjectionsConverter {
 
   /**
    * Converts the entities to projections and adds the entities to the projection
+   *
    * @param projection
    * @param entities
    */
@@ -61,8 +79,8 @@ public class ProjectionsConverter {
 
   /**
    * Converts the ETRX projection entity to projection entity
+   *
    * @param entity
-   * @return
    */
   private ProjectionEntity convertEntity(ETRXProjectionEntity entity) {
     return new ProjectionEntity(entity.getTable().getName(), entity.getIdentity());
@@ -70,8 +88,8 @@ public class ProjectionsConverter {
 
   /**
    * Converts the entity to projection entity
+   *
    * @param entity
-   * @return
    */
   private ProjectionEntity convertEntity(Entity entity) {
     var projectionEntity = new ProjectionEntity(entity.getName(), false);
@@ -82,8 +100,8 @@ public class ProjectionsConverter {
 
   /**
    * Gets the entities map from the entities list
+   *
    * @param entities
-   * @return
    */
   public Map<String, ProjectionEntity> getEntitiesMap(List<Entity> entities) {
     Projection projection = new Projection("default");

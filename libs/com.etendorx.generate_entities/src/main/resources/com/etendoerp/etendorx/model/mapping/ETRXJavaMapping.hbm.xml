@@ -17,10 +17,10 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="com.etendoerp.etendorx.model.projection.ETRXEntityField" lazy="false" table="etrx_entity_field">
+    <class name="com.etendoerp.etendorx.model.mapping.ETRXJavaMapping" lazy="false" table="etrx_java_mapping">
         <cache usage="read-write"/>
 
-        <id name="id" type="string" column="etrx_entity_field_id">
+        <id name="id" type="string" column="etrx_java_mapping_id">
             <generator class="org.etendorx.base.session.DalUUIDGenerator"/>
         </id>
 
@@ -29,17 +29,11 @@
         <property name="active" type="org.etendorx.base.session.OBYesNoType" not-null="true"
                   column="isactive"/>
 
-        <property name="property"/>
+        <property name="description"/>
+        <property name="qualifier"/>
+        <property name="mappingType" column="mapping_type"/>
 
-        <property name="name"/>
-        <property name="isMandatory" column="ismandatory"/>
-        <property name="identifiesUnivocally" column="identifies_univocally"/>
-        <property name="fieldMapping" column="field_mapping"/>
-
-        <many-to-one name="entity" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
-                     column="etrx_projection_entity_id"/>
-
-        <many-to-one name="javaMapping" not-null="true" class="com.etendoerp.etendorx.model.mapping.ETRXJavaMapping"
-                     column="etrx_java_mapping_id"/>
+        <many-to-one name="table" not-null="true" class="org.openbravo.base.model.Table"
+                     column="ad_table_id"/>
     </class>
 </hibernate-mapping>
