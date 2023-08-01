@@ -48,6 +48,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -123,7 +124,10 @@ public class RepositoryTest {
 
   @Test
   public void whenReadUser() {
-    setUserContextFromToken(userContext, TOKEN, "true", "GET");
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    request.setParameter("active", "true");
+    request.setMethod("GET");
+    setUserContextFromToken(userContext, TOKEN, request);
     AppContext.setCurrentUser(userContext);
     var allUsers = userRepository.findAll();
     assert allUsers.iterator().hasNext();
@@ -133,8 +137,11 @@ public class RepositoryTest {
 
   @Test
   public void whenFindByName() {
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    request.setParameter("active", "true");
+    request.setMethod("GET");
     UserContext userContext = new UserContext();
-    setUserContextFromToken(userContext, TOKEN, "true", "GET");
+    setUserContextFromToken(userContext, TOKEN, request);
     var userList = userRepository.searchByUsername("admin", null);
     assert userList.getSize() == 1;
     assert userList.getContent().get(0) != null;

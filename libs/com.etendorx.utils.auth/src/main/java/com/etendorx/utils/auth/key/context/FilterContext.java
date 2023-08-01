@@ -39,6 +39,8 @@ public class FilterContext extends OncePerRequestFilter {
   public static final String HEADER_TOKEN = "X-TOKEN";
   public static final String TRUE = "true";
   public static final String FALSE = "false";
+  public static final String ACTIVE_PARAMETER = "active";
+  public static final String TRIGGER_ENABLED_PARAMETER = "triggerEnabled";
   @Autowired
   private UserContext userContext;
   @Autowired(required = false)
@@ -66,11 +68,13 @@ public class FilterContext extends OncePerRequestFilter {
   }
 
   public void setUserContextFromToken(String token, HttpServletRequest request) {
-    setUserContextFromToken(userContext, token, request.getParameter("active"), request.getMethod());
+    setUserContextFromToken(new UserContext(), token, request);
   }
 
-  public static void setUserContextFromToken(UserContext userContext, String token, String activeParam,
-      String restMethod) {
+  public static void setUserContextFromToken(UserContext userContext, String token, HttpServletRequest req) {
+    String activeParam = req.getParameter(ACTIVE_PARAMETER);
+    String triggerEnabledParam = req.getParameter(TRIGGER_ENABLED_PARAMETER);
+    String restMethod = req.getMethod();
     Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
     userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
     userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
@@ -78,17 +82,25 @@ public class FilterContext extends OncePerRequestFilter {
     userContext.setRoleId((String) tokenValuesMap.get(JwtKeyUtils.ROLE_ID));
     userContext.setSearchKey((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
     userContext.setServiceId((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_ID));
-    boolean active = false;
-    if (activeParam == null) {
-      active = true;
-    } else {
-      if (!StringUtils.equalsAny(activeParam, TRUE, FALSE)) {
-        throw new IllegalArgumentException("Invalid value for 'active' parameter: " + active);
-      }
-      active = activeParam.equals(TRUE);
-    }
+    boolean active = getBooleanParameter(activeParam, ACTIVE_PARAMETER);
     userContext.setActive(active);
     userContext.setAuthToken(token);
     userContext.setRestMethod(restMethod);
+    boolean isTriggerEnabled = getBooleanParameter(triggerEnabledParam, TRIGGER_ENABLED_PARAMETER);
+    userContext.setTriggerEnabled(isTriggerEnabled);
+  }
+
+  private static boolean getBooleanParameter(String paramValueStr, String nameParam) {
+    boolean valueParam;
+    if (paramValueStr == null) {
+      valueParam = true;
+    } else {
+      if (!StringUtils.equalsAny(paramValueStr, TRUE, FALSE)) {
+        throw new IllegalArgumentException(
+            String.format("Invalid value for '%s' parameter: %s", nameParam, paramValueStr));
+      }
+      valueParam = StringUtils.equals(paramValueStr, TRUE);
+    }
+    return valueParam;
   }
 }

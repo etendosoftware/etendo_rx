@@ -43,4 +43,5 @@ public class UserContext {
 
   private String restMethod;
 
+  private boolean isTriggerEnabled;
 }
