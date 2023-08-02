@@ -1,24 +1,22 @@
 package com.etendorx.das.mapper;
 
-import java.math.BigDecimal;
-
 import org.openbravo.model.common.plm.Product;
-import org.openbravo.model.materialmgmt.onhandquantity.StorageDetail;
-import org.openbravo.model.pricing.pricelist.ProductPrice;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.apachecommons.CommonsLog;
+import com.etendorx.entities.entities.DTOConverter;
 
 @Component
-public class MELIProductDTOConverter  {
+public class MELIProductDTOProductConverter implements DTOConverter<Product, MELIProductDTO> {
 
   private final MELIProductFieldConverter converter;
 
-  public MELIProductDTOConverter(MELIProductFieldConverter converter) {
+  public MELIProductDTOProductConverter(
+      MELIProductFieldConverter converter) {
     this.converter = converter;
   }
 
-  MELIProductDTO convertDTO(Product product) {
+  @Override
+  public MELIProductDTO convert(Product product) {
     MELIProductDTO dto = new MELIProductDTO();
     dto.setId(converter.getId(product));
     dto.setTitle(converter.getTitle(product));
@@ -29,14 +27,20 @@ public class MELIProductDTOConverter  {
     dto.setBuyingMode(converter.getBuyingMode(product));
     dto.setCondition(converter.getCondition(product));
     dto.setListingTypeId(converter.getListingTypeId(product));
+    dto.setSaleTerms(converter.getSaleTerms(product));
+    dto.setPictures(converter.getPictures(product));
+    dto.setAttributes(converter.getAttributes(product));
+    dto.setStocked(converter.getStocked(product));
     return dto;
   }
 
-  Product convertDTO(MELIProductDTO product, Product dto) {
-    if(dto == null) {
+  @Override
+  public Product convert(MELIProductDTO product, Product dto) {
+    if (dto == null) {
       dto = new Product();
     }
     dto.setName(converter.getTitle(product));
+    dto.setStocked(converter.getStocked(product));
     return dto;
   }
 

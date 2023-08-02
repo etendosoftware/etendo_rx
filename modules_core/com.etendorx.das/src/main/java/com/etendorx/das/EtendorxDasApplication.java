@@ -18,6 +18,8 @@ package com.etendorx.das;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -33,7 +35,12 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
     "com.etendorx.das.scan",
     "com.etendorx.das.mapper"
 })
-public class EtendorxDasApplication {
+public class EtendorxDasApplication extends SpringBootServletInitializer {
+
+  @Override
+  protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+    return builder.sources(EtendorxDasApplication.class);
+  }
 
   public static void main(String[] args) {
     SpringApplication.run(EtendorxDasApplication.class, args);

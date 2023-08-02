@@ -2,7 +2,7 @@ package com.etendorx.das.mapper;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.annotation.JsonKey;
+import com.etendorx.entities.entities.BaseDTOModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MELIProductDTO {
+public class MELIProductDTO implements BaseDTOModel {
   @JsonProperty("id")
   String id;
   @JsonProperty("title")
@@ -29,4 +29,12 @@ public class MELIProductDTO {
   String condition;
   @JsonProperty("listing_type_id")
   String listingTypeId;
+  @JsonProperty("sale_terms")
+  Object saleTerms;
+  @JsonProperty("pictures")
+  Object pictures;
+  @JsonProperty("attributes")
+  Object attributes;
+  @JsonProperty("stocked")
+  Boolean stocked;
 }
