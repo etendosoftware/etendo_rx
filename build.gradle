@@ -20,9 +20,6 @@ repositories {
             password = "${repositoryPassword}"
         }
     }
-    maven {
-        url = 'https://repo.futit.cloud/repository/etendo-public-jars/'
-    }
 }
 
 dependencies {
