@@ -58,7 +58,7 @@ public class FilterContext extends OncePerRequestFilter {
   }
 
   public void setUserContextFromToken(String token, HttpServletRequest request) {
-    setUserContextFromToken(new UserContext(), token, request);
+    setUserContextFromToken(userContext, token, request);
   }
 
   public static void setUserContextFromToken(UserContext userContext, String token, HttpServletRequest req) {
