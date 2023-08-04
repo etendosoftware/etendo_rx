@@ -73,7 +73,7 @@ dependencies {
     }
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation (project(':com.etendorx.das_core'))
+    implementation(project(':com.etendorx.das_core'))
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:postgresql:1.17.3'
@@ -86,9 +86,37 @@ dependencies {
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
     testCompileOnly 'org.projectlombok:lombok:1.18.22'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+}
 
-    codescan(project(':com.etendorx.test.eventhandler'))
+var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modules"]
+afterEvaluate {
+    directories.each { dir ->
+        var fileToFind = "build.gradle"
+        def subDirs = findSubDirectoriesWithFile(new File(dir), fileToFind)
+        subDirs.each { subDir ->
+            if (hasEventHandler(new File(subDir, fileToFind))) {
+                dependencies {
+                    implementation(project(":${subDir.name}"))
+                }
+            }
+        }
+    }
+}
 
+static List<File> findSubDirectoriesWithFile(File startDir, String fileName) {
+    def subDirs = []
+    startDir.eachDirRecurse { dir ->
+        if (new File(dir, fileName).isFile()) {
+            subDirs << dir
+        }
+    }
+    return subDirs
+}
+
+boolean hasEventHandler(File propertiesFile) {
+    Properties properties = new Properties()
+    propertiesFile.withInputStream { properties.load(it) }
+    return properties.get('hasEventHandler')?.toBoolean() ?: false
 }
 
 sourceSets.main.compileClasspath += configurations.codegen
