@@ -41,6 +41,8 @@ public class FilterContext extends OncePerRequestFilter {
   private UserContext userContext;
   @Autowired(required = false)
   private AllowedURIS allowedURIS;
+  @Autowired
+  private GlobalAllowedURIS globalAllowedURIS;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -48,8 +50,10 @@ public class FilterContext extends OncePerRequestFilter {
     String token = request.getHeader(HEADER_TOKEN);
     if (!StringUtils.isEmpty(token)) {
       setUserContextFromToken(token, request);
-    } else if (allowedURIS == null || !allowedURIS.isAllowed(request.getRequestURI())) {
-      throw new ForbiddenException();
+    } else if (allowedURIS == null ||
+        !allowedURIS.isAllowed(request.getRequestURI()) ||
+        !globalAllowedURIS.isAllowed(request.getRequestURI())) {
+      throw new ForbiddenException(request.getRequestURI() + " is not allowed for this user");
     }
     AppContext.setCurrentUser(userContext);
     filterChain.doFilter(request, response);
