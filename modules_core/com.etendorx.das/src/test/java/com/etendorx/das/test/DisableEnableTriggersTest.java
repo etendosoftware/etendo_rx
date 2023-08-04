@@ -30,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.etendorx.utils.auth.key.context.AppContext;
+import com.etendorx.utils.auth.key.context.FilterContext;
 import com.etendorx.utils.auth.key.context.UserContext;
 
 @Testcontainers
@@ -51,7 +52,7 @@ public class DisableEnableTriggersTest {
   @Test
   void whenExecuteRequestWithoutTriggerParam() {
     MockHttpServletRequest request = new MockHttpServletRequest();
-    request.setParameter("active", "true");
+    request.setParameter(FilterContext.ACTIVE_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
     setUserContextFromToken(userContext, TOKEN, request);
     AppContext.setCurrentUser(userContext);
@@ -62,8 +63,8 @@ public class DisableEnableTriggersTest {
   @Test
   void whenExecuteRequestWithTriggerDisableParam() {
     MockHttpServletRequest request = new MockHttpServletRequest();
-    request.setParameter("active", "true");
-    request.setParameter("triggerEnabled", "false");
+    request.setParameter(FilterContext.ACTIVE_PARAMETER, FilterContext.TRUE);
+    request.setParameter(FilterContext.TRIGGER_ENABLED_PARAMETER, FilterContext.FALSE);
     request.setMethod("GET");
     UserContext userContext = new UserContext();
     setUserContextFromToken(userContext, TOKEN, request);
