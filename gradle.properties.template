@@ -1,9 +1,6 @@
 repositoryUser=
 repositoryPassword=
-repositoryUrl=https://repo.futit.cloud/repository/etendo-public-jars
-
-githubUser=
-githubToken=
+repositoryUrl=https://maven.pkg.github.com/etendosoftware/etendo_rx
 
 org.gradle.parallel=true
 org.gradle.daemon=false
