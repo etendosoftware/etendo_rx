@@ -18,6 +18,8 @@ package com.etendorx.utils.auth.key.context;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -40,9 +42,7 @@ public class FilterContext extends OncePerRequestFilter {
   @Autowired
   private UserContext userContext;
   @Autowired(required = false)
-  private AllowedURIS allowedURIS;
-  @Autowired
-  private GlobalAllowedURIS globalAllowedURIS;
+  private Set<AllowedURIS> allowedURIS;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -50,10 +50,16 @@ public class FilterContext extends OncePerRequestFilter {
     String token = request.getHeader(HEADER_TOKEN);
     if (!StringUtils.isEmpty(token)) {
       setUserContextFromToken(token, request);
-    } else if (allowedURIS == null ||
-        !allowedURIS.isAllowed(request.getRequestURI()) ||
-        !globalAllowedURIS.isAllowed(request.getRequestURI())) {
-      throw new ForbiddenException(request.getRequestURI() + " is not allowed for this user");
+    } else {
+      if (allowedURIS == null) {
+        throw new ForbiddenException("No URIs are allowed for this service");
+      }
+      Optional<AllowedURIS> optionalAllowedUri = allowedURIS.stream()
+          .filter(uri -> uri.isAllowed(request.getRequestURI()))
+          .findFirst();
+      if (optionalAllowedUri.isEmpty()) {
+        throw new ForbiddenException(request.getRequestURI() + " is not allowed for this credentials");
+      }
     }
     AppContext.setCurrentUser(userContext);
     filterChain.doFilter(request, response);

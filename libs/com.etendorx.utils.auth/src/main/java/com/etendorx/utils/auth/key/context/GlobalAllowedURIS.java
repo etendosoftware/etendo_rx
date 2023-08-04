@@ -13,7 +13,7 @@ public class GlobalAllowedURIS implements AllowedURIS {
   /**
    * This array contains the uri's that are not protected by the authentication
    */
-  String[] allowedURIS = {
+  private final String[] allowedURIS = {
       "/actuator/"
   };
 
