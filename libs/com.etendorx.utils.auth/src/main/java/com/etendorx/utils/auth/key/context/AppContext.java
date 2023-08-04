@@ -27,7 +27,7 @@ public class AppContext {
 
   public static UserContext getCurrentUser() {
     if (currentUser.get() == null) {
-      throw new ForbiddenException();
+      throw new ForbiddenException("User not found in context");
     }
     return currentUser.get();
   }
