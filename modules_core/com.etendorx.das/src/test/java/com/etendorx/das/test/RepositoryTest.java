@@ -64,6 +64,7 @@ import org.testcontainers.utility.DockerImageName;
 import com.etendorx.das.utils.TestcontainersUtils;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import com.etendorx.utils.auth.key.context.AppContext;
+import com.etendorx.utils.auth.key.context.FilterContext;
 import com.etendorx.utils.auth.key.context.UserContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -125,7 +126,7 @@ public class RepositoryTest {
   @Test
   public void whenReadUser() {
     MockHttpServletRequest request = new MockHttpServletRequest();
-    request.setParameter("active", "true");
+    request.setParameter(FilterContext.ACTIVE_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
     setUserContextFromToken(userContext, TOKEN, request);
     AppContext.setCurrentUser(userContext);
@@ -138,7 +139,7 @@ public class RepositoryTest {
   @Test
   public void whenFindByName() {
     MockHttpServletRequest request = new MockHttpServletRequest();
-    request.setParameter("active", "true");
+    request.setParameter(FilterContext.ACTIVE_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
     UserContext userContext = new UserContext();
     setUserContextFromToken(userContext, TOKEN, request);
