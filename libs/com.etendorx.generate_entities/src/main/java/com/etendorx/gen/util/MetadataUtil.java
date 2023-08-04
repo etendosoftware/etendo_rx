@@ -72,7 +72,7 @@ public class MetadataUtil {
     var metadata = new Metadata();
     metadataContainer.setMetadataMix(metadata);
 
-    var modulesDir = new ArrayList<>(List.of("modules", "modules_core", "modules_rx"));
+    var modulesDir = new ArrayList<>(List.of("modules", "modules_core", "../modules_rx"));
     if (testFiles) {
       modulesDir.add("modules_test");
     }
