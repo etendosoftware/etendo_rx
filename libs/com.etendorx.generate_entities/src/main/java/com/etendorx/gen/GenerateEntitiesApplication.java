@@ -588,7 +588,7 @@ public class GenerateEntitiesApplication {
     // TODO: create the name using the module db prefix
     // Generate the feignClientName used by the @FeignClient annotation.
     String moduleName = projection.getModuleLocation().getName();
-    String feignClientName = data.get("newClassName") + "-" + moduleName;
+    String feignClientName = data.get("newClassName").toString().replace("_", "-") + "-" + moduleName;
     data.put("feignClientName", feignClientName);
 
     var outFileClientRest = new File(fullPathClientRestGen, clientRestClassNameGen);
