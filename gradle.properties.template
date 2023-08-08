@@ -1,6 +1,11 @@
+# Credentials and repository URL for JARs publication
 repositoryUser=
 repositoryPassword=
 repositoryUrl=https://maven.pkg.github.com/etendosoftware/etendo_rx
+
+# Github credentials for downloading the plugin
+githubUser=
+githubToken=
 
 org.gradle.parallel=true
 org.gradle.daemon=false

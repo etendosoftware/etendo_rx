@@ -3,10 +3,11 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven {
-            url 'https://repo.futit.cloud/repository/maven-public-releases'
-        }
-        maven {
-            url 'https://repo.futit.cloud/repository/maven-public-snapshots'
+            url 'https://maven.pkg.github.com/etendosoftware/com.etendorx.gradlepluginrx'
+            credentials {
+                username "${githubUser}"
+                password "${githubToken}"
+            }
         }
     }
 }
