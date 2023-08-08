@@ -193,6 +193,8 @@ spec:
               repositoryUser=${NEXUS_USER}\n
               repositoryPassword=${NEXUS_PASSWORD}\n
               repositoryUrl=${REPOSITORY_URL}\n
+              githubUser=${GITHUB_USER}\n
+              githubToken=${GITHUB_TOKEN}\n
               org.gradle.parallel=true\n
               org.gradle.daemon=false\n
               dasPushImage=\n
