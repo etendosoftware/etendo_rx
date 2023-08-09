@@ -56,7 +56,7 @@ public abstract class ThreadHandler {
       } else {
         throw new OBException("Exception thrown " + se.getMessage(), se);
       }
-    } catch (final Throwable t) {
+    } catch (final Exception t) {
       log.error(t.getMessage(), t);
       throw new OBException("Exception thrown " + t.getMessage(), t);
     } finally {

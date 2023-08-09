@@ -255,7 +255,7 @@ public abstract class BaseOBObject
         if (value instanceof BaseOBObject) {
           value = ((BaseOBObject) value).getId();
         }
-        sb.append(p.getName() + ": " + value);
+        sb.append(p.getName()).append(": ").append(value);
       }
     }
     if (sb.length() > 0) {

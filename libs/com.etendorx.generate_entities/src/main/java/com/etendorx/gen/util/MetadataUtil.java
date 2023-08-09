@@ -15,7 +15,7 @@
  */
 package com.etendorx.gen.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -97,7 +97,7 @@ public class MetadataUtil {
           analizeProjections(metadata.getProjections(), projectionsFile, dir, moduleMetadata);
           analizeRepositories(metadata.getRepositories(), projectionsFile, moduleMetadata);
         } catch (JSONException | IOException | CodeGenerationException exception) {
-          exception.printStackTrace();
+          log.error(exception);
           throw new OBException(exception.getMessage());
         }
       }
@@ -537,23 +537,23 @@ public class MetadataUtil {
         if (!field.getValue().startsWith("#{")) {
           var value = field.getValue().split("\\.");
           if (value.length > 1) {
-            StringBuilder fieldValue = new StringBuilder();
-            String getProperty = "";
-            String notNullProperty = "";
+            StringBuilder getProperty = new StringBuilder();
+            StringBuilder notNullProperty = new StringBuilder();
             var parentEntityModel = entityModel.get();
             for (var i = 0; i < value.length; i++) {
               parentEntityModel = validateParentEntityValue(entity, field, parentEntityModel, value[i], i == value.length - 1);
-              getProperty += ".get" + value[i].substring(0, 1).toUpperCase() + value[i].substring(1) + "()";
-              fieldValue.append(getProperty);
+              getProperty.append(".get");
+                  getProperty.append(value[i].substring(0, 1).toUpperCase());
+                  getProperty.append(value[i].substring(1)).append("()");
               if (i < value.length - 1) {
-                notNullProperty += "#TARGET#" + getProperty + " != null";
+                notNullProperty.append("#TARGET#").append(getProperty).append(" != null");
                 if (i < value.length - 2) {
-                  notNullProperty += " && ";
+                  notNullProperty.append(" && ");
                 }
               }
             }
-            field.setValue(getProperty);
-            field.setNotNullValue(notNullProperty);
+            field.setValue(getProperty.toString());
+            field.setNotNullValue(notNullProperty.toString());
             if (field.getType() == null) {
               field.setType("String");
             }

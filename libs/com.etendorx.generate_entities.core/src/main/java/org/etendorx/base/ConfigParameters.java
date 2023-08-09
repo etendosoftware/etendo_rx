@@ -16,7 +16,7 @@
 
 package org.etendorx.base;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -80,8 +80,8 @@ public class ConfigParameters implements Serializable {
 
     this.strContext = this.extractContext(this.getActualPathContext());
     this.strBaseConfigPath = this.getResolvedParameter(context, "BaseConfigPath");
-    log4j.debug("context: " + this.strContext);
-    log4j.debug("************************prefix: " + this.prefix);
+    log4j.debug("context: {}", this.strContext);
+    log4j.debug("************************prefix: {}", this.prefix);
     this.stcFileProperties = this.prefix + "/" + this.strBaseConfigPath + "/Openbravo.properties";
     this.propFileProperties = this.loadOBProperties();
     String s = "FormatFile";
@@ -92,8 +92,8 @@ public class ConfigParameters implements Serializable {
     this.strDefaultDesignPath = this.getResolvedParameter(context, "DefaultDesignPath");
     this.strDefaultServlet = this.getResolvedParameter(context, "DefaultServlet");
     this.strReplaceWhat = this.getResolvedParameter(context, "ReplaceWhat");
-    log4j.debug("BaseConfigPath: " + this.strBaseConfigPath);
-    log4j.debug("BaseDesignPath: " + this.strBaseDesignPath);
+    log4j.debug("BaseConfigPath: {}", this.strBaseConfigPath);
+    log4j.debug("BaseDesignPath: {}", this.strBaseDesignPath);
     this.strVersion = this.getResolvedParameter(context, "Version");
     this.strParentVersion = this.getResolvedParameter(context, "Parent_Version");
     this.strSystemLanguage = this.getSystemLanguage();
@@ -103,7 +103,7 @@ public class ConfigParameters implements Serializable {
     this.loginServlet = this.getResolvedParameter(context, "LoginServlet");
     this.strServletSinIdentificar = this.getResolvedParameter(context, "LoginServlet");
     this.strServletGoBack = this.getResolvedParameter(context, "ServletGoBack");
-    log4j.debug("strServletGoBack: " + this.strServletGoBack);
+    log4j.debug("strServletGoBack: {}", this.strServletGoBack);
     this.periodicBackgroundTime = this.asLong(
       this.getResolvedParameter(context, "PeriodicBackgroundTime"));
     String var10001 = this.prefix;
@@ -117,7 +117,7 @@ public class ConfigParameters implements Serializable {
         f.mkdir();
       }
     } catch (Exception var4) {
-      var4.printStackTrace();
+      log4j.error(var4);
     }
 
   }
@@ -238,8 +238,8 @@ public class ConfigParameters implements Serializable {
   public Properties loadOBProperties() {
     Properties obProperties = new Properties();
 
-    try {
-      obProperties.load(new FileInputStream(this.stcFileProperties));
+    try(FileInputStream fis = new FileInputStream(this.stcFileProperties)) {
+      obProperties.load(fis);
       log4j.info("Properties file: " + this.stcFileProperties);
       overrideProperties(obProperties, this.stcFileProperties);
     } catch (IOException var3) {
@@ -273,9 +273,9 @@ public class ConfigParameters implements Serializable {
         }
 
         if (!propertiesFile.exists()) {
-          log4j.debug("No override file can be found at " + propertiesFile.getAbsolutePath());
+          log4j.debug("No override file can be found at {}", propertiesFile.getAbsolutePath());
         } else {
-          log4j.info("Loading override properties file from " + propertiesFile.getAbsolutePath());
+          log4j.info("Loading override properties file from {}", propertiesFile.getAbsolutePath());
           Properties overrideProperties = new Properties();
           FileInputStream fis = null;
 
@@ -289,18 +289,17 @@ public class ConfigParameters implements Serializable {
               String overrideValue = overrideProperties.getProperty(obProperty);
               Object object = obProperties.setProperty(obProperty, overrideValue);
               log4j.info(
-                "Overriding property " + obProperty + ": " + object + "->" + obProperties.getProperty(
-                  obProperty));
+                "Overriding property {}: {} -> {}",
+                  obProperty, object, obProperties.getProperty(obProperty));
             }
           } catch (Exception var19) {
-            log4j.error("Error loading override Openbravo.properties from " + propertiesFile,
-              var19);
+            log4j.error("Error loading override Openbravo.properties from {} {}", propertiesFile, var19);
           } finally {
             if (fis != null) {
               try {
                 fis.close();
               } catch (IOException var18) {
-                log4j.error("Error closing input stream for " + propertiesFile);
+                log4j.error("Error closing input stream for {}", propertiesFile);
               }
             }
 
@@ -318,7 +317,7 @@ public class ConfigParameters implements Serializable {
     if (StringUtils.isEmpty(name)) {
       try {
         name = InetAddress.getLocalHost().getHostName();
-        log4j.info("Checking override properties for " + name);
+        log4j.info("Checking override properties for {}", name);
       } catch (UnknownHostException var2) {
         log4j.error("Error when getting host name", var2);
       }

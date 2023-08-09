@@ -66,12 +66,12 @@ public class SessionHandler implements OBNotSingleton {
     if (poolClassName != null && !"".equals(poolClassName)) {
       try {
         externalConnectionPool = ExternalConnectionPool.getInstance(poolClassName);
-      } catch (Throwable e) {
+      } catch (Exception e) {
         externalConnectionPool = null;
         if (!log.isDebugEnabled()) {
-          log.info("Could not load external DB pool [" + poolClassName + "]. Using old pool.");
+          log.info("Could not load external DB pool [{}]. Using old pool.", poolClassName );
         } else {
-          log.warn("External connection pool class not found: " + poolClassName, e);
+          log.warn("External connection pool class not found: {}", poolClassName, e);
         }
       }
     }
@@ -268,8 +268,8 @@ public class SessionHandler implements OBNotSingleton {
    * Commits all remaining sessions and closes them
    */
   public void cleanUpSessions() {
-    for (String pool : sessions.keySet()) {
-      commitAndCloseNoCheck(pool);
+    for (Map.Entry<String, Session> entry : sessions.entrySet()) {
+      commitAndCloseNoCheck(entry.getKey());
     }
     clearSessions();
     clearTransactions();
@@ -664,7 +664,7 @@ public class SessionHandler implements OBNotSingleton {
     if (err && trx != null) {
       try {
         trx.rollback();
-      } catch (Throwable t) {
+      } catch (Exception t) {
         // ignore these exception not to hide others
       }
     }
