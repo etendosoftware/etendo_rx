@@ -16,7 +16,7 @@
 
 package org.openbravo.base.model;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.exception.OBException;
@@ -320,7 +320,7 @@ public class Entity {
       }
       if (duplicatedIdentifier != null) {
         identifierProperties.remove(duplicatedIdentifier);
-        log.debug("Removed duplicated identifier property " + property);
+        log.debug("Removed duplicated identifier property {}", property);
       }
       getIdentifierProperties().add(property);
     }

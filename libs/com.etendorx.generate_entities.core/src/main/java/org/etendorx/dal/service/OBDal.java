@@ -18,6 +18,7 @@ package org.etendorx.dal.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.etendorx.base.exception.OBException;
 import org.etendorx.base.provider.OBNotSingleton;
 import org.etendorx.base.provider.OBProvider;
 import org.etendorx.base.structure.BaseOBObject;
@@ -712,22 +713,7 @@ public class OBDal implements OBNotSingleton {
   }
 */
 
-  /**
-   * Returns an in-clause HQL clause denoting the clients which are allowed to be read by the
-   * current user. The in-clause can be directly used in a HQL. The return string will be for
-   * example: in ('1000000', '1000001')
-   *
-   * @return an in-clause which can be directly used inside of a HQL clause
-   *
-   * @see OBContext#getReadableClients()
-   * @deprecated Use bind statement parameter instead of this method
-   */
-  /*
   @Deprecated
-  public String getReadableClientsInClause() {
-    return createInClause(OBContext.getOBContext().getReadableClients());
-  }
-*/
   private String createInClause(String[] values) {
     if (values.length == 0) {
       return " in ('') ";
@@ -790,11 +776,19 @@ public class OBDal implements OBNotSingleton {
     String rdbms = new DalConnectionProvider(false).getRDBMS();
     String lockType = "ORACLE".equals(rdbms) ? "UPDATE" : "NO KEY UPDATE";
 
-    String sql = "SELECT " + entity.getIdProperties()
-      .get(0)
-      .getColumnName() + " FROM " + entity.getTableName() + " WHERE " + entity.getIdProperties()
-      .get(0)
-      .getColumnName() + " = :id FOR " + lockType;
+    Property idProperty = (entity.getIdProperties() != null && !entity.getIdProperties().isEmpty())
+        ? entity.getIdProperties().get(0)
+        : null;
+
+    if (idProperty == null || idProperty.getColumnName() == null || entity.getTableName() == null) {
+      // Handle this case, e.g., log an error, throw an exception, etc.
+      throw new OBException("Required fields are missing.");
+    }
+
+    String sql = "SELECT " + idProperty.getColumnName() +
+        " FROM " + entity.getTableName() +
+        " WHERE " + idProperty.getColumnName() +
+        " = :id FOR " + lockType;
 
     Session session = getSession();
     session.evict(object);

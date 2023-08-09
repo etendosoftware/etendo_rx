@@ -16,7 +16,7 @@
 
 package org.openbravo.base.model;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.expression.Evaluator;
@@ -289,7 +289,7 @@ public class Property {
     }
     if (getName().equals("inheritedFrom") && !isPrimitive() && "ADRole".equals(
       getReferencedProperty().getEntity().getName())) {
-      log.debug("Entity inheriting from role: " + getEntity().getName());
+      log.debug("Entity inheriting from role: {}", getEntity().getName());
       getEntity().setHasInheritedFrom(true);
     }
   }
@@ -408,7 +408,7 @@ public class Property {
     if (defaultValue == null && isBoolean()) {
       if (getName().equalsIgnoreCase("active")) {
         log.debug(
-          "Property " + this + " is probably the active column but does not have a default value set, supplying default value Y");
+          "Property {} is probably the active column but does not have a default value set, supplying default value Y", this);
         defaultValue = "Y";
       } else {
         defaultValue = "N";
@@ -503,7 +503,7 @@ public class Property {
     if (defaultValue == null && isBoolean()) {
       if (getName().equalsIgnoreCase("isactive")) {
         log.debug(
-          "Property " + this + " is probably the active column but does not have a default value set, supplying default value Y");
+          "Property {} is probably the active column but does not have a default value set, supplying default value Y", this);
         setDefaultValue("Y");
       } else {
         setDefaultValue("N");
@@ -1240,11 +1240,11 @@ public class Property {
    */
   void setTranslatable(Property translationProperty) {
     log.debug(
-      "Setting translatable for " + this.getEntity().getTableName() + "." + this.getColumnName());
+      "Setting translatable for {}.{}",this.getEntity().getTableName(), this.getColumnName());
 
     if (translationProperty == null) {
-      log.warn(this.getEntity()
-        .getTableName() + "." + this.getColumnName() + " is not translatable: null translationProperty");
+      log.warn("{}.{} is not translatable: null translationProperty",
+          this.getEntity().getTableName(), this.getColumnName());
       translatable = false;
       return;
     }
@@ -1273,6 +1273,10 @@ public class Property {
       translatable = false;
       log.warn(this.getEntity()
         .getTableName() + "." + this.getColumnName() + " is not translatable: not found one to many property to trl table");
+      return;
+    }
+
+    if(pk == null) {
       return;
     }
 

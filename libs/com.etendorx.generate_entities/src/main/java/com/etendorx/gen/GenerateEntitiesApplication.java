@@ -21,8 +21,8 @@ import com.etendorx.gen.process.GenerateMetadata;
 import com.etendorx.gen.process.GenerateProtoFile;
 import com.etendorx.gen.util.*;
 import freemarker.template.Template;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -227,9 +227,12 @@ public class GenerateEntitiesApplication {
           data.put("packageEntities", packageEntities);
           data.put("packageName", data.get("packageEntities").toString());
           data.put("dasUrl", dasUrl);
-          if (metadata.getRepositories().containsKey(data.get("newClassName").toString())) {
-            data.put("searches",
-              metadata.getRepositories().get(data.get("newClassName").toString()).getSearchesMap());
+          String newClassName = data.get("newClassName").toString();
+          if (metadata.getRepositories().containsKey(newClassName)) {
+            var repositories = metadata.getRepositories().get(newClassName);
+            if(repositories != null) {
+              data.put("searches", repositories.getSearchesMap());
+            }
           }
 
           generateEntityRX(data, pathEntitiesRx);
@@ -381,7 +384,7 @@ public class GenerateEntitiesApplication {
     final String fullPathEntities = pathEntitiesRx + "/src/main/entities/";
     var classfileName = className + ".java";
 
-    log.debug(GENERATING_FILE + classfileName);
+    log.debug("{} {}", GENERATING_FILE, classfileName);
     var outFile = new File(fullPathEntities, classfileName);
     new File(outFile.getParent()).mkdirs();
     String ftlFileNameRX = "/org/openbravo/base/gen/entityRX.ftl";

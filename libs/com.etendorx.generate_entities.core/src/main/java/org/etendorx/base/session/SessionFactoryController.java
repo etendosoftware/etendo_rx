@@ -16,7 +16,7 @@
 
 package org.etendorx.base.session;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.exception.OBException;
@@ -211,9 +211,6 @@ public abstract class SessionFactoryController {
 
   private void registerSqlFunctions() {
     Map<String, SQLFunction> sqlFunctions = getSQLFunctions();
-    if (sqlFunctions == null || sqlFunctions.isEmpty()) {
-      return;
-    }
     for (Entry<String, SQLFunction> entry : sqlFunctions.entrySet()) {
       log.debug("Registering SQL function: {}", entry.getKey());
       configuration.addSqlFunction(entry.getKey(), entry.getValue());

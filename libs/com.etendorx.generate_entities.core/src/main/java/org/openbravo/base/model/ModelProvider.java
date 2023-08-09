@@ -223,16 +223,16 @@ public class ModelProvider implements OBSingleton {
         t.setReferenceTypes(ModelProvider.instance);
       }
 
-      model = new ArrayList<Entity>();
-      entitiesByName = new HashMap<String, Entity>();
-      entitiesByClassName = new HashMap<String, Entity>();
-      entitiesByTableName = new HashMap<String, Entity>();
-      entitiesByTableId = new HashMap<String, Entity>();
-      entitiesWithTreeType = new ArrayList<Entity>();
-      entitiesWithImage = new HashMap<Entity, List<String>>();
-      entitiesWithFile = new HashMap<Entity, List<String>>();
+      model = new ArrayList<>();
+      entitiesByName = new HashMap<>();
+      entitiesByClassName = new HashMap<>();
+      entitiesByTableName = new HashMap<>();
+      entitiesByTableId = new HashMap<>();
+      entitiesWithTreeType = new ArrayList<>();
+      entitiesWithImage = new HashMap<>();
+      entitiesWithFile = new HashMap<>();
       for (final Table t : tables) {
-        log.debug("Building model for table " + t.getName());
+        log.debug("Building model for table {}", t.getName());
 
         final Entity e = new Entity();
         e.initialize(t);
@@ -250,7 +250,7 @@ public class ModelProvider implements OBSingleton {
         if (e.hasComputedColumns()) {
           // When the entity has computed columns, an extra virtual entity is generated in order to
           // access these computed columns through a proxy that allows to compute them lazily.
-          log.debug("Generating computed columns proxy entity for entity " + e.getName());
+          log.debug("Generating computed columns proxy entity for entity {}", e.getName());
           final Entity computedColsEntity = new Entity();
           computedColsEntity.initializeComputedColumns(t, e);
 
@@ -524,13 +524,17 @@ public class ModelProvider implements OBSingleton {
     }
   }
 
+  /**
+   * Iterates over the entities and sets virtual properties based on the reference ID.
+   */
   private void setVirtualPropertiesForReferenceId() {
-
-    for (final Entity e : entitiesByName.values()) {
-      if (e.getIdProperties().size() == 1 && !e.getIdProperties().get(0).isPrimitive()) {
-        createIdReferenceProperty(e);
-      } else if (e.getIdProperties().size() > 1) {
-        createCompositeId(e);
+    for (final Entity entity : entitiesByName.values()) {
+      List<Property> idProperties = entity.getIdProperties();
+      int size = idProperties.size();
+      if (size == 1 && !idProperties.get(0).isPrimitive()) {
+        createIdReferenceProperty(entity);
+      } else if (size > 1) {
+        createCompositeId(entity);
       }
     }
   }
@@ -585,12 +589,12 @@ public class ModelProvider implements OBSingleton {
     for (final Column c : t.getColumns()) {
       if (!c.isPrimitiveType()) {
         final Property thisProp = c.getProperty();
-        log.debug("Setting targetEntity and reference Property for " + thisProp);
+        log.debug("Setting targetEntity and reference Property for {}",thisProp);
         final Column thatColumn = c.getReferenceType();
         if (thatColumn == null) {
           if (!OBPropertiesProvider.isFriendlyWarnings()) {
             log.error(
-              "Property " + thisProp + " is mapped incorrectly, there is no referenced column for it, removing from the mapping");
+              "Property {} is mapped incorrectly, there is no referenced column for it, removing from the mapping", thisProp);
           }
           thisProp.getEntity().getProperties().remove(thisProp);
           if (thisProp.getEntity().getIdProperties().remove(thisProp)) {
@@ -739,12 +743,16 @@ public class ModelProvider implements OBSingleton {
 
   // expects that there is only one property
   private void createIdReferenceProperty(Entity e) {
-    Check.isTrue(e.getIdProperties().size() == 1 && !e.getIdProperties().get(0).isPrimitive(),
+    var idProperties = e.getIdProperties();
+    if(idProperties == null) {
+      throw new OBException("No id properties found for entity " + e.getName());
+    }
+    Check.isTrue(idProperties.size() == 1 && !idProperties.get(0).isPrimitive(),
       "Expect one id property for the entity and it should be a reference type");
-    final Property idProperty = e.getIdProperties().get(0);
-    log.debug("Handling many-to-one reference for " + idProperty);
-    Check.isTrue(e.getIdProperties().size() == 1,
+    Check.isTrue(idProperties.size() == 1,
       "Foreign-key id-properties are only handled if there is one in an entity " + e.getName());
+    final Property idProperty = idProperties.get(0);
+    log.debug("Handling many-to-one reference for {}", idProperty);
     // create a reference property
     final Property newProp = new Property();
     newProp.setEntity(e);
@@ -771,8 +779,9 @@ public class ModelProvider implements OBSingleton {
     // and change the old id property to a primitive one
     // this assumes that the column in the target entity is itself
     // not a foreign key!
-    final Property targetIdProp = idProperty.getTargetEntity().getIdProperties().get(0);
-    Check.isTrue(targetIdProp.isPrimitive(),
+    var targetIdProps = idProperty.getTargetEntity().getIdProperties();
+    final Property targetIdProp = targetIdProps != null && !targetIdProps.isEmpty() ? targetIdProps.get(0) : null;
+    Check.isTrue(Objects.requireNonNull(targetIdProp).isPrimitive(),
       "Entity " + e + ", The ID property of the referenced class should be primitive, an other case is not supported");
     idProperty.setDomainType(targetIdProp.getDomainType());
     idProperty.setIdBasedOnProperty(newProp);
@@ -1069,8 +1078,11 @@ public class ModelProvider implements OBSingleton {
    * @return Entity or null if none found
    */
   public Entity getEntityFromTreeType(String treeType) {
+    if(treeType == null) {
+      return null;
+    }
     for (Entity entity : entitiesWithTreeType) {
-      if (entity.getTreeType().equals(treeType)) {
+      if (entity != null && entity.getTreeType() != null && entity.getTreeType().equals(treeType)) {
         return entity;
       }
     }
