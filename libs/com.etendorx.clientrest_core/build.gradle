@@ -34,26 +34,17 @@ publishing {
 }
 
 dependencies {
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    implementation 'org.apache.commons:commons-lang3:3.13.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.1'
+    implementation 'org.springframework.hateoas:spring-hateoas:1.4.0'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
-    implementation 'io.github.openfeign:feign-okhttp'
-    implementation 'io.github.openfeign:feign-jackson:11.8'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-}
-
-ext {
-    set('springCloudVersion', "2021.0.8")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
