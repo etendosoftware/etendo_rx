@@ -2,6 +2,7 @@
 repositoryUser=
 repositoryPassword=
 repositoryUrl=https://maven.pkg.github.com/etendosoftware/etendo_rx
+pluginRepositoryUrl=https://maven.pkg.github.com/etendosoftware/com.etendorx.gradlepluginrx
 
 # Github credentials for downloading the plugin
 githubUser=
@@ -14,6 +15,10 @@ dasPushImage=
 authPushImage=
 edgePushImage=
 zapierIntegrationPushImage=
+pushUrl=
+pushUsername=
+pushPassword=
+asyncPushImage=
 pushUrl=
 pushUsername=
 pushPassword=

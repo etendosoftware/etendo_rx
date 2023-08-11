@@ -91,11 +91,16 @@ var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modul
 afterEvaluate {
     directories.each { dir ->
         var fileToFind = "build.gradle"
-        def subDirs = findSubDirectoriesWithFile(new File(dir), fileToFind)
-        subDirs.each { subDir ->
-            if (includeInDasDependencies(new File(subDir, fileToFind))) {
-                dependencies {
-                    implementation(project(":${subDir.name}"))
+        def startDir = new File(project.rootDir, dir)
+
+        if (startDir.exists() && startDir.isDirectory()) {
+            def subDirs = findSubDirectoriesWithFile(startDir, fileToFind)
+
+            subDirs.each { subDir ->
+                if (includeInDasDependencies(new File(subDir, fileToFind))) {
+                    dependencies {
+                        implementation(project(":${subDir.name}"))
+                    }
                 }
             }
         }
