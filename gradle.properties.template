@@ -14,6 +14,7 @@ dasPushImage=
 authPushImage=
 edgePushImage=
 zapierIntegrationPushImage=
+asyncPushImage=
 pushUrl=
 pushUsername=
 pushPassword=
