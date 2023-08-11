@@ -52,7 +52,7 @@ public class StreamConfiguration {
   private String kafkaStreamsHostInfo;
   @Value("${kafka.streams.state.dir:/tmp/kafka-streams/async-process-queries}")
   private String kafkaStreamsStateDir;
-  @Value("${bootstrap_server:localhost:9092}")
+  @Value("${bootstrap_server:kafka:9092}")
   private String bootstrapServer;
 
   @Bean
