@@ -42,8 +42,8 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   String contextName;
   private String externalPoolClassName;
   private static ExternalConnectionPool externalConnectionPool;
-  final String ERROR_GET_CONNECTION_UNNAMED_POOL = "Couldn't get a connection for an unnamed pool";
-  final String ERROR_UNNAMED_POOL_NOT_FOUND = "Can't get the pool. No pool name specified";
+  private static final String ERROR_GET_CONNECTION_UNNAMED_POOL = "Couldn't get a connection for an unnamed pool";
+  private static final String ERROR_UNNAMED_POOL_NOT_FOUND = "Can't get the pool. No pool name specified";
 
   public ConnectionProviderImpl(Properties properties) throws PoolNotFoundException {
     this.defaultPoolName = "";
