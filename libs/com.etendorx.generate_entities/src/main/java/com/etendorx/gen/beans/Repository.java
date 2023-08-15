@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.gen.util;
+package com.etendorx.gen.beans;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +28,8 @@ import java.util.stream.Collectors;
  */
 public class Repository {
   private final boolean transactional;
-
-  private String entityName;
   private final Map<String, RepositorySearch> searches = new HashMap<>();
+  private String entityName;
 
   public Repository(String entityName, boolean transactional) {
     this.entityName = entityName;
@@ -55,21 +54,12 @@ public class Repository {
 
   public List<HashMap<String, Object>> getSearchesMap() {
     return searches.values().stream().map(v -> {
-      var d = new HashMap<String, Object>();
-      d.put("query", v.getQuery());
-      d.put("method", v.getMethod());
-      d.put("params", v.getSearchParamsMap());
-      List<String> list = new ArrayList<>();
-      if (v.getFetchAttributes() != null) {
-        for (int i = 0; i < v.getFetchAttributes().length(); i++) {
-          try {
-            list.add(v.getFetchAttributes().getString(i));
-          } catch (Exception ignored) {
-          }
-        }
-      }
-      d.put("fetchAttributes", list);
-      return d;
+      var searchesMap = new HashMap<String, Object>();
+      searchesMap.put("query", v.getQuery());
+      searchesMap.put("method", v.getMethod());
+      searchesMap.put("params", v.getSearchParamsMap());
+      searchesMap.put("fetchAttributes", new ArrayList<>());
+      return searchesMap;
     }).collect(Collectors.toList());
   }
 }

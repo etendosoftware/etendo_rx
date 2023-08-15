@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.gen.util;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+package com.etendorx.gen.beans;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Projection Entity class needed for code generation
@@ -30,14 +30,14 @@ import java.util.stream.Collectors;
  */
 public class ProjectionEntity {
   private static final Logger log = LogManager.getLogger();
-  private final String identity;
+  private final Boolean identity;
 
   private String name;
   private Map<String, ProjectionEntityField> fields = new HashMap<>();
   private String packageName;
   private String className;
 
-  public ProjectionEntity(String name, String identity) {
+  public ProjectionEntity(String name, Boolean identity) {
     this.name = name;
     this.identity = identity;
   }
@@ -54,38 +54,38 @@ public class ProjectionEntity {
     return fields;
   }
 
-  public List<HashMap<String, String>> getFieldsMap() {
-    return fields.values().stream().map(v -> {
-      var d = new HashMap<String, String>();
-      d.put("name", v.getName());
-      d.put("value", v.getValue());
-      d.put("type", v.getType());
-      d.put("className", v.getClassName());
-      d.put("projectedEntity", v.getProjectedEntity());
-      d.put("projectedField", v.getProjectedField());
-      d.put("notNullValue", v.getNotNullValue());
-      return d;
-    }).collect(Collectors.toList());
+  public String getPackageName() {
+    return packageName;
   }
 
   public void setPackageName(String packageName) {
     this.packageName = packageName;
   }
 
-  public String getPackageName() {
-    return packageName;
+  public Boolean getIdentity() {
+    return identity;
   }
 
-  public String getIdentity() {
-    return identity;
+  public String getClassName() {
+    return className;
   }
 
   public void setClassName(String className) {
     this.className = className;
   }
 
-  public String getClassName() {
-    return className;
+  public List<Map<String, String>> getFieldsMap() {
+    return fields.values().stream().map(v -> {
+      var fieldsMap = new HashMap<String, String>();
+      fieldsMap.put("name", v.getName());
+      fieldsMap.put("value", v.getValue());
+      fieldsMap.put("type", v.getType());
+      fieldsMap.put("className", v.getClassName());
+      fieldsMap.put("projectedEntity", v.getProjectedEntity());
+      fieldsMap.put("projectedField", v.getProjectedField());
+      fieldsMap.put("notNullValue", v.getNotNullValue());
+      return fieldsMap;
+    }).collect(Collectors.toList());
   }
 
 }

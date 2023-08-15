@@ -27,7 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -41,12 +44,14 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.etendorx.das.utils.TestcontainersUtils;
 import com.etendorx.entities.jparepo.ADUserRepository;
+import com.etendorx.utils.auth.key.context.UserContext;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19090")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @AutoConfigureMockMvc
+@ComponentScan("com.etendorx.das.test.projections")
 public class RestCallTest {
 
   public static final String X_TOKEN = "X-TOKEN";
@@ -56,6 +61,11 @@ public class RestCallTest {
   private TestRestTemplate testRestTemplate;
   @Autowired
   private MockMvc mockMvc;
+
+  @TestConfiguration
+  @ComponentScan("com.etendorx.das.test.projections")
+  static class RepositoryTestConfiguration {
+  }
 
   private final String token = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjg2MDc2NjE2LCJhZF" +
       "91c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAiLCJhZF9yb2xlX2lkIjoiMCIsInNlYXJjaF9rZXkiOiIi" +
@@ -70,17 +80,8 @@ public class RestCallTest {
   }
 
   @Container
-  public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-      DockerImageName.parse("etendo/etendodata:rx-1.2.1").asCompatibleSubstituteFor("postgres")
-  )
-    .withPassword("syspass")
-    .withUsername("postgres")
-    .withEnv("PGDATA", "/postgres")
-    .withDatabaseName("etendo")
-    .withExposedPorts(5432)
-    .waitingFor(
-      Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
-    );
+  public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
+
   public static Stream<Arguments> validRequestParams() {
     return Stream.of(
       // Undefined username

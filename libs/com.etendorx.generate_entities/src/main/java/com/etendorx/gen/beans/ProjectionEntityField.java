@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.gen.util;
+package com.etendorx.gen.beans;
 
 public class ProjectionEntityField {
   private String name;
@@ -61,12 +61,12 @@ public class ProjectionEntityField {
     this.type = type;
   }
 
-  public void setClassName(String className) {
-    this.className = className;
-  }
-
   public String getClassName() {
     return this.className;
+  }
+
+  public void setClassName(String className) {
+    this.className = className;
   }
 
   public String getProjectedEntity() {
@@ -85,11 +85,11 @@ public class ProjectionEntityField {
     this.projectedField = projectedField;
   }
 
-  public void setNotNullValue(String notNullValue) {
-    this.notNullValue = notNullValue;
-  }
-
   public String getNotNullValue() {
     return notNullValue;
+  }
+
+  public void setNotNullValue(String notNullValue) {
+    this.notNullValue = notNullValue;
   }
 }
