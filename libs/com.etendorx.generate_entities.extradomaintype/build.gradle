@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+group 'com.etendorx'
+version = "$gradle.ext.version"
+
+repositories {
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = 'extra-domain-type'
+            version = version
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.2'
+    implementation 'org.hibernate:hibernate-core:5.4.2.Final'
+
+    implementation project(':com.etendorx.generate_entities.core')
+}
+
+test {
+    useJUnitPlatform()
+}

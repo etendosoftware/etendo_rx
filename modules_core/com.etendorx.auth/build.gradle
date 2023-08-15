@@ -1,44 +1,82 @@
 plugins {
-	id 'org.springframework.boot'
-	id 'io.spring.dependency-management'
-	id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'java'
+    id 'maven-publish'
 }
 
-group = 'com.etendorx.auth'
-version = '0.0.1-SNAPSHOT'
+group = 'com.etendorx'
+version = "$gradle.ext.version"
 sourceCompatibility = '11'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        bootJava(MavenPublication) {
+            groupId = group
+            artifactId = 'auth'
+            version = version
+            artifact tasks.named("bootJar")
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
 }
 
 dependencies {
-	implementation 'org.springframework.cloud:spring-cloud-starter-config'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation (project(':com.etendorx.utils.auth')) {
-		exclude group: 'org.slf4j', module: '*'
-	}
-	implementation 'io.jsonwebtoken:jjwt:0.9.1'
-	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation(project(':com.etendorx.utils.auth')) {
+        exclude group: 'org.slf4j', module: '*'
+    }
 
-	// Feign
-	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-	compileOnly 'org.projectlombok:lombok:1.18.22'
-	annotationProcessor 'org.projectlombok:lombok:1.18.22'
-	implementation 'io.github.openfeign:feign-okhttp'
-	implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation project(":com.etendorx.clientrest")
+    implementation project(":com.etendorx.clientrest_core")
 
-	// Test
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation "com.github.tomakehurst:wiremock-jre8:2.33.1"
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // String Utils
+    implementation 'org.apache.commons:commons-lang3:3.13.0'
+    // Feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation 'io.github.openfeign:feign-okhttp'
+    implementation 'io.github.openfeign:feign-jackson:11.8'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+
+    // Test
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.33.1'
 }
 
 ext {
-	set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2021.0.8")
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += ['src-gen/main/java']
+        }
+    }
 }
 
 /**
@@ -46,33 +84,37 @@ ext {
  * ./gradlew com.etendorx.auth:bootRun --info --debug-jvm -PdebugPort=9994
  */
 bootRun {
-	debugOptions{
-		port = Integer.valueOf((findProperty('debugPort') ?: port.get()) as String)
-	}
+    debugOptions {
+        port = Integer.valueOf((findProperty('debugPort') ?: port.get()) as String)
+    }
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 bootBuildImage {
-	imageName = "${authPushImage}"
-	publish = true
-	docker {
-		publishRegistry {
-			url = "${pushUrl}"
-			username = "${pushUsername}"
-			password = "${pushPassword}"
-		}
-	}
+    imageName = "${authPushImage}"
+    publish = true
+    docker {
+        publishRegistry {
+            url = "${pushUrl}"
+            username = "${pushUsername}"
+            password = "${pushPassword}"
+        }
+    }
+}
+springBoot {
+    buildInfo()
 }
 
-springBoot {
-	buildInfo()
+test.onlyIf {
+    // TODO: Test execution needs to be parametrized
+    false
 }

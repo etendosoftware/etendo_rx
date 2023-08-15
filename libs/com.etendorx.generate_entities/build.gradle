@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'maven-publish'
+}
+
+group 'com.etendorx'
+version = "$gradle.ext.version"
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    javaMainClass = "com.etendorx.gen.GenerateEntitiesApplication"
+}
+
+application {
+    mainClassName = javaMainClass
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = 'generate-entities'
+            version = version
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.31'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.2'
+    implementation 'org.hibernate:hibernate-core:5.4.2.Final'
+    implementation group: 'org.codehaus.jettison', name: 'jettison', version: '1.4.1'
+    implementation 'commons-cli:commons-cli:1.5.0'
+
+    // String Utils
+    implementation 'org.apache.commons:commons-lang3:3.13.0'
+
+    runtimeOnly group: 'com.oracle.database.jdbc', name: 'ojdbc8', version: '21.6.0.0.1'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
+
+    implementation project(":com.etendorx.generate_entities.core")
+    implementation project(":com.etendorx.generate_entities.extradomaintype")
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,10 +1,11 @@
 {
+  "react": false,
   "projections": [
     {
       "name": "auth",
       "entities": [
         {
-          "name": "AdUser",
+          "name": "ADUser",
           "fields": [
             {
               "name": "id"
@@ -37,19 +38,15 @@
   ],
   "repositories": [
     {
-      "entityName": "AdUser",
+      "entityName": "ADUser",
       "searches": [
         {
-          "query": "SELECT u FROM AdUser u WHERE u.username = :username and u.active = :active",
+          "query": "SELECT u FROM ADUser u WHERE u.username = :username",
           "method": "searchByUsername",
           "params": [
             {
               "name": "username",
               "type": "java.lang.String"
-            },
-            {
-              "name": "active",
-              "type": "java.lang.Boolean"
             }
           ]
         }

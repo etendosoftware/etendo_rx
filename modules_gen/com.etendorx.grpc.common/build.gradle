@@ -13,15 +13,25 @@ plugins {
     id "com.google.protobuf" version "0.8.18"
 }
 apply from: "grpc.gradle"
+sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
+}
+
+configurations {
+    // Configuration used to store the dependencies that the FAT JAR will contain
+    bundle
 }
 
 dependencies {
     implementation 'io.github.lognet:grpc-spring-boot-starter:4.6.0'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
+}
+
+bootJar {
+    enabled = false
 }
 
 apply plugin: 'idea'

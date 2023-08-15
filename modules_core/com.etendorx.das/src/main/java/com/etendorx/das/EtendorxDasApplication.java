@@ -18,17 +18,23 @@ package com.etendorx.das;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EntityScan(basePackages = {"com.etendorx.entities.entities.*"})
 @EnableJpaRepositories("com.etendorx.entities.jparepo")
-@ComponentScan({"com.etendorx.das.handler", "com.etendorx.das.grpcrepo"})
+@ComponentScan({
+    "com.etendorx.das.hibernate_interceptor",
+    "com.etendorx.das.handler",
+    "com.etendorx.das.grpcrepo",
+    "com.etendorx.utils.auth.key.context",
+    "com.etendorx.das.services",
+    "com.etendorx.das.scan"
+})
 public class EtendorxDasApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(EtendorxDasApplication.class, args);
   }
+
 }

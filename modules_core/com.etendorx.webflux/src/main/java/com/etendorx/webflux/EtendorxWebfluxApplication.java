@@ -12,8 +12,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "com.etendorx.jparepo")
 public class EtendorxWebfluxApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(EtendorxWebfluxApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(EtendorxWebfluxApplication.class, args);
+  }
 
 }

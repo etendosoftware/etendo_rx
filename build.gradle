@@ -1,22 +1,74 @@
 plugins {
-    id 'org.springframework.boot' version '2.6.3'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '2.7.14'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
     id 'java'
     id 'java-library'
+    id 'groovy'
+    id 'com.etendorx.gradlepluginrx' version '1.1.0'
 }
+
 group = 'com.etendorx'
-version = '0.0.1-SNAPSHOT'
+version = "$gradle.ext.version"
 sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
+    maven {
+        url = "${repositoryUrl}"
+        credentials {
+            username = "${repositoryUser}"
+            password = "${repositoryPassword}"
+        }
+    }
 }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+task upgradeRxVersion() {
+    final String MAJOR = 'major'
+    final String MINOR = 'minor'
+    final String PATCH = 'patch'
+    doLast {
+        def versionType
+        if (project.hasProperty('type')){
+            versionType = project.getProperty('type')
+        } else {
+            throw new GradleException("The parameter -Ptype is required")
+        }
+
+        if (versionType != MAJOR && versionType != MINOR && versionType != PATCH) {
+            throw new GradleException("The parameter value '${versionType}' is not valid, the options should be 'major', 'minor' or 'patch'")
+        }
+
+        def version = project.gradle.ext.version.trim().split("\\.")
+
+        if (version.length != 3) {
+            throw new GradleException("The version must be in the format major.minor.patch")
+        }
+
+        switch (versionType) {
+            case MAJOR:
+                version[0]++
+                version[1] = 0
+                version[2] = 0
+                break
+            case MINOR:
+                version[1]++
+                version[2] = 0
+                break
+            case PATCH:
+                version[2]++
+                break
+        }
+
+        def nextVersion = "${version[0]}.${version[1]}.${version[2]}"
+
+        //Rewrite settings.gradle file with new value
+        def settingsGradleContent = file('settings.gradle').text
+        settingsGradleContent = settingsGradleContent.replaceAll(/gradle.ext.version = '\d+.\d+.\d+'/, "gradle.ext.version = '${nextVersion}'")
+        file('settings.gradle').write(settingsGradleContent)
+    }
 }
 
 test {
     useJUnitPlatform()
 }
+

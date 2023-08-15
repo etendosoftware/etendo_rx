@@ -1,12 +1,36 @@
-org.gradle.parallel=true
+# Credentials and repository URL for JARs publication
+repositoryUser=
+repositoryPassword=
+repositoryUrl=https://maven.pkg.github.com/etendosoftware/etendo_rx
+pluginRepositoryUrl=https://maven.pkg.github.com/etendosoftware/com.etendorx.gradlepluginrx
 
-dasPushImage=registry.futit.cloud/default_etendorx_das:1.0.0
-authPushImage=registry.futit.cloud/default_etendorx_auth:1.0.0
-edgePushImage=registry.futit.cloud/default_etendorx_edge:1.0.0
-zapierIntegrationPushImage=registry.futit.cloud/default_etendorx_zapier_integration:1.0.0
-pushUrl=https://registry.futit.cloud
+# Github credentials for downloading the plugin
+githubUser=
+githubToken=
+
+org.gradle.parallel=true
+org.gradle.daemon=false
+
+dasPushImage=
+authPushImage=
+edgePushImage=
+zapierIntegrationPushImage=
+pushUrl=
 pushUsername=
 pushPassword=
 
+bbdd.rdbms=POSTGRE
+bbdd.driver=org.postgresql.Driver
+bbdd.url=jdbc:postgresql://localhost\:5432
+bbdd.sid=etendo
+bbdd.systemUser=postgres
+bbdd.systemPassword=syspass
+bbdd.user=tad
+bbdd.password=tad
+bbdd.sessionConfig=select update_dateFormat('DD-MM-YYYY')
 
+# Boolean value to generate or not code to RX
+rx.generateCode=true
 
+rx.computedColumns=true
+rx.views=true

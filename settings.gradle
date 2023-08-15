@@ -1,60 +1,45 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        maven {
+            url 'https://maven.pkg.github.com/etendosoftware/com.etendorx.gradlepluginrx'
+            credentials {
+                username "${githubUser}"
+                password "${githubToken}"
+            }
+        }
+    }
+}
+
 rootProject.name = 'etendorx'
+var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modules"]
+gradle.ext.version = '1.1.0'
 
-def subDirs = new File("modules_core").listFiles(new FileFilter() {
-    boolean accept(File file) {
-        if (!file.isDirectory()) {
-            return false
+directories.each {
+    def subDirs = []
+    def queue = new LinkedList()
+    queue.add(new File(it))
+
+    while (!queue.isEmpty()) {
+        def dir = queue.remove()
+        if (new File(dir, 'build.gradle').isFile()) {
+            subDirs.add(dir)
+        } else {
+            dir.listFiles(new FileFilter() {
+                boolean accept(File file) {
+                    return file.isDirectory()
+                }
+            })?.each {
+                queue.add(it)
+            }
         }
-
-        return new File(file, 'build.gradle').isFile()
     }
-})
-println subDirs.toString()
-subDirs.each { File dir ->
-    include dir.name
-    project (":" + dir.name).projectDir = dir
-}
-subDirs = new File("modules_gen").listFiles(new FileFilter() {
-    boolean accept(File file) {
-        if (!file.isDirectory()) {
-            return false
-        }
 
-        return new File(file, 'build.gradle').isFile()
+    println subDirs.toString()
+    subDirs.each { File dir ->
+        include dir.name
+
+        project(":" + dir.name).projectDir = dir
     }
-})
-println subDirs.toString()
-subDirs.each { File dir ->
-    include dir.name
-    project (":" + dir.name).projectDir = dir
-}
-
-subDirs = new File("modules").listFiles(new FileFilter() {
-    boolean accept(File file) {
-        if (!file.isDirectory()) {
-            return false
-        }
-
-        return new File(file, 'build.gradle').isFile()
-    }
-})
-println subDirs.toString()
-subDirs.each { File dir ->
-    include dir.name
-    project (":" + dir.name).projectDir = dir
-}
-
-subDirs = new File("libs").listFiles(new FileFilter() {
-    boolean accept(File file) {
-        if (!file.isDirectory()) {
-            return false
-        }
-
-        return new File(file, 'build.gradle').isFile()
-    }
-})
-println subDirs.toString()
-subDirs.each { File dir ->
-    include dir.name
-    project (":" + dir.name).projectDir = dir
 }
