@@ -59,6 +59,18 @@ dependencies {
 
 }
 
+bootBuildImage {
+    imageName = "${asyncPushImage}"
+    publish = true
+    docker {
+        publishRegistry {
+            url = "${pushUrl}"
+            username = "${pushUsername}"
+            password = "${pushPassword}"
+        }
+    }
+}
+
 ext {
     set('springCloudVersion', "2021.0.2")
 }

@@ -69,7 +69,7 @@ Thumbs.db
 /Dockerfile
 /HELP.md
 /rx.sh
-/modules/
+/modules/*
 *.pem
 /libs/generate_entities_repo/
 **/application.properties
