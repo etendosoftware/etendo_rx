@@ -84,7 +84,7 @@ public class AsyncProcessController {
   }
 
   @Operation(summary = "Get current status of execution")
-  @GetMapping(value = "/{asyncProcessId}", produces = "application/json")
+  @GetMapping(value = "/{asyncProcessId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<AsyncProcess> getAsyncProcess(@PathVariable("asyncProcessId") String asyncProcessId) {
     var asyncProcess = asyncProcessService.getAsyncProcess(asyncProcessId);
     return ResponseEntity.ok(asyncProcess);
@@ -151,7 +151,7 @@ public class AsyncProcessController {
         session = new LinkedHashMap<>();
         localBody.put("session", session);
       }
-      session.put("id", uuid);
+      session.put("run_id", uuid);
     }
 
     kafkaMessageUtil.saveProcessExecution(
