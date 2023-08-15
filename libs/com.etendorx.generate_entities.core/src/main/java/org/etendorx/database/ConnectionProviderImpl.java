@@ -42,6 +42,8 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   String contextName;
   private String externalPoolClassName;
   private static ExternalConnectionPool externalConnectionPool;
+  private static final String ERROR_GET_CONNECTION_UNNAMED_POOL = "Couldn't get a connection for an unnamed pool";
+  private static final String ERROR_UNNAMED_POOL_NOT_FOUND = "Can't get the pool. No pool name specified";
 
   public ConnectionProviderImpl(Properties properties) throws PoolNotFoundException {
     this.defaultPoolName = "";
@@ -212,7 +214,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
         return connectionPool;
       }
     } else {
-      throw new PoolNotFoundException("Couldn´t get an unnamed pool");
+      throw new PoolNotFoundException(ERROR_UNNAMED_POOL_NOT_FOUND);
     }
   }
 
@@ -234,14 +236,14 @@ public class ConnectionProviderImpl implements ConnectionProvider {
 
       return conn;
     } else {
-      throw new NoConnectionAvailableException("Couldn´t get a connection for an unnamed pool");
+      throw new NoConnectionAvailableException(ERROR_GET_CONNECTION_UNNAMED_POOL);
     }
   }
 
   private Connection getNewConnection(String poolName) throws NoConnectionAvailableException {
     // Check for empty poolName
     if (poolName == null || poolName.trim().isEmpty()) {
-      throw new NoConnectionAvailableException("Couldn't get a connection for an unnamed pool");
+      throw new NoConnectionAvailableException(ERROR_GET_CONNECTION_UNNAMED_POOL);
     }
 
     // Check and instantiate externalConnectionPool if necessary
@@ -276,7 +278,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
           "There are no connections available in jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
       }
     } else {
-      throw new NoConnectionAvailableException("Couldn´t get a connection for an unnamed pool");
+      throw new NoConnectionAvailableException(ERROR_GET_CONNECTION_UNNAMED_POOL);
     }
   }
 
@@ -323,7 +325,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   public Connection getTransactionConnection() throws NoConnectionAvailableException, SQLException {
     Connection conn = this.getNewConnection(this.defaultPoolName);
     if (conn == null) {
-      throw new NoConnectionAvailableException("Couldn´t get an available connection");
+      throw new NoConnectionAvailableException("Couldn't get an available connection");
     } else {
       conn.setAutoCommit(false);
       return conn;
@@ -358,7 +360,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
       log4j.debug("connection established");
       return this.getPreparedStatement(conn, SQLPreparedStatement);
     } else {
-      throw new PoolNotFoundException("Can't get the pool. No pool name specified");
+      throw new PoolNotFoundException(ERROR_UNNAMED_POOL_NOT_FOUND);
     }
   }
 
@@ -392,7 +394,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
       Connection conn = this.getConnection(poolName);
       return this.getCallableStatement(conn, SQLCallableStatement);
     } else {
-      throw new PoolNotFoundException("Can't get the pool. No pool name specified");
+      throw new PoolNotFoundException(ERROR_UNNAMED_POOL_NOT_FOUND);
     }
   }
 
@@ -423,7 +425,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
       Connection conn = this.getConnection(poolName);
       return this.getStatement(conn);
     } else {
-      throw new PoolNotFoundException("Can't get the pool. No pool name specified");
+      throw new PoolNotFoundException(ERROR_UNNAMED_POOL_NOT_FOUND);
     }
   }
 

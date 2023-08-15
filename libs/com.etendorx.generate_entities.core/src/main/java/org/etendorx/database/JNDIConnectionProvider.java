@@ -154,7 +154,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
   public Connection getTransactionConnection() throws NoConnectionAvailableException, SQLException {
     Connection conn = this.getConnection();
     if (conn == null) {
-      throw new NoConnectionAvailableException("Couldn´t get an available connection");
+      throw new NoConnectionAvailableException("Couldn't get an available connection");
     } else {
       conn.setAutoCommit(false);
       return conn;
