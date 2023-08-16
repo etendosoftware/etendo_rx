@@ -52,7 +52,7 @@ public class DisableEnableTriggersTest {
   @Test
   void whenExecuteRequestWithoutTriggerParam() {
     MockHttpServletRequest request = new MockHttpServletRequest();
-    request.setParameter(FilterContext.ACTIVE_PARAMETER, FilterContext.TRUE);
+    request.setParameter(FilterContext.NO_ACTIVE_FILTER_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
     setUserContextFromToken(userContext, TOKEN, request);
     AppContext.setCurrentUser(userContext);
@@ -63,7 +63,7 @@ public class DisableEnableTriggersTest {
   @Test
   void whenExecuteRequestWithTriggerDisableParam() {
     MockHttpServletRequest request = new MockHttpServletRequest();
-    request.setParameter(FilterContext.ACTIVE_PARAMETER, FilterContext.TRUE);
+    request.setParameter(FilterContext.NO_ACTIVE_FILTER_PARAMETER, FilterContext.TRUE);
     request.setParameter(FilterContext.TRIGGER_ENABLED_PARAMETER, FilterContext.FALSE);
     request.setMethod("GET");
     UserContext userContext = new UserContext();

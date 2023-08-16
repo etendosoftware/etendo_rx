@@ -54,14 +54,14 @@ public class DefaultFilters {
 
         switch (restMethod) {
             case GET_METHOD:
-                return replaceInQuery(sql, clientId, roleId, isActive, true);
+                return replaceInQuery(sql, clientId, roleId, isActive);
             case DELETE_METHOD:
             case PUT_METHOD:
             case PATCH_METHOD:
-                return replaceInQuery(sql, clientId, roleId, isActive, sql.startsWith(SELECT));
+                return replaceInQuery(sql, clientId, roleId, sql.startsWith(SELECT));
             case POST_METHOD:
                 if (sql.startsWith(SELECT)) {
-                    return replaceInQuery(sql, clientId, roleId, isActive, true);
+                    return replaceInQuery(sql, clientId, roleId, isActive);
                 } else {
                     return sql;
                 }
@@ -108,11 +108,10 @@ public class DefaultFilters {
     }
 
     @NotNull
-    private static String replaceInQuery(String sql, String clientId, String roleId, boolean isActive,
-        boolean isActiveFilter) {
+    private static String replaceInQuery(String sql, String clientId, String roleId, boolean isActiveFilter) {
         QueryInfo tableInfo = getQueryInfo(sql);
         List<String> conditions = getDefaultWhereClause(tableInfo.getTableAlias(), clientId, roleId);
-        if (isActiveFilter && tableInfo.isContainsWhere() && isActive) {
+        if (isActiveFilter) {
             conditions.add(tableInfo.getTableAlias() + ".isactive = 'Y'");
         }
         return applyFilters(sql, tableInfo, conditions);
@@ -160,6 +159,7 @@ public class DefaultFilters {
         log.error("[getQueryInfo] - PATTERN ERROR");
         throw new QueryException("getQueryInfo ERROR");
     }
+
 
     static class QueryInfo {
         private String sqlAction;
