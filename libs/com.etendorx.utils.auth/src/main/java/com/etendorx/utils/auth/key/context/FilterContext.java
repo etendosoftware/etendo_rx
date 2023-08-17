@@ -72,7 +72,7 @@ public class FilterContext extends OncePerRequestFilter {
   }
 
   public static void setUserContextFromToken(UserContext userContext, String token, HttpServletRequest req) {
-    String noActiveFilterParam = req.getParameter(NO_ACTIVE_FILTER_PARAMETER);
+    String noActiveFilterParameter = req.getParameter(NO_ACTIVE_FILTER_PARAMETER);
     String triggerEnabledParam = req.getParameter(TRIGGER_ENABLED_PARAMETER);
     String restMethod = req.getMethod();
     Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
@@ -82,15 +82,15 @@ public class FilterContext extends OncePerRequestFilter {
     userContext.setRoleId((String) tokenValuesMap.get(JwtKeyUtils.ROLE_ID));
     userContext.setSearchKey((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
     userContext.setServiceId((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_ID));
-    boolean noActiveFilter = !getBooleanParameter(noActiveFilterParam, NO_ACTIVE_FILTER_PARAMETER, false);
+    boolean noActiveFilter = !parseBooleanParameter(noActiveFilterParameter, NO_ACTIVE_FILTER_PARAMETER, false);
     userContext.setActive(noActiveFilter);
     userContext.setAuthToken(token);
     userContext.setRestMethod(restMethod);
-    boolean isTriggerEnabled = getBooleanParameter(triggerEnabledParam, TRIGGER_ENABLED_PARAMETER, true);
+    boolean isTriggerEnabled = parseBooleanParameter(triggerEnabledParam, TRIGGER_ENABLED_PARAMETER, true);
     userContext.setTriggerEnabled(isTriggerEnabled);
   }
 
-  private static boolean getBooleanParameter(String paramValueStr, String nameParam, boolean defaultValue) {
+  private static boolean parseBooleanParameter(String paramValueStr, String nameParam, boolean defaultValue) {
     boolean valueParam;
     if (paramValueStr == null) {
       valueParam = defaultValue;
