@@ -120,12 +120,7 @@ public class GenerateEntities {
 
     var projections = getProjections(paths, entities);
     var generators = getGenerators(projections);
-    var mappingGenerators = new ArrayList<MappingGenerator>();
-    mappingGenerators.add(new GenerateBaseDTO());
-    mappingGenerators.add(new GenerateBaseFieldConverterRead());
-    mappingGenerators.add(new GenerateBaseFieldConverterWrite());
-    mappingGenerators.add(new GenerateBaseRestController());
-    mappingGenerators.add(new GenerateBaseRepository());
+    var mappingGenerators = getMappingGenerators();
     try {
       for (Entity entity : entities) {
         if (entity.isDataSourceBased() || entity.isHQLBased()) {
@@ -133,33 +128,12 @@ public class GenerateEntities {
         }
         if (generateRxCode && !entity.isVirtualEntity() && (includeViews || !entity.isView())) {
           var data = TemplateUtil.getModelData(paths, entity, getSearchesMap(entity), computedColumns, includeViews);
-          for (EntityGenerator generator : generators) {
-            generator.generate(data, paths);
-          }
-
-          // Mappings
-          Table table = ModelProvider.getInstance().getTable(entity.getTableName());
-          List<ETRXProjectionEntity> list = ETRXModelProvider.getInstance().getETRXProjectionEntity(table);
-          new GenerateBaseDTOConverter().generate(list, paths);
-          // mappings
-          for (ETRXProjectionEntity etrxProjectionEntity : list) {
-            if (hasReadWrite(list, etrxProjectionEntity)) {
-              for (MappingGenerator mappingGenerator : mappingGenerators) {
-                mappingGenerator.generate(etrxProjectionEntity, paths);
-              }
-            }
-          }
+          generateEntityCode(data, paths, generators);
+          generateMappingCode(entity, paths, mappingGenerators);
         }
-
       }
-      generateEntityScan(entities, paths.pathEntitiesRx);
 
-      generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, Templates.baseRXObject,
-          paths.packageEntities);
-      generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository, Templates.baseDASRepository,
-          paths.packageEntities);
-      generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository, Templates.baseDTORepository,
-          paths.packageEntities);
+      generateGlobalCode(paths, entities);
 
       generateProtofile(projections, entities, paths, computedColumns, includeViews);
 
@@ -167,6 +141,50 @@ public class GenerateEntities {
       log.error(ERROR_GENERATING_FILE + GENERATED_DIR, e);
     }
     log.info("Generated {} entities", entities.size());
+  }
+
+  private void generateGlobalCode(GeneratePaths paths, List<Entity> entities) throws FileNotFoundException {
+    generateEntityScan(entities, paths.pathEntitiesRx);
+
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, Templates.baseRxObject,
+        paths.packageEntities);
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository, Templates.baseDasRepository,
+        paths.packageEntities);
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository, Templates.baseDtoRepository,
+        paths.packageEntities);
+
+  }
+
+  private List<MappingGenerator> getMappingGenerators() {
+    var mappingGenerators = new ArrayList<MappingGenerator>();
+    mappingGenerators.add(new GenerateBaseDTO());
+    mappingGenerators.add(new GenerateBaseFieldConverterRead());
+    mappingGenerators.add(new GenerateBaseFieldConverterWrite());
+    mappingGenerators.add(new GenerateBaseRestController());
+    mappingGenerators.add(new GenerateBaseRepository());
+    return mappingGenerators;
+  }
+
+  private void generateEntityCode(Map<String, Object> data, GeneratePaths paths,
+      List<EntityGenerator> generators) throws FileNotFoundException {
+    for (EntityGenerator generator : generators) {
+      generator.generate(data, paths);
+    }
+  }
+
+  private void generateMappingCode(Entity entity, GeneratePaths paths, List<MappingGenerator> mappingGenerators) throws FileNotFoundException {
+    // Mappings
+    Table table = ModelProvider.getInstance().getTable(entity.getTableName());
+    List<ETRXProjectionEntity> list = ETRXModelProvider.getInstance().getETRXProjectionEntity(table);
+    new GenerateBaseDTOConverter().generate(list, paths);
+    // mappings
+    for (ETRXProjectionEntity etrxProjectionEntity : list) {
+      if (hasReadWrite(list, etrxProjectionEntity)) {
+        for (MappingGenerator mappingGenerator : mappingGenerators) {
+          mappingGenerator.generate(etrxProjectionEntity, paths);
+        }
+      }
+    }
   }
 
   private boolean hasReadWrite(List<ETRXProjectionEntity> list, ETRXProjectionEntity entity) {
@@ -207,7 +225,6 @@ public class GenerateEntities {
     generators.add(new GenerateJPARepo());
     generators.add(new GenerateClientRestRX());
     generators.add(new GenerateEntityModel());
-    //
     generators.add(new GenerateProjections(projections));
     return generators;
   }

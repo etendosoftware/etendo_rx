@@ -35,13 +35,11 @@ public class GenerateBaseDTO extends MappingGenerationBase {
   }
 
   private String type(String mappingType) {
-    switch (mappingType) {
-      case MappingConstants.MAPPING_TYPE_READ:
-        return "Read";
-      case MappingConstants.MAPPING_TYPE_WRITE:
-        return "Write";
-    }
-    return mappingType;
+    return switch (mappingType) {
+      case MappingConstants.MAPPING_TYPE_READ -> "Read";
+      case MappingConstants.MAPPING_TYPE_WRITE -> "Write";
+      default -> mappingType;
+    };
   }
 
 

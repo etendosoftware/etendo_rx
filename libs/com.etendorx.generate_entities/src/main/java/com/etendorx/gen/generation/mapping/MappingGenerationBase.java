@@ -32,13 +32,10 @@ public abstract class MappingGenerationBase implements MappingGenerator {
   private static final Logger log = LogManager.getLogger();
   private final String ftlFileNameRX;
 
-  public MappingGenerationBase(String ftlFileNameRX) {
+  protected MappingGenerationBase(String ftlFileNameRX) {
     this.ftlFileNameRX = ftlFileNameRX;
   }
 
-  /**
-   *
-   */
   @Override
   public void generate(ETRXProjectionEntity etrxProjectionEntity, GeneratePaths path) throws FileNotFoundException {
     if(!isValid(etrxProjectionEntity)) {

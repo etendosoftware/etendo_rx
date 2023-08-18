@@ -48,7 +48,7 @@ public class ProjectionsConverter {
     }
     var moduleLocation = new File(pathEtendoRx + File.separator + defaultDir + File.separator + rxJavaPackage);
     if (moduleLocation.exists()) {
-      var ignored = moduleLocation.mkdirs();
+      moduleLocation.mkdirs();
     }
     return moduleLocation;
   }

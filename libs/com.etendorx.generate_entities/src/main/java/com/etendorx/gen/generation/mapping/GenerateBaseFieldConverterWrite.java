@@ -20,10 +20,10 @@ import com.etendorx.gen.generation.constants.MappingConstants;
 import org.apache.commons.lang.StringUtils;
 
 public class GenerateBaseFieldConverterWrite extends MappingGenerationBase {
-  private static final String ftlFileNameRX = "/org/openbravo/base/gen/mappings/baseFieldConverterWrite.ftl";
+  private static final String FTL_FILE = "/org/openbravo/base/gen/mappings/baseFieldConverterWrite.ftl"; // NOSONAR
 
   public GenerateBaseFieldConverterWrite() {
-    super(ftlFileNameRX);
+    super(FTL_FILE);
   }
 
   @Override

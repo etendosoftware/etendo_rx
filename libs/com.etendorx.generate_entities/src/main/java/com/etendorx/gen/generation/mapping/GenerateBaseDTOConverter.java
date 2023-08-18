@@ -33,12 +33,12 @@ import java.util.Map;
 public class GenerateBaseDTOConverter {
 
   private static final Logger log = LogManager.getLogger();
-  private static final String ftlFileNameRX = "/org/openbravo/base/gen/mappings/baseDTOConverter.ftl";
-  private static final String outFileName = "DTOConverter.java";
+  private static final String FTL_FILE = "/org/openbravo/base/gen/mappings/baseDTOConverter.ftl"; // NOSONAR
+  private static final String OUT_FILE_NAME = "DTOConverter.java";
 
   public void generate(List<ETRXProjectionEntity> projectionEntities, GeneratePaths path) throws FileNotFoundException {
     freemarker.template.Template templateJPARepoRX = TemplateUtil.createTemplateImplementation(
-        ftlFileNameRX);
+        FTL_FILE);
 
     List<String> projectionsId = projectionEntities.stream().map(m -> m.getProjection().getId()).distinct().toList();
     for (String projectionId : projectionsId) {
@@ -59,7 +59,7 @@ public class GenerateBaseDTOConverter {
       TemplateUtil.processTemplate(
           templateJPARepoRX,
           getData(mappingPrefix, projection, readEntity, writeEntity),
-          CodeGenerationUtils.getWriter(mappingPrefix, outFileName, path)
+          CodeGenerationUtils.getWriter(mappingPrefix, OUT_FILE_NAME, path)
       );
     }
   }

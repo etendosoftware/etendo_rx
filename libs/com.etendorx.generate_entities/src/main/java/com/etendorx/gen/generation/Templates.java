@@ -1,7 +1,10 @@
 package com.etendorx.gen.generation;
 
 public class Templates {
-  public static final String baseRXObject = "baseEntityRx.ftl";
-  public static final String baseDASRepository = "baseDASRepository.ftl";
-  public static final String baseDTORepository = "baseDTORepository.ftl";
+
+  private Templates() {}
+
+  public static final String baseRxObject = "baseEntityRx.ftl";
+  public static final String baseDasRepository = "baseDASRepository.ftl";
+  public static final String baseDtoRepository = "baseDTORepository.ftl";
 }

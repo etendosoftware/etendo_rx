@@ -21,10 +21,10 @@ import org.apache.commons.lang.StringUtils;
 
 public class GenerateBaseRepository extends MappingGenerationBase {
 
-  private static final String ftlFileNameRX = "/org/openbravo/base/gen/mappings/baseRepository.ftl";
+  private static final String FTL_FILE = "/org/openbravo/base/gen/mappings/baseRepository.ftl"; // NOSONAR
 
   public GenerateBaseRepository() {
-    super(ftlFileNameRX);
+    super(FTL_FILE);
   }
 
   @Override

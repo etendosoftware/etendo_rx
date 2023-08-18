@@ -26,12 +26,14 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
 public class CodeGenerationUtils {
+
+  private CodeGenerationUtils() {}
+  
   public static Writer getWriter(String mappingPrefix, String outFileName,
       GeneratePaths path) throws FileNotFoundException {
     final String packageJPARepo = path.pathEntitiesRx.substring(path.pathEntitiesRx.lastIndexOf('/')) + ".mappings";
     final String fullPathJPARepo = path.pathEntitiesRx + "/src/main/mappings/" + packageJPARepo.replace('.', '/');
     final String repositoryClass = mappingPrefix + outFileName;
-    //
     new File(fullPathJPARepo).mkdirs();
     var outFileRepo = new File(fullPathJPARepo, repositoryClass);
 

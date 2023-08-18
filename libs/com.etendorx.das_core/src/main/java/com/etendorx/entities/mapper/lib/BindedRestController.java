@@ -28,7 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 public abstract class BindedRestController<E extends BaseDTOModel, F extends BaseDTOModel> {
   private final DASRepository<E, F> repository;
 
-  public BindedRestController(
+  protected BindedRestController(
       DASRepository<E, F> repository) {
     this.repository = repository;
   }
@@ -43,9 +43,8 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
     var entity = repository.findById(id);
     if (entity != null) {
       return new ResponseEntity<>(entity, HttpStatus.OK);
-    } else {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found");
     }
+    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found");
   }
 
   @PostMapping

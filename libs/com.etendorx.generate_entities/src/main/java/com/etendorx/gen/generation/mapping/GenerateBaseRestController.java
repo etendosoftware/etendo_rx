@@ -20,10 +20,10 @@ import com.etendorx.gen.generation.constants.MappingConstants;
 import org.apache.commons.lang.StringUtils;
 
 public class GenerateBaseRestController extends MappingGenerationBase {
-  private static final String ftlFileNameRX = "/org/openbravo/base/gen/mappings/baseRestController.ftl";
+  private static final String FTL_FILE = "/org/openbravo/base/gen/mappings/baseRestController.ftl"; // NOSONAR
 
   public GenerateBaseRestController() {
-    super(ftlFileNameRX);
+    super(FTL_FILE);
   }
 
   @Override
