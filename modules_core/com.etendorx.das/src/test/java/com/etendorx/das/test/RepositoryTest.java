@@ -57,10 +57,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import com.etendorx.das.utils.TestcontainersUtils;
 import com.etendorx.entities.jparepo.ADUserRepository;
@@ -118,7 +116,7 @@ public class RepositoryTest {
   @Test
   public void whenReadUser() {
     MockHttpServletRequest request = new MockHttpServletRequest();
-    request.setParameter(FilterContext.ACTIVE_PARAMETER, FilterContext.TRUE);
+    request.setParameter(FilterContext.NO_ACTIVE_FILTER_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
     setUserContextFromToken(userContext, TOKEN, request);
     AppContext.setCurrentUser(userContext);
@@ -131,7 +129,7 @@ public class RepositoryTest {
   @Test
   public void whenFindByName() {
     MockHttpServletRequest request = new MockHttpServletRequest();
-    request.setParameter(FilterContext.ACTIVE_PARAMETER, FilterContext.TRUE);
+    request.setParameter(FilterContext.NO_ACTIVE_FILTER_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
     UserContext userContext = new UserContext();
     setUserContextFromToken(userContext, TOKEN, request);

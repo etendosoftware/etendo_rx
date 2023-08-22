@@ -88,7 +88,7 @@ class DefaultFiltersTest {
         // Assert
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', '456') " +
             "and etrx_role_organizations('456', '101112', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         Assertions.assertEquals(expected, result);
     }
 
@@ -115,7 +115,7 @@ class DefaultFiltersTest {
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -140,7 +140,7 @@ class DefaultFiltersTest {
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -164,7 +164,7 @@ class DefaultFiltersTest {
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -188,7 +188,7 @@ class DefaultFiltersTest {
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
