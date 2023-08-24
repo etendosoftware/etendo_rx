@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GenerateBaseDTOConverter {
 
@@ -40,10 +41,12 @@ public class GenerateBaseDTOConverter {
     freemarker.template.Template templateJPARepoRX = TemplateUtil.createTemplateImplementation(
         FTL_FILE);
 
-    List<String> projectionsId = projectionEntities.stream().map(m -> m.getProjection().getId()).distinct().toList();
+    List<String> projectionsId = projectionEntities.stream().map(m -> m.getProjection().getId()).distinct().collect(
+        Collectors.toList());
     for (String projectionId : projectionsId) {
       var filteredProjectionEntities = projectionEntities.stream().filter(
-          m -> m.getProjection().getId().equals(projectionId)).toList();
+          m -> m.getProjection().getId().equals(projectionId)).collect(
+          Collectors.toList());;
       ETRXProjection projection = filteredProjectionEntities.get(0).getProjection();
       ETRXProjectionEntity readEntity = filteredProjectionEntities.stream()
           .filter(e -> StringUtils.equals(e.getMappingType(), MappingConstants.MAPPING_TYPE_READ)).findFirst().orElse(
