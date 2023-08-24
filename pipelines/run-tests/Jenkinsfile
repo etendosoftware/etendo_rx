@@ -128,6 +128,7 @@ spec:
                             cp gradle.properties.template gradle.properties
                             sed -i 's/^githubUser=.*/githubUser=${GITHUB_USER}/' gradle.properties
                             sed -i 's/^githubToken=.*/githubToken=${GITHUB_TOKEN}/' gradle.properties
+                            mkdir -p modules
                             ./gradlew :setup
                             ./gradlew :com.etendorx.test.testcontainer:test
                             """
@@ -237,7 +238,8 @@ spec:
                             cd etendo_rx
                             chmod a+x ./pipelines/run-tests/build-update.sh
                             ./pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo RX" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL
-                            ./gradlew generate.entities.test --info
+                            mkdir -p modules
+                            ./gradlew generate.entities --info
                             """
                             echo 'Build of Etendo RX Finished'
                             env.STATUSRX = "1"
