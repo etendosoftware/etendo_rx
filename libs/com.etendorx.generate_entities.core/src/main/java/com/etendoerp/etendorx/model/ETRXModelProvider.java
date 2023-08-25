@@ -1,14 +1,29 @@
+/*
+ * Copyright 2022-2023  Futit Services SL
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.etendoerp.etendorx.model;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
+import com.etendoerp.etendorx.model.mapping.ETRXJavaMapping;
+import com.etendoerp.etendorx.model.projection.ETRXEntityField;
+import com.etendoerp.etendorx.model.projection.ETRXProjection;
+import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
+import com.etendoerp.etendorx.model.repository.ETRXEntitySearch;
+import com.etendoerp.etendorx.model.repository.ETRXRepository;
+import com.etendoerp.etendorx.model.repository.ETRXSearchParam;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.provider.OBProvider;
@@ -20,14 +35,13 @@ import org.openbravo.base.model.ModelSessionFactoryController;
 import org.openbravo.base.model.Module;
 import org.openbravo.base.model.Table;
 
-import com.etendoerp.etendorx.model.projection.ETRXEntityField;
-import com.etendoerp.etendorx.model.projection.ETRXProjection;
-import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
-import com.etendoerp.etendorx.model.repository.ETRXEntitySearch;
-import com.etendoerp.etendorx.model.repository.ETRXRepository;
-import com.etendoerp.etendorx.model.repository.ETRXSearchParam;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 public class ETRXModelProvider implements OBSingleton {
 
@@ -39,16 +53,18 @@ public class ETRXModelProvider implements OBSingleton {
 
   // Etendo RX Models
   private static final List<Class<? extends ModelObject>> ETRX_MODEL_CLASSES = List.of(
-    // Modules
-    ETRXModule.class,
-    // Projections
-    ETRXProjection.class,
-    ETRXProjectionEntity.class,
-    ETRXEntityField.class,
-    // Repositories
-    ETRXRepository.class,
-    ETRXEntitySearch.class,
-    ETRXSearchParam.class
+      // Modules
+      ETRXModule.class,
+      // Projections
+      ETRXProjection.class,
+      ETRXProjectionEntity.class,
+      ETRXEntityField.class,
+      // Repositories
+      ETRXRepository.class,
+      ETRXEntitySearch.class,
+      ETRXSearchParam.class,
+      // Mappings
+      ETRXJavaMapping.class
   );
 
   public static synchronized ETRXModelProvider getInstance() {
@@ -69,7 +85,7 @@ public class ETRXModelProvider implements OBSingleton {
 
   private <T> List<T> getData(Class<T> tClass, Function<Session, List<T>> retrieve) {
     // Verify Etendo RX module is installed
-    if(initSession == null) {
+    if (initSession == null) {
       final ModelSessionFactoryController sessionFactoryController = getETRXSessionFactoryController();
       initSession = sessionFactoryController.getSessionFactory().openSession();
     }
@@ -102,7 +118,7 @@ public class ETRXModelProvider implements OBSingleton {
    * Generates a Map of ETRXModules with the json representation.
    *
    * @param etrxModules
-   *   List of modules to parse
+   *     List of modules to parse
    *
    * @return Map of json values
    */
@@ -177,9 +193,9 @@ public class ETRXModelProvider implements OBSingleton {
    * Retrieves a list of model objects of the class passed as parameter.
    *
    * @param session
-   *   the session used to query for the objects
+   *     the session used to query for the objects
    * @param clazz
-   *   the class of the model objects to be retrieved
+   *     the class of the model objects to be retrieved
    *
    * @return a list of model objects
    */
@@ -241,5 +257,19 @@ public class ETRXModelProvider implements OBSingleton {
 
   public List<ETRXRepository> getETRXRepositories() {
     return getData(ETRXRepository.class, this::retrieveETRXRepositories);
+  }
+
+  public List<ETRXProjectionEntity> retrieveETRXProjectionEntity(Session session, Table table) {
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaQuery<ETRXProjectionEntity> criteria = builder.createQuery(ETRXProjectionEntity.class);
+    Root<ETRXProjectionEntity> root = criteria.from(ETRXProjectionEntity.class);
+    criteria.select(root);
+    criteria.where(builder.equal(root.get("table"), table));
+    criteria.orderBy(builder.asc(root.get("projection")));
+    return session.createQuery(criteria).list();
+  }
+
+  public List<ETRXProjectionEntity> getETRXProjectionEntity(Table table) {
+    return getData(ETRXProjectionEntity.class, s -> retrieveETRXProjectionEntity(s, table));
   }
 }

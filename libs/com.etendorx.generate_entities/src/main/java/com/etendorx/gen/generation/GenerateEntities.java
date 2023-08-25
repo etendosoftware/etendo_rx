@@ -1,6 +1,43 @@
+/*
+ * Copyright 2022-2023  Futit Services SL
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.etendorx.gen.generation;
 
-import static com.etendorx.gen.generation.GenerateEntitiesConstants.PROJECTION_DEFAULT;
+import com.etendoerp.etendorx.model.ETRXModelProvider;
+import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
+import com.etendorx.gen.beans.Metadata;
+import com.etendorx.gen.beans.Projection;
+import com.etendorx.gen.beans.Repository;
+import com.etendorx.gen.commandline.CommandLineProcess;
+import com.etendorx.gen.generation.interfaces.EntityGenerator;
+import com.etendorx.gen.generation.interfaces.MappingGenerator;
+import com.etendorx.gen.generation.mapping.GenerateBaseDTO;
+import com.etendorx.gen.generation.mapping.GenerateBaseDTOConverter;
+import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterRead;
+import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterWrite;
+import com.etendorx.gen.generation.mapping.GenerateBaseRepository;
+import com.etendorx.gen.generation.mapping.GenerateBaseRestController;
+import com.etendorx.gen.metadata.MetadataContainer;
+import com.etendorx.gen.process.GenerateProtoFile;
+import com.etendorx.gen.util.TemplateUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.etendorx.base.session.OBPropertiesProvider;
+import org.openbravo.base.model.Entity;
+import org.openbravo.base.model.ModelProvider;
+import org.openbravo.base.model.Table;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,21 +54,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.etendorx.base.session.OBPropertiesProvider;
-import org.openbravo.base.model.Entity;
-import org.openbravo.base.model.ModelProvider;
-
-import com.etendoerp.etendorx.model.ETRXModelProvider;
-import com.etendorx.gen.beans.Metadata;
-import com.etendorx.gen.beans.Projection;
-import com.etendorx.gen.beans.Repository;
-import com.etendorx.gen.commandline.CommandLineProcess;
-import com.etendorx.gen.generation.interfaces.EntityGenerator;
-import com.etendorx.gen.metadata.MetadataContainer;
-import com.etendorx.gen.process.GenerateProtoFile;
-import com.etendorx.gen.util.TemplateUtil;
+import static com.etendorx.gen.generation.GenerateEntitiesConstants.PROJECTION_DEFAULT;
 
 public class GenerateEntities {
   public static final String ERROR_GENERATING_FILE = "Error generating file: ";
@@ -64,7 +87,9 @@ public class GenerateEntities {
 
   /**
    * Executes the command
-   * @param cmdProcess the command line process
+   *
+   * @param cmdProcess
+   *     the command line process
    */
   public void execute(CommandLineProcess cmdProcess) {
     if (getBasePath() == null) {
@@ -95,7 +120,7 @@ public class GenerateEntities {
 
     var projections = getProjections(paths, entities);
     var generators = getGenerators(projections);
-
+    var mappingGenerators = getMappingGenerators();
     try {
       for (Entity entity : entities) {
         if (entity.isDataSourceBased() || entity.isHQLBased()) {
@@ -103,13 +128,13 @@ public class GenerateEntities {
         }
         if (generateRxCode && !entity.isVirtualEntity() && (includeViews || !entity.isView())) {
           var data = TemplateUtil.getModelData(paths, entity, getSearchesMap(entity), computedColumns, includeViews);
-          for (EntityGenerator generator : generators) {
-            generator.generate(data, paths);
-          }
+          generateEntityCode(data, paths, generators);
+          generateMappingCode(entity, paths, mappingGenerators);
         }
       }
-      generateEntityScan(entities, paths.pathEntitiesRx);
-      generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, paths.packageEntities);
+
+      generateGlobalCode(paths, entities);
+
       generateProtofile(projections, entities, paths, computedColumns, includeViews);
 
     } catch (IOException e) {
@@ -118,10 +143,64 @@ public class GenerateEntities {
     log.info("Generated {} entities", entities.size());
   }
 
+  private void generateGlobalCode(GeneratePaths paths, List<Entity> entities) throws FileNotFoundException {
+    generateEntityScan(entities, paths.pathEntitiesRx);
+
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, Templates.baseRxObject,
+        paths.packageEntities);
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository, Templates.baseDasRepository,
+        paths.packageEntities);
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository, Templates.baseDtoRepository,
+        paths.packageEntities);
+
+  }
+
+  private List<MappingGenerator> getMappingGenerators() {
+    var mappingGenerators = new ArrayList<MappingGenerator>();
+    mappingGenerators.add(new GenerateBaseDTO());
+    mappingGenerators.add(new GenerateBaseFieldConverterRead());
+    mappingGenerators.add(new GenerateBaseFieldConverterWrite());
+    mappingGenerators.add(new GenerateBaseRestController());
+    mappingGenerators.add(new GenerateBaseRepository());
+    return mappingGenerators;
+  }
+
+  private void generateEntityCode(Map<String, Object> data, GeneratePaths paths,
+      List<EntityGenerator> generators) throws FileNotFoundException {
+    for (EntityGenerator generator : generators) {
+      generator.generate(data, paths);
+    }
+  }
+
+  private void generateMappingCode(Entity entity, GeneratePaths paths, List<MappingGenerator> mappingGenerators) throws FileNotFoundException {
+    // Mappings
+    Table table = ModelProvider.getInstance().getTable(entity.getTableName());
+    List<ETRXProjectionEntity> list = ETRXModelProvider.getInstance().getETRXProjectionEntity(table);
+    new GenerateBaseDTOConverter().generate(list, paths);
+    // mappings
+    for (ETRXProjectionEntity etrxProjectionEntity : list) {
+      if (hasReadWrite(list, etrxProjectionEntity)) {
+        for (MappingGenerator mappingGenerator : mappingGenerators) {
+          mappingGenerator.generate(etrxProjectionEntity, paths);
+        }
+      }
+    }
+  }
+
+  private boolean hasReadWrite(List<ETRXProjectionEntity> list, ETRXProjectionEntity entity) {
+    return list.stream()
+        .filter(m -> m.getProjection().getId().equals(entity.getProjection().getId()))
+        .count() == 2;
+  }
+
   /**
    * Generates the projections
-   * @param paths the paths
-   * @param entities the entities
+   *
+   * @param paths
+   *     the paths
+   * @param entities
+   *     the entities
+   *
    * @return the projections
    */
   private ArrayList<Projection> getProjections(GeneratePaths paths, List<Entity> entities) {
@@ -134,7 +213,10 @@ public class GenerateEntities {
 
   /**
    * Generates the generators
-   * @param projections the projections
+   *
+   * @param projections
+   *     the projections
+   *
    * @return the generators
    */
   private List<EntityGenerator> getGenerators(ArrayList<Projection> projections) {
@@ -149,12 +231,20 @@ public class GenerateEntities {
 
   /**
    * Generates the protofile
-   * @param projections the projections
-   * @param entities the entities
-   * @param paths the paths
-   * @param computedColumns the computed columns
-   * @param includeViews the include views
-   * @throws FileNotFoundException the file not found exception
+   *
+   * @param projections
+   *     the projections
+   * @param entities
+   *     the entities
+   * @param paths
+   *     the paths
+   * @param computedColumns
+   *     the computed columns
+   * @param includeViews
+   *     the include views
+   *
+   * @exception FileNotFoundException
+   *     the file not found exception
    */
   private void generateProtofile(ArrayList<Projection> projections, List<Entity> entities, GeneratePaths paths,
       boolean computedColumns, boolean includeViews) throws FileNotFoundException {
@@ -180,7 +270,10 @@ public class GenerateEntities {
 
   /**
    * Gets the default projection
-   * @param entities the entities
+   *
+   * @param entities
+   *     the entities
+   *
    * @return the generated projections
    */
   private Projection getDefaultProjection(List<Entity> entities) {
@@ -191,7 +284,10 @@ public class GenerateEntities {
 
   /**
    * Get the search map
-   * @param entity the entity
+   *
+   * @param entity
+   *     the entity
+   *
    * @return the search map
    */
   private List<HashMap<String, Object>> getSearchesMap(Entity entity) {
@@ -205,7 +301,10 @@ public class GenerateEntities {
 
   /**
    * Get repositories from entity
-   * @param entity the entity
+   *
+   * @param entity
+   *     the entity
+   *
    * @return the repository list
    */
   private List<Repository> getRepositories(Entity entity) {
@@ -216,6 +315,7 @@ public class GenerateEntities {
 
   /**
    * Get repositories
+   *
    * @return the repository list
    */
   private List<Repository> getRepositories() {
@@ -226,7 +326,10 @@ public class GenerateEntities {
 
   /**
    * Get projections
-   * @param paths the paths
+   *
+   * @param paths
+   *     the paths
+   *
    * @return the projections
    */
   private List<Projection> getProjections(GeneratePaths paths) {
@@ -238,9 +341,11 @@ public class GenerateEntities {
 
   /**
    * Generates the entity scan
-   * @param entities the entities
-   * @param pathEntitiesRx the path entities rx
-   * @throws FileNotFoundException
+   *
+   * @param entities
+   *     the entities
+   * @param pathEntitiesRx
+   *     the path entities rx
    */
   private void generateEntityScan(List<Entity> entities, String pathEntitiesRx) throws FileNotFoundException {
     Map<String, Object> data = new HashMap<>();
@@ -258,20 +363,27 @@ public class GenerateEntities {
   }
 
   /**
-   * Generates the base entity rx
-   * @param data the data
-   * @param pathEntitiesRx the path entities rx
-   * @param className the class name
-   * @param packageName the package name
-   * @throws FileNotFoundException the file not found exception
+   * Generates the baseRestController.ftl entity rx
+   *
+   * @param data
+   *     the data
+   * @param pathEntitiesRx
+   *     the path entities rx
+   * @param className
+   *     the class name
+   * @param packageName
+   *     the package name
+   *
+   * @exception FileNotFoundException
+   *     the file not found exception
    */
-  private void generateBaseEntityRx(Map<String, Object> data, String pathEntitiesRx, String className,
+  private void generateBaseEntityRx(Map<String, Object> data, String pathEntitiesRx, String className, String template,
       String packageName) throws FileNotFoundException {
     final String fullPathEntities = pathEntitiesRx + "/src/main/entities/" + packageName.replace(".", "/");
     var classfileName = className + ".java";
     var outFile = new File(fullPathEntities, classfileName);
     new File(outFile.getParent()).mkdirs();
-    String ftlFileNameRX = "/org/openbravo/base/gen/baseEntityRx.ftl";
+    String ftlFileNameRX = "/org/openbravo/base/gen/" + template;
     freemarker.template.Template templateRX = TemplateUtil.createTemplateImplementation(
         ftlFileNameRX);
     Writer outWriter = new BufferedWriter(

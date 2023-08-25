@@ -47,6 +47,7 @@ sourceSets {
             srcDirs 'src/main/entities' // project(':com.etendorx.entities').sourceSets.main.java.srcDirs
             srcDirs 'src/main/jparepo' // project(':com.etendorx.entities').sourceSets.main.java.srcDirs
             srcDirs 'src/main/projections' // project(':com.etendorx.entities').sourceSets.main.java.srcDirs
+            srcDirs 'src/main/mappings'
         }
     }
 }
