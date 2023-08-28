@@ -1,16 +1,23 @@
 <#macro toCamelCase string>
-  <#compress >
-  <#if string?matches("^[a-z]+[A-Za-z0-9]*$")>${string}<#else>
-    <#assign result="">
-    <#list string?split("_") as part>
-      <#if part?index == 0>
-        <#assign result = result + part>
+  <#compress>
+    <#assign finalResultList = []>
+    <#list string?split(".") as subString>
+      <#assign isFirstSubStr = (subString?index == 0)>
+      <#assign result="">
+      <#list subString?split("_") as part>
+        <#if part?index == 0>
+          <#assign result = result + part>
+        <#else>
+          <#assign result = result + part?cap_first>
+        </#if>
+      </#list>
+      <#if isFirstSubStr>
+        <#assign finalResultList = finalResultList + [result]>
       <#else>
-        <#assign result = result + part?cap_first>
+        <#assign finalResultList = finalResultList + [result?cap_first]>
       </#if>
     </#list>
-    ${result}
-  </#if>
+    ${finalResultList?join("")}
   </#compress>
 </#macro>
 /**
