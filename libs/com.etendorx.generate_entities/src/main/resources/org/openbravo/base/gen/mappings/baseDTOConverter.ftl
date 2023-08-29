@@ -38,14 +38,14 @@ import ${readEntity.table.thePackage.javaPackage}.${readEntity.table.className};
 import org.springframework.stereotype.Component;
 
 @Component
-public class ${mappingPrefix}DTOConverter implements DTOConverter<${readEntity.table.className}, ${mappingPrefix}${readEntity.name}DTORead, ${mappingPrefix}${readEntity.name}DTOWrite> {
+public class ${mappingPrefix}${readEntity.name}DTOConverter implements DTOConverter<${readEntity.table.className}, ${mappingPrefix}${readEntity.name}DTORead, ${mappingPrefix}${readEntity.name}DTOWrite> {
 
   private final ${mappingPrefix}${readEntity.name}FieldConverterRead readConverter;
   <#if writeEntity??>
   private final ${mappingPrefix}${writeEntity.name}FieldConverterWrite writeConverter;
   </#if>
 
-  public ${mappingPrefix}DTOConverter(
+  public ${mappingPrefix}${readEntity.name}DTOConverter(
     ${mappingPrefix}${readEntity.name}FieldConverterRead readConverter<#if writeEntity??>, ${mappingPrefix}${writeEntity.name}FieldConverterWrite writeConverter</#if>) {
     this.readConverter = readConverter;
 <#if writeEntity??>

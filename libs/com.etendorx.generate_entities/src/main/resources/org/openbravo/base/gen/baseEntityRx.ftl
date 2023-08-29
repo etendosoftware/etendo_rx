@@ -24,13 +24,15 @@ import org.openbravo.model.ad.access.User;
 import org.openbravo.model.ad.system.Client;
 import org.openbravo.model.common.enterprise.Organization;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class BaseRXObject implements Serializable {
+public abstract class BaseRXObject implements BaseSerializableObject {
     @javax.persistence.JoinColumn(name = "ad_client_id", referencedColumnName = "AD_Client_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
     Client client;
@@ -57,4 +59,6 @@ public abstract class BaseRXObject implements Serializable {
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
     User updatedBy;
 
+    @JsonProperty("_identifier")
+    public abstract String get_identifier();
 }

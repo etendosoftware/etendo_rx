@@ -35,11 +35,15 @@
         <property name="isMandatory" column="ismandatory"/>
         <property name="identifiesUnivocally" column="identifies_univocally"/>
         <property name="fieldMapping" column="field_mapping"/>
+        <property name="line" column="line"/>
 
         <many-to-one name="entity" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
                      column="etrx_projection_entity_id"/>
 
         <many-to-one name="javaMapping" not-null="true" class="com.etendoerp.etendorx.model.mapping.ETRXJavaMapping"
                      column="etrx_java_mapping_id"/>
+
+        <many-to-one name="etrxProjectionEntityRelated" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
+                     column="etrx_projection_entity_related_id" foreign-key="etrx_projection_entity_id"/>
     </class>
 </hibernate-mapping>

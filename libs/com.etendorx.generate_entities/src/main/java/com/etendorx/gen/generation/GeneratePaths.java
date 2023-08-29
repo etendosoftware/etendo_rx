@@ -27,6 +27,8 @@ public class GeneratePaths {
   public final String pathEntitiesRx;
   public final String baseDASRepository;
   public final String baseDTORepository;
+  public final String mappingUtils;
+  public final String baseSerializableObject;
 
   GeneratePaths(String pathEtendoRx) {
     this.pathEtendoRx = pathEtendoRx;
@@ -37,5 +39,7 @@ public class GeneratePaths {
     this.baseRXObject = "BaseRXObject";
     this.baseDASRepository = "BaseDASRepository";
     this.baseDTORepository = "BaseDTORepositoryDefault";
+    this.mappingUtils = "MappingUtils";
+    this.baseSerializableObject = "BaseSerializableObject";
   }
 }
