@@ -44,6 +44,6 @@
                      column="etrx_java_mapping_id"/>
 
         <many-to-one name="etrxProjectionEntityRelated" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
-                     column="etrx_projection_entity_related_id" foreign-key="etrx_projection_entity_id"/>
+                     column="etrx_projection_entity_rel_id" foreign-key="etrx_projection_entity_id"/>
     </class>
 </hibernate-mapping>
