@@ -27,7 +27,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseDTORepositoryDefault<T extends BaseRXObject,E extends BaseDTOModel,F extends BaseDTOModel> implements DASRepository<E,F> {
+public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends BaseDTOModel,F extends BaseDTOModel> implements DASRepository<E,F> {
 
   private final BaseDASRepository<T> repository;
   private final DTOConverter<T, E, F> converter;

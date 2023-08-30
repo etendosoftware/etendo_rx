@@ -15,8 +15,42 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Generic interface for DTO converters
+ * @param <E> Entity object to convert
+ * @param <F> Read DTO model
+ * @param <G> Write DTO model
+ */
 public interface DTOConverter<E, F, G> {
+
+  /**
+   * Read Entity and transform to DTO (GET Method)
+   * @param entity
+   * @return DTO converted
+   */
   F convert(E entity);
 
+  /**
+   * Read DTO and transform to Entity (POST Method)
+   * @param dto
+   * @param entity
+   * @return Entity updated
+   */
   E convert(G dto, E entity);
+
+  /**
+   * Read Entity list and transform to DTO list (GET Method)
+   * @param entities
+   * @return a list of DTOs converted
+   */
+  default Iterable<F> convert(Iterable<E> entities) {
+    List<F> dtos = new ArrayList<>();
+    for (E entity : entities) {
+      dtos.add(convert(entity));
+    }
+    return dtos;
+  }
 }

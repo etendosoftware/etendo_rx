@@ -1,25 +1,50 @@
 <#macro toCamelCase string>
   <#compress>
-    <#if string?matches("^[a-z]+[A-Za-z0-9]*$")>${string?cap_first}<#else>
+    <#assign finalResultList = []>
+    <#list string?split(".") as subString>
+      <#assign isFirstSubStr = (subString?index == 0)>
       <#assign result="">
-      <#list string?split("_") as part>
-        <#if part?index == 0>
-          <#assign result = result + part>
-        <#else>
-          <#assign result = result + part?cap_first>
-        </#if>
-      </#list>${result?cap_first}</#if>
+      <#list subString?split("_") as part>
+        <#assign result = result + part?cap_first>
+      </#list>
+      <#if isFirstSubStr>
+        <#assign finalResultList = finalResultList + [result]>
+      <#else>
+        <#assign finalResultList = finalResultList + [result?cap_first]>
+      </#if>
+    </#list>
+    ${finalResultList?join("")}
   </#compress>
 </#macro>
-<#macro convertToGetMethod path>
-  <#compress>
+<#macro convertToGetMethod name path mappingType>
   <#assign result="entity">
+  <#assign nullCheck="if (">
   <#list path?split(".") as part>
+    <#if part?index != 0>
+      <#assign nullCheck = nullCheck + " && ">
+    </#if>
     <#assign result = result + ".get" + part?cap_first + "()">
+    <#assign nullCheck = nullCheck + result + " != null">
   </#list>
-  ${result}
+  <#if mappingType == "EM">
+    <#assign result = name + ".convert(" + result + ")">
+  </#if>
+  <#assign nullCheck = nullCheck + ") {\n      return MappingUtils.handleBaseObject(" + result + ");\n    } else {\n      return null;\n    }">
+  ${nullCheck}
+</#macro>
+<#macro getConverterName field>
+  <#assign projectionName = field.etrxProjectionEntityRelated.projection.name?upper_case>
+  <#assign tableName = field.etrxProjectionEntityRelated.table.name>
+  <#compress>
+  ${projectionName}${tableName}DTOConverter
   </#compress>
 </#macro>
+<#assign mappings = []>
+<#list entity.fields as field>
+  <#if field.name != "id" && (field.fieldMapping == "JM" || field.fieldMapping == "EM")>
+    <#assign mappings = mappings + [field]>
+  </#if>
+</#list>
 <#assign javaMappings = []>
 <#list entity.fields as field>
   <#if field.name != "id" && field.fieldMapping == "JM">
@@ -43,6 +68,7 @@
 */
 package com.etendorx.entities.mappings;
 
+import com.etendorx.entities.entities.mappings.MappingUtils;
 import com.etendorx.entities.mapper.lib.DTOReadMapping;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,17 +78,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class ${mappingPrefix}${entity.name}FieldConverterRead {
 
-<#list javaMappings as field>
+<#list mappings as field>
+  <#if field.fieldMapping == "JM">
   private final DTOReadMapping<${entity.table.className}> ${field.name};
+  <#else>
+  private final <@getConverterName field=field/> ${field.name};
+  </#if>
 </#list>
 
   public ${mappingPrefix}${entity.name}FieldConverterRead(
-<#list javaMappings as field>
-    @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOReadMapping<${entity.table.className}> ${field.name}<#if field_has_next>,</#if>
-</#list>
+<#compress>
+  <#list mappings as field>
+    <#compress>
+    <#if field.fieldMapping == "JM">
+    @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOReadMapping<${entity.table.className}> ${field.name}
+    <#else>
+    @Autowired <@getConverterName field=field/> ${field.name}
+    </#if><#if field_has_next>,</#if>
+    </#compress>
+  </#list>
+</#compress>
   ) {
     super();
-<#list javaMappings as field>
+<#list mappings as field>
     this.${field.name} = ${field.name};
 </#list>
   }
@@ -79,10 +117,10 @@ public class ${mappingPrefix}${entity.name}FieldConverterRead {
 </#list>
 
 <#list entity.fields as field>
-  <#if field.name != "id" && field.fieldMapping == "DM" && field.entity.mappingType == "R">
+  <#if field.name != "id" && (field.fieldMapping == "DM" || field.fieldMapping == "EM") && field.entity.mappingType == "R">
   public Object get<@toCamelCase field.name/>(${entity.table.className} entity) {
     // ${field.property}
-    return <@convertToGetMethod field.property/>;
+    <@convertToGetMethod field.name field.property field.fieldMapping/>
   }
   </#if>
 

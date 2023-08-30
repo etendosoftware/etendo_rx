@@ -1,14 +1,19 @@
 <#macro toCamelCase string>
   <#compress>
-    <#if string?matches("^[a-z]+[A-Za-z0-9]*$")>${string?cap_first}<#else>
+    <#assign finalResultList = []>
+    <#list string?split(".") as subString>
+      <#assign isFirstSubStr = (subString?index == 0)>
       <#assign result="">
-      <#list string?split("_") as part>
-        <#if part?index == 0>
-          <#assign result = result + part>
-        <#else>
-          <#assign result = result + part?cap_first>
-        </#if>
-      </#list>${result?cap_first}</#if>
+      <#list subString?split("_") as part>
+        <#assign result = result + part?cap_first>
+      </#list>
+      <#if isFirstSubStr>
+        <#assign finalResultList = finalResultList + [result]>
+      <#else>
+        <#assign finalResultList = finalResultList + [result?cap_first]>
+      </#if>
+    </#list>
+    ${finalResultList?join("")}
   </#compress>
 </#macro>
 /**
@@ -33,14 +38,14 @@ import ${readEntity.table.thePackage.javaPackage}.${readEntity.table.className};
 import org.springframework.stereotype.Component;
 
 @Component
-public class ${mappingPrefix}DTOConverter implements DTOConverter<${readEntity.table.className}, ${mappingPrefix}${readEntity.name}DTORead, ${mappingPrefix}${readEntity.name}DTOWrite> {
+public class ${mappingPrefix}${readEntity.name}DTOConverter implements DTOConverter<${readEntity.table.className}, ${mappingPrefix}${readEntity.name}DTORead, ${mappingPrefix}${readEntity.name}DTOWrite> {
 
   private final ${mappingPrefix}${readEntity.name}FieldConverterRead readConverter;
   <#if writeEntity??>
   private final ${mappingPrefix}${writeEntity.name}FieldConverterWrite writeConverter;
   </#if>
 
-  public ${mappingPrefix}DTOConverter(
+  public ${mappingPrefix}${readEntity.name}DTOConverter(
     ${mappingPrefix}${readEntity.name}FieldConverterRead readConverter<#if writeEntity??>, ${mappingPrefix}${writeEntity.name}FieldConverterWrite writeConverter</#if>) {
     this.readConverter = readConverter;
 <#if writeEntity??>

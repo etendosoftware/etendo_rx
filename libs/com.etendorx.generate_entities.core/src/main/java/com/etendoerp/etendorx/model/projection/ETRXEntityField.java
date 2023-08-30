@@ -15,6 +15,8 @@
  */
 package com.etendoerp.etendorx.model.projection;
 
+import java.math.BigDecimal;
+
 import com.etendoerp.etendorx.model.mapping.ETRXJavaMapping;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,7 +30,10 @@ public class ETRXEntityField extends ModelObject {
   private Boolean isMandatory;
   private Boolean identifiesUnivocally;
   private String fieldMapping;
+  private BigDecimal line;
   private ETRXJavaMapping javaMapping;
+
+  private ETRXProjectionEntity etrxProjectionEntityRelated;
 
   public ETRXProjectionEntity getEntity() {
     return entity;
@@ -79,4 +84,28 @@ public class ETRXEntityField extends ModelObject {
     this.fieldMapping = fieldMapping;
   }
 
+  public Boolean getMandatory() {
+    return isMandatory;
+  }
+
+  public void setMandatory(Boolean mandatory) {
+    isMandatory = mandatory;
+  }
+
+  public ETRXProjectionEntity getEtrxProjectionEntityRelated() {
+    return etrxProjectionEntityRelated;
+  }
+
+  public void setEtrxProjectionEntityRelated(
+      ETRXProjectionEntity etrxProjectionEntityRelated) {
+    this.etrxProjectionEntityRelated = etrxProjectionEntityRelated;
+  }
+
+  public BigDecimal getLine() {
+    return line;
+  }
+
+  public void setLine(BigDecimal line) {
+    this.line = line;
+  }
 }

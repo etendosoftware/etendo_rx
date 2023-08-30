@@ -146,13 +146,16 @@ public class GenerateEntities {
   private void generateGlobalCode(GeneratePaths paths, List<Entity> entities) throws FileNotFoundException {
     generateEntityScan(entities, paths.pathEntitiesRx);
 
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseSerializableObject, Templates.baseSerializableObject,
+        paths.packageEntities);
     generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, Templates.baseRxObject,
         paths.packageEntities);
     generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository, Templates.baseDasRepository,
         paths.packageEntities);
     generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository, Templates.baseDtoRepository,
         paths.packageEntities);
-
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.mappingUtils, Templates.mappingUtils,
+        paths.packageEntities + ".mappings");
   }
 
   private List<MappingGenerator> getMappingGenerators() {

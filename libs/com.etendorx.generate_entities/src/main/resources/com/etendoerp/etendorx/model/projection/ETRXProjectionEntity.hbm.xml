@@ -42,7 +42,7 @@
                      column="ad_table_id"/>
 
         <set name="fields" table="etrx_entity_field" inverse="true"
-             cascade="save-update" lazy="true" fetch="select">
+             cascade="save-update" lazy="true" fetch="select" order-by="line desc">
             <key>
                 <column name="etrx_projection_entity_id" not-null="true"/>
             </key>
