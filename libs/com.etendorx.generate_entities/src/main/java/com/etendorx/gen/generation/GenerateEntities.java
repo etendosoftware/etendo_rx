@@ -15,6 +15,30 @@
  */
 package com.etendorx.gen.generation;
 
+import static com.etendorx.gen.generation.GenerateEntitiesConstants.PROJECTION_DEFAULT;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.etendorx.base.session.OBPropertiesProvider;
+import org.openbravo.base.model.Entity;
+import org.openbravo.base.model.ModelProvider;
+import org.openbravo.base.model.Table;
+
 import com.etendoerp.etendorx.model.ETRXModelProvider;
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.beans.Metadata;
@@ -34,29 +58,6 @@ import com.etendorx.gen.generation.mapping.GenerateBaseRestController;
 import com.etendorx.gen.metadata.MetadataContainer;
 import com.etendorx.gen.process.GenerateProtoFile;
 import com.etendorx.gen.util.TemplateUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.etendorx.base.session.OBPropertiesProvider;
-import org.openbravo.base.model.Entity;
-import org.openbravo.base.model.ModelProvider;
-import org.openbravo.base.model.Table;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
-import static com.etendorx.gen.generation.GenerateEntitiesConstants.PROJECTION_DEFAULT;
 
 public class GenerateEntities {
   public static final String ERROR_GENERATING_FILE = "Error generating file: ";
@@ -148,17 +149,17 @@ public class GenerateEntities {
   private void generateGlobalCode(GeneratePaths paths, List<Entity> entities) throws FileNotFoundException {
     generateEntityScan(entities, paths.pathEntitiesRx);
 
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseSerializableObject, Templates.baseSerializableObject,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseSerializableObject, Templates.BASE_SERIALIZABLE_OBJECT_FTL,
         paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, Templates.baseRxObject,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, Templates.BASE_ENTITY_RX_FTL,
         paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository, Templates.baseDasRepository,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository, Templates.BASE_DASREPOSITORY_FTL,
         paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository, Templates.baseDtoRepository,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository, Templates.BASE_DTOREPOSITORY_FTL,
         paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.mappingUtils, Templates.mappingUtils,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.mappingUtils, Templates.MAPPING_UTILS_FTL,
         paths.packageEntities + ".mappings");
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.auditServiceInterceptor, Templates.auditServiceInterceptor,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.auditServiceInterceptor, Templates.AUDIT_SERVICE_INTERCEPTOR_FTL,
         paths.packageEntities);
   }
 

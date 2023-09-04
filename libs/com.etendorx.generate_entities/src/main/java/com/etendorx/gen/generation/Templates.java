@@ -23,11 +23,12 @@ public class Templates {
   private Templates() {
   }
 
-  public static final String baseSerializableObject = "baseSerializableObject.ftl";
-  public static final String baseRxObject = "baseEntityRx.ftl";
-  public static final String baseDasRepository = "baseDASRepository.ftl";
-  public static final String baseDtoRepository = "baseDTORepository.ftl";
+  public static final String BASE_SERIALIZABLE_OBJECT_FTL = "baseSerializableObject.ftl";
+  public static final String BASE_ENTITY_RX_FTL = "baseEntityRx.ftl";
+  public static final String BASE_DASREPOSITORY_FTL = "baseDASRepository.ftl";
+  public static final String BASE_DTOREPOSITORY_FTL = "baseDTORepository.ftl";
 
-  public static final String mappingUtils = "mappings/mappingUtils.ftl";
-  public static final String auditServiceInterceptor = "mappings/auditServiceInterceptor.ftl";
+  public static final String MAPPING_UTILS_FTL = "mappings/mappingUtils.ftl";
+  public static final String AUDIT_SERVICE_INTERCEPTOR_FTL = "mappings/auditServiceInterceptor.ftl";
+
 }
