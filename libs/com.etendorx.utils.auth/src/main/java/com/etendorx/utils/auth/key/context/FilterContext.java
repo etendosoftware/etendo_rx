@@ -41,6 +41,8 @@ public class FilterContext extends OncePerRequestFilter {
   public static final String FALSE = "false";
   public static final String NO_ACTIVE_FILTER_PARAMETER = "_noActiveFilter";
   public static final String TRIGGER_ENABLED_PARAMETER = "triggerEnabled";
+  private static final String DATE_FORMAT_PARAMETER = "_dateFormat";
+  private static final String TIME_ZONE_PARAMETER = "_timeZone";
   @Autowired
   private UserContext userContext;
   @Autowired(required = false)
@@ -74,6 +76,8 @@ public class FilterContext extends OncePerRequestFilter {
   public static void setUserContextFromToken(UserContext userContext, String token, HttpServletRequest req) {
     String noActiveFilterParameter = req.getParameter(NO_ACTIVE_FILTER_PARAMETER);
     String triggerEnabledParam = req.getParameter(TRIGGER_ENABLED_PARAMETER);
+    String dateFormatParam = req.getParameter(DATE_FORMAT_PARAMETER);
+    String timeZoneParam = req.getParameter(TIME_ZONE_PARAMETER);
     String restMethod = req.getMethod();
     Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
     userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
@@ -88,6 +92,12 @@ public class FilterContext extends OncePerRequestFilter {
     userContext.setRestMethod(restMethod);
     boolean isTriggerEnabled = parseBooleanParameter(triggerEnabledParam, TRIGGER_ENABLED_PARAMETER, true);
     userContext.setTriggerEnabled(isTriggerEnabled);
+    if(StringUtils.isNotBlank(dateFormatParam)) {
+      userContext.setDateFormat(dateFormatParam);
+    }
+    if(StringUtils.isNotBlank(dateFormatParam)) {
+      userContext.setTimeZone(timeZoneParam);
+    }
   }
 
   private static boolean parseBooleanParameter(String paramValueStr, String nameParam, boolean defaultValue) {

@@ -29,7 +29,7 @@
   <#if mappingType == "EM">
     <#assign result = name + ".convert(" + result + ")">
   </#if>
-  <#assign nullCheck = nullCheck + ") {\n      return MappingUtils.handleBaseObject(" + result + ");\n    } else {\n      return null;\n    }">
+  <#assign nullCheck = nullCheck + ") {\n      return mappingUtils.handleBaseObject(" + result + ");\n    } else {\n      return null;\n    }">
   ${nullCheck}
 </#macro>
 <#macro getConverterName field>
@@ -78,6 +78,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ${mappingPrefix}${entity.name}FieldConverterRead {
 
+  private final MappingUtils mappingUtils;
 <#list mappings as field>
   <#if field.fieldMapping == "JM">
   private final DTOReadMapping<${entity.table.className}> ${field.name};
@@ -87,6 +88,7 @@ public class ${mappingPrefix}${entity.name}FieldConverterRead {
 </#list>
 
   public ${mappingPrefix}${entity.name}FieldConverterRead(
+        MappingUtils mappingUtils<#if mappings?size gt 0>,</#if>
 <#compress>
   <#list mappings as field>
     <#compress>
@@ -100,6 +102,7 @@ public class ${mappingPrefix}${entity.name}FieldConverterRead {
 </#compress>
   ) {
     super();
+    this.mappingUtils = mappingUtils;
 <#list mappings as field>
     this.${field.name} = ${field.name};
 </#list>
