@@ -26,10 +26,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 public abstract class BindedRestController<E extends BaseDTOModel, F extends BaseDTOModel> {
+  private final JsonPathConverter<F> converter;
   private final DASRepository<E, F> repository;
 
   protected BindedRestController(
+      JsonPathConverter<F> converter,
       DASRepository<E, F> repository) {
+    this.converter = converter;
     this.repository = repository;
   }
 
@@ -48,14 +51,15 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   }
 
   @PostMapping
-  public ResponseEntity<E> post(F dtoEntity) {
+  public ResponseEntity<E> post(@RequestBody String rawEntity) {
+    F dtoEntity = converter.convert(rawEntity);
     return new ResponseEntity<>(repository.save(dtoEntity), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<E> put(@PathVariable String id, @RequestBody F dtoEntity) {
-    dtoEntity.setId(id);
+  public ResponseEntity<E> put(@PathVariable String id, @RequestBody String rawEntity) {
+    F dtoEntity = converter.convert(rawEntity);
     return new ResponseEntity<>(repository.updated(dtoEntity), HttpStatus.CREATED);
   }
 }

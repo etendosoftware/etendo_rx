@@ -34,6 +34,7 @@ public class ETRXEntityField extends ModelObject {
   private ETRXJavaMapping javaMapping;
 
   private ETRXProjectionEntity etrxProjectionEntityRelated;
+  private String jsonPath;
 
   public ETRXProjectionEntity getEntity() {
     return entity;
@@ -107,5 +108,13 @@ public class ETRXEntityField extends ModelObject {
 
   public void setLine(BigDecimal line) {
     this.line = line;
+  }
+
+  public String getJsonPath() {
+    return jsonPath;
+  }
+
+  public void setJsonPath(String jsonPath) {
+    this.jsonPath = jsonPath;
   }
 }

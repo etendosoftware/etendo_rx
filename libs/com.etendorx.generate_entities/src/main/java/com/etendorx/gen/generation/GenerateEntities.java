@@ -27,6 +27,8 @@ import com.etendorx.gen.generation.mapping.GenerateBaseDTO;
 import com.etendorx.gen.generation.mapping.GenerateBaseDTOConverter;
 import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterRead;
 import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterWrite;
+import com.etendorx.gen.generation.mapping.GenerateBaseJsonPathConverter;
+import com.etendorx.gen.generation.mapping.GenerateBaseJsonPathRetriever;
 import com.etendorx.gen.generation.mapping.GenerateBaseRepository;
 import com.etendorx.gen.generation.mapping.GenerateBaseRestController;
 import com.etendorx.gen.metadata.MetadataContainer;
@@ -156,6 +158,8 @@ public class GenerateEntities {
         paths.packageEntities);
     generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.mappingUtils, Templates.mappingUtils,
         paths.packageEntities + ".mappings");
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.auditServiceInterceptor, Templates.auditServiceInterceptor,
+        paths.packageEntities);
   }
 
   private List<MappingGenerator> getMappingGenerators() {
@@ -163,6 +167,8 @@ public class GenerateEntities {
     mappingGenerators.add(new GenerateBaseDTO());
     mappingGenerators.add(new GenerateBaseFieldConverterRead());
     mappingGenerators.add(new GenerateBaseFieldConverterWrite());
+    mappingGenerators.add(new GenerateBaseJsonPathConverter());
+    mappingGenerators.add(new GenerateBaseJsonPathRetriever());
     mappingGenerators.add(new GenerateBaseRestController());
     mappingGenerators.add(new GenerateBaseRepository());
     return mappingGenerators;

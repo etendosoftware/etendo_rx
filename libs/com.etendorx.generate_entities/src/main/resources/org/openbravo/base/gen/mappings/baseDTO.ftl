@@ -38,22 +38,40 @@
 package com.etendorx.entities.mappings;
 
 import com.etendorx.entities.mapper.lib.BaseDTOModel;
+<#if entity.mappingType == "R">
 import com.fasterxml.jackson.annotation.JsonProperty;
+</#if>
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+  <#list entity.fields as field>
+    <#if field.property??>
+      <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "" />
+      <#if columnType?? && columnType != "">
+import ${columnType};
+
+      </#if>
+    </#if>
+  </#list>
 
 @Getter
 @Setter
 public class ${mappingPrefix}${entity.name}DTO<#if entity.mappingType == "R">Read<#else>Write</#if> implements BaseDTOModel {
+  <#if entity.mappingType == "R">
   @JsonProperty("id")
+  </#if>
   String id;
 
   <#list entity.fields as field>
     <#if field.name != "id">
+      <#if entity.mappingType == "R">
   @JsonProperty("${field.name}")
-  <#if entity.mappingType == "R">Object<#else>String</#if> <@toCamelCase field.name?trim?replace("\n", "", "r")/>;
+      </#if>
+  <#assign columnType = "Object">
+  <#if field.property??>
+  <#assign columnType = modelProvider.getColumnTypeName(entity.table, entity.table.name + "." + field.property) ! "Object">
+  </#if>
+  <#if entity.mappingType == "R">Object<#else>${columnType}</#if> <@toCamelCase field.name?trim?replace("\n", "", "r")/>;
 
     </#if>
   </#list>

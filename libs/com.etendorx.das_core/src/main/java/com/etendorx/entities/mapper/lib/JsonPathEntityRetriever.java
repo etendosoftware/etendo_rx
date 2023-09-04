@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.gen.generation;
+package com.etendorx.entities.mapper.lib;
 
-/**
- * Templates constants helper
- */
-public class Templates {
+import java.util.TreeSet;
 
-  private Templates() {
-  }
+public interface JsonPathEntityRetriever<E> {
+  E get(String key);
 
-  public static final String baseSerializableObject = "baseSerializableObject.ftl";
-  public static final String baseRxObject = "baseEntityRx.ftl";
-  public static final String baseDasRepository = "baseDASRepository.ftl";
-  public static final String baseDtoRepository = "baseDTORepository.ftl";
-
-  public static final String mappingUtils = "mappings/mappingUtils.ftl";
-  public static final String auditServiceInterceptor = "mappings/auditServiceInterceptor.ftl";
+  E get(TreeSet<String> keyValues);
 }

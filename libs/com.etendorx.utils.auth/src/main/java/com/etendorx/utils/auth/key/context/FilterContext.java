@@ -34,7 +34,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.etendorx.utils.auth.key.JwtKeyUtils;
 import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class FilterContext extends OncePerRequestFilter {
   public static final String HEADER_TOKEN = "X-TOKEN";
   public static final String TRUE = "true";

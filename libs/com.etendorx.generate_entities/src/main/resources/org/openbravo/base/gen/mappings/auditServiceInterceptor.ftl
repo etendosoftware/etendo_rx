@@ -13,21 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.gen.generation;
+ package com.etendorx.entities.entities;
 
-/**
- * Templates constants helper
- */
-public class Templates {
-
-  private Templates() {
-  }
-
-  public static final String baseSerializableObject = "baseSerializableObject.ftl";
-  public static final String baseRxObject = "baseEntityRx.ftl";
-  public static final String baseDasRepository = "baseDASRepository.ftl";
-  public static final String baseDtoRepository = "baseDTORepository.ftl";
-
-  public static final String mappingUtils = "mappings/mappingUtils.ftl";
-  public static final String auditServiceInterceptor = "mappings/auditServiceInterceptor.ftl";
+public interface AuditServiceInterceptor {
+  void setAuditValues(BaseRXObject baseObject, boolean newRecord);
 }
