@@ -31,11 +31,14 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
 
   private final BaseDASRepository<T> repository;
   private final DTOConverter<T, E, F> converter;
+  private final AuditServiceInterceptor auditService;
 
   public BaseDTORepositoryDefault(BaseDASRepository<T> repository,
-      DTOConverter<T, E, F> converter) {
+      DTOConverter<T, E, F> converter,
+      AuditServiceInterceptor auditService) {
     this.repository = repository;
     this.converter = converter;
+    this.auditService = auditService;
   }
 
   @Override
@@ -57,6 +60,10 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   @Transactional
   public E save(F dtoEntity) {
     var entity = converter.convert(dtoEntity, null);
+    if(BaseRXObject.class.isAssignableFrom(entity.getClass())) {
+      var baseObject = (BaseRXObject) entity;
+      auditService.setAuditValues(baseObject, true);
+    }
     //repository.disableTriggers();
     repository.save(entity);
     //repository.enableTriggers();
@@ -66,14 +73,18 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   @Override
   @Transactional
   public E updated(F dtoEntity) {
-    var entity = repository.findById(dtoEntity.getId());
-    if (entity.isEmpty()) {
+    var entity = repository.findById(dtoEntity.getId()).orElse(null);
+    if (entity == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found");
     }
+    if(BaseRXObject.class.isAssignableFrom(entity.getClass())) {
+      var baseObject = (BaseRXObject) entity;
+      auditService.setAuditValues(baseObject, false);
+    }
 //    repository.disableTriggers();
-    repository.save(converter.convert(dtoEntity, entity.get()));
+    repository.save(converter.convert(dtoEntity, entity));
 //    repository.enableTriggers();
-    return converter.convert(entity.get());
+    return converter.convert(entity);
   }
 
 }

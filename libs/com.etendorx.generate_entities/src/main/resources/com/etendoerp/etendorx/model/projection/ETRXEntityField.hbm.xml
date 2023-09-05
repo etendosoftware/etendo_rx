@@ -36,6 +36,7 @@
         <property name="identifiesUnivocally" column="identifies_univocally"/>
         <property name="fieldMapping" column="field_mapping"/>
         <property name="line" column="line"/>
+        <property name="jsonPath" column="jsonpath"/>
 
         <many-to-one name="entity" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
                      column="etrx_projection_entity_id"/>

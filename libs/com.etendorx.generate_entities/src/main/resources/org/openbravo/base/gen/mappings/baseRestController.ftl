@@ -17,6 +17,8 @@ package com.etendorx.entities.mappings;
 
 import com.etendorx.entities.mapper.lib.BindedRestController;
 import com.etendorx.entities.mapper.lib.DASRepository;
+import com.etendorx.entities.mapper.lib.JsonPathConverter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ${mappingPrefix}${entity.name}RestController extends BindedRestController<${mappingPrefix}${entity.name}DTORead, ${mappingPrefix}${entity.name}DTOWrite> {
 
   public ${mappingPrefix}${entity.name}RestController(
+  JsonPathConverter<${mappingPrefix}${entity.name}DTOWrite> converter,
   @Autowired @Qualifier("${mappingPrefix}${entity.name}DASRepository") DASRepository<${mappingPrefix}${entity.name}DTORead, ${mappingPrefix}${entity.name}DTOWrite> repository) {
-    super(repository);
+    super(converter, repository);
   }
 
 }

@@ -15,29 +15,7 @@
  */
 package com.etendorx.gen.generation;
 
-import com.etendoerp.etendorx.model.ETRXModelProvider;
-import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
-import com.etendorx.gen.beans.Metadata;
-import com.etendorx.gen.beans.Projection;
-import com.etendorx.gen.beans.Repository;
-import com.etendorx.gen.commandline.CommandLineProcess;
-import com.etendorx.gen.generation.interfaces.EntityGenerator;
-import com.etendorx.gen.generation.interfaces.MappingGenerator;
-import com.etendorx.gen.generation.mapping.GenerateBaseDTO;
-import com.etendorx.gen.generation.mapping.GenerateBaseDTOConverter;
-import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterRead;
-import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterWrite;
-import com.etendorx.gen.generation.mapping.GenerateBaseRepository;
-import com.etendorx.gen.generation.mapping.GenerateBaseRestController;
-import com.etendorx.gen.metadata.MetadataContainer;
-import com.etendorx.gen.process.GenerateProtoFile;
-import com.etendorx.gen.util.TemplateUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.etendorx.base.session.OBPropertiesProvider;
-import org.openbravo.base.model.Entity;
-import org.openbravo.base.model.ModelProvider;
-import org.openbravo.base.model.Table;
+import static com.etendorx.gen.generation.GenerateEntitiesConstants.PROJECTION_DEFAULT;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -54,7 +32,32 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static com.etendorx.gen.generation.GenerateEntitiesConstants.PROJECTION_DEFAULT;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.etendorx.base.session.OBPropertiesProvider;
+import org.openbravo.base.model.Entity;
+import org.openbravo.base.model.ModelProvider;
+import org.openbravo.base.model.Table;
+
+import com.etendoerp.etendorx.model.ETRXModelProvider;
+import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
+import com.etendorx.gen.beans.Metadata;
+import com.etendorx.gen.beans.Projection;
+import com.etendorx.gen.beans.Repository;
+import com.etendorx.gen.commandline.CommandLineProcess;
+import com.etendorx.gen.generation.interfaces.EntityGenerator;
+import com.etendorx.gen.generation.interfaces.MappingGenerator;
+import com.etendorx.gen.generation.mapping.GenerateBaseDTO;
+import com.etendorx.gen.generation.mapping.GenerateBaseDTOConverter;
+import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterRead;
+import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterWrite;
+import com.etendorx.gen.generation.mapping.GenerateBaseJsonPathConverter;
+import com.etendorx.gen.generation.mapping.GenerateBaseJsonPathRetriever;
+import com.etendorx.gen.generation.mapping.GenerateBaseRepository;
+import com.etendorx.gen.generation.mapping.GenerateBaseRestController;
+import com.etendorx.gen.metadata.MetadataContainer;
+import com.etendorx.gen.process.GenerateProtoFile;
+import com.etendorx.gen.util.TemplateUtil;
 
 public class GenerateEntities {
   public static final String ERROR_GENERATING_FILE = "Error generating file: ";
@@ -146,16 +149,18 @@ public class GenerateEntities {
   private void generateGlobalCode(GeneratePaths paths, List<Entity> entities) throws FileNotFoundException {
     generateEntityScan(entities, paths.pathEntitiesRx);
 
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseSerializableObject, Templates.baseSerializableObject,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseSerializableObject, Templates.BASE_SERIALIZABLE_OBJECT_FTL,
         paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, Templates.baseRxObject,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, Templates.BASE_ENTITY_RX_FTL,
         paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository, Templates.baseDasRepository,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository, Templates.BASE_DASREPOSITORY_FTL,
         paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository, Templates.baseDtoRepository,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository, Templates.BASE_DTOREPOSITORY_FTL,
         paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.mappingUtils, Templates.mappingUtils,
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.mappingUtils, Templates.MAPPING_UTILS_FTL,
         paths.packageEntities + ".mappings");
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.auditServiceInterceptor, Templates.AUDIT_SERVICE_INTERCEPTOR_FTL,
+        paths.packageEntities);
   }
 
   private List<MappingGenerator> getMappingGenerators() {
@@ -163,6 +168,8 @@ public class GenerateEntities {
     mappingGenerators.add(new GenerateBaseDTO());
     mappingGenerators.add(new GenerateBaseFieldConverterRead());
     mappingGenerators.add(new GenerateBaseFieldConverterWrite());
+    mappingGenerators.add(new GenerateBaseJsonPathConverter());
+    mappingGenerators.add(new GenerateBaseJsonPathRetriever());
     mappingGenerators.add(new GenerateBaseRestController());
     mappingGenerators.add(new GenerateBaseRepository());
     return mappingGenerators;

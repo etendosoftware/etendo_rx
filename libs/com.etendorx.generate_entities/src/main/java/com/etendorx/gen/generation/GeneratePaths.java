@@ -29,6 +29,7 @@ public class GeneratePaths {
   public final String baseDTORepository;
   public final String mappingUtils;
   public final String baseSerializableObject;
+  public final String auditServiceInterceptor;
 
   GeneratePaths(String pathEtendoRx) {
     this.pathEtendoRx = pathEtendoRx;
@@ -41,5 +42,6 @@ public class GeneratePaths {
     this.baseDTORepository = "BaseDTORepositoryDefault";
     this.mappingUtils = "MappingUtils";
     this.baseSerializableObject = "BaseSerializableObject";
+    this.auditServiceInterceptor = "AuditServiceInterceptor";
   }
 }

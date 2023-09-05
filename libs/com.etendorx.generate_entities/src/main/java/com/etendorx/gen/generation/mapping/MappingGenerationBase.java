@@ -22,6 +22,7 @@ import com.etendorx.gen.generation.utils.CodeGenerationUtils;
 import com.etendorx.gen.util.TemplateUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openbravo.base.model.ModelProvider;
 
 import java.io.FileNotFoundException;
 import java.io.Writer;
@@ -63,6 +64,7 @@ public abstract class MappingGenerationBase implements MappingGenerator {
     Map<String, Object> data = new HashMap<>();
     data.put("mappingPrefix", mappingPrefix);
     data.put("entity", etrxProjectionEntity);
+    data.put("modelProvider", ModelProvider.getInstance());
     return data;
   }
 

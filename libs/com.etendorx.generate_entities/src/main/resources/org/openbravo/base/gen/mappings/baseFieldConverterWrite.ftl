@@ -72,14 +72,14 @@ public class ${mappingPrefix}${entity.name}FieldConverterWrite {
   }
 
 <#list javaMappings as field>
-  public void set<@toCamelCase field.name/>(${entity.name} entity, ${mappingPrefix}${entity.name}DTOWrite dto) {
+  public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.name}DTOWrite dto) {
     ${field.name}.map(entity, dto);
   }
 
 </#list>
 <#list entity.fields as field>
   <#if field.name != "id" && field.fieldMapping == "DM">
-  public void set<@toCamelCase field.name/>(${entity.name} entity, ${mappingPrefix}${entity.name}DTOWrite dto) {
+  public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.name}DTOWrite dto) {
     // ${field.property}
     entity.set${field.property?cap_first}(dto.get${field.name?cap_first}());
   }

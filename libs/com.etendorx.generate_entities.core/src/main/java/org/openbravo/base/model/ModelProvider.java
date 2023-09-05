@@ -1211,5 +1211,83 @@ public class ModelProvider implements OBSingleton {
     }
   }
 
+  /**
+   * Method to obtain the column object from a table and a property name. Is needed to pass the property in the format:
+   * <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate.
+   * @param table Table object
+   * @param property String with the property name to search
+   * @return Column object or null if not found
+   */
+  public Column getColumn(Table table, String property) {
+    var columns = this.tablesByTableName.get(table.getTableName().toLowerCase()).getColumns();
+    for (final Column column : columns) {
+      if (column.getProperty().toString().equalsIgnoreCase(property)) {
+        return column;
+      }
+    }
+    return null;
+  }
 
+  /**
+   * Method to obtain the column type from a table and a property name. Is needed to pass the property in the format:
+   * <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate. See {@link #getColumn(Table, String)}
+   * @param table Table object to search
+   * @param property String with the property name to search
+   * @return String with the column type or null if not found
+   */
+  public String getColumnTypeName(Table table, String property) {
+    var column = getColumn(table, property);
+    if(column != null) {
+      return column.getTypeName();
+    }
+    return null;
+  }
+
+  /**
+   * Method to obtain the column type with javapackage from a table and a property name. Is needed to pass the property
+   * in the format: <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate.
+   * See {@link #getColumn(Table, String)}
+   * @param table
+   * @param property
+   * @return
+   */
+  public String getColumnTypeFullQualified(Table table, String property) {
+    var column = getColumn(table, property);
+    if(column != null && column.getProperty().getTargetEntity() != null) {
+      return column.getProperty().getTargetEntity().getClassName();
+    }
+    return null;
+  }
+
+  /**
+   * Method to obtain the entity name from a property. Is needed to pass the property in the format:
+   * <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate.
+   * See {@link #getColumn(Table, String)}
+   * @param table Table object to search
+   * @param property String with the property name to search
+   * @return String with the entity name or null if not found
+   */
+  public String getColumnEntityName(Table table, String property) {
+    var column = getColumn(table, property);
+    if(column != null && column.getProperty().getTargetEntity() != null) {
+      return column.getProperty().getTargetEntity().getName();
+    }
+    return null;
+  }
+
+  /**
+   * Method to obtain the column primitive type from a table and a property name. Is needed to pass the property in the
+   * format: <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate.
+   * See {@link #getColumn(Table, String)}
+   * @param table Table object to search
+   * @param property String with the property name to search
+   * @return String with the column primitive type or null if not found
+   */
+  public String getColumnPrimitiveType(Table table, String property) {
+    var column = getColumn(table, property);
+    if(column != null && column.getProperty().getPrimitiveType() != null) {
+      return column.getProperty().getPrimitiveType().getName();
+    }
+    return null;
+  }
 }
