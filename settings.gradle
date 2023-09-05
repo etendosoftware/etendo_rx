@@ -3,17 +3,18 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven {
-            url 'https://repo.futit.cloud/repository/maven-public-releases'
-        }
-        maven {
-            url 'https://repo.futit.cloud/repository/maven-public-snapshots'
+            url 'https://maven.pkg.github.com/etendosoftware/com.etendorx.gradlepluginrx'
+            credentials {
+                username "${githubUser}"
+                password "${githubToken}"
+            }
         }
     }
 }
 
 rootProject.name = 'etendorx'
 var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modules"]
-gradle.ext.version = '1.0.7'
+gradle.ext.version = '1.1.0'
 
 directories.each {
     def subDirs = []

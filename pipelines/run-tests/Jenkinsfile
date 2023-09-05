@@ -126,6 +126,8 @@ spec:
                             cd etendo_rx
                             chmod a+x ./pipelines/run-tests/build-update.sh
                             cp gradle.properties.template gradle.properties
+                            sed -i 's/^githubUser=.*/githubUser=${GITHUB_USER}/' gradle.properties
+                            sed -i 's/^githubToken=.*/githubToken=${GITHUB_TOKEN}/' gradle.properties
                             ./gradlew :setup
                             ./gradlew :com.etendorx.test.testcontainer:test
                             """

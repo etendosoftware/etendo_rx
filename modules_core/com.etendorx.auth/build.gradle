@@ -48,6 +48,8 @@ dependencies {
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    // String Utils
+    implementation 'org.apache.commons:commons-lang3:3.13.0'
     // Feign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
@@ -66,7 +68,7 @@ dependencies {
 }
 
 ext {
-    set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2021.0.8")
 }
 
 sourceSets {

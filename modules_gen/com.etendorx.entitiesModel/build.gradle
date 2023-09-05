@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.etendorx.entitiesModel'
-version = '0.0.1-SNAPSHOT'
+version = "$gradle.ext.version"
 sourceCompatibility = '11'
 
 repositories {
@@ -23,7 +23,7 @@ dependencies {
 }
 
 ext {
-    set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2021.0.8")
 }
 
 dependencyManagement {

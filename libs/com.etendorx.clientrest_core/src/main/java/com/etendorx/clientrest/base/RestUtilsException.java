@@ -1,5 +1,5 @@
 /*
- * Copyright 2022  Futit Services SL
+ * Copyright 2023  Futit Services SL
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.etendorx.clientrest.base;
 
-package com.etendorx.utils.auth.key.context;
-
-import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
-
-public class AppContext {
-  private static final ThreadLocal<UserContext> currentUser = new ThreadLocal<>();
-
-  public static void setCurrentUser(UserContext userContext) {
-    currentUser.set(userContext);
+/**
+ * Exception for RestUtils
+ */
+public class RestUtilsException extends RuntimeException {
+  public RestUtilsException(String s) {
+    super(s);
   }
-
-  public static UserContext getCurrentUser() {
-    if (currentUser.get() == null) {
-      throw new ForbiddenException("User not found in context");
-    }
-    return currentUser.get();
-  }
-
-
 }

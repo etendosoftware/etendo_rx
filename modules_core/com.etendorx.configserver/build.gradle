@@ -34,7 +34,7 @@ publishing {
 }
 
 ext {
-    set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2021.0.8")
 }
 
 dependencies {

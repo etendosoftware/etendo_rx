@@ -35,7 +35,7 @@ publishing {
 }
 
 ext {
-    set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2021.0.8")
 }
 
 dependencyManagement {
@@ -56,8 +56,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
     implementation 'org.jetbrains:annotations:23.0.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation project(path: ':com.etendorx.entities')
     runtimeOnly group: 'com.oracle.database.jdbc', name: 'ojdbc8', version: '21.6.0.0.1'
-    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.3.8'
 
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
@@ -65,8 +66,8 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     compileOnly project(':com.etendorx.entities')
     codegen project(':com.etendorx.entities')
-    codegen project(':com.etendorx.grpc.common')
     implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
+    codegen project(':com.etendorx.grpc.common')
     implementation 'com.google.protobuf:protobuf-java-util:3.19.4'
     implementation(project(':com.etendorx.utils.auth')) {
         exclude group: 'org.slf4j', module: '*'

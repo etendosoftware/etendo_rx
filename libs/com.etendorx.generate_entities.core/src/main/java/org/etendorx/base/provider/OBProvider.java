@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class OBProvider {
     OBProvider.instance = instance;
   }
 
-  private Map<String, Registration> registrations = new Hashtable<String, Registration>();
+  private Map<String, Registration> registrations = new HashMap<>();
 
   /**
    * Returns true if the clz is registered.
@@ -138,13 +139,13 @@ public class OBProvider {
     if (currentReg != null) {
       if (!overwrite || !currentReg.isOverwritable()) {
         log.debug(
-          "A different registration: " + currentReg + " already exists under this name, NOT overwriting it by " + reg);
+          "A different registration: {} already exists under this name, NOT overwriting it by {}", currentReg, reg);
         return;
       } else {
-        log.debug(currentReg + " will be replaced by " + reg);
+        log.debug("{} will be replaced by {}", currentReg, reg);
       }
     } else {
-      log.debug("Registering " + reg);
+      log.debug("Registering {}", reg);
     }
     registrations.put(name, reg);
   }
@@ -164,7 +165,7 @@ public class OBProvider {
     if (reg == null) {
       // register it
       log.debug(
-        "Registration for class " + clz.getName() + " not found, creating a registration automatically");
+        "Registration for class {}  not found, creating a registration automatically", clz.getName());
       register(clz, clz, false);
 
       reg = registrations.get(clz.getName());
@@ -180,10 +181,10 @@ public class OBProvider {
    *   the instance of this class is removed.
    */
   public void removeInstance(Class<?> clz) {
-    log.debug("Removing instance " + clz.getName());
+    log.debug("Removing instance {}", clz.getName());
     final Registration reg = registrations.get(clz.getName());
     if (reg == null) {
-      log.debug("Removing instance " + clz.getName() + " but it was not registered, doing nothing");
+      log.debug("Removing instance {} but it was not registered, doing nothing", clz.getName());
       return;
     }
     reg.setInstance(null);

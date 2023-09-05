@@ -1,10 +1,10 @@
 plugins {
-    id 'org.springframework.boot' version '2.6.3'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '2.7.14'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
     id 'java'
     id 'java-library'
     id 'groovy'
-    id 'com.etendorx.gradlepluginrx' version '1.0.1-SNAPSHOT'
+    id 'com.etendorx.gradlepluginrx' version '1.1.0'
 }
 
 group = 'com.etendorx'
@@ -20,14 +20,6 @@ repositories {
             password = "${repositoryPassword}"
         }
     }
-    maven {
-        url = 'https://repo.futit.cloud/repository/etendo-public-jars/'
-    }
-}
-
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 task upgradeRxVersion() {

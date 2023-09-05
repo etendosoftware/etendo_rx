@@ -16,8 +16,6 @@
 
 package org.etendorx.dal.security;
 
-//import com.etendoerp.redis.interfaces.CachedList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.exception.OBSecurityException;
@@ -118,19 +116,18 @@ public class EntityAccessChecker implements OBNotSingleton {
 
   private String roleId;
   private Set<String> tabsWithSelectors;
-  private Set<Entity> writableEntities = new HashSet<Entity>();
+  private final Set<Entity> writableEntities = new HashSet<>();
 
-  private Set<Entity> readableEntities = new HashSet<Entity>();
+  private final Set<Entity> readableEntities = new HashSet<>();
   // the derived readable entities only contains the entities which are
   // derived
   // readable
   // the completely readable entities are present in the readableEntities
-  private Set<Entity> derivedReadableEntities = new HashSet<Entity>();
+  private final Set<Entity> derivedReadableEntities = new HashSet<>();
   // the derived entities from process only contains the entities which are
   // derived from process definition
-  private Set<Entity> derivedEntitiesFromProcess = new HashSet<Entity>();
-  private Set<String> processes = new HashSet<String>();
-  private Set<Entity> nonReadableEntities = new HashSet<Entity>();
+  private final Set<Entity> derivedEntitiesFromProcess = new HashSet<>();
+  private final Set<String> processes = new HashSet<>();
   private boolean isInitialized = false;
 
   private OBContext obContext;
@@ -146,12 +143,11 @@ public class EntityAccessChecker implements OBNotSingleton {
    * The static block only gets called once, when the class itself is initialized.
    */
   public static void calculateCachedElements() {
-    // targetTablesIds = new CachedList<>("EntityAccessChecker:targetTablesIds");
-    processAccessSelectors = new ArrayList<>(); //CachedList<>("EntityAccessChecker:processAccessSelectors");
-    processAccessButtons = new ArrayList(); //CachedList<>("EntityAccessChecker:processAccessButtons");
-    parameterOfWindowProcessReference = new ArrayList(); //CachedList<>("EntityAccessChecker:parameterOfWindowProcessReference");
-    parameterOfSelectorProcessReference = new ArrayList(); //CachedList<>("EntityAccessChecker:parameterOfSelectorProcessReference");
-    selectorsFromWindowReferences = new ArrayList(); //CachedList<>("EntityAccessChecker:selectorsFromWindowReferences");
+    processAccessSelectors = new ArrayList<>();
+    processAccessButtons = new ArrayList<>();
+    parameterOfWindowProcessReference = new ArrayList<>();
+    parameterOfSelectorProcessReference = new ArrayList<>();
+    selectorsFromWindowReferences = new ArrayList<>();
 
     // @formatter:off
     String hqlQry = "select distinct(s.table.id), c.table.id"
@@ -258,41 +254,6 @@ public class EntityAccessChecker implements OBNotSingleton {
         }
       }
 
-      /*
-      // and take into account table access
-      // @formatter:off
-      final String tafQryStr = "select ta"
-          + " from ADTableAccess ta"
-          + " where role.id= :roleId";
-      // @formatter:on
-      Query<TableAccess> tafQry = SessionHandler.getInstance()
-          .createQuery(tafQryStr, TableAccess.class)
-          .setParameter("roleId", getRoleId());
-
-      final List<TableAccess> tas = tafQry.list();
-      for (final TableAccess ta : tas) {
-        final String tableName = ta.getTable().getName();
-        final Entity e = mp.getEntity(tableName);
-
-        if (ta.isExclude()) {
-          readableEntities.remove(e);
-          writableEntities.remove(e);
-          nonReadableEntities.add(e);
-        } else if (ta.isReadOnly()) {
-          writableEntities.remove(e);
-          readableEntities.add(e);
-          nonReadableEntities.remove(e);
-        } else {
-          if (!writableEntities.contains(e)) {
-            writableEntities.add(e);
-          }
-          if (!readableEntities.contains(e)) {
-            readableEntities.add(e);
-          }
-          nonReadableEntities.remove(e);
-        }
-      }
-*/
       // and compute the derived readable
       for (final Entity e : new ArrayList<Entity>(readableEntities)) {
         for (final Property p : e.getProperties()) {
@@ -331,7 +292,7 @@ public class EntityAccessChecker implements OBNotSingleton {
         for (String tableId : getTargetTablesIds(processTables)) {
           Entity targetSelectorEntity = ModelProvider.getInstance().getEntityByTableId(tableId);
           if (!writableEntities.contains(targetSelectorEntity) && !readableEntities.contains(
-            targetSelectorEntity) && !nonReadableEntities.contains(targetSelectorEntity)) {
+            targetSelectorEntity)) {
             derivedReadableEntities.add(targetSelectorEntity);
           }
         }
@@ -566,17 +527,13 @@ public class EntityAccessChecker implements OBNotSingleton {
       return;
     }
 
-    if (nonReadableEntities.contains(entity)) {
-      throw new OBSecurityException("Entity " + entity + " is not readable by this user");
-    }
-
     if (derivedReadableEntities.contains(entity)) {
       return;
     }
 
     if (!readableEntities.contains(entity)) {
       throw new OBSecurityException(
-        "Entity " + entity + " is not readable by the user "); // + obContext.getUser().getId());
+        "Entity " + entity + " is not readable by the user ");
     }
   }
 
@@ -589,7 +546,6 @@ public class EntityAccessChecker implements OBNotSingleton {
   public void checkReadableAccess(Entity entity) {
     if (!isReadableWithoutAdminMode(entity)) {
       throw new OBSecurityException("Entity " + entity + " is not accessible by this role/user: ");
-      //  + obContext.getRole().getName() + "/" + obContext.getUser().getName());
     }
   }
 
@@ -602,7 +558,6 @@ public class EntityAccessChecker implements OBNotSingleton {
   public void checkDerivedAccess(Entity entity) {
     if (!isDerivedWithoutAdminMode(entity)) {
       throw new OBSecurityException("Entity " + entity + " is not accessible by this role/user: ");
-      //      + obContext.getRole().getName() + "/" + obContext.getUser().getName());
     }
   }
 
@@ -615,7 +570,6 @@ public class EntityAccessChecker implements OBNotSingleton {
   public void checkWritableAccess(Entity entity) {
     if (!isWritableWithoutAdminMode(entity)) {
       throw new OBSecurityException("Entity " + entity + " is not writable by this role/user: ");
-      //    + obContext.getRole().getName() + "/" + obContext.getUser().getName());
     }
   }
 
@@ -768,7 +722,7 @@ public class EntityAccessChecker implements OBNotSingleton {
     final Entity derivedEntity = mp.getEntityByTableId((String) ref[SELECTED_TABLE_ID]);
     if (!writableEntities.contains(derivedEntity) && !readableEntities.contains(
       derivedEntity) && !derivedReadableEntities.contains(
-      derivedEntity) && !nonReadableEntities.contains(derivedEntity)) {
+      derivedEntity)) {
       derivedEntitiesFromProcess.add(derivedEntity);
     }
   }
@@ -781,7 +735,7 @@ public class EntityAccessChecker implements OBNotSingleton {
 
     final Entity derivedEntity = mp.getEntityByTableId((String) ref[SELECTED_TABLE_ID]);
     if (!writableEntities.contains(derivedEntity) && !readableEntities.contains(
-      derivedEntity) && !nonReadableEntities.contains(derivedEntity)) {
+      derivedEntity)) {
       readableEntities.add(derivedEntity);
       writableEntities.add(derivedEntity);
       // Removed from derived entities

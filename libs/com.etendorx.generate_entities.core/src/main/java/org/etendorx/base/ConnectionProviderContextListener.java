@@ -16,7 +16,7 @@
 
 package org.etendorx.base;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.database.ConnectionProvider;
@@ -99,16 +99,16 @@ public class ConnectionProviderContextListener implements ServletContextListener
     Properties properties = new Properties();
     String jndiUsage = null;
 
-    try {
-      properties.load(new FileInputStream(strPoolFile));
+    try(FileInputStream fis = new FileInputStream(strPoolFile)) {
+      properties.load(fis);
       String externalPool = properties.getProperty("db.externalPoolClassName");
-      if (externalPool != null && !"".equals(externalPool)) {
+      if (externalPool != null && !externalPool.isEmpty()) {
         return false;
       }
 
       jndiUsage = properties.getProperty("JNDI.usage");
     } catch (Exception var4) {
-      log4j.error("Error checking JNDI mode file:" + strPoolFile, var4);
+      log4j.error("Error checking JNDI mode file: {} {}", strPoolFile, var4);
     }
 
     return StringUtils.equals("yes", jndiUsage);
@@ -119,7 +119,7 @@ public class ConnectionProviderContextListener implements ServletContextListener
       try {
         ((JNDIConnectionProvider) connectionPool).destroy();
       } catch (Exception var3) {
-        var3.printStackTrace();
+        log4j.error(var3);
       }
     } else if (connectionPool != null && connectionPool instanceof ConnectionProvider) {
       try {

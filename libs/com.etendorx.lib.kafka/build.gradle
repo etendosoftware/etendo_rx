@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.etendorx.lib.kafka'
-version = '1.0-SNAPSHOT'
+version = "$gradle.ext.version"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
@@ -22,7 +22,7 @@ dependencies {
 }
 
 ext {
-    set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2021.0.8")
 }
 
 dependencyManagement {

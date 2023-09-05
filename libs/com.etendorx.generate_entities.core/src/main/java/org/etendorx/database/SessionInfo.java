@@ -82,25 +82,16 @@ public class SessionInfo {
 
     try {
       PreparedStatement psCreate = getPreparedStatement(conn, sql);
-
+      if(psCreate == null) {
+        throw new IllegalStateException("Error creating AD_CONTEXT_INFO table");
+      }
       try {
         psCreate.execute();
-      } catch (Throwable var6) {
-        if (psCreate != null) {
-          try {
-            psCreate.close();
-          } catch (Throwable var5) {
-            var6.addSuppressed(var5);
-          }
-        }
-
-        throw var6;
-      }
-
-      if (psCreate != null) {
+      } catch (SQLException var6) {
+        log4j.error("Error creating AD_CONTEXT_INFO table", var6);
+      } finally {
         psCreate.close();
       }
-
     } catch (SQLException var7) {
       log4j.error("Error initializating audit infrastructure", var7);
       throw new IllegalStateException(var7);
@@ -143,52 +134,16 @@ public class SessionInfo {
   }
 
   private static boolean adContextInfoExists(Connection conn) {
-    boolean alreadyExists = false;
-
-    try {
-      PreparedStatement psQuery = getPreparedStatement(conn,
-        "select count(*) from information_schema.tables where table_name='ad_context_info' and table_type = 'LOCAL TEMPORARY'");
-
-      try {
-        ResultSet rs = psQuery.executeQuery();
-
-        try {
-          alreadyExists = rs.next() && !rs.getString(1).equals("0");
-        } catch (Throwable var8) {
-          if (rs != null) {
-            try {
-              rs.close();
-            } catch (Throwable var7) {
-              var8.addSuppressed(var7);
-            }
-          }
-
-          throw var8;
-        }
-
-        if (rs != null) {
-          rs.close();
-        }
-      } catch (Throwable var9) {
-        if (psQuery != null) {
-          try {
-            psQuery.close();
-          } catch (Throwable var6) {
-            var9.addSuppressed(var6);
-          }
-        }
-
-        throw var9;
-      }
-
-      if (psQuery != null) {
-        psQuery.close();
-      }
-    } catch (SQLException var10) {
-      log4j.error("Error checking if the ad_context_info table exists", var10);
+    String query = "select count(*) from information_schema.tables where table_name='ad_context_info' and table_type = 'LOCAL TEMPORARY'";
+    try (
+        PreparedStatement psQuery = conn.prepareStatement(query);
+        ResultSet rs = psQuery.executeQuery()
+    ) {
+      return rs.next() && !rs.getString(1).equals("0");
+    } catch (SQLException ex) {
+      log4j.error("Error checking if the ad_context_info table exists", ex);
     }
-
-    return alreadyExists;
+    return false;
   }
 
   /**
@@ -200,9 +155,8 @@ public class SessionInfo {
       if (log4j.isDebugEnabled()) {
         boolean var10001 = isAuditActive;
         log4j.debug(
-          "No session info set isAuditActive: " + var10001 + " - changes in info: " + changedInfo.get());
+          "No session info set isAuditActive: {} - changes in info: {}", var10001, changedInfo.get());
       }
-
     } else {
       saveContextInfoIntoDB(conn);
     }

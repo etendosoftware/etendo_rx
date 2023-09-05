@@ -1,7 +1,10 @@
+# Credentials and repository URL for JARs publication
 repositoryUser=
 repositoryPassword=
-repositoryUrl=https://repo.futit.cloud/repository/etendo-public-jars
+repositoryUrl=https://maven.pkg.github.com/etendosoftware/etendo_rx
+pluginRepositoryUrl=https://maven.pkg.github.com/etendosoftware/com.etendorx.gradlepluginrx
 
+# Github credentials for downloading the plugin
 githubUser=
 githubToken=
 
