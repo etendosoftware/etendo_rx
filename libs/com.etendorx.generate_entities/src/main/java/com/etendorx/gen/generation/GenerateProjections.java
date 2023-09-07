@@ -8,7 +8,9 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.ModelProvider;
+import org.openbravo.base.model.Table;
 
+import com.etendoerp.etendorx.model.ETRXModelProvider;
 import com.etendorx.gen.beans.Projection;
 import com.etendorx.gen.generation.interfaces.EntityGenerator;
 
@@ -31,8 +33,8 @@ public class GenerateProjections implements EntityGenerator {
       if (StringUtils.equals(GenerateEntitiesConstants.PROJECTION_DEFAULT,
           projection.getName()) || projection.getEntities().containsKey(
           data.get("newClassName").toString())) {
-        List<Entity> entities = ModelProvider.getInstance().getModel();
-        data.put("anotherEntities", new ProjectionsConverter().getEntitiesMap(entities));
+        data.put("anotherEntities",
+            ETRXModelProvider.getInstance().getETRXProjectionEntity(projection.getProjection()));
         new GenerateProjectedEntities().generate(path, data, projection);
         if (!projection.getReact()) {
           if (!StringUtils.equals(GenerateEntitiesConstants.PROJECTION_DEFAULT, projection.getName())) {
