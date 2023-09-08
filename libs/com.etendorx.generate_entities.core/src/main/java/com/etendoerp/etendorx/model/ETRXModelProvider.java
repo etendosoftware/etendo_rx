@@ -272,4 +272,18 @@ public class ETRXModelProvider implements OBSingleton {
   public List<ETRXProjectionEntity> getETRXProjectionEntity(Table table) {
     return getData(ETRXProjectionEntity.class, s -> retrieveETRXProjectionEntity(s, table));
   }
+
+  public List<ETRXProjectionEntity> retrieveETRXProjectionEntity(Session session, ETRXProjection projection) {
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaQuery<ETRXProjectionEntity> criteria = builder.createQuery(ETRXProjectionEntity.class);
+    Root<ETRXProjectionEntity> root = criteria.from(ETRXProjectionEntity.class);
+    criteria.select(root);
+    criteria.where(builder.equal(root.get("projection"), projection));
+    criteria.orderBy(builder.asc(root.get("projection")));
+    return session.createQuery(criteria).list();
+  }
+
+  public List<ETRXProjectionEntity> getETRXProjectionEntity(ETRXProjection projection) {
+    return getData(ETRXProjectionEntity.class, s -> retrieveETRXProjectionEntity(s, projection));
+  }
 }

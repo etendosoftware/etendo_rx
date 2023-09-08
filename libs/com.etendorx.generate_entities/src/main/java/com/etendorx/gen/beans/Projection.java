@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.etendoerp.etendorx.model.projection.ETRXProjection;
+
 /**
  * Projection class needed for code generation
  *
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
  */
 public class Projection {
 
+  private ETRXProjection projection;
   private String name;
   private boolean grpc;
   private boolean react;
@@ -39,10 +42,11 @@ public class Projection {
     this.name = name;
   }
 
-  public Projection(String name, boolean grpc, boolean react) {
-    this(name);
-    this.grpc = grpc;
-    this.react = react;
+  public Projection(ETRXProjection projection) {
+    this(projection.getName());
+    this.projection = projection;
+    this.grpc = projection.isGrpc();
+    this.react = projection.getModule().isReact();
   }
 
   public File getModuleLocation() {
@@ -67,6 +71,10 @@ public class Projection {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public ETRXProjection getProjection() {
+    return projection;
   }
 
   public Map<String, ProjectionEntity> getEntities() {

@@ -24,11 +24,7 @@ public class ProjectionsConverter {
   public List<Projection> convert(GeneratePaths paths, List<ETRXProjection> etrxProjections) {
     List<Projection> projections = new ArrayList<>();
     for (ETRXProjection etrxProjection : etrxProjections) {
-      Projection projection = new Projection(
-          etrxProjection.getName(),
-          etrxProjection.isGrpc(),
-          etrxProjection.getModule().isReact()
-      );
+      Projection projection = new Projection(etrxProjection);
       File moduleLocation = getModuleLocation(paths.pathEtendoRx, etrxProjection.getModule().getRxJavaPackage());
       projection.setModuleLocation(moduleLocation);
       convert(projection, etrxProjection.getEntities());
