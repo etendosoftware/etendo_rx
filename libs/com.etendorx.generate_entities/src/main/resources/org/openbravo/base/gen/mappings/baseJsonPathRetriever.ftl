@@ -1,3 +1,9 @@
+<#assign indentifierFields = []>
+<#list entity.fields as field>
+  <#if field.identifiesUnivocally>
+    <#assign indentifierFields = indentifierFields + [field]>
+  </#if>
+</#list>
 /**
 * Copyright 2022-2023 Futit Services SL
 *
@@ -15,6 +21,7 @@
 */
 package com.etendorx.entities.mappings;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
@@ -23,6 +30,7 @@ import com.etendorx.entities.jparepo.${entity.table.name}Repository;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetrieverBase;
 
 @Component
+@Slf4j
 public class ${mappingPrefix}${entity.name}JsonPathRetriever extends JsonPathEntityRetrieverBase<${entity.table.className}> {
 
   private final JpaSpecificationExecutor<${entity.table.className}> repository;
@@ -38,6 +46,12 @@ public class ${mappingPrefix}${entity.name}JsonPathRetriever extends JsonPathEnt
 
   @Override
   public String[] getKeys() {
-    return new String[]{"name"};
+    var keys = new String[]{
+    <#list indentifierFields as field>
+      "${field.property}"<#if field_has_next>,</#if>
+    </#list>
+    };
+    log.debug("retrieve ${entity.name} with keys: {}", (Object) keys);
+    return keys;
   }
 }
