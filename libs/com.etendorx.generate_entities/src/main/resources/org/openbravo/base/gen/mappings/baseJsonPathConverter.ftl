@@ -44,12 +44,14 @@ package com.etendorx.entities.mappings;
 
 import java.math.BigDecimal;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import com.etendorx.entities.mapper.lib.JsonPathConverterBase;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 
 @Component
+@Slf4j
 public class ${mappingPrefix}${entity.name}JsonPathConverter extends JsonPathConverterBase<${mappingPrefix}${entity.name}DTOWrite> {
 
   <#list objectFields as field>
@@ -92,13 +94,15 @@ public class ${mappingPrefix}${entity.name}JsonPathConverter extends JsonPathCon
     </#if>
   </#if>
   <#if hasRetriever>
-    dto.set<@toCamelCase field.name />(retrieve${field.name?cap_first}(ctx.read("${field.jsonPath!"missing json path"}")));
+    var ${field.name} = retrieve${field.name?cap_first}(ctx.read("${field.jsonPath!"missing json path"}"));
   <#elseif field.property??>
     <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + field.property) ! "" />
-    dto.set<@toCamelCase field.name />(ctx.read("${field.jsonPath!"missing json path"}", ${returnClass}.class));
+    var ${field.name} = ctx.read("${field.jsonPath!"missing json path"}", ${returnClass}.class);
   <#else>
-    dto.set<@toCamelCase field.name />(ctx.read("${field.jsonPath!"missing json path"}"));
+    var ${field.name} = ctx.read("${field.jsonPath!"missing json path"}");
   </#if>
+    log.debug("pathConverter ${entity.name} \"${field.jsonPath!"missing json path"}\": {}", ${field.name});
+    dto.set<@toCamelCase field.name />(${field.name});
   </#list>
     return dto;
   }
@@ -108,6 +112,9 @@ public class ${mappingPrefix}${entity.name}JsonPathConverter extends JsonPathCon
     <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "" />
     <#if columnType?? && columnType != "">
   private ${columnType} retrieve${field.name?cap_first}(String id) {
+    if (id == null) {
+      return null;
+    }
     return ${field.name}Retriever.get(id);
   }
 

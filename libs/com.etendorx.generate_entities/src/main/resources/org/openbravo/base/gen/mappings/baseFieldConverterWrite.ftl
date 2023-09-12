@@ -78,10 +78,13 @@ public class ${mappingPrefix}${entity.name}FieldConverterWrite {
 
 </#list>
 <#list entity.fields as field>
-  <#if field.name != "id" && field.fieldMapping == "DM">
+  <#if field.name != "id" && (field.fieldMapping == "DM" || field.fieldMapping == "EM")>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.name}DTOWrite dto) {
-    // ${field.property}
+    <#if field.property??>
     entity.set${field.property?cap_first}(dto.get${field.name?cap_first}());
+    <#else>
+    entity.set${field.name?cap_first}(dto.get${field.name?cap_first}());
+    </#if>
   }
   </#if>
 
