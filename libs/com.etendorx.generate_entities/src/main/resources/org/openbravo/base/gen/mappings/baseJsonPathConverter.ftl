@@ -94,15 +94,15 @@ public class ${mappingPrefix}${entity.name}JsonPathConverter extends JsonPathCon
     </#if>
   </#if>
   <#if hasRetriever>
-    var ${field.name} = retrieve${field.name?cap_first}(ctx.read("${field.jsonPath!"missing json path"}"));
+    var ${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(ctx.read("${field.jsonPath!"missing json path"}"));
   <#elseif field.property??>
     <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + field.property) ! "" />
-    var ${field.name} = ctx.read("${field.jsonPath!"missing json path"}", ${returnClass}.class);
+    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"missing json path"}", ${returnClass}.class);
   <#else>
-    var ${field.name} = ctx.read("${field.jsonPath!"missing json path"}");
+    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"missing json path"}");
   </#if>
-    log.debug("pathConverter ${entity.name} \"${field.jsonPath!"missing json path"}\": {}", ${field.name});
-    dto.set<@toCamelCase field.name />(${field.name});
+    log.debug("pathConverter ${entity.name} \"${field.jsonPath!"missing json path"}\": {}", ${NamingUtil.getSafeJavaName(field.name)});
+    dto.set<@toCamelCase field.name />(${NamingUtil.getSafeJavaName(field.name)});
   </#list>
     return dto;
   }
