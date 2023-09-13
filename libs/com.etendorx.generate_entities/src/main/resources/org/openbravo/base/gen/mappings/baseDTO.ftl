@@ -12,9 +12,9 @@
         </#if>
       </#list>
       <#if isFirstSubStr>
-        <#assign finalResultList = finalResultList + [result]>
+        <#assign finalResultList = finalResultList + [NamingUtil.getSafeJavaName(result)]>
       <#else>
-        <#assign finalResultList = finalResultList + [result?cap_first]>
+        <#assign finalResultList = finalResultList + [NamingUtil.getSafeJavaName(result)?cap_first]>
       </#if>
     </#list>
     ${finalResultList?join("")}
@@ -54,12 +54,11 @@ import ${columnType};
     </#if>
   </#list>
 
-@Getter
-@Setter
 public class ${mappingPrefix}${entity.name}DTO<#if entity.mappingType == "R">Read<#else>Write</#if> implements BaseDTOModel {
   <#if entity.mappingType == "R">
   @JsonProperty("id")
   </#if>
+  @Getter @Setter
   String id;
 
   <#list entity.fields as field>
@@ -67,11 +66,26 @@ public class ${mappingPrefix}${entity.name}DTO<#if entity.mappingType == "R">Rea
       <#if entity.mappingType == "R">
   @JsonProperty("${field.name}")
       </#if>
-  <#assign columnType = "Object">
-  <#if field.property??>
-  <#assign columnType = modelProvider.getColumnTypeName(entity.table, entity.table.name + "." + field.property) ! "Object">
-  </#if>
-  <#if entity.mappingType == "R">Object<#else>${columnType}</#if> <@toCamelCase field.name?trim?replace("\n", "", "r")/>;
+      <#if !NamingUtil.isJavaReservedWord(field.name)>
+  @Getter @Setter
+      </#if>
+      <#assign columnType = "Object">
+      <#if field.property??>
+        <#assign columnType = modelProvider.getColumnTypeName(entity.table, entity.table.name + "." + field.property) ! "Object">
+      </#if>
+  <#if entity.mappingType == "R">Object<#else>${columnType}</#if> <@toCamelCase field.name/>;
+      <#if NamingUtil.isJavaReservedWord(field.name)>
+        <#assign safeFieldName=NamingUtil.getSafeJavaName(field.name) >
+
+  public <#if entity.mappingType == "R">Object<#else>${columnType}</#if> get${field.name?cap_first}() {
+    return this.${safeFieldName};
+  }
+
+  public void set${field.name?cap_first}(<#if entity.mappingType == "R">Object<#else>${columnType}</#if> ${safeFieldName}) {
+    this.${safeFieldName} = ${safeFieldName};
+  }
+
+      </#if>
 
     </#if>
   </#list>

@@ -20,6 +20,11 @@ import com.etendorx.gen.generation.GeneratePaths;
 import com.etendorx.gen.generation.interfaces.MappingGenerator;
 import com.etendorx.gen.generation.utils.CodeGenerationUtils;
 import com.etendorx.gen.util.TemplateUtil;
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.BeansWrapperBuilder;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateHashModel;
+import freemarker.template.TemplateModelException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openbravo.base.model.ModelProvider;
@@ -61,10 +66,19 @@ public abstract class MappingGenerationBase implements MappingGenerator {
   protected abstract String getOutFileName(ETRXProjectionEntity etrxProjectionEntity);
 
   private Map<String, Object> getData(String mappingPrefix, ETRXProjectionEntity etrxProjectionEntity) {
+    BeansWrapper wrapper = new BeansWrapperBuilder(Configuration.VERSION_2_3_31).build();
+    TemplateHashModel staticModels = wrapper.getStaticModels();
+
     Map<String, Object> data = new HashMap<>();
     data.put("mappingPrefix", mappingPrefix);
     data.put("entity", etrxProjectionEntity);
     data.put("modelProvider", ModelProvider.getInstance());
+    try {
+      TemplateHashModel fileStatics = null;
+      fileStatics = (TemplateHashModel) staticModels.get("org.openbravo.base.model.NamingUtil");
+      data.put("NamingUtil", fileStatics);
+    } catch (TemplateModelException ignored) {
+    }
     return data;
   }
 

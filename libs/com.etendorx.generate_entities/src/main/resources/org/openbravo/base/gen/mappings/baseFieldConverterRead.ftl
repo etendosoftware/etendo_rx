@@ -23,7 +23,11 @@
     <#if part?index != 0>
       <#assign nullCheck = nullCheck + " && ">
     </#if>
-    <#assign result = result + ".get" + part?cap_first + "()">
+    <#assign safePart = part>
+    <#if NamingUtil.isJavaReservedWord(part)>
+      <#assign safePart = NamingUtil.getSafeJavaName(part)>
+    </#if>
+    <#assign result = result + ".get" + safePart?cap_first + "()">
     <#assign nullCheck = nullCheck + result + " != null">
   </#list>
   <#if mappingType == "EM">
