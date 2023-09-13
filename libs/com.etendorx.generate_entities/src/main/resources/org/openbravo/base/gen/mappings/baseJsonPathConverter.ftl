@@ -97,7 +97,7 @@ public class ${mappingPrefix}${entity.name}JsonPathConverter extends JsonPathCon
     var ${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(ctx.read("${field.jsonPath!"missing json path"}"));
   <#elseif field.property??>
     <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + field.property) ! "" />
-    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"missing json path"}", ${returnClass}.class);
+    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"missing json path"}"<#if returnClass != "">, ${returnClass}.class</#if>);
   <#else>
     var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"missing json path"}");
   </#if>
