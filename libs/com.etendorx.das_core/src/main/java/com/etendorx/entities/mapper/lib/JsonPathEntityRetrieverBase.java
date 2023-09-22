@@ -22,6 +22,7 @@ import java.util.TreeSet;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.web.server.ResponseStatusException;
 
 public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRetriever<E> {
 
@@ -30,9 +31,9 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
   public abstract String[] getKeys();
 
   @Override
-  public E get(String key) {
+  public E get(Object key) {
     var treeSet = new TreeSet<String>();
-    treeSet.add(key);
+    treeSet.add(objectToString(key));
     return get(treeSet);
   }
 
@@ -51,5 +52,21 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
 
     Specification<E> combinedSpec = specs.stream().reduce(Specification::and).orElse(null);
     return getRepository().findOne(combinedSpec).orElse(null);
+  }
+
+  private String objectToString(Object id) {
+    if (id == null) {
+      return null;
+    }
+    String strId = null;
+    if(id instanceof Integer) {
+      strId = Integer.toString((Integer) id);
+    } else if (id instanceof String) {
+      strId = (String) id;
+    }
+    if(strId == null) {
+      throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Invalid value");
+    }
+    return strId;
   }
 }

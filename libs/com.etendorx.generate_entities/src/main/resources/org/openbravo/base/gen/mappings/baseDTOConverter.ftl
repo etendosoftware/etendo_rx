@@ -57,7 +57,6 @@ public class ${mappingPrefix}${readEntity.name}DTOConverter implements DTOConver
   @Override
   public ${mappingPrefix}${readEntity.name}DTORead convert(${readEntity.table.className} entity) {
     ${mappingPrefix}${readEntity.name}DTORead dto = new ${mappingPrefix}${readEntity.name}DTORead();
-    dto.setId(readConverter.getId(entity));
 <#list readEntity.fields as field>
     dto.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(readConverter.get<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity));
 </#list>
@@ -72,9 +71,7 @@ public class ${mappingPrefix}${readEntity.name}DTOConverter implements DTOConver
       entity = new ${writeEntity.table.className}();
     }
 <#list writeEntity.fields as field>
-<#if field.name != "id">
     writeConverter.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity, dto);
-</#if>
 </#list>
     return entity;
   }

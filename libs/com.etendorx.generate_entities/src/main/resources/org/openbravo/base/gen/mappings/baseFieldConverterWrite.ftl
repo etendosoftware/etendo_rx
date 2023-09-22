@@ -22,7 +22,7 @@
 </#macro>
 <#assign javaMappings = []>
 <#list entity.fields as field>
-  <#if field.name != "id" && field.fieldMapping == "JM">
+  <#if field.fieldMapping == "JM">
     <#assign javaMappings = javaMappings + [field]>
   </#if>
 </#list>
@@ -78,7 +78,7 @@ public class ${mappingPrefix}${entity.name}FieldConverterWrite {
 
 </#list>
 <#list entity.fields as field>
-  <#if field.name != "id" && (field.fieldMapping == "DM" || field.fieldMapping == "EM")>
+  <#if (field.fieldMapping == "DM" || field.fieldMapping == "EM")>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.name}DTOWrite dto) {
     <#if field.property??>
     entity.set${NamingUtil.getSafeJavaName(field.property)?cap_first}(dto.get${field.name?cap_first}());

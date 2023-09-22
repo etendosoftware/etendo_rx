@@ -18,7 +18,7 @@
 </#macro>
 <#macro convertToGetMethod name path mappingType>
   <#assign result="entity">
-  <#assign nullCheck="if (">
+  <#assign nullCheck="  if (">
   <#list path?split(".") as part>
     <#if part?index != 0>
       <#assign nullCheck = nullCheck + " && ">
@@ -33,7 +33,11 @@
   <#if mappingType == "EM">
     <#assign result = name + ".convert(" + result + ")">
   </#if>
+  <#if name == "id">
+  <#assign nullCheck = nullCheck + ") {\n      return " + result + ";\n    } else {\n      return null;\n    }">
+  <#else>
   <#assign nullCheck = nullCheck + ") {\n      return mappingUtils.handleBaseObject(" + result + ");\n    } else {\n      return null;\n    }">
+  </#if>
   ${nullCheck}
 </#macro>
 <#macro getConverterName field>
@@ -45,13 +49,13 @@
 </#macro>
 <#assign mappings = []>
 <#list entity.fields as field>
-  <#if field.name != "id" && (field.fieldMapping == "JM" || field.fieldMapping == "EM")>
+  <#if field.fieldMapping == "JM" || field.fieldMapping == "EM">
     <#assign mappings = mappings + [field]>
   </#if>
 </#list>
 <#assign javaMappings = []>
 <#list entity.fields as field>
-  <#if field.name != "id" && field.fieldMapping == "JM">
+  <#if field.fieldMapping == "JM">
     <#assign javaMappings = javaMappings + [field]>
   </#if>
 </#list>
@@ -112,10 +116,6 @@ public class ${mappingPrefix}${entity.name}FieldConverterRead {
 </#list>
   }
 
-  public String getId(${entity.table.className} entity) {
-    return entity.getId();
-  }
-
 <#list javaMappings as field>
   public Object get<@toCamelCase field.name/>(${entity.table.className} entity) {
     return ${field.name}.map(entity);
@@ -124,8 +124,8 @@ public class ${mappingPrefix}${entity.name}FieldConverterRead {
 </#list>
 
 <#list entity.fields as field>
-  <#if field.name != "id" && (field.fieldMapping == "DM" || field.fieldMapping == "EM") && field.entity.mappingType == "R">
-  public Object get<@toCamelCase field.name/>(${entity.table.className} entity) {
+  <#if (field.fieldMapping == "DM" || field.fieldMapping == "EM") && field.entity.mappingType == "R">
+  public <#if field.name == "id">String<#else>Object</#if> get<@toCamelCase field.name/>(${entity.table.className} entity) {
     // ${field.property}
     <@convertToGetMethod field.name field.property field.fieldMapping/>
   }

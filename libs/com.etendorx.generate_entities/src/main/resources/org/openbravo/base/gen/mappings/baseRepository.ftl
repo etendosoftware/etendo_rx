@@ -4,6 +4,7 @@ import com.etendorx.entities.entities.AuditServiceInterceptor;
 import com.etendorx.entities.entities.BaseDTORepositoryDefault;
 import com.etendorx.entities.jparepo.${entity.name}Repository;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
+import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import org.springframework.stereotype.Component;
 
 @Component("${mappingPrefix}${entity.name}DASRepository")
@@ -12,9 +13,10 @@ public class ${mappingPrefix}${entity.name}DTORepositoryDefault extends BaseDTOR
   public ${mappingPrefix}${entity.name}DTORepositoryDefault(
       ${entity.name}Repository repository,
       ${mappingPrefix}${entity.name}DTOConverter converter,
+      JsonPathEntityRetriever<${entity.table.className}> retriever,
       AuditServiceInterceptor auditService
     ) {
-    super(repository, converter, auditService);
+    super(repository, converter, retriever, auditService);
   }
 
 }
