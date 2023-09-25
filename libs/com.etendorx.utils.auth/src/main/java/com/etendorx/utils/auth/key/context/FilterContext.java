@@ -76,19 +76,15 @@ public class FilterContext extends OncePerRequestFilter {
     setUserContextFromToken(userContext, token, request);
   }
 
+
+
   public static void setUserContextFromToken(UserContext userContext, String token, HttpServletRequest req) {
+    TokenUtil.convertToken(userContext, token);
     String noActiveFilterParameter = req.getParameter(NO_ACTIVE_FILTER_PARAMETER);
     String triggerEnabledParam = req.getParameter(TRIGGER_ENABLED_PARAMETER);
     String dateFormatParam = req.getParameter(DATE_FORMAT_PARAMETER);
     String timeZoneParam = req.getParameter(TIME_ZONE_PARAMETER);
     String restMethod = req.getMethod();
-    Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
-    userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
-    userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
-    userContext.setOrganizationId((String) tokenValuesMap.get(JwtKeyUtils.ORG_ID));
-    userContext.setRoleId((String) tokenValuesMap.get(JwtKeyUtils.ROLE_ID));
-    userContext.setSearchKey((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
-    userContext.setServiceId((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_ID));
     boolean noActiveFilter = !parseBooleanParameter(noActiveFilterParameter, NO_ACTIVE_FILTER_PARAMETER, false);
     userContext.setActive(noActiveFilter);
     userContext.setAuthToken(token);
