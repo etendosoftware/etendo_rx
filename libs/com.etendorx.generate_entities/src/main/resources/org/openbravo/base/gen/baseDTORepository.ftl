@@ -19,6 +19,7 @@ package com.etendorx.entities.entities;
 import com.etendorx.entities.mapper.lib.BaseDTOModel;
 import com.etendorx.entities.mapper.lib.DASRepository;
 import com.etendorx.entities.mapper.lib.DTOConverter;
+import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,13 +33,16 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   private final BaseDASRepository<T> repository;
   private final DTOConverter<T, E, F> converter;
   private final AuditServiceInterceptor auditService;
+  private final JsonPathEntityRetriever<T> retriever;
 
   public BaseDTORepositoryDefault(BaseDASRepository<T> repository,
       DTOConverter<T, E, F> converter,
+      JsonPathEntityRetriever<T> retriever,
       AuditServiceInterceptor auditService) {
     this.repository = repository;
     this.converter = converter;
     this.auditService = auditService;
+    this.retriever = retriever;
   }
 
   @Override
@@ -59,8 +63,14 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   @Override
   @Transactional
   public E save(F dtoEntity) {
+    if(dtoEntity.getId() != null) {
+      var dto = retriever.get(dtoEntity.getId());
+      if (dto != null) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "Record already exists");
+      }
+    }
     var entity = converter.convert(dtoEntity, null);
-    if(BaseRXObject.class.isAssignableFrom(entity.getClass())) {
+    if (BaseRXObject.class.isAssignableFrom(entity.getClass())) {
       var baseObject = (BaseRXObject) entity;
       auditService.setAuditValues(baseObject, true);
     }
@@ -73,7 +83,7 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   @Override
   @Transactional
   public E updated(F dtoEntity) {
-    var entity = repository.findById(dtoEntity.getId()).orElse(null);
+    var entity = retriever.get(dtoEntity.getId());
     if (entity == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found");
     }

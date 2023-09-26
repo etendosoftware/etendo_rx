@@ -16,11 +16,14 @@
 package com.etendorx.das.utils;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.collection.internal.PersistentBag;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +35,7 @@ import com.etendorx.utils.auth.key.context.AppContext;
  * Mapping utils implementation for the DAS module
  */
 @Component
+@Slf4j
 public class MappingUtilsImpl implements MappingUtils {
 
   /**
@@ -42,6 +46,7 @@ public class MappingUtilsImpl implements MappingUtils {
    * @param obj
    * @return the object
    */
+  @Override
   public Object handleBaseObject(Object obj) {
     if(BaseSerializableObject.class.isAssignableFrom(obj.getClass())) {
       return ((BaseSerializableObject) obj).get_identifier();
@@ -65,5 +70,23 @@ public class MappingUtilsImpl implements MappingUtils {
       }
     }
     return obj;
+  }
+
+  @Override
+  public Date parseDate(String date) {
+    var dateFormat = AppContext.getCurrentUser().getDateFormat();
+    var timeZone = AppContext.getCurrentUser().getTimeZone();
+    if(dateFormat != null) {
+      SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+      if(timeZone != null) {
+        sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+      }
+      try {
+        return sdf.parse(date);
+      } catch (ParseException e) {
+        log.error("Error parsing date with value {}", date, e);
+      }
+    }
+    return null;
   }
 }
