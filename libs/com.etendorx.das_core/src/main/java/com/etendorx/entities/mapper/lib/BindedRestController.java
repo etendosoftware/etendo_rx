@@ -51,6 +51,7 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   }
 
   @PostMapping
+  @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<E> post(@RequestBody String rawEntity) {
     F dtoEntity = converter.convert(rawEntity);
     return new ResponseEntity<>(repository.save(dtoEntity), HttpStatus.CREATED);
@@ -60,6 +61,7 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<E> put(@PathVariable String id, @RequestBody String rawEntity) {
     F dtoEntity = converter.convert(rawEntity);
+    dtoEntity.setId(id);
     return new ResponseEntity<>(repository.updated(dtoEntity), HttpStatus.CREATED);
   }
 }

@@ -18,7 +18,7 @@ package com.etendorx.entities.mapper.lib;
 import java.util.TreeSet;
 
 public interface JsonPathEntityRetriever<E> {
-  E get(String key);
+  E get(Object key);
 
   E get(TreeSet<String> keyValues);
 }
