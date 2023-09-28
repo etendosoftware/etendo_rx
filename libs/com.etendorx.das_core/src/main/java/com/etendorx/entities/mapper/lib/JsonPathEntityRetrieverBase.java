@@ -32,6 +32,9 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
 
   @Override
   public E get(Object key) {
+    if(key == null) {
+      return null;
+    }
     var treeSet = new TreeSet<String>();
     treeSet.add(objectToString(key));
     return get(treeSet);
