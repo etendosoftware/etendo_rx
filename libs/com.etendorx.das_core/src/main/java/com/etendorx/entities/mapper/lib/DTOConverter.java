@@ -15,9 +15,6 @@
  */
 package com.etendorx.entities.mapper.lib;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Generic interface for DTO converters
  * @param <E> Entity object to convert
@@ -46,11 +43,6 @@ public interface DTOConverter<E, F, G> {
    * @param entities
    * @return a list of DTOs converted
    */
-  default Iterable<F> convert(Iterable<E> entities) {
-    List<F> dtos = new ArrayList<>();
-    for (E entity : entities) {
-      dtos.add(convert(entity));
-    }
-    return dtos;
-  }
+  Iterable<F> convert(Iterable<E> entities);
+
 }
