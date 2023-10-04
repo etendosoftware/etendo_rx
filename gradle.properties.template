@@ -36,4 +36,3 @@ rx.computedColumns=true
 rx.views=true
 
 grpc.enabled=false
-data-rest.enabled=true

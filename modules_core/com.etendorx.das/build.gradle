@@ -81,15 +81,14 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     if(project.hasProperty('grpc.enabled') && project.property('grpc.enabled') == "true") {
+        println "GRP Enabled"
         codegen project(':com.etendorx.grpc.common')
         implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
         testImplementation project(':com.etendorx.grpc.common')
         testImplementation 'io.grpc:grpc-testing:1.49.0'
         testImplementation 'io.github.lognet:grpc-spring-boot-starter:4.6.0'
     }
-    if(!project.hasProperty('data-rest.enabled') || project.property('data-rest.enabled') == "true") {
-        implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
-    }
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 }
 
 var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modules"]

@@ -35,7 +35,6 @@ publishing {
 
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     implementation 'io.github.openfeign:feign-okhttp'
