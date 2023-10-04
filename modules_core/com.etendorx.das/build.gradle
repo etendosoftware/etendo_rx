@@ -52,7 +52,6 @@ configurations {
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
     implementation 'org.jetbrains:annotations:23.0.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     runtimeOnly group: 'com.oracle.database.jdbc', name: 'ojdbc8', version: '21.6.0.0.1'
@@ -64,8 +63,6 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     compileOnly project(':com.etendorx.entities')
     codegen project(':com.etendorx.entities')
-    codegen project(':com.etendorx.grpc.common')
-    implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
     implementation 'com.google.protobuf:protobuf-java-util:3.19.4'
     implementation(project(':com.etendorx.utils.auth')) {
         exclude group: 'org.slf4j', module: '*'
@@ -78,13 +75,21 @@ dependencies {
     testImplementation 'org.testcontainers:postgresql:1.17.3'
     testImplementation 'org.testcontainers:junit-jupiter:1.17.3'
     testImplementation project(':com.etendorx.entities')
-    testImplementation project(':com.etendorx.grpc.common')
-    testImplementation 'io.grpc:grpc-testing:1.49.0'
-    testImplementation 'io.github.lognet:grpc-spring-boot-starter:4.6.0'
     testImplementation 'net.java.dev.jna:jna:5.7.0'
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
     testCompileOnly 'org.projectlombok:lombok:1.18.22'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    if(project.hasProperty('grpc.enabled') && project.property('grpc.enabled') == "true") {
+        codegen project(':com.etendorx.grpc.common')
+        implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
+        testImplementation project(':com.etendorx.grpc.common')
+        testImplementation 'io.grpc:grpc-testing:1.49.0'
+        testImplementation 'io.github.lognet:grpc-spring-boot-starter:4.6.0'
+    }
+    if(!project.hasProperty('data-rest.enabled') || project.property('data-rest.enabled') == "true") {
+        implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
+    }
 }
 
 var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modules"]
