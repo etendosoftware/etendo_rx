@@ -1,23 +1,32 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
     id 'java'
+    id 'org.springframework.boot' apply false
+    id 'io.spring.dependency-management'
 }
 
 group = 'com.etendorx.utils.auth'
 version = "$gradle.ext.version"
-sourceCompatibility = '11'
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
 }
+ext {
+    set('springCloudVersion', "2022.0.4")
+}
+dependencyManagement {
+    imports {
+        mavenBom SpringBootPlugin.BOM_COORDINATES
+    }
+}
 
 dependencies {
-    implementation 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation 'org.springframework:spring-context:5.3.15'
-    implementation 'org.springframework:spring-web:5.3.15'
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-    implementation 'javax.xml.bind:jaxb-api:2.3.1'
-    implementation 'org.slf4j:slf4j-api:1.7.36'
-    implementation 'org.slf4j:slf4j-simple:1.7.36'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.2'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.2'
     testImplementation 'junit:junit:4.13'
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.0')
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
@@ -39,3 +48,4 @@ tasks.test {
 tasks.named('test') {
     useJUnitPlatform()
 }
+

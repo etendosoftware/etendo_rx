@@ -22,7 +22,7 @@ class JwtRequestValidationTest {
         JwtRequest jwtRequest = new JwtRequest("", "password", "service", "secret");
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> jwtRequestValidation.validateJwtRequest(jwtRequest));
-        assertThat(exception.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(exception.getReason()).isEqualTo(UNDEFINED_USERNAME_MESSAGE);
     }
 
@@ -31,7 +31,7 @@ class JwtRequestValidationTest {
         JwtRequest jwtRequest = new JwtRequest("username", "", "service", "secret");
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> jwtRequestValidation.validateJwtRequest(jwtRequest));
-        assertThat(exception.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(exception.getReason()).isEqualTo(UNDEFINED_PASSWORD_MESSAGE);
     }
 
@@ -40,7 +40,7 @@ class JwtRequestValidationTest {
         JwtRequest jwtRequest = new JwtRequest("username", "password", "", "secret");
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> jwtRequestValidation.validateJwtRequest(jwtRequest));
-        assertThat(exception.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(exception.getReason()).isEqualTo(UNDEFINED_SERVICE_MESSAGE);
     }
 
@@ -49,7 +49,7 @@ class JwtRequestValidationTest {
         JwtRequest jwtRequest = new JwtRequest("username", "password", "service", "");
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> jwtRequestValidation.validateJwtRequest(jwtRequest));
-        assertThat(exception.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(exception.getReason()).isEqualTo(UNDEFINED_SECRET_MESSAGE);
     }
 }

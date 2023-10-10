@@ -34,8 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,8 +44,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -123,7 +122,7 @@ public class RepositoryTest {
 
   @Test
   public void whenReadUser() {
-    setUserContextFromToken(userContext, TOKEN, "true", "GET");
+    setUserContextFromToken(userContext, publicKey, TOKEN, "true", "GET");
     AppContext.setCurrentUser(userContext);
     var allUsers = userRepository.findAll();
     assert allUsers.iterator().hasNext();
@@ -134,7 +133,7 @@ public class RepositoryTest {
   @Test
   public void whenFindByName() {
     UserContext userContext = new UserContext();
-    setUserContextFromToken(userContext, TOKEN, "true", "GET");
+    setUserContextFromToken(userContext, publicKey, TOKEN, "true", "GET");
     var userList = userRepository.searchByUsername("admin", null);
     assert userList.getSize() == 1;
     assert userList.getContent().get(0) != null;

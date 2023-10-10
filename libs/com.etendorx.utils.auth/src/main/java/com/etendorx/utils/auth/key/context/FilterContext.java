@@ -21,13 +21,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -43,6 +43,8 @@ public class FilterContext extends OncePerRequestFilter {
   private UserContext userContext;
   @Autowired(required = false)
   private Set<AllowedURIS> allowedURIS;
+  @Value("${public-key:}")
+  String publicKey;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -66,12 +68,12 @@ public class FilterContext extends OncePerRequestFilter {
   }
 
   public void setUserContextFromToken(String token, HttpServletRequest request) {
-    setUserContextFromToken(userContext, token, request.getParameter("active"), request.getMethod());
+    setUserContextFromToken(userContext, publicKey, token, request.getParameter("active"), request.getMethod());
   }
 
-  public static void setUserContextFromToken(UserContext userContext, String token, String activeParam,
+  public static void setUserContextFromToken(UserContext userContext, String publicKey, String token, String activeParam,
       String restMethod) {
-    Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
+    Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(publicKey, token);
     userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
     userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
     userContext.setOrganizationId((String) tokenValuesMap.get(JwtKeyUtils.ORG_ID));

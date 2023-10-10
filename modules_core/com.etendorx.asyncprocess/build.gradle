@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.etendorx'
 version = "$gradle.ext.version"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -54,13 +54,13 @@ dependencies {
         exclude group: 'org.slf4j', module: '*'
     }
     implementation project(':com.etendorx.lib.asyncprocess')
-    implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 }
 
 ext {
-    set('springCloudVersion', "2021.0.8")
+    set('springCloudVersion', "2022.0.4")
 }
 
 dependencyManagement {

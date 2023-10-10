@@ -278,7 +278,8 @@ public class GenerateEntitiesApplication {
       // 'feign clients' (to make the http request to the DAS) should contain the 'searches' query's
       // Each metadata object should be created from each module.
 
-      generateBaseEntityRx(new HashMap<>(), pathEntitiesRx, baseRXObject, packageEntities);
+      generateBaseEntityRx(new HashMap<>(), pathEntitiesRx, baseRXObject, packageEntities, "baseEntityRx.ftl");
+      generateBaseEntityRx(new HashMap<>(), pathEntitiesRx, "BaseRXRepository", packageEntities, "baseRxRepository.ftl");
 
       GenerateProtoFile generateProtoFile = new GenerateProtoFile();
       generateProtoFile.setEntitiesModel(entities);
@@ -364,12 +365,12 @@ public class GenerateEntitiesApplication {
     TemplateUtil.processTemplate(templateJPARepoRX, data, outWriterRepo);
   }
 
-  private void generateBaseEntityRx(Map<String, Object> data, String pathEntitiesRx, String className, String packageName) throws FileNotFoundException {
+  private void generateBaseEntityRx(Map<String, Object> data, String pathEntitiesRx, String className, String packageName, String template) throws FileNotFoundException {
     final String fullPathEntities = pathEntitiesRx + "/src/main/entities/" + packageName.replace(".", "/");
     var classfileName = className + ".java";
     var outFile = new File(fullPathEntities, classfileName);
     new File(outFile.getParent()).mkdirs();
-    String ftlFileNameRX = "/org/openbravo/base/gen/baseEntityRx.ftl";
+    String ftlFileNameRX = "/org/openbravo/base/gen/" + template;
     freemarker.template.Template templateRX = TemplateUtil.createTemplateImplementation(
       ftlFileNameRX);
     Writer outWriter = new BufferedWriter(
@@ -568,9 +569,6 @@ public class GenerateEntitiesApplication {
     // This is the case where the 'metadata' only contains repositories searches, and a feign client should be created.
     // In other case, use the defined 'user' projection entity. (The feign client will extend from the entity defined by the user or a default one.)
 
-    freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(
-      FTL_FILE_NAME_CLIENTREST);
-
     String fullPathClientRestGen = MetadataUtil.getBasePackageGenLocationPath(projection.getModuleLocation()) + File.separator + MetadataUtil.CLIENTREST_PACKAGE;
     final String clientRestClassNameGen = data.get("newClassName") + "ClientRest.java";
 
@@ -601,9 +599,6 @@ public class GenerateEntitiesApplication {
     String packageClientRestProjected = projection.getModuleLocation().getName() + "." + MetadataUtil.CLIENTREST_PACKAGE;
     data.put("packageClientRestProjected", packageClientRestProjected);
 
-    Writer outWriterClientRest = new BufferedWriter(
-      new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
-    TemplateUtil.processTemplate(templateClientRestRX, data, outWriterClientRest);
   }
 
   private void addClassInGenerated(FileOutputStream excludedFilter, Entity entity, String suffix) {

@@ -1,5 +1,7 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
-    id 'org.springframework.boot'
+    id 'org.springframework.boot' apply false
     id 'io.spring.dependency-management'
     id 'java'
     id 'maven-publish'
@@ -7,7 +9,7 @@ plugins {
 
 group = 'com.etendorx'
 version = "$gradle.ext.version"
-sourceCompatibility = '11'
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -48,8 +50,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'javax.persistence:javax.persistence-api:2.2'
 
 }
 
@@ -57,3 +59,8 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom SpringBootPlugin.BOM_COORDINATES
+    }
+}
