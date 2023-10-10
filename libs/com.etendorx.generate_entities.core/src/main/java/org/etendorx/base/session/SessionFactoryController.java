@@ -16,7 +16,7 @@
 
 package org.etendorx.base.session;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.exception.OBException;
@@ -26,8 +26,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.dialect.PostgreSQL82Dialect;
-import org.hibernate.dialect.function.SQLFunction;
+import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.service.Service;
@@ -210,17 +210,14 @@ public abstract class SessionFactoryController {
   }
 
   private void registerSqlFunctions() {
-    Map<String, SQLFunction> sqlFunctions = getSQLFunctions();
-    if (sqlFunctions == null || sqlFunctions.isEmpty()) {
-      return;
-    }
-    for (Entry<String, SQLFunction> entry : sqlFunctions.entrySet()) {
+    Map<String, StandardSQLFunction> sqlFunctions = getSQLFunctions();
+    for (Entry<String, StandardSQLFunction> entry : sqlFunctions.entrySet()) {
       log.debug("Registering SQL function: {}", entry.getKey());
       configuration.addSqlFunction(entry.getKey(), entry.getValue());
     }
   }
 
-  protected Map<String, SQLFunction> getSQLFunctions() {
+  protected Map<String, StandardSQLFunction> getSQLFunctions() {
     return Collections.emptyMap();
   }
 
@@ -269,7 +266,7 @@ public abstract class SessionFactoryController {
   private Properties getPostgresHbProps(Properties obProps) {
     isPostgresDatabase = true;
     final Properties props = new Properties();
-    props.setProperty(AvailableSettings.DIALECT, PostgreSQL82Dialect.class.getName());
+    props.setProperty(AvailableSettings.DIALECT, PostgreSQLDialect.class.getName());
     if (isJNDIModeOn(obProps)) {
       setJNDI(obProps, props);
     } else {

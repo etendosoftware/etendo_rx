@@ -1,12 +1,14 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
-    id 'org.springframework.boot'
+    id 'org.springframework.boot' apply false
     id 'io.spring.dependency-management'
     id 'java'
 }
 
 group = 'com.etendorx.entitiesModel'
 version = "$gradle.ext.version"
-sourceCompatibility = '11'
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -15,19 +17,17 @@ repositories {
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.22'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation project(':com.etendorx.clientrest_core')
-//	implementation project(':com.etendorx.clientrest')
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
 ext {
-    set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2022.0.4")
 }
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom SpringBootPlugin.BOM_COORDINATES
     }
 }

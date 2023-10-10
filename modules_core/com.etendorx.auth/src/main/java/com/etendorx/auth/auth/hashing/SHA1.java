@@ -22,6 +22,8 @@ package com.etendorx.auth.auth.hashing;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Passwords are hashed with SHA-1 algorithm represented as a {@code String} encoded in base 64.
  * <p>
@@ -39,7 +41,7 @@ class SHA1 extends HashingAlgorithm {
 
   @Override
   protected boolean check(String plainTextPassword, String hashedPassword) {
-    return hash(plainTextPassword, null).equals(hashedPassword);
+    return plainTextPassword != null && hashedPassword != null && StringUtils.equals(hash(plainTextPassword, null), hashedPassword);
   }
 
   @Override
@@ -49,7 +51,7 @@ class SHA1 extends HashingAlgorithm {
 
   @Override
   protected String generateHash(String password) {
-    return hash(password, null);
+    return password == null ? null : hash(password, null);
   }
 
 }

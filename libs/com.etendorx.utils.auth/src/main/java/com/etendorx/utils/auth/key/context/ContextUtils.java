@@ -18,19 +18,20 @@ package com.etendorx.utils.auth.key.context;
 
 import com.etendorx.utils.auth.key.JwtKeyUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.List;
 import java.util.Map;
 
 public class ContextUtils {
 
-  public static Map<String, Object> getTokenValues(HttpServletRequest request) {
+  public static Map<String, Object> getTokenValues(String publicKey, HttpServletRequest request) {
     String tokenHeader = request.getHeaders("X-TOKEN").nextElement();
-    return getTokenValues(tokenHeader);
+    return getTokenValues(publicKey, tokenHeader);
   }
 
-  public static Map<String, Object> getTokenValues(String token) {
-    Map<String, Object> tokenValuesMap = JwtKeyUtils.getTokenValues(token);
+  public static Map<String, Object> getTokenValues(String publicKey, String token) {
+    Map<String, Object> tokenValuesMap = JwtKeyUtils.getTokenValues(publicKey, token);
     JwtKeyUtils.validateTokenValues(tokenValuesMap,
         List.of(JwtKeyUtils.USER_ID_CLAIM, JwtKeyUtils.CLIENT_ID_CLAIM, JwtKeyUtils.ORG_ID,
             JwtKeyUtils.ROLE_ID, JwtKeyUtils.SERVICE_ID));

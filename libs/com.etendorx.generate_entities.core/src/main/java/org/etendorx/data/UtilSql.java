@@ -20,7 +20,11 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class UtilSql {
+  protected static Logger log4j = LogManager.getLogger();
   public UtilSql() {
   }
 
@@ -57,7 +61,7 @@ public class UtilSql {
 
       return true;
     } catch (Exception var7) {
-      var7.printStackTrace();
+      log4j.error("SQL sentence assignment fails {}", var7);
       return false;
     }
   }

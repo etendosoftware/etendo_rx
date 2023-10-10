@@ -16,7 +16,7 @@
 
 package org.etendorx.base.session;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dom4j.Document;
@@ -112,12 +112,10 @@ public class OBPropertiesProvider {
   }
 
   public void setProperties(String fileLocation) {
-    log.debug("Setting Openbravo.properties through file: " + fileLocation);
+    log.debug("Setting Openbravo.properties through file: {}", fileLocation);
     obProperties = new Properties();
-    try {
-      final FileInputStream fis = new FileInputStream(fileLocation);
+    try(FileInputStream fis = new FileInputStream(fileLocation)) {
       obProperties.load(fis);
-      fis.close();
     } catch (final Exception e) {
       throw new OBException(e);
     }

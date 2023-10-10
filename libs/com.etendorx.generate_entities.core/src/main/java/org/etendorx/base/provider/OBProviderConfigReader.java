@@ -49,9 +49,9 @@ class OBProviderConfigReader {
   }
 
   void read(String prefix, String fileLocation) {
-    try {
+    try(FileInputStream fis = new FileInputStream(fileLocation)) {
       final SAXReader reader = XMLUtil.getInstance().newSAXReader();
-      final Document doc = reader.read(new FileInputStream(fileLocation));
+      final Document doc = reader.read(fis);
       process(prefix, doc);
     } catch (final Exception e) {
       throw new OBProviderException(e);

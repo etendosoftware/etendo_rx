@@ -24,7 +24,7 @@
  */
 package ${packageJPARepo};
 
-import com.etendorx.entities.entities.BaseDASRepository;
+import com.etendorx.entities.entities.BaseRXRepository;
 import ${entity.getPackageName()}.${entity.simpleClassName}DefaultProjection;
 import ${entity.getPackageName()}.${entity.simpleClassName};
 import org.springframework.data.domain.Page;
@@ -41,7 +41,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  *
  */
 @RepositoryRestResource(excerptProjection = ${entity.simpleClassName}DefaultProjection.class, path = "${entity.name}")
-public interface ${entity.name}Repository extends BaseDASRepository<${entity.simpleClassName}>{
+public interface ${entity.name}Repository extends BaseRXRepository<${entity.simpleClassName}, String>{
     <#if searches??>
 
     <#list searches as s>

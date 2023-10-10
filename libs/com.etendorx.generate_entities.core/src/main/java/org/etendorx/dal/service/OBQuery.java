@@ -168,8 +168,10 @@ public class OBQuery<E extends BaseOBObject> {
       final int index = qryStr.indexOf(FROM_SPACED) + FROM_SPACED.length();
       qryStr = qryStr.substring(index);
     }
-    final Query<Number> qry = getSession().createQuery("select count(*) " + FROM_SPACED + qryStr,
-      Number.class);
+    String sql = "select count(*) " +
+        FROM_SPACED +
+        qryStr;
+    final Query<Number> qry = getSession().createQuery(sql, Number.class);
     setParameters(qry);
     return qry.uniqueResult().intValue();
   }
@@ -235,7 +237,7 @@ public class OBQuery<E extends BaseOBObject> {
     StringBuilder deleteClause = new StringBuilder();
     try {
       deleteClause.append("DELETE FROM ");
-      deleteClause.append(getEntity().getName() + " ");
+      deleteClause.append(getEntity().getName()).append(" ");
       deleteClause.append(whereClause);
       final Query qry = getSession().createQuery(deleteClause.toString());
       setParameters(qry);
@@ -413,47 +415,9 @@ public class OBQuery<E extends BaseOBObject> {
         "" :
         "select " + selectClause + " ") + "from " + getEntity().getName() + " " + aliasJoinClause + " " + whereClause + orderByClause;
     }
-    log.debug("Created query string " + result);
+    log.debug("Created query string {}", result);
     return result;
   }
-/*
-  private String addOrgClientActiveFilter(String paramWhereClause, String prefix) {
-    String whereClause = paramWhereClause;
-    final OBContext obContext = OBContext.getOBContext();
-    boolean addWhereClause = !whereClause.toLowerCase().contains(" where ");
-    if (isFilterOnReadableOrganization() && entity.isOrganizationPartOfKey()) {
-      whereClause = (addWhereClause ? " where " : "") + addAnd(whereClause) + prefix
-          + "id.organization.id in (:" + DAL_ORG_FILTER + ")";
-      setNamedParameter(DAL_ORG_FILTER, obContext.getReadableOrganizations());
-      if (addWhereClause) {
-        addWhereClause = false;
-      }
-    } else if (isFilterOnReadableOrganization() && entity.isOrganizationEnabled()) {
-      whereClause = (addWhereClause ? " where " : "") + addAnd(whereClause) + prefix
-          + "organization.id in (:" + DAL_ORG_FILTER + ")";
-      setNamedParameter(DAL_ORG_FILTER, obContext.getReadableOrganizations());
-      if (addWhereClause) {
-        addWhereClause = false;
-      }
-    }
-
-    if (isFilterOnReadableClients() && getEntity().isClientEnabled()) {
-      whereClause = (addWhereClause ? " where " : "") + addAnd(whereClause) + prefix
-          + "client.id in (:" + DAL_CLIENT_FILTER + ")";
-      setNamedParameter(DAL_CLIENT_FILTER, obContext.getReadableClients());
-      if (addWhereClause) {
-        addWhereClause = false;
-      }
-    }
-
-    if (isFilterOnActive() && entity.isActiveEnabled()) {
-      whereClause = (addWhereClause ? " where " : "") + addAnd(whereClause) + prefix
-          + "active='Y' ";
-    }
-    return whereClause;
-  }
-
- */
 
   private String addAnd(String whereClause) {
     if (whereClause.trim().length() > 0) {

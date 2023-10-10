@@ -2,9 +2,8 @@ package com.etendorx.das.handler;
 
 import java.util.Date;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;

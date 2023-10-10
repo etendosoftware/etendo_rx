@@ -1,5 +1,6 @@
 package com.etendorx.utils.auth.key;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -18,16 +19,15 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
+import org.springframework.beans.factory.annotation.Value;
 
 public class JwtKeyUtils {
 
@@ -39,6 +39,8 @@ public class JwtKeyUtils {
   public static final String ROLE_ID = "ad_role_id";
   public static final String SERVICE_SEARCH_KEY = "search_key";
   public static final String SERVICE_ID = "service_id";
+  @Value("${public-key:}")
+  String publicKey;
 
   /**
    * Generates a {@link PrivateKey} from a key String
@@ -87,7 +89,7 @@ public class JwtKeyUtils {
   }
 
   public static Claims getJwtClaims(PublicKey publicKey, String jwt) {
-    return Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt).getBody();
+    return Jwts.parser().setSigningKey(publicKey).build().parseClaimsJws(jwt).getBody();
   }
 
   public static <T extends Key> T readKey(String originalKey, String spec, Function<String, EncodedKeySpec> keySpec, BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator) {
@@ -129,9 +131,9 @@ public class JwtKeyUtils {
     return key.replaceAll("\\s+", "");
   }
 
-  public static Claims parseUnsignedToken(String token) {
-    String[] splitToken = token.split("\\.");
-    return (Claims) Jwts.parser().parse(splitToken[0] + "." + splitToken[1] + ".").getBody();
+  public static Claims parseUnsignedToken(String publicKey, String token) {
+    PublicKey pk = JwtKeyUtils.readPublicKey(publicKey);
+    return JwtKeyUtils.getJwtClaims(pk, token);
   }
 
   public static String generateJwtToken(PrivateKey privateKey, Claims claims, String iss) {
@@ -143,9 +145,9 @@ public class JwtKeyUtils {
       .compact();
   }
 
-  public static Map<String, Object> getTokenValues(String token) {
+  public static Map<String, Object> getTokenValues(String publicKey, String token) {
     try {
-      return new HashMap<>(parseUnsignedToken(token));
+      return new HashMap<>(parseUnsignedToken(publicKey, token));
     } catch (Exception e) {
       logger.error("Error parsing the token '{}' - {}", token, e.getMessage());
       throw new IllegalArgumentException(e);
@@ -162,7 +164,8 @@ public class JwtKeyUtils {
 
   public static Claims generateUserClaims(String userId, String clientId, String orgId,
                                           String roleId, String searchKey, String serviceId) {
-    Claims claims = new DefaultClaims();
+    Map<String, Object> map = new HashMap<>();
+    Claims claims = new DefaultClaims(map);
     claims.put(USER_ID_CLAIM, userId);
     claims.put(CLIENT_ID_CLAIM, clientId);
     claims.put(ORG_ID, orgId);

@@ -21,13 +21,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -50,6 +50,8 @@ public class FilterContext extends OncePerRequestFilter {
   private UserContext userContext;
   @Autowired(required = false)
   private Set<AllowedURIS> allowedURIS;
+  @Value("${public-key:}")
+  String publicKey;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -73,16 +75,16 @@ public class FilterContext extends OncePerRequestFilter {
   }
 
   public void setUserContextFromToken(String token, HttpServletRequest request) {
-    setUserContextFromToken(userContext, token, request);
+    setUserContextFromToken(userContext, publicKey, token, request);
   }
 
-  public static void setUserContextFromToken(UserContext userContext, String token, HttpServletRequest req) {
+  public static void setUserContextFromToken(UserContext userContext, String publicKey, String token, HttpServletRequest req) {
     String noActiveFilterParameter = req.getParameter(NO_ACTIVE_FILTER_PARAMETER);
     String triggerEnabledParam = req.getParameter(TRIGGER_ENABLED_PARAMETER);
     String dateFormatParam = req.getParameter(DATE_FORMAT_PARAMETER);
     String timeZoneParam = req.getParameter(TIME_ZONE_PARAMETER);
     String restMethod = req.getMethod();
-    Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(token);
+    Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(publicKey, token);
     userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
     userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
     userContext.setOrganizationId((String) tokenValuesMap.get(JwtKeyUtils.ORG_ID));

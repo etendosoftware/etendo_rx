@@ -51,11 +51,10 @@ class DefaultFiltersTest {
     @Test
     void testAddFiltersAuthServiceBypass() {
         // Arrange
-        String userId = null;
         boolean isActive = true;
 
         // Act
-        String result = DefaultFilters.addFilters(SELECT_QUERY, userId, USER_ID_123, ROLE_ID_789, isActive, REST_METHOD_GET);
+        String result = DefaultFilters.addFilters(SELECT_QUERY, null, USER_ID_123, ROLE_ID_789, isActive, REST_METHOD_GET);
 
         // Assert
         Assertions.assertEquals(SELECT_QUERY, result);
