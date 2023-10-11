@@ -52,7 +52,6 @@ configurations {
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.jetbrains:annotations:23.0.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
@@ -67,7 +66,6 @@ dependencies {
     compileOnly project(':com.etendorx.entities')
     codegen project(':com.etendorx.entities')
     implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
-    codegen project(':com.etendorx.grpc.common')
     implementation 'com.google.protobuf:protobuf-java-util:3.19.4'
     implementation(project(':com.etendorx.utils.auth')) {
         exclude group: 'org.slf4j', module: '*'
@@ -93,10 +91,13 @@ dependencies {
         testImplementation 'io.grpc:grpc-testing:1.49.0'
         testImplementation 'io.github.lognet:grpc-spring-boot-starter:4.6.0'
     }
+    if(project.hasProperty('data-rest.enabled') && project.property('data-rest.enabled') == "true") {
+        implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
+    }
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // Swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 }
 
 var directories = ["libs", "modules_core", "modules_gen", "modules_test", "modules"]

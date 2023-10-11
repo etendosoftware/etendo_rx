@@ -20,12 +20,14 @@ public class GenerateClientRestRX implements EntityGenerator {
 
   /**
    * Generates the entity
+   *
    * @param data
    * @param path
+   * @param dataRestEnabled
    * @throws FileNotFoundException
    */
   @Override
-  public void generate(Map<String, Object> data, GeneratePaths path) throws FileNotFoundException {
+  public void generate(Map<String, Object> data, GeneratePaths path, boolean dataRestEnabled) throws FileNotFoundException {
     String pathClientRestRx = path.pathEtendoRx + File.separator + MODULES_GEN + File.separator + "com.etendorx.entitiesModel";
     String ftlFileNameClientRest = "/org/openbravo/base/gen/clientRestRX.ftl";
     freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(

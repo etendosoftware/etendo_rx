@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
     id 'java'
+    id("org.springdoc.openapi-gradle-plugin") version "1.7.0"
 }
 
 group = 'com.etendorx.entities'
@@ -24,10 +25,14 @@ dependencies {
     //testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.1'
     implementation 'org.springframework:spring-web'
-    implementation 'org.springframework.data:spring-data-rest-core'
     implementation project(':com.etendorx.das_core')
     bundle(project(':com.etendorx.das_core')) {
         exclude group: '*', module: "*"
+    }
+    implementation 'com.jayway.jsonpath:json-path:2.8.0'
+
+    if(project.hasProperty('data-rest.enabled') && project.property('data-rest.enabled') == "true") {
+        implementation 'org.springframework.data:spring-data-rest-core'
     }
 }
 

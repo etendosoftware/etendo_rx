@@ -4,9 +4,6 @@ import java.util.Date;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
-import org.springframework.data.rest.core.annotation.HandleBeforeSave;
-import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.stereotype.Component;
 
 import com.etendorx.entities.entities.BaseRXObject;
@@ -17,7 +14,6 @@ import com.etendorx.utils.auth.key.context.UserContext;
 
 import lombok.extern.slf4j.Slf4j;
 
-@RepositoryEventHandler
 @Slf4j
 @Component
 public class EventHandlerEntities {
@@ -37,7 +33,6 @@ public class EventHandlerEntities {
     return userContext;
   }
 
-  @HandleBeforeCreate
   public void handleBeforeCreate(BaseRXObject entity) {
     log.info("handleBeforeCreate {}", entity);
     UserContext userContext = getUserContext();
@@ -63,7 +58,6 @@ public class EventHandlerEntities {
     entity.setActive(true);
   }
 
-  @HandleBeforeSave
   public void handleBeforeSave(BaseRXObject entity) {
     log.info("handleBeforeSave {}", entity);
     UserContext userContext = getUserContext();

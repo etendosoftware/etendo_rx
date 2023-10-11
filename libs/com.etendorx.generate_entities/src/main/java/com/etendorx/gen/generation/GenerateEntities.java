@@ -114,6 +114,7 @@ public class GenerateEntities {
     final boolean generateRxCode = Boolean.parseBoolean(obProperties.getProperty("rx.generateCode"));
     final boolean computedColumns = Boolean.parseBoolean(obProperties.getProperty("rx.computedColumns"));
     final boolean includeViews = Boolean.parseBoolean(obProperties.getProperty("rx.views"));
+    final boolean dataRestEnabled = Boolean.parseBoolean(obProperties.getProperty("data-rest.enabled"));
 
     log.info("Generate Etendo Rx Code={}", generateRxCode);
     log.info("Path Project Rx={}", pathEtendoRx);
@@ -131,7 +132,7 @@ public class GenerateEntities {
         }
         if (generateRxCode && !entity.isVirtualEntity() && (includeViews || !entity.isView())) {
           var data = TemplateUtil.getModelData(paths, entity, getSearchesMap(entity), computedColumns, includeViews);
-          generateEntityCode(data, paths, generators);
+          generateEntityCode(data, paths, generators, dataRestEnabled);
           generateMappingCode(entity, paths, mappingGenerators);
         }
       }
@@ -176,9 +177,9 @@ public class GenerateEntities {
   }
 
   private void generateEntityCode(Map<String, Object> data, GeneratePaths paths,
-      List<EntityGenerator> generators) throws FileNotFoundException {
+      List<EntityGenerator> generators, boolean dataRestEnabled) throws FileNotFoundException {
     for (EntityGenerator generator : generators) {
-      generator.generate(data, paths);
+      generator.generate(data, paths, dataRestEnabled);
     }
   }
 

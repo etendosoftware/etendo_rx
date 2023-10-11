@@ -9,10 +9,12 @@ public interface EntityGenerator {
 
   /**
    * Generates the entity
+   *
    * @param data
    * @param path
+   * @param dataRestEnabled
    * @throws FileNotFoundException
    */
-  void generate(Map<String, Object> data, GeneratePaths path) throws FileNotFoundException;
+  void generate(Map<String, Object> data, GeneratePaths path, boolean dataRestEnabled) throws FileNotFoundException;
 
 }

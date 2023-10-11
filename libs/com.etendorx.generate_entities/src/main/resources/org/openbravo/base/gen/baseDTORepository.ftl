@@ -56,8 +56,8 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   }
 
   public E findById(String id) {
-    var entity = repository.findById(id);
-    return entity.map(converter::convert).orElse(null);
+    var entity = retriever.get(id);
+    return converter.convert(entity);
   }
 
   @Override
