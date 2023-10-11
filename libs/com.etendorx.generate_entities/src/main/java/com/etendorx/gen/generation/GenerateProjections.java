@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.ModelProvider;
 import org.openbravo.base.model.Table;
@@ -38,7 +38,7 @@ public class GenerateProjections implements EntityGenerator {
         new GenerateProjectedEntities().generate(path, data, projection);
         if (!projection.getReact()) {
           if (!StringUtils.equals(GenerateEntitiesConstants.PROJECTION_DEFAULT, projection.getName())) {
-            new GenerateClientRest().generate(path, data, projection);
+            //new GenerateClientRest().generate(path, data, projection);
           }
         } else {
           new GenerateReactCode().generate(path, data, projection);

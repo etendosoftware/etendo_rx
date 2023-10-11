@@ -18,6 +18,7 @@ package com.etendorx.entities.entities;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Convert;
 import lombok.Getter;
 import lombok.Setter;

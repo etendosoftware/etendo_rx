@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.etendorx.eventhandler.AnnotatedEventHandlerListenerInvoker;
 
-@Configuration
-@ConditionalOnClass(EntityManagerFactory.class)
+//@Configuration
+//@ConditionalOnClass(EntityManagerFactory.class)
 public class EventHandlerAutoConfiguration {
 
   @Autowired

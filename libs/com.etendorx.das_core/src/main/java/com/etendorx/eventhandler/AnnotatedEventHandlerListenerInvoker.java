@@ -55,7 +55,7 @@ public class AnnotatedEventHandlerListenerInvoker implements
   }
 
   @Override
-  public boolean requiresPostCommitHanding(EntityPersister entityPersister) {
+  public boolean requiresPostCommitHandling(EntityPersister persister) {
     return false;
   }
 
