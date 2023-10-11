@@ -52,7 +52,6 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.13.0'
     // Feign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     implementation 'io.github.openfeign:feign-okhttp'

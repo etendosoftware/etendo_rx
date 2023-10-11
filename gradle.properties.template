@@ -35,3 +35,5 @@ rx.generateCode=true
 
 rx.computedColumns=true
 rx.views=true
+
+grpc.enabled=false
