@@ -79,7 +79,7 @@ public class AuthService {
    */
   public UserModel validateCredentials(String username, String password) {
     log.debug("Sending request to the DAS server.");
-    UserModel userModel = restUtils.getEntity("/AUTHADUser/" + username, UserModel.class);
+    UserModel userModel = restUtils.getEntity("/auth/ADUser/" + username, UserModel.class);
     if (!PasswordHash.matches(password, userModel.getPassword())) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_MESSAGE);
     }

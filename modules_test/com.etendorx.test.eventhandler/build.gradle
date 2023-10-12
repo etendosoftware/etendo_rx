@@ -1,5 +1,7 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
-    id 'org.springframework.boot'
+    id 'org.springframework.boot' apply false
     id 'io.spring.dependency-management'
     id 'java'
     id 'idea'
@@ -15,13 +17,14 @@ repositories {
 }
 
 ext {
-    set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2022.0.4")
     includeInDasDependencies = true
 }
 
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom SpringBootPlugin.BOM_COORDINATES
     }
 }
 
@@ -53,5 +56,4 @@ tasks.named('test') {
 }
 
 springBoot {
-    buildInfo()
 }

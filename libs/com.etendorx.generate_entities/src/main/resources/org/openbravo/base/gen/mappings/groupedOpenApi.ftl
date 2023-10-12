@@ -38,7 +38,7 @@ public class OpenApiConfig {
 
 
   @Bean
-  public OpenAPI customOpenAPI(@Value("${"$"}{springdoc.version}") String appVersion) {
+  public OpenAPI customOpenAPI(@Value("${"$"}{springdoc.version:}") String appVersion) {
     return new OpenAPI().components(new Components().addSecuritySchemes("basicScheme",
                 new SecurityScheme()
                     .type(SecurityScheme.Type.APIKEY)

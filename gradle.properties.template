@@ -38,3 +38,6 @@ rx.views=true
 
 grpc.enabled=false
 data-rest.enabled=false
+
+springdoc.show-actuator=true
+

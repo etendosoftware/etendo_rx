@@ -93,6 +93,8 @@ dependencies {
     }
     if(project.hasProperty('data-rest.enabled') && project.property('data-rest.enabled') == "true") {
         implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
+    } else {
+        testImplementation 'org.springframework.data:spring-data-rest-core:4.1.4'
     }
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
