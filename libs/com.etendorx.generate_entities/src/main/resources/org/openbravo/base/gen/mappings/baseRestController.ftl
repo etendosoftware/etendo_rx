@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${mappingPrefix}${entity.name}")
+@RequestMapping("/${mappingPrefix?lower_case}/${entity.name}")
 public class ${mappingPrefix}${entity.name}RestController extends BindedRestController<${mappingPrefix}${entity.name}DTORead, ${mappingPrefix}${entity.name}DTOWrite> {
 
   public ${mappingPrefix}${entity.name}RestController(
