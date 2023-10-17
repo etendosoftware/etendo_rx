@@ -2,6 +2,7 @@
 repositoryUser=
 repositoryPassword=
 repositoryUrl=https://maven.pkg.github.com/etendosoftware/etendo_rx
+pluginRepositoryUrl=https://maven.pkg.github.com/etendosoftware/com.etendorx.gradlepluginrx
 
 # Github credentials for downloading the plugin
 githubUser=
@@ -34,3 +35,9 @@ rx.generateCode=true
 
 rx.computedColumns=true
 rx.views=true
+
+grpc.enabled=false
+data-rest.enabled=false
+
+springdoc.show-actuator=true
+

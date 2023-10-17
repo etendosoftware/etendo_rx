@@ -21,13 +21,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -50,6 +50,8 @@ public class FilterContext extends OncePerRequestFilter {
   private UserContext userContext;
   @Autowired(required = false)
   private Set<AllowedURIS> allowedURIS;
+  @Value("${public-key:}")
+  String publicKey;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -73,7 +75,7 @@ public class FilterContext extends OncePerRequestFilter {
   }
 
   public void setUserContextFromToken(String token, HttpServletRequest request) {
-    setUserContextFromToken(userContext, token, request);
+    setUserContextFromToken(userContext, publicKey, token, request);
   }
 
 

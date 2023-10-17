@@ -24,6 +24,7 @@ import org.openbravo.base.model.Module;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -105,7 +106,7 @@ public class OBConfigFileProvider implements OBSingleton {
   // main config file
   // TODO: add searching at the root of the classpath
   protected void readModuleConfigsFromFile() {
-    log.debug("Reading from fileLocation " + fileLocation);
+    log.debug("Reading from fileLocation {}", fileLocation);
     // find the parent
     try {
       File providerDir = new File(fileLocation);
@@ -136,19 +137,20 @@ public class OBConfigFileProvider implements OBSingleton {
           }
         }
       }
-    } catch (final Throwable t) {
+    } catch (final Exception t) {
       log.error(t.getMessage(), t);
     }
   }
 
   protected void readModuleConfigsFromClassPath() {
+    InputStream is = null;
     try {
       if (classPathLocation.endsWith("/")) {
         log.warn("Classpathlocation of config file should not end with /");
-        classPathLocation = classPathLocation.substring(0, classPathLocation.length());
+        classPathLocation = classPathLocation.substring(0, classPathLocation.length() - 1);
       }
 
-      final InputStream is = getResourceAsStream(
+      is = getResourceAsStream(
         classPathLocation + "/" + org.etendorx.base.provider.OBProvider.CONFIG_FILE_NAME);
       if (is != null) {
         org.etendorx.base.provider.OBProvider.getInstance().register("", is);
@@ -159,15 +161,30 @@ public class OBConfigFileProvider implements OBSingleton {
           continue;
         }
         final String configLoc = classPathLocation + "/" + module.getJavaPackage() + CUSTOM_POSTFIX;
-        final InputStream cis = getResourceAsStream(configLoc);
-        if (cis != null) {
-          log.info("Found provider config file " + configLoc);
-          org.etendorx.base.provider.OBProvider.getInstance()
-            .register(module.getJavaPackage(), cis);
+        registerConfiguration(module, configLoc);
+      }
+    } catch (final Exception t) {
+      log.error(t.getMessage(), t);
+    } finally {
+      if(is != null) {
+        try {
+          is.close();
+        } catch (final IOException e) {
+          log.error(e.getMessage(), e);
         }
       }
-    } catch (final Throwable t) {
-      log.error(t.getMessage(), t);
+    }
+  }
+
+  private void registerConfiguration(Module module, String configLoc) {
+    try(InputStream cis = getResourceAsStream(configLoc)) {
+      if (cis != null) {
+        log.info("Found provider config file {}", configLoc);
+        OBProvider.getInstance()
+            .register(module.getJavaPackage(), cis);
+      }
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
     }
   }
 

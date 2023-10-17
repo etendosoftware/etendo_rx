@@ -19,8 +19,6 @@ package com.etendorx.entities.jparepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
 import com.etendorx.clientrest.base.ClientRestBase;
-import com.etendorx.clientrest.base.FeignConfiguration;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable;
  * ${projectionName?cap_first} ${newClassName} Projection Class
  *
  */
-@FeignClient(name = "${newClassName}${projectionName?cap_first}", url = "${"$"}{das.url}/cBpartners", configuration = FeignConfiguration.class)
 @Projection(name = "${projectionName?pluralize}", types = ${packageName}.${entity.getPackageName()}.${newClassName}.class)
 public interface ${newClassName}ClientRest {
 <#list entity.properties as p><#compress>

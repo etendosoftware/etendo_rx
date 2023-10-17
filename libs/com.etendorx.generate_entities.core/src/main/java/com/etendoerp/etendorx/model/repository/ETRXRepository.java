@@ -2,7 +2,8 @@ package com.etendoerp.etendorx.model.repository;
 
 import com.etendoerp.etendorx.model.ETRXModule;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import org.apache.commons.lang.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.openbravo.base.model.ModelObject;
 import org.openbravo.base.model.Table;
 

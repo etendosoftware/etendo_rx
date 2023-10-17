@@ -153,7 +153,7 @@ public class XMLEntityConverter extends BaseXMLEntityConverter {
       return null;
     }
     try {
-      log.debug("Converting entity " + entityName);
+      log.debug("Converting entity {}", entityName);
       final boolean hasReferenceAttribute = obElement.attributeValue(
         XMLConstants.REFERENCE_ATTRIBUTE) != null;
 
@@ -222,10 +222,11 @@ public class XMLEntityConverter extends BaseXMLEntityConverter {
           final Property p = entity.getProperty(childElement.getName(), false);
           if (p == null) {
             log.warn(
-              "Trying to set property " + childElement.getName() + " in entity " + entity.getName() + ". Cannot find property in entity, skipping it.");
+              "Trying to set property {} in entity {}. Cannot find property in entity, skipping it.",
+                childElement.getName(), entity.getName());
             continue;
           }
-          log.debug(">>> Exporting property " + p.getName());
+          log.debug(">>> Exporting property {}", p.getName());
 
           // TODO: make this option controlled
           final boolean isNotImportableProperty = p.isTransient(
@@ -233,7 +234,7 @@ public class XMLEntityConverter extends BaseXMLEntityConverter {
             .isVirtualEntity() || p.isComputedColumn();
 
           if (isNotImportableProperty) {
-            log.debug("Property " + p + " is inactive, transient or auditinfo, " + "ignoring it");
+            log.debug("Property {} is inactive, transient or auditinfo, ignoring it", p);
             continue;
           }
 
@@ -253,7 +254,7 @@ public class XMLEntityConverter extends BaseXMLEntityConverter {
             // correct the value
             newValue = replaceValue(bob, p, newValue);
 
-            log.debug("Primitive property with value " + newValue);
+            log.debug("Primitive property with value {}", newValue);
 
             // only update if changed
             if ((currentValue == null && newValue != null) || (currentValue != null && newValue == null) || (currentValue != null && newValue != null && !currentValue.equals(
@@ -307,7 +308,7 @@ public class XMLEntityConverter extends BaseXMLEntityConverter {
             final boolean hasChanged = (currentValue == null && newValue != null) || (currentValue != null && newValue == null) || (currentValue != null && newValue != null && !currentValue.equals(
               newValue));
             if (hasChanged) {
-              log.debug("Setting value " + newValue);
+              log.debug("Setting value {}", newValue);
               if (!preventRealUpdate) {
                 bob.set(p.getName(), newValue);
                 updated = true;

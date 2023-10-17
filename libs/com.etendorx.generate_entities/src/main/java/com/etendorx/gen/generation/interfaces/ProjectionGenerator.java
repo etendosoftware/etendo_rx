@@ -10,11 +10,13 @@ public interface ProjectionGenerator {
 
   /**
    * Generates the projection
+   *
    * @param paths
    * @param data
    * @param projection
+   * @param dataRestEnabled
    * @throws FileNotFoundException
    */
   void generate(GeneratePaths paths, Map<String, Object> data,
-      Projection projection) throws FileNotFoundException;
+      Projection projection, boolean dataRestEnabled) throws FileNotFoundException;
 }

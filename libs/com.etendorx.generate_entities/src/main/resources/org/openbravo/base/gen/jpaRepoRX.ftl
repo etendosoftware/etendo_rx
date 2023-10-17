@@ -25,14 +25,18 @@
 package ${packageJPARepo};
 
 import com.etendorx.entities.entities.BaseDASRepository;
+<#if dataRestEnabled == true>
 import ${entity.getPackageName()}.${entity.simpleClassName}DefaultProjection;
+</#if>
 import ${entity.getPackageName()}.${entity.simpleClassName};
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+<#if dataRestEnabled == true>
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+</#if>
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -40,7 +44,9 @@ import org.springframework.format.annotation.DateTimeFormat;
  * ${entity.simpleClassName} JPA CRUD Repository
  *
  */
+<#if dataRestEnabled == true>
 @RepositoryRestResource(excerptProjection = ${entity.simpleClassName}DefaultProjection.class, path = "${entity.name}")
+</#if>
 public interface ${entity.name}Repository extends BaseDASRepository<${entity.simpleClassName}>{
     <#if searches??>
 

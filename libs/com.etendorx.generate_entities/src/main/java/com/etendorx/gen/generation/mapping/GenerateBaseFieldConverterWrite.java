@@ -17,7 +17,7 @@ package com.etendorx.gen.generation.mapping;
 
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.generation.constants.MappingConstants;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class GenerateBaseFieldConverterWrite extends MappingGenerationBase {
   private static final String FTL_FILE = "/org/openbravo/base/gen/mappings/baseFieldConverterWrite.ftl"; // NOSONAR

@@ -24,7 +24,7 @@ import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,8 +58,8 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
 
   @Transactional
   public E findById(String id) {
-    var entity = repository.findById(id);
-    return entity.map(converter::convert).orElse(null);
+    var entity = retriever.get(id);
+    return converter.convert(entity);
   }
 
   @Override

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.collection.internal.PersistentBag;
+import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.stereotype.Component;
 
 import com.etendorx.entities.entities.BaseSerializableObject;

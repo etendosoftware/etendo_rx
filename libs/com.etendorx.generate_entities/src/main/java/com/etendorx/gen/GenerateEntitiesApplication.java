@@ -18,6 +18,13 @@ package com.etendorx.gen;
 
 import java.io.File;
 
+import com.etendorx.gen.commandline.CommandLineProcess;
+import com.etendorx.gen.process.GenerateMetadata;
+import com.etendorx.gen.process.GenerateProtoFile;
+import com.etendorx.gen.util.*;
+import freemarker.template.Template;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

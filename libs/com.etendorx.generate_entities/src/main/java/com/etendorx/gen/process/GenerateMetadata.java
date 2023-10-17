@@ -130,9 +130,9 @@ public class GenerateMetadata {
         metadataLocation.createNewFile();
       }
 
-      FileWriter writer = new FileWriter(metadataLocation, false);
-      writer.write(jsonMetadata);
-      writer.close();
+      try (FileWriter writer = new FileWriter(metadataLocation, false)) {
+        writer.write(jsonMetadata);
+      }
 
       log.info("Metadata generated for '{}' in: {}", moduleJavaPackage, metadataLocation.getAbsolutePath());
       return true;

@@ -43,7 +43,9 @@ public class JNDIConnectionProvider implements ConnectionProvider {
 
     try {
       Properties properties = new Properties();
-      properties.load(new FileInputStream(file));
+      try (FileInputStream fis = new FileInputStream(file)) {
+        properties.load(fis);
+      }
       String poolName = properties.getProperty("bbdd.poolName", "myPool");
       if (log4j.isDebugEnabled()) {
         log4j.debug("poolName: " + poolName);
@@ -87,22 +89,22 @@ public class JNDIConnectionProvider implements ConnectionProvider {
       }
 
       Connection con = null;
-
       try {
         log4j.info("Initializing connection...");
         con = ds.getConnection();
-        log4j.info(" Got connection" + con.toString());
-        PreparedStatement pstmt = con.prepareStatement(dbSessionConfig);
-        log4j.debug("Prepared statement with query: " + dbSessionConfig);
-        pstmt.executeQuery();
+        log4j.info(" Got connection {}",  con);
+        try(PreparedStatement pstmt = con.prepareStatement(dbSessionConfig)) {
+          log4j.debug("Prepared statement with query: {}", dbSessionConfig);
+          try(var ignored = pstmt.executeQuery()) {
+            log4j.debug("Executed query");
+          }
+        }
         log4j.debug("Connection initialized");
       } finally {
         if (con != null) {
           con.close();
         }
-
       }
-
       log4j.debug("Created JNDI ConnectionProvider");
     } catch (Exception var17) {
       log4j.error("Error creating JNDI connection", var17);
@@ -143,7 +145,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
         conn.close();
         return true;
       } catch (Exception var3) {
-        var3.printStackTrace();
+        log4j.error("Error releasing connection", var3);
         return false;
       }
     }
@@ -152,7 +154,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
   public Connection getTransactionConnection() throws NoConnectionAvailableException, SQLException {
     Connection conn = this.getConnection();
     if (conn == null) {
-      throw new NoConnectionAvailableException("Couldn´t get an available connection");
+      throw new NoConnectionAvailableException("Couldn't get an available connection");
     } else {
       conn.setAutoCommit(false);
       return conn;
@@ -347,9 +349,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
   }
 
   public String getStatus() {
-    StringBuffer strResultado = new StringBuffer();
-    strResultado.append("Not implemented yet");
-    return strResultado.toString();
+    return "Not implemented yet";
   }
 
   protected class PoolInfo implements Serializable {

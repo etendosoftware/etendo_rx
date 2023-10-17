@@ -18,14 +18,16 @@ public class GenerateReactCode implements ProjectionGenerator {
 
   /**
    * Generates the projections and the model projected for a React module
+   *
    * @param paths
    * @param data
    * @param projection
+   * @param dataRestEnabled
    * @throws FileNotFoundException
    */
   @Override
   public void generate(GeneratePaths paths, Map<String, Object> data,
-      Projection projection) throws FileNotFoundException {
+      Projection projection, boolean dataRestEnabled) throws FileNotFoundException {
     generateReactFile(data, projection, "/org/openbravo/base/react/model.types.ftl",
         data.get("newClassName").toString().toLowerCase() + ".types.ts");
     generateReactFile(data, projection, "/org/openbravo/base/react/modelservice.ts.ftl",

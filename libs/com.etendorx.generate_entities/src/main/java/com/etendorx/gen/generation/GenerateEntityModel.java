@@ -18,12 +18,14 @@ public class GenerateEntityModel implements EntityGenerator {
 
   /**
    * Generates the entity model
+   *
    * @param data
    * @param path
+   * @param dataRestEnabled
    * @throws FileNotFoundException
    */
   @Override
-  public void generate(Map<String, Object> data, GeneratePaths path) throws FileNotFoundException {
+  public void generate(Map<String, Object> data, GeneratePaths path, boolean dataRestEnabled) throws FileNotFoundException {
 
     String ftlFileNameEntitiesModel = "/org/openbravo/base/gen/entityModel.ftl";
     Template templateEntityModelRX = TemplateUtil.createTemplateImplementation(

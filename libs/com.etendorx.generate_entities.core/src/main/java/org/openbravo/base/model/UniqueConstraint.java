@@ -49,14 +49,16 @@ public class UniqueConstraint {
         Check.isFalse(properties.contains(property),
           "Column " + columnName + " occurs twice in uniqueconstraint " + name + " in entity " + entity + " table " + entity.getTableName());
         properties.add(property);
-        log.debug("Adding property " + property + " to uniqueconstraint " + name);
+        log.debug("Adding property {} to uniqueconstraint {}", property, name);
         return;
       }
     }
 
     setInvalid(true);
     log.error(
-      "Fail when setting uniqueconstraint " + getName() + " columnname " + columnName + " not present in entity " + entity + " table " + entity.getTableName() + ". Ignoring " + "this unique constraint");
+      "Fail when setting uniqueconstraint {} columnname {} not present in entity {} table {}. Ignoring this unique constraint",
+      getName(), columnName , entity , entity.getTableName()
+    );
     entity.getUniqueConstraints().remove(this);
   }
 
@@ -65,7 +67,7 @@ public class UniqueConstraint {
   }
 
   public void setName(String name) {
-    log.debug("Created unique constraint " + name);
+    log.debug("Created unique constraint {}", name);
     this.name = name;
   }
 
