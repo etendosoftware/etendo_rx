@@ -2,3 +2,15 @@ server:
   port: 0
 openbravo:
   url:
+externalSystem:
+  auth:
+    header:
+token:
+connector:
+  instance:
+  user:
+das:
+  url:
+  grpc:
+    ip:
+    port:
