@@ -43,7 +43,7 @@ metadata:
 spec:
   containers:
     - name: compiler
-      image: etendo/compiler_jenkins:1.0.4
+      image: etendo/compiler_jenkins:1.0.7
       ports:
         - name: ssh
           containerPort: 22
@@ -121,7 +121,7 @@ spec:
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
                             export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             git clone --branch $BRANCH_NAME https://github.com/etendosoftware/etendo_rx
                             cd etendo_rx
                             chmod a+x ./pipelines/run-tests/build-update.sh
@@ -234,7 +234,7 @@ spec:
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
                             export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             chmod a+x ./pipelines/run-tests/build-update.sh
                             ./pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo RX" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL
@@ -303,7 +303,7 @@ spec:
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
                             export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.auth:test --info
                             """
@@ -345,7 +345,7 @@ spec:
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
                             export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RepositoryTest
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RestCallTest
@@ -390,7 +390,7 @@ spec:
                             export DOCKER_HOST=/var/run/docker.sock
                             export TESTCONTAINERS_RYUK_DISABLED=true
                             export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.edge:test --info
                             """
@@ -431,7 +431,7 @@ spec:
                                     sh """
                                     export DOCKER_HOST=/var/run/docker.sock
                                     export TESTCONTAINERS_RYUK_DISABLED=true
-                                    export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                                    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                                     cd etendo_rx
                                     ./gradlew :com.etendorx.test.eventhandler:test --info
                                     """
