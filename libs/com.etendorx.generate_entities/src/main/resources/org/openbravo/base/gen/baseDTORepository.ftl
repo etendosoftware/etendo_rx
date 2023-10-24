@@ -20,6 +20,8 @@ import com.etendorx.entities.mapper.lib.BaseDTOModel;
 import com.etendorx.entities.mapper.lib.DASRepository;
 import com.etendorx.entities.mapper.lib.DTOConverter;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
+import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
+import jakarta.transaction.Transactional;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,15 +32,16 @@ import java.util.List;
 
 public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends BaseDTOModel,F extends BaseDTOModel> implements DASRepository<E,F> {
 
+  private final RestCallTransactionHandler transactionHandler;
   private final BaseDASRepository<T> repository;
   private final DTOConverter<T, E, F> converter;
   private final AuditServiceInterceptor auditService;
   private final JsonPathEntityRetriever<T> retriever;
 
-  public BaseDTORepositoryDefault(BaseDASRepository<T> repository,
-      DTOConverter<T, E, F> converter,
-      JsonPathEntityRetriever<T> retriever,
-      AuditServiceInterceptor auditService) {
+  public BaseDTORepositoryDefault(RestCallTransactionHandler transactionHandler,
+      BaseDASRepository<T> repository, DTOConverter<T, E, F> converter,
+      JsonPathEntityRetriever<T> retriever, AuditServiceInterceptor auditService) {
+    this.transactionHandler = transactionHandler;
     this.repository = repository;
     this.converter = converter;
     this.auditService = auditService;
@@ -65,38 +68,44 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   @Override
   @Transactional
   public E save(F dtoEntity) {
-    if(dtoEntity.getId() != null) {
-      var dto = retriever.get(dtoEntity.getId());
-      if (dto != null) {
-        throw new ResponseStatusException(HttpStatus.CONFLICT, "Record already exists");
+    try {
+      transactionHandler.begin();
+      if (dtoEntity.getId() != null) {
+        var dto = retriever.get(dtoEntity.getId());
+        if (dto != null) {
+          throw new ResponseStatusException(HttpStatus.CONFLICT, "Record already exists");
+        }
       }
+      var entity = converter.convert(dtoEntity, null);
+      if (BaseRXObject.class.isAssignableFrom(entity.getClass())) {
+        var baseObject = (BaseRXObject) entity;
+        auditService.setAuditValues(baseObject, true);
+      }
+      repository.save(entity);
+      return converter.convert(entity);
+    } finally {
+      transactionHandler.commit();
     }
-    var entity = converter.convert(dtoEntity, null);
-    if (BaseRXObject.class.isAssignableFrom(entity.getClass())) {
-      var baseObject = (BaseRXObject) entity;
-      auditService.setAuditValues(baseObject, true);
-    }
-    //repository.disableTriggers();
-    repository.save(entity);
-    //repository.enableTriggers();
-    return converter.convert(entity);
   }
 
   @Override
   @Transactional
   public E updated(F dtoEntity) {
-    var entity = retriever.get(dtoEntity.getId());
-    if (entity == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found");
+    try {
+      transactionHandler.begin();
+      var entity = retriever.get(dtoEntity.getId());
+      if (entity == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found");
+      }
+      if (BaseRXObject.class.isAssignableFrom(entity.getClass())) {
+        var baseObject = (BaseRXObject) entity;
+        auditService.setAuditValues(baseObject, false);
+      }
+      repository.save(converter.convert(dtoEntity, entity));
+      return converter.convert(entity);
+    } finally {
+      transactionHandler.commit();
     }
-    if(BaseRXObject.class.isAssignableFrom(entity.getClass())) {
-      var baseObject = (BaseRXObject) entity;
-      auditService.setAuditValues(baseObject, false);
-    }
-//    repository.disableTriggers();
-    repository.save(converter.convert(dtoEntity, entity));
-//    repository.enableTriggers();
-    return converter.convert(entity);
   }
 
 }
