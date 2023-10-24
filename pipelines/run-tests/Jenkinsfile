@@ -128,6 +128,8 @@ spec:
                             cp gradle.properties.template gradle.properties
                             sed -i 's/^githubUser=.*/githubUser=${GITHUB_USER}/' gradle.properties
                             sed -i 's/^githubToken=.*/githubToken=${GITHUB_TOKEN}/' gradle.properties
+                            sed -i 's/^grpc.enabled=.*/grpc.enabled=true/' gradle.properties
+                            sed -i 's/^data-rest.enabled=.*/data-rest.enabled=true/' gradle.properties
                             mkdir -p modules
                             ./gradlew :setup
                             ./gradlew :com.etendorx.test.testcontainer:test
