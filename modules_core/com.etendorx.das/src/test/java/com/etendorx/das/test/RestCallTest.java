@@ -47,7 +47,7 @@ import com.etendorx.entities.jparepo.ADUserRepository;
 import com.etendorx.utils.auth.key.context.UserContext;
 
 @Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19090")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {"grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @AutoConfigureMockMvc
