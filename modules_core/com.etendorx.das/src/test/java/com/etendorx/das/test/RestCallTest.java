@@ -67,12 +67,7 @@ public class RestCallTest {
   static class RepositoryTestConfiguration {
   }
 
-  private final String token = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjg2MDc2NjE2LCJhZF" +
-      "91c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAiLCJhZF9yb2xlX2lkIjoiMCIsInNlYXJjaF9rZXkiOiIi" +
-      "LCJzZXJ2aWNlX2lkIjoiIn0.oBxwXw3Td0q1wNGVK4vSli4VGMGeRdfajwtzLCh9dVlLNFBFLJZ6EjJLUCFbZXTsxnwYHJfsHOQYcr7iWejdnP" +
-      "Djy3l0CqGKFGxI-bNm_73Ky48fRdBakqzwFQExit9HfPDHd_iojp0hlpH736CWvh11v0QGja9Q0LdY4W69Np1waxUI2Qf4z2WfJaoQhIjdOq4B" +
-      "cFoqqCBknVougK0J7ZMmxcOnSe6MSQ7UDzKgwunSSuT-iVeF4sxLb80hWu5dInfvn8iJVC8krJ9telWVqbo-dPoFbnFw9CtmTHpK153b4nj5U6" +
-      "ZOTFP4kZqsqhvWo7wKg03O1emGmCKo1vg9Cg";
+  private static final String TOKEN = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjk3MTM1NjE4LCJhZF91c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAiLCJhZF9yb2xlX2lkIjoiMCIsInNlYXJjaF9rZXkiOiIiLCJzZXJ2aWNlX2lkIjoiIn0.JXgTYhxyK23BZXJEOObs2n4ms4Fls3jXSsKNScT90j-22c8Ypo4ZYkjt0ucKLEjccuPSsxiyGfwH6fwtdoeAxSr9dQCQaV94jjJHXm75IgncgF1YHTUTCgZQ073prX6lyHdQZ0okhBrDMHiEo1_JWbLbEluiERzJFk0t9NYcXJcNAVvTK50zPJk4Ar0cwOEtIEP1nIPOeA8vQY2NBff5t3x_CCVNgdl3BC19nx-iWBf_6xyF0mRAs2uNQ5KI9aY63vjv_z1e_j4Wupff67oQHRwMLnJShemWnjbs71s6S5SbMrUfM2Z8TkLYC964rGlUYnmwHuCTkDoBDNKebYEINw";
 
   @DynamicPropertySource
   static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -114,7 +109,7 @@ public class RestCallTest {
   @MethodSource("validRequestParams")
   public void whenRestRead(String model, String id, String name) throws Exception {
     var result = mockMvc.perform(
-      get("/" + model + "/" + id + "?projection=default").header(X_TOKEN, token)
+      get("/" + model + "/" + id + "?projection=default").header(X_TOKEN, TOKEN)
     );
     result.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
     result.andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name));
@@ -141,7 +136,7 @@ public class RestCallTest {
   @MethodSource("invalidRequestParams")
   public void whenRestReadFails(String id) throws Exception {
     var result = mockMvc.perform(
-      get("/ADUser/" + id + "?projection=default").header(X_TOKEN, token)
+      get("/ADUser/" + id + "?projection=default").header(X_TOKEN, TOKEN)
     );
     result.andExpect(MockMvcResultMatchers.status().is4xxClientError());
     result.andExpect(response -> {
@@ -184,7 +179,7 @@ public class RestCallTest {
   @MethodSource("validBusinessPartnerCategoryName")
   public void whenRestReadBusinessPartnerCategoryName(String id, String businessPartnerName, String businessPartnerCategoryName) throws Exception {
     var result = mockMvc.perform(
-      get("/ADUser/" + id + "?projection=test").header(X_TOKEN, token)
+      get("/ADUser/" + id + "?projection=test").header(X_TOKEN, TOKEN)
     );
     result.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
     result.andExpect(MockMvcResultMatchers.jsonPath("$.businessPartnerName").value(businessPartnerName));
@@ -205,7 +200,7 @@ public class RestCallTest {
   @MethodSource("validInvoiceLineProjection")
   public void whenRestReadInvoiceLineCustomProjection(String id, String invoiceLineProductId, String invoiceLineProductName) throws Exception {
     var result = mockMvc.perform(
-      get("/InvoiceLine/" + id + "?projection=test").header(X_TOKEN, token)
+      get("/InvoiceLine/" + id + "?projection=test").header(X_TOKEN, TOKEN)
     );
     result.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
     result.andExpect(MockMvcResultMatchers.jsonPath("$.productId").value(invoiceLineProductId));
