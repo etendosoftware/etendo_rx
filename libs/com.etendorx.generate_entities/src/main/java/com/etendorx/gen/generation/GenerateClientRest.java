@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openbravo.base.model.Entity;
 
 import com.etendorx.gen.beans.Projection;
@@ -24,14 +24,16 @@ public class GenerateClientRest implements ProjectionGenerator {
 
   /**
    * Generates the projection
+   *
    * @param paths
    * @param data
    * @param projection
+   * @param dataRestEnabled
    * @throws FileNotFoundException
    */
   @Override
   public void generate(GeneratePaths paths, Map<String, Object> data,
-      Projection projection) throws FileNotFoundException {
+      Projection projection, boolean dataRestEnabled) throws FileNotFoundException {
     freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(
         FTL_FILE_NAME_CLIENTREST);
     var outFileClientRest = TemplateUtil.prepareOutputFile(

@@ -68,7 +68,7 @@ public class Evaluator implements OBSingleton {
   public Boolean evaluateBoolean(BaseOBObjectDef contextBob, String script) {
     // TODO: check if the compiled javascript can be cached
 
-    log.debug("Evaluating script for " + contextBob + " script: " + script);
+    log.debug("Evaluating script for {} script: {}", contextBob, script);
 
     OBScriptEngine engine = OBScriptEngine.getInstance();
 

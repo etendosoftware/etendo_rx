@@ -23,8 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.HttpStatus;
@@ -160,7 +160,7 @@ public class AsyncProcessController {
     );
 
     Message<Object> message = MessageBuilder.withPayload(bodyChanges)
-        .setHeader(KafkaHeaders.MESSAGE_KEY, uuid.getBytes(StandardCharsets.UTF_8))
+        .setHeader(KafkaHeaders.KEY, uuid.getBytes(StandardCharsets.UTF_8))
         .build();
     if (!streamBridge.send(processName, message)) {
       throw new Exception("Error sending message");

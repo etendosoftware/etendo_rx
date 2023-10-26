@@ -1,5 +1,7 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
-    id 'org.springframework.boot'
+    id 'org.springframework.boot' apply false
     id 'io.spring.dependency-management'
     id 'java'
     id 'maven-publish'
@@ -7,7 +9,7 @@ plugins {
 
 group = 'com.etendorx'
 version = "$gradle.ext.version"
-sourceCompatibility = '11'
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -15,11 +17,19 @@ repositories {
 
 publishing {
     publications {
-        maven(MavenPublication) {
+        mavenJava(MavenPublication) {
             groupId = group
             artifactId = 'das_core'
             version = version
             from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
         }
     }
     repositories {
@@ -34,18 +44,26 @@ publishing {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
-    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.1.4'
+    implementation 'com.jayway.jsonpath:json-path:2.8.0'
+    implementation 'org.springframework:spring-web'
+    runtimeOnly 'org.postgresql:postgresql:42.6.0'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.1.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'javax.persistence:javax.persistence-api:2.2'
 
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.16'
+    implementation 'io.swagger.core.v3:swagger-models:2.2.16'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom SpringBootPlugin.BOM_COORDINATES
+    }
+}

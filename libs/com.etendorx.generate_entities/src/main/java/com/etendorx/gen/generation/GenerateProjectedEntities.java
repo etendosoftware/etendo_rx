@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openbravo.base.model.Entity;
 
 import com.etendorx.gen.beans.Projection;
@@ -27,15 +27,20 @@ public class GenerateProjectedEntities implements ProjectionGenerator {
 
   /**
    * Generates the projections and the model projected
+   *
    * @param paths
    * @param data
    * @param projection
+   * @param dataRestEnabled
    * @throws FileNotFoundException
    */
   @Override
   public void generate(GeneratePaths paths, Map<String, Object> data,
-      Projection projection) throws FileNotFoundException {
-    generateProjections(data, paths.pathEntitiesRx, "/org/openbravo/base/gen/jpaProjectionRX.ftl", projection);
+      Projection projection, boolean dataRestEnabled) throws FileNotFoundException {
+    if(dataRestEnabled) {
+      generateProjections(data, paths.pathEntitiesRx,
+          "/org/openbravo/base/gen/datarest/jpaProjectionRX.ftl", projection);
+    }
     if (!StringUtils.equals(GenerateEntitiesConstants.PROJECTION_DEFAULT, projection.getName())) {
       generateModelProjected(data, paths.pathEntitiesModelRx, projection, (Entity) data.get("entity"));
     }

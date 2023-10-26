@@ -16,25 +16,21 @@
 
 package com.etendorx.utils.auth.key.context;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.etendorx.utils.auth.key.JwtKeyUtils;
-import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
-
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Set;
 
 @Component
 @Slf4j
@@ -50,13 +46,15 @@ public class FilterContext extends OncePerRequestFilter {
   private UserContext userContext;
   @Autowired(required = false)
   private Set<AllowedURIS> allowedURIS;
+  @Value("${public-key:}")
+  String publicKey;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     String token = request.getHeader(HEADER_TOKEN);
     if (!StringUtils.isEmpty(token)) {
-      setUserContextFromToken(token, request);
+      setUserContextFromToken(publicKey, token, request);
     } else {
       if (allowedURIS == null) {
         throw new ForbiddenException("No URIs are allowed for this service");
@@ -65,41 +63,44 @@ public class FilterContext extends OncePerRequestFilter {
           .filter(uri -> uri.isAllowed(request.getRequestURI()))
           .findFirst();
       if (optionalAllowedUri.isEmpty()) {
-        throw new ForbiddenException(request.getRequestURI() + " is not allowed for this credentials");
+        throw new ForbiddenException(
+            request.getRequestURI() + " is not allowed for this credentials");
       }
     }
     AppContext.setCurrentUser(userContext);
     filterChain.doFilter(request, response);
   }
 
-  public void setUserContextFromToken(String token, HttpServletRequest request) {
-    setUserContextFromToken(userContext, token, request);
+  public void setUserContextFromToken(String publicKey, String token, HttpServletRequest request) {
+    setUserContextFromToken(userContext, publicKey, token, request);
   }
 
-
-
-  public static void setUserContextFromToken(UserContext userContext, String token, HttpServletRequest req) {
-    TokenUtil.convertToken(userContext, token);
+  public static void setUserContextFromToken(UserContext userContext, String publicKey,
+      String token, HttpServletRequest req) {
+    TokenUtil.convertToken(userContext, publicKey, token);
     String noActiveFilterParameter = req.getParameter(NO_ACTIVE_FILTER_PARAMETER);
     String triggerEnabledParam = req.getParameter(TRIGGER_ENABLED_PARAMETER);
     String dateFormatParam = req.getParameter(DATE_FORMAT_PARAMETER);
     String timeZoneParam = req.getParameter(TIME_ZONE_PARAMETER);
     String restMethod = req.getMethod();
-    boolean noActiveFilter = !parseBooleanParameter(noActiveFilterParameter, NO_ACTIVE_FILTER_PARAMETER, false);
+    boolean noActiveFilter = !parseBooleanParameter(noActiveFilterParameter,
+        NO_ACTIVE_FILTER_PARAMETER, false);
     userContext.setActive(noActiveFilter);
     userContext.setAuthToken(token);
     userContext.setRestMethod(restMethod);
-    boolean isTriggerEnabled = parseBooleanParameter(triggerEnabledParam, TRIGGER_ENABLED_PARAMETER, true);
+    boolean isTriggerEnabled = parseBooleanParameter(triggerEnabledParam, TRIGGER_ENABLED_PARAMETER,
+        true);
     userContext.setTriggerEnabled(isTriggerEnabled);
-    if(StringUtils.isNotBlank(dateFormatParam)) {
+    if (StringUtils.isNotBlank(dateFormatParam)) {
       userContext.setDateFormat(dateFormatParam);
     }
-    if(StringUtils.isNotBlank(dateFormatParam)) {
+    if (StringUtils.isNotBlank(dateFormatParam)) {
       userContext.setTimeZone(timeZoneParam);
     }
   }
 
-  private static boolean parseBooleanParameter(String paramValueStr, String nameParam, boolean defaultValue) {
+  private static boolean parseBooleanParameter(String paramValueStr, String nameParam,
+      boolean defaultValue) {
     boolean valueParam;
     if (paramValueStr == null) {
       valueParam = defaultValue;

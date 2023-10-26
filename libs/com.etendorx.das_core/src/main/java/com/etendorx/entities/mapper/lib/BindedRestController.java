@@ -15,14 +15,12 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 public abstract class BindedRestController<E extends BaseDTOModel, F extends BaseDTOModel> {
@@ -37,11 +35,15 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   }
 
   @GetMapping
+  @Transactional
+  @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   public ResponseEntity<Iterable<E>> findAll() {
     return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
   }
 
   @GetMapping("/{id}")
+  @Transactional
+  @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   public ResponseEntity<E> get(@PathVariable("id") String id) {
     var entity = repository.findById(id);
     if (entity != null) {
@@ -52,6 +54,8 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
 
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
+  @Transactional
+  @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   public ResponseEntity<E> post(@RequestBody String rawEntity) {
     F dtoEntity = converter.convert(rawEntity);
     return new ResponseEntity<>(repository.save(dtoEntity), HttpStatus.CREATED);
@@ -59,6 +63,8 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
 
   @PutMapping("/{id}")
   @ResponseStatus(HttpStatus.OK)
+  @Transactional
+  @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   public ResponseEntity<E> put(@PathVariable String id, @RequestBody String rawEntity) {
     F dtoEntity = converter.convert(rawEntity);
     dtoEntity.setId(id);

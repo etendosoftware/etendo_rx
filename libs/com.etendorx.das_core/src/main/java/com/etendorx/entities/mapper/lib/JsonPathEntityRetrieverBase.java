@@ -15,14 +15,14 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
-
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.web.server.ResponseStatusException;
 
 public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRetriever<E> {
 
@@ -32,7 +32,7 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
 
   @Override
   public E get(Object key) {
-    if(key == null) {
+    if (key == null) {
       return null;
     }
     var treeSet = new TreeSet<String>();
@@ -44,7 +44,7 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
   public E get(TreeSet<String> keyValues) {
     Iterator<String> valueIterator = keyValues.iterator();
     if (keyValues.size() != getKeys().length) {
-      throw new IllegalArgumentException("Invalid number of key values");
+      throw new IllegalArgumentException("Mapping has misconfigured identifiers");
     }
     List<Specification<E>> specs = new ArrayList<>();
 
@@ -62,13 +62,14 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
       return null;
     }
     String strId = null;
-    if(id instanceof Integer) {
+    if (id instanceof Integer) {
       strId = Integer.toString((Integer) id);
     } else if (id instanceof String) {
       strId = (String) id;
     }
-    if(strId == null) {
-      throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Invalid value");
+    if (strId == null) {
+      throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,
+          "Invalid value");
     }
     return strId;
   }

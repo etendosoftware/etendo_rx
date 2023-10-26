@@ -1,29 +1,38 @@
 package com.etendorx.auth.feign.model;
 
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JacksonAnnotation;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.List;
 
 @Data
-@Builder
+@NoArgsConstructor
 public class UserModel {
   private String id;
 
   private Boolean active;
 
-  private String clientId;
+  private String client;
 
-  private String organizationId;
+  private String organization;
 
-  private String defaultClientId;
+  private String defaultClient;
 
-  private String defaultOrganizationId;
+  private String defaultOrganization;
 
   private String username;
 
   private String password;
 
-  private List<HashMap<String, String>> eTRXRxServicesAccessList;
+  private List<ServiceAccess> eTRXRxServicesAccessList;
+
+  public void seteTRXRxServicesAccessList(List<ServiceAccess> eTRXRxServicesAccessList) {
+    this.eTRXRxServicesAccessList = eTRXRxServicesAccessList;
+  }
+
+  public List<ServiceAccess> geteTRXRxServicesAccessList() {
+    return eTRXRxServicesAccessList;
+  }
 }

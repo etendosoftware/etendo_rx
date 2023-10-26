@@ -15,14 +15,20 @@
  */
 package com.etendorx.clientrest.base;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Objects;
 
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,10 +39,12 @@ import org.springframework.web.client.RestTemplate;
 public class RestUtils {
 
   private final RestTemplate restTemplate;
+  private final String dasUrl;
 
   @Autowired
-  public RestUtils(RestTemplate restTemplate) {
+  public RestUtils(RestTemplate restTemplate, @Value("${das.url:}") String dasUrl) {
     this.restTemplate = restTemplate;
+    this.dasUrl = dasUrl;
   }
 
   /**
@@ -53,11 +61,18 @@ public class RestUtils {
    * @throws RestUtilsException
    *     If there is an error getting the list
    */
+  @Nullable
   public <T> Collection<T> getList(String url, Class<T> responseType) throws RestUtilsException {
-    ResponseEntity<PagedModel<T>> list = exchange(url, new ParameterizedTypeReference<>() {
-    });
+    var typeRef = new ParameterizedTypeReference<PagedModel<T>>() {
+      @Override
+      @NonNull
+      public Type getType() {
+        return TypeUtils.parameterize(PagedModel.class, responseType);
+      }
+    };
+    ResponseEntity<PagedModel<T>> list = exchange(url, typeRef);
     if (list.getBody() != null) {
-      return list.getBody().getContent();
+      return Objects.requireNonNull(list.getBody()).getContent();
     }
     throw new RestUtilsException("Error getting list: " + list.getStatusCodeValue());
   }
@@ -76,10 +91,16 @@ public class RestUtils {
    *     If there is an error getting the entity
    */
   public <T> T getEntity(String url, Class<T> responseType) throws RestUtilsException {
-    ResponseEntity<EntityModel<T>> entity = exchange(url, new ParameterizedTypeReference<EntityModel<T>>() {
-    });
-    if (entity.getBody() != null && entity.getBody().getContent() != null) {
-      return entity.getBody().getContent();
+    var typeRef = new ParameterizedTypeReference<EntityModel<T>>() {
+      @Override
+      @NonNull
+      public Type getType() {
+        return TypeUtils.parameterize(EntityModel.class, responseType);
+      }
+    };
+    ResponseEntity<EntityModel<T>> entity = exchange(url, typeRef);
+    if(entity.getBody() != null) {
+      return Objects.requireNonNull(entity.getBody()).getContent();
     }
     throw new RestUtilsException("Error getting entity: " + entity.getStatusCodeValue());
   }
@@ -99,7 +120,7 @@ public class RestUtils {
    */
   private <T> ResponseEntity<T> exchange(String url,
       ParameterizedTypeReference<T> responseType) throws RestUtilsException {
-    ResponseEntity<T> response = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+    ResponseEntity<T> response = restTemplate.exchange(dasUrl + url, HttpMethod.GET, null, responseType);
     if (response.getStatusCode().is2xxSuccessful()) {
       return response;
     }

@@ -1,11 +1,10 @@
 package com.etendorx.das.configuration;
 
-import javax.persistence.EntityManagerFactory;
-
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +16,7 @@ import com.etendorx.eventhandler.AnnotatedEventHandlerListenerInvoker;
 @ConditionalOnClass(EntityManagerFactory.class)
 public class EventHandlerAutoConfiguration {
 
-  @Autowired
+  @PersistenceUnit
   private EntityManagerFactory entityManagerFactory;
 
   @Bean

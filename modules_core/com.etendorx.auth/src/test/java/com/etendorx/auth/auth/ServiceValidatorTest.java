@@ -3,6 +3,7 @@ package com.etendorx.auth.auth;
 import com.etendorx.auth.auth.AuthService;
 import com.etendorx.auth.auth.jwt.JwtRequest;
 import com.etendorx.auth.feign.ServiceClient;
+import com.etendorx.auth.feign.model.ServiceAccess;
 import com.etendorx.auth.feign.model.UserModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class ServiceValidatorTest {
         MockitoAnnotations.initMocks(this);
         serviceValidator = new AuthService();
         userModel.setId("100");
-        regularUser.setETRXRxServicesAccessList(new ArrayList<>());
+        regularUser.seteTRXRxServicesAccessList(new ArrayList<>());
         authRequest = new JwtRequest("user", "pass", "service", "secret");
     }
 
@@ -56,11 +57,9 @@ public class ServiceValidatorTest {
 
     @Test
     public void testValidateService_unsuccessfulDASConnection_throwsException() {
-        List<HashMap<String, String>> accessList = new ArrayList<>();
-        HashMap<String, String> accessItem = new HashMap<>();
-        accessItem.put("rxServiceId", "123");
-        accessList.add(accessItem);
-        regularUser.setETRXRxServicesAccessList(accessList);
+        var serviceAccess = new ServiceAccess();
+        serviceAccess.setRxServiceId("123");
+        regularUser.seteTRXRxServicesAccessList(List.of(serviceAccess));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HEADER_TOKEN, "token");
         ResponseEntity<String> responseEntity = new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
@@ -73,11 +72,9 @@ public class ServiceValidatorTest {
 
     @Test
     public void testValidateService_nullServicesAccessModel_throwsException() {
-        List<HashMap<String, String>> accessList = new ArrayList<>();
-        HashMap<String, String> accessItem = new HashMap<>();
-        accessItem.put("rxServiceId", "123");
-        accessList.add(accessItem);
-        regularUser.setETRXRxServicesAccessList(accessList);
+        ServiceAccess serviceAccess = new ServiceAccess();
+        serviceAccess.setRxServiceId("123");
+        regularUser.seteTRXRxServicesAccessList(List.of(serviceAccess));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HEADER_TOKEN, "token");
         ResponseEntity<String> responseEntity = new ResponseEntity<>("", HttpStatus.OK);

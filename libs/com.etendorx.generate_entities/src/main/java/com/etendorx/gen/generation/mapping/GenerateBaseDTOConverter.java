@@ -21,7 +21,7 @@ import com.etendorx.gen.generation.GeneratePaths;
 import com.etendorx.gen.generation.constants.MappingConstants;
 import com.etendorx.gen.generation.utils.CodeGenerationUtils;
 import com.etendorx.gen.util.TemplateUtil;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

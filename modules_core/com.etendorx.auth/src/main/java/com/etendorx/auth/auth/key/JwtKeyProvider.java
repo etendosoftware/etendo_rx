@@ -1,12 +1,12 @@
 package com.etendorx.auth.auth.key;
 
 import com.etendorx.utils.auth.key.JwtKeyUtils;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.security.PrivateKey;
 

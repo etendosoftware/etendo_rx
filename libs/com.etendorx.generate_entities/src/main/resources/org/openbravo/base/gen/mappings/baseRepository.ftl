@@ -13,7 +13,7 @@ public class ${mappingPrefix}${entity.name}DTORepositoryDefault extends BaseDTOR
   public ${mappingPrefix}${entity.name}DTORepositoryDefault(
       ${entity.name}Repository repository,
       ${mappingPrefix}${entity.name}DTOConverter converter,
-      JsonPathEntityRetriever<${entity.table.className}> retriever,
+      ${mappingPrefix}${entity.name}JsonPathRetriever retriever,
       AuditServiceInterceptor auditService
     ) {
     super(repository, converter, retriever, auditService);

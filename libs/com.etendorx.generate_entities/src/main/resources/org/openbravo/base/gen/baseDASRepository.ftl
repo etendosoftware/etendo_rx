@@ -17,8 +17,9 @@
 package com.etendorx.entities.entities;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface BaseDASRepository<T> extends PagingAndSortingRepository<T, String>, JpaSpecificationExecutor<T> {
+public interface BaseDASRepository<T> extends CrudRepository<T, String>, PagingAndSortingRepository<T, String>, JpaSpecificationExecutor<T> {
 
 }

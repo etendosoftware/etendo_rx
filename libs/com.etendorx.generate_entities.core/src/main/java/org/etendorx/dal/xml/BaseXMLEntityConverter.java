@@ -116,8 +116,8 @@ public class BaseXMLEntityConverter implements OBNotSingleton {
         "This case may only occur for referenced objects which are not new");
       // if the object is referenced then it can not be updated
       if (hasReferenceAttribute && !bob.isNewOBObject()) {
-        log.debug("Entity " + bob + " (" + bob.getEntity()
-          .getTableName() + ") " + " has not been updated because it already exists and " + "it is imported as a reference from another object");
+        log.debug("Entity {} ({}) has not been updated because it already exists and it is imported as a reference from another object",
+            bob, bob.getEntity().getTableName());
       }
       if (!writable && !bob.isNewOBObject() && !hasReferenceAttribute) {
         warn(
@@ -125,7 +125,6 @@ public class BaseXMLEntityConverter implements OBNotSingleton {
       }
     } else if (bob.isNewOBObject()) {
       if (!checkInsert.contains(bob)) {
-        //warnDifferentClientOrg(bob, "Creating");
         log("Inserted entity " + bob.getIdentifier() + originalIdStr);
         toInsert.add(bob);
         checkInsert.add(bob);
@@ -158,39 +157,15 @@ public class BaseXMLEntityConverter implements OBNotSingleton {
         // verify_language process)
         // otherUniqueObject = entityResolver.findUniqueConstrainedObject(bob);
       }
-      if (otherUniqueObject != null && otherUniqueObject != bob) {
-        // now copy the imported values from the bob to
-        // otherUniqueObject
-        for (final Property p : bob.getEntity().getProperties()) {
-          final boolean isNotImportableProperty = p.isTransient(
-            bob) || p.isAuditInfo() || p.isInactive() || p.isId();
-          if (isNotImportableProperty) {
-            continue;
-          }
-          // do not change the client or organization of an
-          // existing object
-          if (p.isClientOrOrganization()) {
-            continue;
-          }
-          // do not replace one to manies
-          if (!p.isOneToMany()) {
-            otherUniqueObject.set(p.getName(), bob.get(p.getName()));
-          }
-        }
-        // and replace the bob, because the object from the db
-        // should be used
-        getEntityResolver().exchangeObjects(bob, otherUniqueObject);
-        replacedObjects.put(bob, otherUniqueObject);
-        return otherUniqueObject;
-      }
     }
     return bob;
   }
 
   protected void repairReferences() {
-    for (BaseOBObject bob : replacedObjects.keySet()) {
-      final BaseOBObject newObject = replacedObjects.get(bob);
-      repairReferences(bob, newObject);
+    for (Map.Entry<BaseOBObject, BaseOBObject> entry : replacedObjects.entrySet()) {
+      final BaseOBObject oldObject = entry.getKey();
+      final BaseOBObject newObject = entry.getValue();
+      repairReferences(oldObject, newObject);
     }
   }
 
@@ -316,8 +291,13 @@ public class BaseXMLEntityConverter implements OBNotSingleton {
           }
         }
 
-        sb.append(
-          "Referenced object " + bob.getEntityName() + " (id: " + bob.getId() + " / " + idObject + ") not present in the xml or in the database.");
+        sb.append("Referenced object ")
+            .append(bob.getEntityName())
+            .append(" (id: ")
+            .append(bob.getId())
+            .append(" / ")
+            .append(idObject != null ? idObject : "unknown")
+            .append(") not present in the xml or in the database.");
       }
     }
 

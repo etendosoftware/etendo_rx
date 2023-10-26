@@ -17,11 +17,14 @@
 package org.etendorx.database;
 
 import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.util.Properties;
 
 class OpenbravoDriverManagerConnectionFactory implements ConnectionFactory {
+  protected static Logger log4j = LogManager.getLogger();
   protected String _connectUri;
   protected String _uname;
   protected String _passwd;
@@ -80,7 +83,7 @@ class OpenbravoDriverManagerConnectionFactory implements ConnectionFactory {
 
       SessionInfo.initDB(conn, this._rdbsm);
     } catch (SQLException var21) {
-      var21.printStackTrace();
+      log4j.error("Error executing default SQL: {}", this._dbSessionConfig, var21);
     } finally {
       try {
         if (rset != null) {

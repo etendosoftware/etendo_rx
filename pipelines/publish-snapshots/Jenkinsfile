@@ -133,7 +133,7 @@ spec:
               githubUser=${GITHUB_USER}\n
               githubToken=${GITHUB_TOKEN}\n
               allow.root=true\n
-              org.gradle.jvmargs=-Xmx2g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8\" > gradle.properties
+              org.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8\" > gradle.properties
               """
 
               echo "---------------- Clone RX module of Classic ---------------"

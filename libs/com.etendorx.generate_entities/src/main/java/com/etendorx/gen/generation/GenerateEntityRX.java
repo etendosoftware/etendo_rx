@@ -20,12 +20,14 @@ public class GenerateEntityRX implements EntityGenerator {
 
   /**
    * Generates the entity RX
+   *
    * @param data
    * @param paths
+   * @param dataRestEnabled
    * @throws FileNotFoundException
    */
   @Override
-  public void generate(Map<String, Object> data, GeneratePaths paths) throws FileNotFoundException {
+  public void generate(Map<String, Object> data, GeneratePaths paths, boolean dataRestEnabled) throws FileNotFoundException {
     final String className = data.get(GenerateEntitiesConstants.CLASS_NAME).toString();
     final String fullPathEntities = paths.pathEntitiesRx + GenerateEntitiesConstants.SRC_MAIN_ENTITIES;
     var classfileName = className + GenerateEntitiesConstants.JAVA;

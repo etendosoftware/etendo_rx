@@ -1,5 +1,7 @@
 package com.etendorx.das.test;
 
+import com.etendorx.das.utils.DefaultFilters;
+import com.etendorx.das.utils.TestcontainersUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,10 +14,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.etendorx.das.utils.DefaultFilters;
-import com.etendorx.das.utils.TestcontainersUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19090")
@@ -51,11 +51,10 @@ class DefaultFiltersTest {
     @Test
     void testAddFiltersAuthServiceBypass() {
         // Arrange
-        String userId = null;
         boolean isActive = true;
 
         // Act
-        String result = DefaultFilters.addFilters(SELECT_QUERY, userId, USER_ID_123, ROLE_ID_789, isActive, REST_METHOD_GET);
+        String result = DefaultFilters.addFilters(SELECT_QUERY, null, USER_ID_123, ROLE_ID_789, isActive, REST_METHOD_GET);
 
         // Assert
         Assertions.assertEquals(SELECT_QUERY, result);

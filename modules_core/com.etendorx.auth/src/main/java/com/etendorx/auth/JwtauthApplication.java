@@ -3,11 +3,8 @@ package com.etendorx.auth;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.context.annotation.RequestScope;
 
-import com.etendorx.utils.auth.key.context.UserContext;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {

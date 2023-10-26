@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import com.etendoerp.etendorx.model.projection.ETRXProjection;
+import com.etendorx.gen.generation.mapping.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.session.OBPropertiesProvider;
@@ -47,14 +49,6 @@ import com.etendorx.gen.beans.Repository;
 import com.etendorx.gen.commandline.CommandLineProcess;
 import com.etendorx.gen.generation.interfaces.EntityGenerator;
 import com.etendorx.gen.generation.interfaces.MappingGenerator;
-import com.etendorx.gen.generation.mapping.GenerateBaseDTO;
-import com.etendorx.gen.generation.mapping.GenerateBaseDTOConverter;
-import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterRead;
-import com.etendorx.gen.generation.mapping.GenerateBaseFieldConverterWrite;
-import com.etendorx.gen.generation.mapping.GenerateBaseJsonPathConverter;
-import com.etendorx.gen.generation.mapping.GenerateBaseJsonPathRetriever;
-import com.etendorx.gen.generation.mapping.GenerateBaseRepository;
-import com.etendorx.gen.generation.mapping.GenerateBaseRestController;
 import com.etendorx.gen.metadata.MetadataContainer;
 import com.etendorx.gen.process.GenerateProtoFile;
 import com.etendorx.gen.util.TemplateUtil;
@@ -114,6 +108,7 @@ public class GenerateEntities {
     final boolean generateRxCode = Boolean.parseBoolean(obProperties.getProperty("rx.generateCode"));
     final boolean computedColumns = Boolean.parseBoolean(obProperties.getProperty("rx.computedColumns"));
     final boolean includeViews = Boolean.parseBoolean(obProperties.getProperty("rx.views"));
+    final boolean dataRestEnabled = Boolean.parseBoolean(obProperties.getProperty("data-rest.enabled"));
 
     log.info("Generate Etendo Rx Code={}", generateRxCode);
     log.info("Path Project Rx={}", pathEtendoRx);
@@ -131,10 +126,11 @@ public class GenerateEntities {
         }
         if (generateRxCode && !entity.isVirtualEntity() && (includeViews || !entity.isView())) {
           var data = TemplateUtil.getModelData(paths, entity, getSearchesMap(entity), computedColumns, includeViews);
-          generateEntityCode(data, paths, generators);
+          generateEntityCode(data, paths, generators, dataRestEnabled);
           generateMappingCode(entity, paths, mappingGenerators);
         }
       }
+      generateMappingGroup(paths, new GenerateGroupedOpenApi());
 
       generateGlobalCode(paths, entities);
 
@@ -144,6 +140,12 @@ public class GenerateEntities {
       log.error(ERROR_GENERATING_FILE + GENERATED_DIR, e);
     }
     log.info("Generated {} entities", entities.size());
+  }
+
+  private void generateMappingGroup(GeneratePaths paths,
+      GenerateGroupedOpenApi generateGroupedOpenApi) throws FileNotFoundException {
+      List<ETRXProjection> list = ETRXModelProvider.getInstance().getETRXProjection();
+      generateGroupedOpenApi.generate(list, paths);
   }
 
   private void generateGlobalCode(GeneratePaths paths, List<Entity> entities) throws FileNotFoundException {
@@ -176,9 +178,9 @@ public class GenerateEntities {
   }
 
   private void generateEntityCode(Map<String, Object> data, GeneratePaths paths,
-      List<EntityGenerator> generators) throws FileNotFoundException {
+      List<EntityGenerator> generators, boolean dataRestEnabled) throws FileNotFoundException {
     for (EntityGenerator generator : generators) {
-      generator.generate(data, paths);
+      generator.generate(data, paths, dataRestEnabled);
     }
   }
 

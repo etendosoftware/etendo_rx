@@ -18,7 +18,7 @@ package com.etendorx.gen.metadata;
 import com.etendorx.gen.beans.ProjectionEntity;
 import com.etendorx.gen.beans.ProjectionEntityField;
 import com.etendorx.gen.util.CodeGenerationException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openbravo.base.model.Entity;

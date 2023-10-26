@@ -42,6 +42,8 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   String contextName;
   private String externalPoolClassName;
   private static ExternalConnectionPool externalConnectionPool;
+  private static final String ERROR_GET_CONNECTION_UNNAMED_POOL = "Couldn't get a connection for an unnamed pool";
+  private static final String ERROR_UNNAMED_POOL_NOT_FOUND = "Can't get the pool. No pool name specified";
 
   public ConnectionProviderImpl(Properties properties) throws PoolNotFoundException {
     this.defaultPoolName = "";
@@ -72,8 +74,8 @@ public class ConnectionProviderImpl implements ConnectionProvider {
     throws PoolNotFoundException {
     Properties properties = new Properties();
 
-    try {
-      properties.load(new FileInputStream(file));
+    try(FileInputStream fis = new FileInputStream(file)) {
+      properties.load(fis);
       this.create(properties, isRelative, _context);
     } catch (IOException var6) {
       log4j.error("Error loading properties", var6);
@@ -81,55 +83,49 @@ public class ConnectionProviderImpl implements ConnectionProvider {
 
   }
 
-  private void create(Properties properties, boolean isRelative, String _context)
-    throws PoolNotFoundException {
+  private void create(Properties properties, boolean isRelative, String providedContext) throws PoolNotFoundException {
     log4j.debug("Creating ConnectionProviderImpl");
-    if (_context != null && !_context.equals("")) {
-      this.contextName = _context;
+
+    // Set context if provided
+    if (providedContext != null && !providedContext.isEmpty()) {
+      this.contextName = providedContext;
     }
 
-    String poolName = null;
-    String dbDriver = null;
-    String dbServer = null;
-    String dbLogin = null;
-    String dbPassword = null;
-
-    double maxConnTime = 0.5;
-    String dbSessionConfig = null;
-    String _rdbms = null;
-    poolName = properties.getProperty("bbdd.poolName", "myPool");
-    this.externalPoolClassName = properties.getProperty("db.externalPoolClassName");
-    dbDriver = properties.getProperty("bbdd.driver");
-    dbServer = properties.getProperty("bbdd.url");
-    dbLogin = properties.getProperty("bbdd.user");
-    dbPassword = properties.getProperty("bbdd.password");
+    String poolName = properties.getProperty("bbdd.poolName", "myPool");
+    this.externalPoolClassName = properties.getProperty("db.externalPoolClassName", "");
+    String dbDriver = properties.getProperty("bbdd.driver", "");
+    String dbServer = properties.getProperty("bbdd.url", "");
+    String dbLogin = properties.getProperty("bbdd.user", "");
+    String dbPassword = properties.getProperty("bbdd.password", "");
     int minConns = Integer.parseInt(properties.getProperty("bbdd.minConns", "1"));
     int maxConns = Integer.parseInt(properties.getProperty("bbdd.maxConns", "10"));
-    maxConnTime = Double.parseDouble(properties.getProperty("maxConnTime", "0.5"));
-    dbSessionConfig = properties.getProperty("bbdd.sessionConfig");
-    _rdbms = properties.getProperty("bbdd.rdbms");
-    if (_rdbms.equalsIgnoreCase("POSTGRE")) {
+    double maxConnTime = Double.parseDouble(properties.getProperty("maxConnTime", "0.5"));
+    String dbSessionConfig = properties.getProperty("bbdd.sessionConfig", "");
+    String rdbmsType = properties.getProperty("bbdd.rdbms", "");
+
+    // Update dbServer if rdbmsType is POSTGRE
+    if ("POSTGRE".equalsIgnoreCase(rdbmsType)) {
       dbServer = dbServer + "/" + properties.getProperty("bbdd.sid");
     }
 
     if (log4j.isDebugEnabled()) {
-      log4j.debug("poolName: " + poolName);
-      log4j.debug("externalPoolClassName: " + this.externalPoolClassName);
-      log4j.debug("dbDriver: " + dbDriver);
-      log4j.debug("dbServer: " + dbServer);
-      log4j.debug("dbLogin: " + dbLogin);
-      log4j.debug("dbPassword: " + dbPassword);
-      log4j.debug("minConns: " + minConns);
-      log4j.debug("maxConns: " + maxConns);
-      log4j.debug("maxConnTime: " + Double.toString(maxConnTime));
-      log4j.debug("dbSessionConfig: " + dbSessionConfig);
-      log4j.debug("rdbms: " + _rdbms);
+      log4j.debug("poolName: {}", poolName);
+      log4j.debug("externalPoolClassName: {}", this.externalPoolClassName);
+      log4j.debug("dbDriver: {}", dbDriver);
+      log4j.debug("dbServer: {}", dbServer);
+      log4j.debug("dbLogin: {}", dbLogin);
+      log4j.debug("dbPassword: {}", dbPassword);
+      log4j.debug("minConns: {}", minConns);
+      log4j.debug("maxConns: {}", maxConns);
+      log4j.debug("maxConnTime: {}", maxConnTime);
+      log4j.debug("dbSessionConfig: {}", dbSessionConfig);
+      log4j.debug("rdbms: {}", rdbmsType);
     }
 
-    if (this.externalPoolClassName != null && !"".equals(this.externalPoolClassName)) {
+    if (this.externalPoolClassName != null && !this.externalPoolClassName.isEmpty()) {
       try {
         externalConnectionPool = ExternalConnectionPool.getInstance(this.externalPoolClassName);
-      } catch (Throwable var17) {
+      } catch (Exception e) {
         externalConnectionPool = null;
         this.externalPoolClassName = null;
       }
@@ -137,12 +133,13 @@ public class ConnectionProviderImpl implements ConnectionProvider {
 
     try {
       this.addNewPool(dbDriver, dbServer, dbLogin, dbPassword, minConns, maxConns, maxConnTime,
-        dbSessionConfig, _rdbms, poolName);
-    } catch (Exception var16) {
-      log4j.error(var16);
-      throw new PoolNotFoundException("Failed when creating database connections pool", var16);
+          dbSessionConfig, rdbmsType, poolName);
+    } catch (Exception e) {
+      log4j.error(e);
+      throw new PoolNotFoundException("Failed when creating database connections pool", e);
     }
   }
+
 
   public void destroy(String name) throws Exception {
     if (externalConnectionPool != null) {
@@ -217,7 +214,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
         return connectionPool;
       }
     } else {
-      throw new PoolNotFoundException("Couldn´t get an unnamed pool");
+      throw new PoolNotFoundException(ERROR_UNNAMED_POOL_NOT_FOUND);
     }
   }
 
@@ -239,34 +236,32 @@ public class ConnectionProviderImpl implements ConnectionProvider {
 
       return conn;
     } else {
-      throw new NoConnectionAvailableException("Couldn´t get a connection for an unnamed pool");
+      throw new NoConnectionAvailableException(ERROR_GET_CONNECTION_UNNAMED_POOL);
     }
   }
 
   private Connection getNewConnection(String poolName) throws NoConnectionAvailableException {
-    if (poolName != null && !poolName.equals("")) {
-      if (externalConnectionPool == null && this.externalPoolClassName != null && !"".equals(
-        this.externalPoolClassName)) {
-        try {
-          externalConnectionPool = ExternalConnectionPool.getInstance(this.externalPoolClassName);
-        } catch (Throwable var4) {
-          externalConnectionPool = null;
-          this.externalPoolClassName = null;
-        }
-      }
-
-      Connection conn;
-      if (externalConnectionPool != null) {
-        conn = externalConnectionPool.getConnection();
-      } else {
-        conn = this.getCommonsDbcpPoolConnection(poolName);
-      }
-
-      return conn;
-    } else {
-      throw new NoConnectionAvailableException("Couldn´t get a connection for an unnamed pool");
+    // Check for empty poolName
+    if (poolName == null || poolName.trim().isEmpty()) {
+      throw new NoConnectionAvailableException(ERROR_GET_CONNECTION_UNNAMED_POOL);
     }
+
+    // Check and instantiate externalConnectionPool if necessary
+    if (externalConnectionPool == null && this.externalPoolClassName != null && !this.externalPoolClassName.trim().isEmpty()) {
+      try {
+        externalConnectionPool = ExternalConnectionPool.getInstance(this.externalPoolClassName);
+      } catch (ReflectiveOperationException throwable) {
+        externalConnectionPool = null;
+        this.externalPoolClassName = null;
+      }
+    }
+
+    // Obtain the connection from the relevant pool
+    return (externalConnectionPool != null)
+        ? externalConnectionPool.getConnection()
+        : this.getCommonsDbcpPoolConnection(poolName);
   }
+
 
   private Connection getCommonsDbcpPoolConnection(String poolName)
     throws NoConnectionAvailableException {
@@ -283,7 +278,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
           "There are no connections available in jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
       }
     } else {
-      throw new NoConnectionAvailableException("Couldn´t get a connection for an unnamed pool");
+      throw new NoConnectionAvailableException(ERROR_GET_CONNECTION_UNNAMED_POOL);
     }
   }
 
@@ -330,7 +325,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   public Connection getTransactionConnection() throws NoConnectionAvailableException, SQLException {
     Connection conn = this.getNewConnection(this.defaultPoolName);
     if (conn == null) {
-      throw new NoConnectionAvailableException("Couldn´t get an available connection");
+      throw new NoConnectionAvailableException("Couldn't get an available connection");
     } else {
       conn.setAutoCommit(false);
       return conn;
@@ -365,7 +360,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
       log4j.debug("connection established");
       return this.getPreparedStatement(conn, SQLPreparedStatement);
     } else {
-      throw new PoolNotFoundException("Can't get the pool. No pool name specified");
+      throw new PoolNotFoundException(ERROR_UNNAMED_POOL_NOT_FOUND);
     }
   }
 
@@ -399,7 +394,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
       Connection conn = this.getConnection(poolName);
       return this.getCallableStatement(conn, SQLCallableStatement);
     } else {
-      throw new PoolNotFoundException("Can't get the pool. No pool name specified");
+      throw new PoolNotFoundException(ERROR_UNNAMED_POOL_NOT_FOUND);
     }
   }
 
@@ -430,7 +425,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
       Connection conn = this.getConnection(poolName);
       return this.getStatement(conn);
     } else {
-      throw new PoolNotFoundException("Can't get the pool. No pool name specified");
+      throw new PoolNotFoundException(ERROR_UNNAMED_POOL_NOT_FOUND);
     }
   }
 
@@ -510,8 +505,6 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public String getStatus() {
-    StringBuffer strResultado = new StringBuffer();
-    strResultado.append("Not implemented yet");
-    return strResultado.toString();
+    return "Not implemented yet";
   }
 }

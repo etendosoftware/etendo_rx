@@ -16,7 +16,7 @@
 
 package org.etendorx.service.dataset;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.etendorx.base.provider.OBProvider;
@@ -288,7 +288,9 @@ public class DataSetService implements OBSingleton {
    * @param paramsInWhereClause
    *          New map with found parameters in this where clause
    * @return whereClause ready for execution and existingParams set
-   */ private String getWhereClauseWithAliasesReplaced(String moduleId,
+   */
+  @Deprecated
+  private String getWhereClauseWithAliasesReplaced(String moduleId,
                                                        Map<String, Object> parameters, String whereClauseWithAliases,
                                                        Map<String, Object> paramsInWhereClause) {
     String whereClause = whereClauseWithAliases;
