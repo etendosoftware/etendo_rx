@@ -16,19 +16,17 @@
 
 package com.etendorx.test.eventhandler;
 
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-
+import com.etendorx.das.EtendorxDasApplication;
+import com.etendorx.entities.jparepo.ADUserRepository;
+import com.etendorx.test.eventhandler.component.EventHandlerUser;
+import com.etendorx.test.eventhandler.utils.TestcontainersUtils;
+import com.etendorx.utils.auth.key.context.AppContext;
+import com.etendorx.utils.auth.key.context.UserContext;
 import org.hibernate.event.spi.PreUpdateEvent;
 import org.junit.jupiter.api.Test;
 import org.openbravo.model.ad.access.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
@@ -37,16 +35,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
-import com.etendorx.das.EtendorxDasApplication;
-import com.etendorx.entities.jparepo.ADUserRepository;
-import com.etendorx.test.eventhandler.component.EventHandlerUser;
-import com.etendorx.utils.auth.key.context.AppContext;
-import com.etendorx.utils.auth.key.context.UserContext;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19091")
@@ -73,27 +68,11 @@ public class TestEventHandler {
 
   @DynamicPropertySource
   static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.datasource.url", () -> {
-      return "jdbc:postgresql://" + postgreSQLContainer.getCurrentContainerInfo().getNetworkSettings().getNetworks().entrySet().stream().findFirst().get().getValue().getGateway() + ":" + postgreSQLContainer.getMappedPort(
-          5432) + "/etendo";
-    });
-    registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-    registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-    registry.add("scan.basePackage", () -> "com.etendorx.test.eventhandler");
+    TestcontainersUtils.setProperties(registry, postgreSQLContainer);
   }
 
   @Container
-  public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-      DockerImageName.parse("etendo/etendodata:rx-1.2.1").asCompatibleSubstituteFor("postgres")
-  )
-      .withPassword("syspass")
-      .withUsername("postgres")
-      .withEnv("PGDATA", "/postgres")
-      .withDatabaseName("etendo")
-      .withExposedPorts(5432)
-      .waitingFor(
-          Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
-      );
+  public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
   @Test
   void testUpdateUserAndExecuteEventHandler() {

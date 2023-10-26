@@ -46,6 +46,7 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   }
 
   @Override
+  @Transactional
   public Iterable<E> findAll() {
     List<E> dtos = new ArrayList<>();
     Iterable<T> entities = repository.findAll();
@@ -55,6 +56,7 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
     return dtos;
   }
 
+  @Transactional
   public E findById(String id) {
     var entity = retriever.get(id);
     return converter.convert(entity);

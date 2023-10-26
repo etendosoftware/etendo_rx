@@ -44,13 +44,13 @@ publishing {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.1.4'
     implementation 'com.jayway.jsonpath:json-path:2.8.0'
     implementation 'org.springframework:spring-web'
-    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'org.postgresql:postgresql:42.6.0'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.1.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'javax.persistence:javax.persistence-api:2.2'
 
