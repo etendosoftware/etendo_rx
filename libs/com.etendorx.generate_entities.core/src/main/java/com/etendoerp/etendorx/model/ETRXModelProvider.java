@@ -29,11 +29,8 @@ import org.apache.logging.log4j.Logger;
 import org.etendorx.base.provider.OBProvider;
 import org.etendorx.base.provider.OBSingleton;
 import org.hibernate.Session;
-import org.openbravo.base.model.Entity;
-import org.openbravo.base.model.ModelObject;
-import org.openbravo.base.model.ModelSessionFactoryController;
+import org.openbravo.base.model.*;
 import org.openbravo.base.model.Module;
-import org.openbravo.base.model.Table;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -223,6 +220,10 @@ public class ETRXModelProvider implements OBSingleton {
 
   public List<ETRXRepository> getETRXRepositories(Entity entity) {
     return getData(ETRXRepository.class, session -> retrieveETRXRepositories(session, entity));
+  }
+
+  public List<ETRXRepository> getETRXRepositories(ETRXProjectionEntity entity) {
+    return getETRXRepositories(ModelProvider.getInstance().getEntity(entity.getName()));
   }
 
   private Table retrieveTable(Session session, String tableId) {

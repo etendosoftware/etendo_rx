@@ -18,6 +18,7 @@ package com.etendorx.entities.mapper.lib;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 public abstract class BindedRestController<E extends BaseDTOModel, F extends BaseDTOModel> {
   private final JsonPathConverter<F> converter;
+  @Getter
   private final DASRepository<E, F> repository;
 
   protected BindedRestController(

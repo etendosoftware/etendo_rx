@@ -6,6 +6,7 @@ import com.etendorx.entities.jparepo.${entity.name}Repository;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component("${mappingPrefix}${entity.name}DASRepository")
@@ -21,4 +22,12 @@ public class ${mappingPrefix}${entity.name}DTORepositoryDefault extends BaseDTOR
     super(restCallTransactionHandler, repository, converter, retriever, auditService);
   }
 
+  <#list modelProviderRX.getETRXRepositories(entity) as repo>
+    <#list repo.searches as search>
+  Iterable<${mappingPrefix}${entity.name}DTORead> ${search.method}(<#list search.params as param>String ${param.name}, </#list>Pageable page) {
+      var repository = ((${entity.name}Repository) getRepository()).${search.method}(<#list search.params as param>${param.name}, </#list>page);
+      return getConverter().convert(repository.toList());
+  }
+    </#list>
+  </#list>
 }

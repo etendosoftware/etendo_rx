@@ -15,6 +15,7 @@
  */
 package com.etendorx.gen.generation.mapping;
 
+import com.etendoerp.etendorx.model.ETRXModelProvider;
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.generation.GeneratePaths;
 import com.etendorx.gen.generation.interfaces.MappingGenerator;
@@ -73,6 +74,7 @@ public abstract class MappingGenerationBase implements MappingGenerator {
     data.put("mappingPrefix", mappingPrefix);
     data.put("entity", etrxProjectionEntity);
     data.put("modelProvider", ModelProvider.getInstance());
+    data.put("modelProviderRX", ETRXModelProvider.getInstance());
     try {
       TemplateHashModel fileStatics = null;
       fileStatics = (TemplateHashModel) staticModels.get("org.openbravo.base.model.NamingUtil");
