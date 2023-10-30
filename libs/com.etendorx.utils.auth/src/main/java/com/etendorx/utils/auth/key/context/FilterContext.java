@@ -39,7 +39,7 @@ public class FilterContext extends OncePerRequestFilter {
   public static final String TRUE = "true";
   public static final String FALSE = "false";
   public static final String NO_ACTIVE_FILTER_PARAMETER = "_noActiveFilter";
-  public static final String TRIGGER_ENABLED_PARAMETER = "triggerEnabled";
+  public static final String TRIGGER_ENABLED_PARAMETER = "_triggerEnabled";
   private static final String DATE_FORMAT_PARAMETER = "_dateFormat";
   private static final String TIME_ZONE_PARAMETER = "_timeZone";
   @Autowired

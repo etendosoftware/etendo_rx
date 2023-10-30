@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.entities.mapper.lib;
+package com.etendorx.eventhandler.transaction;
 
+/**
+ * This class is used to disable triggers when a rest call is made.
+ */
+public interface RestCallTransactionHandler {
+  /**
+   * Disables triggers.
+   */
+  void begin();
 
-public interface DASRepository<E extends BaseDTOModel, F extends BaseDTOModel> {
-
-  Iterable<E> findAll();
-
-  E findById(String id);
-
-  E save(F dtoEntity);
-
-  E updated(F dtoEntity);
-
+  /**
+   * Must be called on transaction commit. This method will enable triggers.
+   */
+  void commit();
 }
-
