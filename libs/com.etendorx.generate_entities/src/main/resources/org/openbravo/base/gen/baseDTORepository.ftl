@@ -22,18 +22,20 @@ import com.etendorx.entities.mapper.lib.DTOConverter;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends BaseDTOModel,F extends BaseDTOModel> implements DASRepository<E,F> {
 
   private final RestCallTransactionHandler transactionHandler;
+  @Getter
   private final BaseDASRepository<T> repository;
+  @Getter
   private final DTOConverter<T, E, F> converter;
   private final AuditServiceInterceptor auditService;
   private final JsonPathEntityRetriever<T> retriever;
