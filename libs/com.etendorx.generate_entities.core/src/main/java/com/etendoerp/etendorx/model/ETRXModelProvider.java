@@ -29,8 +29,12 @@ import org.apache.logging.log4j.Logger;
 import org.etendorx.base.provider.OBProvider;
 import org.etendorx.base.provider.OBSingleton;
 import org.hibernate.Session;
-import org.openbravo.base.model.*;
+import org.openbravo.base.model.Entity;
+import org.openbravo.base.model.ModelObject;
+import org.openbravo.base.model.ModelProvider;
+import org.openbravo.base.model.ModelSessionFactoryController;
 import org.openbravo.base.model.Module;
+import org.openbravo.base.model.Table;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
