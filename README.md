@@ -1,14 +1,47 @@
-### Gradle properties
+# Etendo RX
+This is the development repository of Etendo RX. <br>
 
-    Rename the 'gradle.properties.template' to 'gradle.properties'
+### Etendo RX Instalation
 
-### Generation of entities
+1. Clone the repository
+```
+git clone git@github.com:etendosoftware/etendo_rx.git
+```
 
-- To generate the entities run
+2. To compile and deploy an Etendo RX instance you have to setup the configuration variables, to do that you have to create a copy of `gradle.properties.template` file in root.
 
-```./gradlew generate.entities --info```
+```bash
+cp gradle.properties.template gradle.properties
+```
 
-> The properties will be taken from the 'gradle.properties' file.
+3. You can either edit `gradle.properties` file updating the variables, or use their default values.
+> **Info** <br>
+> Remember to configure `githubUser` and `githubToken`
+
+4. Run setup tasks to create the configurations files
+```
+./gradlew setup
+```
+> **Warning** <br>
+> If you change the default **bbdd.url** and/or **bbdd.sid**, you must edit the `rxconfig/das.yaml` file using the new values.
+
+5. Execute the generate.entities task
+
+```
+./gradlew generate.entities 
+```
+
+6. To execute RX services run:
+```
+./gradlew rx 
+```
+By default the following services must be up:
+- Config
+- Auth
+- Edge
+- Das
+- Async
+
 
 ### Project properties
 
