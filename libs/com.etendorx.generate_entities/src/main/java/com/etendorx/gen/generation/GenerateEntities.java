@@ -189,11 +189,19 @@ public class GenerateEntities {
     Table table = ModelProvider.getInstance().getTable(entity.getTableName());
     List<ETRXProjectionEntity> list = ETRXModelProvider.getInstance().getETRXProjectionEntity(table);
     new GenerateBaseDTOConverter().generate(list, paths);
+    List<String> externalNames = list.stream()
+        .map(m -> m.getExternalName())
+        .distinct()
+        .collect(Collectors.toList());
+    for (String externalName : externalNames) {
     // mappings
-    for (ETRXProjectionEntity etrxProjectionEntity : list) {
-      if (hasReadWrite(list, etrxProjectionEntity)) {
-        for (MappingGenerator mappingGenerator : mappingGenerators) {
-          mappingGenerator.generate(etrxProjectionEntity, paths);
+      var filteredList = list.stream()
+          .filter( m -> m.getExternalName().equals(externalName)).toList();
+      for (ETRXProjectionEntity etrxProjectionEntity : filteredList) {
+        if (hasReadWrite(filteredList, etrxProjectionEntity)) {
+          for (MappingGenerator mappingGenerator : mappingGenerators) {
+            mappingGenerator.generate(etrxProjectionEntity, paths);
+          }
         }
       }
     }

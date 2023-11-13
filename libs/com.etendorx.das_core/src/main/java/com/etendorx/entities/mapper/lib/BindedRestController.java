@@ -75,6 +75,6 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   public ResponseEntity<E> put(@PathVariable String id, @RequestBody String rawEntity) {
     F dtoEntity = converter.convert(rawEntity);
     dtoEntity.setId(id);
-    return new ResponseEntity<>(repository.updated(dtoEntity), HttpStatus.CREATED);
+    return new ResponseEntity<>(repository.update(dtoEntity), HttpStatus.CREATED);
   }
 }

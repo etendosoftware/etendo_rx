@@ -227,7 +227,7 @@ public class ETRXModelProvider implements OBSingleton {
   }
 
   public List<ETRXRepository> getETRXRepositories(ETRXProjectionEntity entity) {
-    return getETRXRepositories(ModelProvider.getInstance().getEntity(entity.getName()));
+    return getETRXRepositories(ModelProvider.getInstance().getEntity(entity.getTable().getName()));
   }
 
   private Table retrieveTable(Session session, String tableId) {

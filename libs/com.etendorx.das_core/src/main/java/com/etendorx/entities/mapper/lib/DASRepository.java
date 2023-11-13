@@ -24,7 +24,7 @@ public interface DASRepository<E extends BaseDTOModel, F extends BaseDTOModel> {
 
   E save(F dtoEntity);
 
-  E updated(F dtoEntity);
+  E update(F dtoEntity);
 
 }
 

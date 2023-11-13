@@ -1,13 +1,19 @@
 package com.etendorx.das.utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.util.ObjectUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TestcontainersUtils {
   private TestcontainersUtils() {
@@ -65,5 +71,15 @@ public class TestcontainersUtils {
         .waitingFor(
             Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
         );
+  }
+
+  public static String getJsonFromFile(String jsonFile) {
+    try {
+      var f = new File(
+          TestcontainersUtils.class.getResource(jsonFile).getFile());
+      return Files.readString(f.toPath(), UTF_8);
+    } catch (Exception e) {
+      throw new RuntimeException("Error reading json file: " + jsonFile);
+    }
   }
 }

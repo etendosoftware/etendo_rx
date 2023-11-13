@@ -34,8 +34,7 @@ public class GenerateBaseRepository extends MappingGenerationBase {
 
   @Override
   protected String getOutFileName(ETRXProjectionEntity etrxProjectionEntity) {
-    final String name = etrxProjectionEntity.getTable().getName();
-    return name + "DTORepositoryDefault.java";
+    return etrxProjectionEntity.getExternalName() + "DTORepositoryDefault.java";
   }
 
 }

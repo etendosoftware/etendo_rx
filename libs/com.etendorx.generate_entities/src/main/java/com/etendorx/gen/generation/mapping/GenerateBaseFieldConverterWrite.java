@@ -33,7 +33,7 @@ public class GenerateBaseFieldConverterWrite extends MappingGenerationBase {
 
   @Override
   protected String getOutFileName(ETRXProjectionEntity etrxProjectionEntity) {
-    return etrxProjectionEntity.getTable().getName() + "FieldConverterWrite.java";
+    return etrxProjectionEntity.getExternalName() + "FieldConverterWrite.java";
   }
 
 }

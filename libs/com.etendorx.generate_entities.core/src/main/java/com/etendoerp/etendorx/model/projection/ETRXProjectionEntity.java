@@ -30,6 +30,8 @@ public class ETRXProjectionEntity extends ModelObject {
   private Boolean identity;
   private String name;
   private String mappingType;
+  private Boolean isRestEndPoint;
+  private String externalName;
 
   private Set<ETRXEntityField> fields;
 
@@ -84,5 +86,22 @@ public class ETRXProjectionEntity extends ModelObject {
 
   public void setMappingType(String mappingType) {
     this.mappingType = mappingType;
+  }
+
+  public Boolean isRestEndPoint() {
+    return isRestEndPoint;
+
+  }
+
+  public void setRestEndPoint(Boolean restEndPoint) {
+    isRestEndPoint = restEndPoint;
+  }
+
+  public String getExternalName() {
+    return externalName;
+  }
+
+  public void setExternalName(String externalName) {
+    this.externalName = externalName;
   }
 }

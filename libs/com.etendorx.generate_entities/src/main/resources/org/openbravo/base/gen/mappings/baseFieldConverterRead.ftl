@@ -42,9 +42,9 @@
 </#macro>
 <#macro getConverterName field>
   <#assign projectionName = field.etrxProjectionEntityRelated.projection.name?upper_case>
-  <#assign tableName = field.etrxProjectionEntityRelated.table.name>
+  <#assign externalName = field.etrxProjectionEntityRelated.externalName>
   <#compress>
-  ${projectionName}${tableName}DTOConverter
+  ${projectionName}${externalName}DTOConverter
   </#compress>
 </#macro>
 <#assign mappings = []>
@@ -84,7 +84,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ${mappingPrefix}${entity.name}FieldConverterRead {
+public class ${mappingPrefix}${entity.externalName}FieldConverterRead {
 
   private final MappingUtils mappingUtils;
 <#list mappings as field>
@@ -95,7 +95,7 @@ public class ${mappingPrefix}${entity.name}FieldConverterRead {
   </#if>
 </#list>
 
-  public ${mappingPrefix}${entity.name}FieldConverterRead(
+  public ${mappingPrefix}${entity.externalName}FieldConverterRead(
         MappingUtils mappingUtils<#if mappings?size gt 0>,</#if>
 <#compress>
   <#list mappings as field>

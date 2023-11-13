@@ -72,7 +72,8 @@ public class RestCallTransactionHandlerImpl implements RestCallTransactionHandle
   private void executeStatement(String sql) {
     if (!userContext.isTriggerEnabled()) {
       transactionTemplate.executeWithoutResult(status -> {
-        try (Connection connection = DataSourceUtils.getConnection(dataSource)) {
+        try {
+          Connection connection = DataSourceUtils.getConnection(dataSource);
           var stmt = connection.prepareStatement(sql);
           stmt.execute();
         } catch (SQLException e) {

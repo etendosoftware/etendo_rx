@@ -50,15 +50,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ${mappingPrefix}${entity.name}FieldConverterWrite {
+public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
 
 <#list javaMappings as field>
-  private final DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.name}DTOWrite> ${field.name};
+  private final DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name};
 </#list>
 
-  public ${mappingPrefix}${entity.name}FieldConverterWrite(
+  public ${mappingPrefix}${entity.externalName}FieldConverterWrite(
 <#list javaMappings as field>
-    @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.name}DTOWrite> ${field.name}<#if field_has_next>,</#if>
+    @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name}<#if field_has_next>,</#if>
 </#list>
   ) {
     super();
@@ -67,23 +67,23 @@ public class ${mappingPrefix}${entity.name}FieldConverterWrite {
 </#list>
   }
 
-  public String getId(${mappingPrefix}${entity.name}DTOWrite entity) {
+  public String getId(${mappingPrefix}${entity.externalName}DTOWrite entity) {
     return entity.getId();
   }
 
 <#list javaMappings as field>
-  public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.name}DTOWrite dto) {
+  public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     ${field.name}.map(entity, dto);
   }
 
 </#list>
 <#list entity.fields as field>
   <#if (field.fieldMapping == "DM" || field.fieldMapping == "EM")>
-  public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.name}DTOWrite dto) {
+  public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     <#if field.property??>
-    entity.set${NamingUtil.getSafeJavaName(field.property)?cap_first}(dto.get${field.name?cap_first}());
+    entity.set${NamingUtil.getSafeJavaName(field.property)?cap_first}(dto.get<@toCamelCase field.name/>());
     <#else>
-    entity.set${field.name?cap_first}(dto.get${field.name?cap_first}());
+    entity.set${field.name?cap_first}(dto.get<@toCamelCase field.name/>());
     </#if>
   }
   </#if>

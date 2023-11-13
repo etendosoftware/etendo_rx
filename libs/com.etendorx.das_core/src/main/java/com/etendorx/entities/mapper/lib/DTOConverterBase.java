@@ -12,4 +12,5 @@ public abstract class DTOConverterBase<E, F, G> implements DTOConverter<E, F, G>
     }
     return dtos;
   }
+
 }

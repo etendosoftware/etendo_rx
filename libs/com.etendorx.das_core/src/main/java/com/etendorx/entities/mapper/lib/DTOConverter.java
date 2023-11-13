@@ -45,4 +45,11 @@ public interface DTOConverter<E, F, G> {
    */
   Iterable<F> convert(Iterable<E> entities);
 
+  /**
+   *
+   * @param dto
+   * @param entity
+   * @return
+   */
+  E convertOneToMany(G dto, E entity);
 }

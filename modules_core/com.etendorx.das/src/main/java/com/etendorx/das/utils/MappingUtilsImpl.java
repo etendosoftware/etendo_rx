@@ -58,6 +58,17 @@ public class MappingUtilsImpl implements MappingUtils {
       }
       return list;
     }
+    if(Date.class.isAssignableFrom(obj.getClass())) {
+      var dateFormat = AppContext.getCurrentUser().getDateFormat();
+      var timeZone = AppContext.getCurrentUser().getTimeZone();
+      if(dateFormat != null) {
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+        if(timeZone != null) {
+          sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+        }
+        return sdf.format((Date) obj);
+      }
+    }
     if(Timestamp.class.isAssignableFrom(obj.getClass())) {
       var dateFormat = AppContext.getCurrentUser().getDateFormat();
       var timeZone = AppContext.getCurrentUser().getTimeZone();

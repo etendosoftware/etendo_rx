@@ -31,11 +31,11 @@ import com.etendorx.entities.mapper.lib.JsonPathEntityRetrieverBase;
 
 @Component
 @Slf4j
-public class ${mappingPrefix}${entity.name}JsonPathRetriever extends JsonPathEntityRetrieverBase<${entity.table.className}> {
+public class ${mappingPrefix}${entity.externalName}JsonPathRetriever extends JsonPathEntityRetrieverBase<${entity.table.className}> {
 
   private final JpaSpecificationExecutor<${entity.table.className}> repository;
 
-  public ${mappingPrefix}${entity.name}JsonPathRetriever(${entity.table.name}Repository repository) {
+  public ${mappingPrefix}${entity.externalName}JsonPathRetriever(${entity.table.name}Repository repository) {
     this.repository = repository;
   }
 
@@ -51,7 +51,7 @@ public class ${mappingPrefix}${entity.name}JsonPathRetriever extends JsonPathEnt
       "${field.property}"<#if field_has_next>,</#if>
     </#list>
     };
-    log.debug("retrieve ${entity.name} with keys: {}", (Object) keys);
+    log.debug("retrieve ${entity.externalName} with keys: {}", (Object) keys);
     return keys;
   }
 }

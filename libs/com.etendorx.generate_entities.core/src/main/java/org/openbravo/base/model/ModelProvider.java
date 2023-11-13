@@ -1294,4 +1294,12 @@ public class ModelProvider implements OBSingleton {
     return null;
   }
 
+  public boolean isColumnIsOneToMany(Table table, String property) {
+    // TODO Improve is many to one detection
+    if(property == null) {
+      return false;
+    }
+    var column = getColumn(table, property);
+    return column == null && property.endsWith("List");
+  }
 }

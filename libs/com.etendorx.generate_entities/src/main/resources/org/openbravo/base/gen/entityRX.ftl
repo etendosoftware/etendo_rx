@@ -19,6 +19,8 @@ import org.hibernate.type.YesNoConverter;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
 *
@@ -61,7 +63,11 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     ${p.getObjectTypeName()} ${p.javaName}_Etendo;
                     <#else>
     @JsonProperty("${p.javaName}")
+                      <#if p.getFormattedDefaultValue()??>
+    ${p.getObjectTypeName()} ${p.javaName} = ${p.getFormattedDefaultValue()};
+                        <#else>
     ${p.getObjectTypeName()} ${p.javaName};
+                        </#if>
                     </#if>
                 <#else>
     @jakarta.persistence.Column(name = "${p.columnName?lower_case}")
@@ -89,7 +95,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
             </#if>
         <#else>
             <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.getTargetEntity().isView() && !p.targetEntity.className?ends_with("_ComputedColumns")>
-    @jakarta.persistence.OneToMany(mappedBy = "${p.referencedProperty.name}")
+    @jakarta.persistence.OneToMany(mappedBy = "${p.referencedProperty.name}", cascade = jakarta.persistence.CascadeType.ALL)
     @JsonIgnoreProperties("${p.referencedProperty.name}")
     java.util.List<${p.targetEntity.className}> ${p.name};
 

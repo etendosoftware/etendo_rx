@@ -34,7 +34,7 @@ public class GenerateBaseJsonPathRetriever extends MappingGenerationBase {
 
   @Override
   protected String getOutFileName(ETRXProjectionEntity etrxProjectionEntity) {
-    return etrxProjectionEntity.getTable().getName() + "JsonPathRetriever.java";
+    return etrxProjectionEntity.getExternalName() + "JsonPathRetriever.java";
   }
 
 }
