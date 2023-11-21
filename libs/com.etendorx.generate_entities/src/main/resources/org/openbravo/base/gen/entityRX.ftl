@@ -67,7 +67,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
 
                 </#if>
             <#else>
-                <#if p.targetEntity?? && !p.isOneToMany() && !p.isId() && !p.getTargetEntity().isView()>
+                <#if p.targetEntity?? && !p.isOneToMany() && !p.isId()>
                     <#if p.targetEntity?? >
                         <#assign repeated=false/>
                         <#list entity.properties as o>
@@ -85,7 +85,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
                 </#if>
             </#if>
         <#else>
-            <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.getTargetEntity().isView() && !p.targetEntity.className?ends_with("_ComputedColumns")>
+            <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.targetEntity.className?ends_with("_ComputedColumns")>
     @javax.persistence.OneToMany(mappedBy = "${p.referencedProperty.name}")
     @JsonIgnoreProperties("${p.referencedProperty.name}")
     java.util.List<${p.targetEntity.className}> ${p.name};
