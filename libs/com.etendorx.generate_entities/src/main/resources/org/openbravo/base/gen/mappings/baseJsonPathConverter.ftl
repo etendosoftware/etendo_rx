@@ -70,7 +70,11 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
 <#list objectFields as field>
   <#if field.property??>
     <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "" />
-    <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + field.property) ! "" />
+    <#if field.etrxProjectionEntityRelated??>
+      <#assign targetEntityName = field.etrxProjectionEntityRelated.externalName />
+    <#else>
+      <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + field.property) ! "" />
+    </#if>
     <#if columnType?? && columnType != "">
     ${mappingPrefix}${targetEntityName}JsonPathRetriever ${field.name}Retriever<#if field_has_next>,</#if>
     </#if>
