@@ -36,7 +36,7 @@ public class GenerateBaseRestController extends MappingGenerationBase {
 
   @Override
   protected String getOutFileName(ETRXProjectionEntity etrxProjectionEntity) {
-    return etrxProjectionEntity.getTable().getName() + "RestController.java";
+    return etrxProjectionEntity.getExternalName()+ "RestController.java";
   }
 
 }
