@@ -101,7 +101,7 @@ public class AuthService {
       String rxServiceId = accessList.get(0).getRxServiceId();
       HttpHeaders headers = new HttpHeaders();
       headers.add(HEADER_TOKEN, token);
-      RxService rxService = restUtils.getEntity("/AUTHETRX_Rx_Services/" + rxServiceId, RxService.class);
+      RxService rxService = restUtils.getEntity("/auth/ETRX_Rx_Services/" + rxServiceId, RxService.class);
       if (!StringUtils.equals(rxService.getSearchkey(), authRequest.getService())) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_SERVICE_MESSAGE);
       }
