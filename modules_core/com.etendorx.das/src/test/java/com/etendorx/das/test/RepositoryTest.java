@@ -109,17 +109,7 @@ public class RepositoryTest {
   }
 
   @Container
-  public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-      DockerImageName.parse("etendo/etendodata:rx-1.2.1").asCompatibleSubstituteFor("postgres")
-  )
-      .withPassword("syspass")
-      .withUsername("postgres")
-      .withEnv("PGDATA", "/postgres")
-      .withDatabaseName("etendo")
-      .withExposedPorts(5432)
-      .waitingFor(
-          Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1)
-      );
+  public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
   @Test
   public void whenReadUser() {

@@ -264,6 +264,9 @@ public class GenerateEntitiesApplication {
                 // REACT
                 generateReactModel(data, projection);
                 generateModelService(data, projection);
+                generateBaseService(data, projection, "baseservice.ts");
+                generateBaseService(data, projection, "baseservice.types.ts");
+                generateBaseService(data, projection, "loginservice.ts");
               }
             }
           }
@@ -545,6 +548,31 @@ public class GenerateEntitiesApplication {
     TemplateUtil.processTemplate(templateClientRestRX, data, outWriterClientRest);
 
   }
+
+  private void generateBaseService(
+      Map<String, Object> data, Projection projection, String tplFile) throws FileNotFoundException {
+
+    freemarker.template.Template templateClientRestRX = TemplateUtil.createTemplateImplementation(
+        "/org/openbravo/base/react/" + tplFile + ".ftl");
+
+    String fullPathClientRestGen = projection.getModuleLocation() + "/lib/base";
+    final String clientRestClassNameGen = tplFile;
+
+    var outFileClientRest = new File(fullPathClientRestGen, clientRestClassNameGen);
+    new File(outFileClientRest.getParent()).mkdirs();
+
+    data.put("projectionName", projection.getName());
+    ProjectionEntity projectionEntity = projection.getEntities().getOrDefault(data.get("newClassName").toString(), null);
+
+    data.put("projectionFields",
+        projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<String>());
+    data.put("projection", projection);
+    Writer outWriterClientRest = new BufferedWriter(
+        new OutputStreamWriter(new FileOutputStream(outFileClientRest), StandardCharsets.UTF_8));
+    TemplateUtil.processTemplate(templateClientRestRX, data, outWriterClientRest);
+
+  }
+
 
   /**
    * Generates the feign client java class corresponding with the defined entity to be projected.

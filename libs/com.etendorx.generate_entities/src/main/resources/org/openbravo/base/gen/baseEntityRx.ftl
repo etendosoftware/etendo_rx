@@ -26,10 +26,12 @@ import javax.persistence.MappedSuperclass;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class BaseRXObject {
+public abstract class BaseRXObject implements Serializable {
     @javax.persistence.JoinColumn(name = "ad_client_id", referencedColumnName = "AD_Client_id")
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
     Client client;

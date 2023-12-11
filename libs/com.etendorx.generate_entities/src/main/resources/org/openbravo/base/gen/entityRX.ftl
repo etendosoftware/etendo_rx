@@ -67,7 +67,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
 
                 </#if>
             <#else>
-                <#if p.targetEntity?? && !p.isOneToMany() && !p.isId() && !p.getTargetEntity().isView()>
+                <#if p.targetEntity?? && !p.isOneToMany() && !p.isId()>
                     <#if p.targetEntity?? >
                         <#assign repeated=false/>
                         <#list entity.properties as o>
@@ -75,7 +75,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
                                 <#assign repeated=true/>
                             </#if>
                         </#list>
-    @javax.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.getTargetEntity().getTableName()}_id"<#if repeated>, updatable = false, insertable = false</#if>)
+    @javax.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.referencedProperty.columnName?lower_case}"<#if repeated>, updatable = false, insertable = false</#if>)
     @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
     @JsonProperty("${p.javaName}")
     ${p.targetEntity.className} ${p.javaName};
@@ -85,7 +85,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
                 </#if>
             </#if>
         <#else>
-            <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.getTargetEntity().isView() && !p.targetEntity.className?ends_with("_ComputedColumns")>
+            <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.targetEntity.className?ends_with("_ComputedColumns")>
     @javax.persistence.OneToMany(mappedBy = "${p.referencedProperty.name}")
     @JsonIgnoreProperties("${p.referencedProperty.name}")
     java.util.List<${p.targetEntity.className}> ${p.name};
