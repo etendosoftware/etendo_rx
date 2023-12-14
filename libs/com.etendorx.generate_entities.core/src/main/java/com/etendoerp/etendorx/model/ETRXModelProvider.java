@@ -15,6 +15,7 @@
  */
 package com.etendoerp.etendorx.model;
 
+import com.etendoerp.etendorx.model.mapping.ETRXConstantValue;
 import com.etendoerp.etendorx.model.mapping.ETRXJavaMapping;
 import com.etendoerp.etendorx.model.projection.ETRXEntityField;
 import com.etendoerp.etendorx.model.projection.ETRXProjection;
@@ -65,7 +66,8 @@ public class ETRXModelProvider implements OBSingleton {
       ETRXEntitySearch.class,
       ETRXSearchParam.class,
       // Mappings
-      ETRXJavaMapping.class
+      ETRXJavaMapping.class,
+      ETRXConstantValue.class
   );
 
   public static synchronized ETRXModelProvider getInstance() {

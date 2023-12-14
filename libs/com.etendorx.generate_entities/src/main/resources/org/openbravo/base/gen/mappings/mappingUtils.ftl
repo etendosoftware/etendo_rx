@@ -25,4 +25,6 @@ public interface MappingUtils {
   Object handleBaseObject(Object obj);
 
   Date parseDate(String date);
+
+  String constantValue(String id);
 }
