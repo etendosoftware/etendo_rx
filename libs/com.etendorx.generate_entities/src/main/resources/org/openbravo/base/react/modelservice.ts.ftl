@@ -13,12 +13,8 @@
   <#default><#return string>
  </#switch>
 </#function>
-import {BaseService} from '../base/baseservice'
-import {
-  ${entity.name},
-  ${entity.name}List,
-  <#if searches??><#list searches as s>${s.method?cap_first}Params<#if !s?is_last>, </#if></#list></#if>
-} from "./${entity.name?lower_case}.types";
+import {BaseService} from '../base/baseservice';
+import {${entity.name}, ${entity.name}List, <#if searches??><#list searches as s>${s.method?cap_first}Params<#if !s?is_last>, </#if></#list></#if>} from './${entity.name?lower_case}.types';
 
 class BackService extends BaseService<${entity.name}> {
   private static modelName = '${entity.name}';
@@ -43,28 +39,33 @@ class BackService extends BaseService<${entity.name}> {
 <#if searches??>
 
 <#list searches as s>
-  async ${s.method}(<#list s.params as p>${p.name}: ${react_type(p.type)}<#if p?has_next>, </#if></#list>): Promise<${entity.name}List> {
+  async ${s.method}(
+  <#list s.params as p>  ${p.name}: ${react_type(p.type)},
+  </#list>  page?: number,
+    size?: number,
+  ): Promise<${entity.name}List> {
     return this._fetchSearch<${s.method?cap_first}Params>(
-      '${s.method}',
-      {<#list s.params as p>${p.name}: ${p.name}<#if p?has_next>, </#if></#list>},
-      '${projectionName}',
-    )
+      '${s.method}', {
+      <#list s.params as p>${p.name}, </#list>
+      projection: '${projectionName}',
+      page,
+      size,
+    });
   }
 </#list>
 </#if>
 
 }
 
-class FrontService {
-  async save(data: ${entity.name}): Promise<${entity.name}> {
-    const req = await fetch(
-      `/api/${entity.name}/${'$'}{data.id}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(data),
-      },
-    );
-    return await req.json();
+class FrontService extends BaseService<Product> {
+  getModelName(): string {
+    throw new Error('Method not implemented.');
+  }
+  getFetchName(): string {
+    throw new Error('Method not implemented.');
+  }
+  mapManyToOne(entity: Product): void {
+    throw new Error('Method not implemented.');
   }
 }
 

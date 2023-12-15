@@ -36,6 +36,7 @@ import java.util.Set;
 @Slf4j
 public class FilterContext extends OncePerRequestFilter {
   public static final String HEADER_TOKEN = "X-TOKEN";
+  private static final String HEADER_AUTHORIZATION = "Authorization";
   public static final String TRUE = "true";
   public static final String FALSE = "false";
   public static final String NO_ACTIVE_FILTER_PARAMETER = "_noActiveFilter";
@@ -53,6 +54,10 @@ public class FilterContext extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     String token = request.getHeader(HEADER_TOKEN);
+    if(StringUtils.isEmpty(token)) {
+      String authHeader = request.getHeader(HEADER_AUTHORIZATION);
+      token = StringUtils.substringAfter(authHeader, "Bearer ");
+    }
     if (!StringUtils.isEmpty(token)) {
       setUserContextFromToken(publicKey, token, request);
     } else {
