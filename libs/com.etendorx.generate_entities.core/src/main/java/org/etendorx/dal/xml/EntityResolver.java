@@ -74,7 +74,7 @@ public class EntityResolver implements OBNotSingleton {
   private Map<BaseOBObject, String> objectOriginalIdMapping = new HashMap<BaseOBObject, String>();
   //private Client clientZero;
   //private Organization organizationZero;
-  private String[] zeroOrgTree = new String[]{"0"};
+  private String[] zeroOrgTree = new String[] { "0" };
   //private Client client;
   //private Organization organization;
   private String[] orgNaturalTree;
@@ -100,20 +100,16 @@ public class EntityResolver implements OBNotSingleton {
    * object (in the root of the xml) the search is differs. If no existing object can be found then
    * new one is created..
    *
-   * @param entityName
-   *   the name of the entity searched for
-   * @param id
-   *   the id, can be null
-   * @param referenced
-   *   if the entity is searched because it is refered to or if it is in the root of the xml
-   *
+   * @param entityName the name of the entity searched for
+   * @param id         the id, can be null
+   * @param referenced if the entity is searched because it is refered to or if it is in the root of the xml
    * @return an existing or a new entity
    */
   // searches for a previous entity with the same id or an id retrieved from
   // the ad_ref_data_loaded table. The resolving takes into account different
   // access levels and
   public BaseOBObject resolve(String entityName, String id, boolean referenced,
-                              boolean filterOrgs) {
+      boolean filterOrgs) {
 
     //  Check.isNotNull(client, "Client should not be null");
     //  Check.isNotNull(organization, "Org should not be null");
@@ -354,7 +350,7 @@ public class EntityResolver implements OBNotSingleton {
   }
 */
   private BaseOBObject searchSystemRefLoaded(String id, Entity entity,
-                                             List<RefDataLoaded> refLoadeds) {
+      List<RefDataLoaded> refLoadeds) {
     BaseOBObject result = null;
     for (RefDataLoaded refLoaded : refLoadeds) {
       if (refLoaded.getClientId().equals("0") && refLoaded.getOrgId().equals("0")) {
@@ -432,7 +428,7 @@ public class EntityResolver implements OBNotSingleton {
      */
     final List<?> res = obc.list();
     Check.isTrue(res.size() <= 1,
-      "More than one result when searching in " + entity.getName() + " with id " + id);
+        "More than one result when searching in " + entity.getName() + " with id " + id);
     if (res.size() == 1) {
       return (BaseOBObject) res.get(0);
     }
@@ -440,7 +436,7 @@ public class EntityResolver implements OBNotSingleton {
   }
 
   private List<RefDataLoaded> getRefLoadedsUsingSql(String id, Entity entity, String orgId,
-                                                    boolean filterByClient) {
+      boolean filterByClient) {
     PreparedStatement ps = null;
     try {
       String st = "Select specific_id, ad_client_id, ad_org_id from ad_ref_data_loaded where ad_client_id in ('" + /* client.getId() + */ "', '0') and generic_id='" + id + "' and ad_table_id='" + entity.getTableId() + "'";
@@ -606,9 +602,8 @@ public class EntityResolver implements OBNotSingleton {
   /**
    * This option controls if referenced objects (through an association) must exist in the database.
    *
-   * @param optionCreateReferencedIfNotFound
-   *   if true then referenced objects are allowed to not exist in the database, meaning that
-   *   they a new object is created for a reference
+   * @param optionCreateReferencedIfNotFound if true then referenced objects are allowed to not exist in the database, meaning that
+   *                                         they a new object is created for a reference
    */
   public void setOptionCreateReferencedIfNotFound(boolean optionCreateReferencedIfNotFound) {
     this.optionCreateReferencedIfNotFound = optionCreateReferencedIfNotFound;
@@ -712,10 +707,8 @@ public class EntityResolver implements OBNotSingleton {
    * Replace an object in the cache with another one. The new one is then found when using the id of
    * the old one. The id of the previous one can be local to the xml.
    *
-   * @param prevObject
-   *   the object current in the data cache
-   * @param newObject
-   *   the new object which can then be found under the old object
+   * @param prevObject the object current in the data cache
+   * @param newObject  the new object which can then be found under the old object
    */
   public void exchangeObjects(BaseOBObject prevObject, BaseOBObject newObject) {
     if (!(prevObject.getId() instanceof String)) {
@@ -728,7 +721,7 @@ public class EntityResolver implements OBNotSingleton {
       return;
     }
     Check.isTrue(prevObject.getEntityName().compareTo(newObject.getEntityName()) == 0,
-      "Entity names are different for objects " + prevObject + " and " + newObject);
+        "Entity names are different for objects " + prevObject + " and " + newObject);
 
     data.put(getKey(prevObject.getEntityName(), id), newObject);
   }

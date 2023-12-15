@@ -15,15 +15,15 @@
  */
 package com.etendoerp.etendorx.model.projection;
 
-import java.math.BigDecimal;
-
 import com.etendoerp.etendorx.model.mapping.ETRXConstantValue;
 import com.etendoerp.etendorx.model.mapping.ETRXJavaMapping;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openbravo.base.model.ModelObject;
 
-@JsonIncludeProperties({"name", "value"})
+import java.math.BigDecimal;
+
+@JsonIncludeProperties({ "name", "value" })
 public class ETRXEntityField extends ModelObject {
 
   private ETRXProjectionEntity entity;
@@ -100,8 +100,7 @@ public class ETRXEntityField extends ModelObject {
     return etrxProjectionEntityRelated;
   }
 
-  public void setEtrxProjectionEntityRelated(
-      ETRXProjectionEntity etrxProjectionEntityRelated) {
+  public void setEtrxProjectionEntityRelated(ETRXProjectionEntity etrxProjectionEntityRelated) {
     this.etrxProjectionEntityRelated = etrxProjectionEntityRelated;
   }
 

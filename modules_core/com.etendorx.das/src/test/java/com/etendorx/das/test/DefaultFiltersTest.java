@@ -24,182 +24,174 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureMockMvc
 class DefaultFiltersTest {
 
-    public static final String REST_METHOD_PATCH = "PATCH";
-    private static final String SELECT_QUERY = "select * from table table0_ limit 10";
-    private static final String UPDATE_QUERY = "update table0_ set column = 'value' where table0_.table0_id = 1";
-    private static final String DELETE_QUERY = "delete from table table0_ where table0_.table0_id = 1";
-    public static final String USER_1 = "user1";
-    public static final String CLIENT_1 = "client1";
-    public static final String ROLE_1 = "role1";
-    public static final String REST_METHOD_POST = "POST";
-    public static final String REST_METHOD_PUT = "PUT";
-    public static final String REST_METHOD_DELETE = "DELETE";
-    public static final String USER_ID_123 = "123";
-    public static final String CLIENT_ID_456 = "456";
-    public static final String ROLE_ID_101112 = "101112";
-    public static final String REST_METHOD_GET = "GET";
-    public static final String ROLE_ID_789 = "789";
+  public static final String REST_METHOD_PATCH = "PATCH";
+  private static final String SELECT_QUERY = "select * from table table0_ limit 10";
+  private static final String UPDATE_QUERY = "update table0_ set column = 'value' where table0_.table0_id = 1";
+  private static final String DELETE_QUERY = "delete from table table0_ where table0_.table0_id = 1";
+  public static final String USER_1 = "user1";
+  public static final String CLIENT_1 = "client1";
+  public static final String ROLE_1 = "role1";
+  public static final String REST_METHOD_POST = "POST";
+  public static final String REST_METHOD_PUT = "PUT";
+  public static final String REST_METHOD_DELETE = "DELETE";
+  public static final String USER_ID_123 = "123";
+  public static final String CLIENT_ID_456 = "456";
+  public static final String ROLE_ID_101112 = "101112";
+  public static final String REST_METHOD_GET = "GET";
+  public static final String ROLE_ID_789 = "789";
 
-    @DynamicPropertySource
-    static void postgresqlProperties(DynamicPropertyRegistry registry) {
-        TestcontainersUtils.setProperties(registry, postgreSQLContainer);
-    }
+  @DynamicPropertySource
+  static void postgresqlProperties(DynamicPropertyRegistry registry) {
+    TestcontainersUtils.setProperties(registry, postgreSQLContainer);
+  }
 
-    @Container
-    public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
+  @Container
+  public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
-    @Test
-    void testAddFiltersAuthServiceBypass() {
-        // Arrange
-        boolean isActive = true;
+  @Test
+  void testAddFiltersAuthServiceBypass() {
+    // Arrange
+    boolean isActive = true;
 
-        // Act
-        String result = DefaultFilters.addFilters(SELECT_QUERY, null, USER_ID_123, ROLE_ID_789, isActive, REST_METHOD_GET);
+    // Act
+    String result = DefaultFilters.addFilters(SELECT_QUERY, null, USER_ID_123, ROLE_ID_789,
+        isActive, REST_METHOD_GET);
 
-        // Assert
-        Assertions.assertEquals(SELECT_QUERY, result);
-    }
+    // Assert
+    Assertions.assertEquals(SELECT_QUERY, result);
+  }
 
-    @Test
-    void testAddFiltersSuperUserBypass() {
-        // Arrange
-        String userId = DefaultFilters.SUPER_USER_ID;
-        String clientId = DefaultFilters.SUPER_USER_CLIENT_ID;
-        boolean isActive = true;
+  @Test
+  void testAddFiltersSuperUserBypass() {
+    // Arrange
+    String userId = DefaultFilters.SUPER_USER_ID;
+    String clientId = DefaultFilters.SUPER_USER_CLIENT_ID;
+    boolean isActive = true;
 
-        // Act
-        String result = DefaultFilters.addFilters(SELECT_QUERY, userId, clientId, ROLE_ID_789, isActive,
-            REST_METHOD_GET);
+    // Act
+    String result = DefaultFilters.addFilters(SELECT_QUERY, userId, clientId, ROLE_ID_789, isActive,
+        REST_METHOD_GET);
 
-        // Assert
-        Assertions.assertEquals(SELECT_QUERY, result);
-    }
+    // Assert
+    Assertions.assertEquals(SELECT_QUERY, result);
+  }
 
-    @Test
-    void testAddFiltersGetMethod() {
-        // Arrange
-        boolean isActive = true;
+  @Test
+  void testAddFiltersGetMethod() {
+    // Arrange
+    boolean isActive = true;
 
-        // Act
-        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_ID_123, CLIENT_ID_456, ROLE_ID_101112, isActive,
-            REST_METHOD_GET);
+    // Act
+    String result = DefaultFilters.addFilters(SELECT_QUERY, USER_ID_123, CLIENT_ID_456,
+        ROLE_ID_101112, isActive, REST_METHOD_GET);
 
-        // Assert
-        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', '456') " +
-            "and etrx_role_organizations('456', '101112', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
-        Assertions.assertEquals(expected, result);
-    }
+    // Assert
+    String expected = "select * from table table0_ where table0_.ad_client_id in ('0', '456') " + "and etrx_role_organizations('456', '101112', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.isactive = 'Y' limit 10"; //NOSONAR
+    Assertions.assertEquals(expected, result);
+  }
 
-    @Test
-    void testAddFiltersPutMethod() {
-        // Arrange
-        boolean isActive = true;
+  @Test
+  void testAddFiltersPutMethod() {
+    // Arrange
+    boolean isActive = true;
 
-        // Act
-        String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_ID_123, CLIENT_ID_456, ROLE_ID_101112, isActive, REST_METHOD_PUT);
+    // Act
+    String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_ID_123, CLIENT_ID_456,
+        ROLE_ID_101112, isActive, REST_METHOD_PUT);
 
-        // Assert
-        String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', '456') " +
-            "and etrx_role_organizations('456', '101112', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "and table0_.table0_id = 1"; //NOSONAR
-        Assertions.assertEquals(expected, result);
-    }
+    // Assert
+    String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', '456') " + "and etrx_role_organizations('456', '101112', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.table0_id = 1"; //NOSONAR
+    Assertions.assertEquals(expected, result);
+  }
 
-    @Test
-    void testAddFiltersPostMethod() {
-        boolean isActive = true;
+  @Test
+  void testAddFiltersPostMethod() {
+    boolean isActive = true;
 
-        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_POST);
+    String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
+        REST_METHOD_POST);
 
-        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
-        assertEquals(expected, result);
-    }
+    String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.isactive = 'Y' limit 10"; //NOSONAR
+    assertEquals(expected, result);
+  }
 
-    @Test
-    void testAddFiltersPutMethodStartingWithUpdate() {
-        boolean isActive = true;
+  @Test
+  void testAddFiltersPutMethodStartingWithUpdate() {
+    boolean isActive = true;
 
-        String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PUT);
+    String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
+        REST_METHOD_PUT);
 
-        String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') " +
-            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "and table0_.table0_id = 1"; //NOSONAR
+    String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.table0_id = 1"; //NOSONAR
 
-        assertEquals(expected, result);
-    }
+    assertEquals(expected, result);
+  }
 
-    @Test
-    void testAddFiltersPutMethodNotStartingWithUpdate() {
-        boolean isActive = true;
+  @Test
+  void testAddFiltersPutMethodNotStartingWithUpdate() {
+    boolean isActive = true;
 
-        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PUT);
+    String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
+        REST_METHOD_PUT);
 
-        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
-        assertEquals(expected, result);
-    }
+    String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.isactive = 'Y' limit 10"; //NOSONAR
+    assertEquals(expected, result);
+  }
 
-    @Test
-    void testAddFilters_PatchMethod_StartingWithUpdate() {
-        boolean isActive = true;
+  @Test
+  void testAddFilters_PatchMethod_StartingWithUpdate() {
+    boolean isActive = true;
 
-        String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PATCH);
+    String result = DefaultFilters.addFilters(UPDATE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
+        REST_METHOD_PATCH);
 
-        String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') " +
-            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "and table0_.table0_id = 1"; //NOSONAR
-        assertEquals(expected, result);
-    }
+    String expected = "update table0_ set column = 'value' where table0_.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.table0_id = 1"; //NOSONAR
+    assertEquals(expected, result);
+  }
 
-    @Test
-    void testAddFilters_PatchMethod_NotStartingWithUpdate() {
-        boolean isActive = true;
+  @Test
+  void testAddFilters_PatchMethod_NotStartingWithUpdate() {
+    boolean isActive = true;
 
-        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_PATCH);
+    String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
+        REST_METHOD_PATCH);
 
-        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
-        assertEquals(expected, result);
-    }
+    String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.isactive = 'Y' limit 10"; //NOSONAR
+    assertEquals(expected, result);
+  }
 
-    @Test
-    void testAddFilters_deleteMethod_StartingWithDelete() {
-        boolean isActive = true;
+  @Test
+  void testAddFilters_deleteMethod_StartingWithDelete() {
+    boolean isActive = true;
 
-        String result = DefaultFilters.addFilters(DELETE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_DELETE);
+    String result = DefaultFilters.addFilters(DELETE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
+        REST_METHOD_DELETE);
 
-        String expected = "delete from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "and table0_.table0_id = 1"; //NOSONAR
-        assertEquals(expected, result);
-    }
+    String expected = "delete from table table0_ where table0_.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.table0_id = 1"; //NOSONAR
+    assertEquals(expected, result);
+  }
 
-    @Test
-    void testAddFilters_deleteMethod_NotStartingWithDelete() {
-        boolean isActive = true;
+  @Test
+  void testAddFilters_deleteMethod_NotStartingWithDelete() {
+    boolean isActive = true;
 
-        String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, REST_METHOD_DELETE);
+    String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
+        REST_METHOD_DELETE);
 
-        String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
-            "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
-        assertEquals(expected, result);
-    }
+    String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.isactive = 'Y' limit 10"; //NOSONAR
+    assertEquals(expected, result);
+  }
 
-    @Test
-    void testAddFilters_UnknownMethod() {
-        boolean isActive = true;
-        String restMethod = "UNKNOWN";
+  @Test
+  void testAddFilters_UnknownMethod() {
+    boolean isActive = true;
+    String restMethod = "UNKNOWN";
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-            DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive, restMethod));
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
+            restMethod));
 
-        String expectedMessage = "Unknown HTTP method: " + restMethod;
-        assertEquals(expectedMessage, exception.getMessage());
-    }
+    String expectedMessage = "Unknown HTTP method: " + restMethod;
+    assertEquals(expectedMessage, exception.getMessage());
+  }
 }

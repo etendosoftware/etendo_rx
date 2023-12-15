@@ -31,7 +31,8 @@ public class RepositorySearch {
   private String method;
   private Map<String, RepositorySearchParam> searchParams = new LinkedHashMap<>();
 
-  public RepositorySearch(String method, String query, Map<String, RepositorySearchParam> searchParams) {
+  public RepositorySearch(String method, String query,
+      Map<String, RepositorySearchParam> searchParams) {
     this.method = method;
     this.query = query;
     this.searchParams = searchParams;
@@ -56,7 +57,6 @@ public class RepositorySearch {
   public Map<String, RepositorySearchParam> getSearchParams() {
     return searchParams;
   }
-
 
   public List<Map<String, String>> getSearchParamsMap() {
     return searchParams.values().stream().map(v -> {

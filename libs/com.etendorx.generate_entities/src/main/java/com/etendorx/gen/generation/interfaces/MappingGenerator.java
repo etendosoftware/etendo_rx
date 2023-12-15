@@ -21,6 +21,7 @@ import com.etendorx.gen.generation.GeneratePaths;
 import java.io.FileNotFoundException;
 
 public interface MappingGenerator {
-  void generate(ETRXProjectionEntity etrxProjectionEntity, GeneratePaths path) throws FileNotFoundException;
+  void generate(ETRXProjectionEntity etrxProjectionEntity, GeneratePaths path)
+      throws FileNotFoundException;
 
 }

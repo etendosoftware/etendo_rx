@@ -26,11 +26,17 @@ public class MproductTestMapping {
   }
 
   public BigDecimal getPrice(Product product) {
-    return product.getPricingProductPriceList().stream().findFirst().map(ProductPrice::getListPrice).orElse(null);
+    return product.getPricingProductPriceList()
+        .stream()
+        .findFirst()
+        .map(ProductPrice::getListPrice)
+        .orElse(null);
   }
 
   public String getCurrencyId(Product product) {
-    return product.getPricingProductPriceList().stream().findFirst()
+    return product.getPricingProductPriceList()
+        .stream()
+        .findFirst()
         .map(ProductPrice::getPriceListVersion)
         .map(PriceListVersion::getPriceList)
         .map(PriceList::getCurrency)
@@ -40,7 +46,10 @@ public class MproductTestMapping {
 
   public BigDecimal getAvailableQuantity(Product product) {
     return Objects.requireNonNull(product)
-        .getStorageBin().getMaterialMgmtStorageDetailList().stream().findFirst()
+        .getStorageBin()
+        .getMaterialMgmtStorageDetailList()
+        .stream()
+        .findFirst()
         .map(StorageDetail::getQuantityOnHand)
         .orElse(null);
   }

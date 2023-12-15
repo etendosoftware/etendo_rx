@@ -11,7 +11,8 @@ public class RXHal<T extends ClientRestBase<E>, E extends RepresentationWithId<E
     this.service = SpringContext.getBean(service);
   }
 
-  public static <T extends ClientRestBase<E>, E extends RepresentationWithId<E>> RXHal<T, E> getInstance(Class<T> service) {
+  public static <T extends ClientRestBase<E>, E extends RepresentationWithId<E>> RXHal<T, E> getInstance(
+      Class<T> service) {
     return new RXHal<>(service);
   }
 

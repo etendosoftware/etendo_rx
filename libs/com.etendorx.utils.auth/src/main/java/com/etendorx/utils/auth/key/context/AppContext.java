@@ -32,5 +32,4 @@ public class AppContext {
     return currentUser.get();
   }
 
-
 }

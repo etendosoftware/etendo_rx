@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 public class Embedded {
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private List<RxService> rxServiceses;
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  private List<RxService> rxServiceses;
 }

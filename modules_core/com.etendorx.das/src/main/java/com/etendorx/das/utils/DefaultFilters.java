@@ -2,9 +2,7 @@ package com.etendorx.das.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.QueryException;
 import org.jetbrains.annotations.NotNull;
@@ -42,8 +40,8 @@ public class DefaultFilters {
     throw new IllegalStateException("Utility class");
   }
 
-  public static String addFilters(String sql, String userId, String clientId, String roleId, boolean isActive,
-      String restMethod) {
+  public static String addFilters(String sql, String userId, String clientId, String roleId,
+      boolean isActive, String restMethod) {
     // AUTH SERVICE BYPASS FILTERS
     if (isAuthService(userId, clientId)) {
       return sql;
@@ -72,12 +70,13 @@ public class DefaultFilters {
     }
   }
 
-  private static List<String> getDefaultWhereClause(String tableAlias, String clientId, String roleId) {
+  private static List<String> getDefaultWhereClause(String tableAlias, String clientId,
+      String roleId) {
     List<String> conditions = new ArrayList<>();
     conditions.add(String.format("%s.ad_client_id in ('0', '%s')", tableAlias, clientId));
-    conditions.add(
-        String.format("etrx_role_organizations('%s', '%s', 'r') like concat('%%|', %s.ad_org_id, '|%%')",
-            clientId, roleId, tableAlias));
+    conditions.add(String.format(
+        "etrx_role_organizations('%s', '%s', 'r') like concat('%%|', %s.ad_org_id, '|%%')",
+        clientId, roleId, tableAlias));
     return conditions;
   }
 
@@ -88,19 +87,16 @@ public class DefaultFilters {
     if (StringUtils.equals(tableInfo.getSqlAction(), UPDATE)) {
       return sql.replace(WHERE, WHERE + whereClause + AND);
     } else if (StringUtils.equalsAny(tableInfo.getSqlAction(), SELECT, DELETE)) {
-      baseLookup = String.format(FROM + "%s %s", tableInfo.getTableName(), tableInfo.getTableAlias());
+      baseLookup = String.format(FROM + "%s %s", tableInfo.getTableName(),
+          tableInfo.getTableAlias());
     } else {
       throw new QueryException("applyFilters ERROR - SQL operation not supported");
     }
     if (tableInfo.isContainsWhere()) {
       String lookup = baseLookup + WHERE;
-      finalSql = sql.replace(
-          lookup, lookup + whereClause + AND
-      );
+      finalSql = sql.replace(lookup, lookup + whereClause + AND);
     } else {
-      finalSql = sql.replace(
-          baseLookup, baseLookup + WHERE + whereClause
-      );
+      finalSql = sql.replace(baseLookup, baseLookup + WHERE + whereClause);
     }
     if (StringUtils.equals(finalSql, sql)) {
       throw new QueryException("applyFilters ERROR - SQL query was not modified");
@@ -109,7 +105,8 @@ public class DefaultFilters {
   }
 
   @NotNull
-  private static String replaceInQuery(String sql, String clientId, String roleId, boolean isActiveFilter) {
+  private static String replaceInQuery(String sql, String clientId, String roleId,
+      boolean isActiveFilter) {
     QueryInfo tableInfo = getQueryInfo(sql);
     List<String> conditions = getDefaultWhereClause(tableInfo.getTableAlias(), clientId, roleId);
     if (isActiveFilter) {
@@ -119,8 +116,8 @@ public class DefaultFilters {
   }
 
   private static boolean isSuperUser(String userId, String clientId) {
-    return StringUtils.equals(userId, SUPER_USER_ID) &&
-        StringUtils.equals(clientId, SUPER_USER_CLIENT_ID);
+    return StringUtils.equals(userId, SUPER_USER_ID) && StringUtils.equals(clientId,
+        SUPER_USER_CLIENT_ID);
   }
 
   // IS_AUTH_SERVICE CONDITION NEEDS IMPROVEMENT
@@ -160,7 +157,6 @@ public class DefaultFilters {
     log.error("[getQueryInfo] - PATTERN ERROR");
     throw new QueryException("getQueryInfo ERROR");
   }
-
 
   @Data
   @AllArgsConstructor

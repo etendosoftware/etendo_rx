@@ -28,9 +28,7 @@ public interface PropertyValidator {
    * Validate the value against constraints implemented in the validator. If the validation fails a
    * message is returned. If validation passes then null is returned.
    *
-   * @param value
-   *   the value to check
-   *
+   * @param value the value to check
    * @return null if validation passes, otherwise a validation message is returned
    */
   public String validate(Object value);

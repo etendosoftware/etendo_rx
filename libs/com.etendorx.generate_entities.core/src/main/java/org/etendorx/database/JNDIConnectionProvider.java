@@ -78,8 +78,8 @@ public class JNDIConnectionProvider implements ConnectionProvider {
       }
 
       pools.put(poolName,
-        new org.etendorx.database.JNDIConnectionProvider.PoolInfo(poolName, ds, rdbms,
-          dbSessionConfig));
+          new org.etendorx.database.JNDIConnectionProvider.PoolInfo(poolName, ds, rdbms,
+              dbSessionConfig));
       if (log4j.isDebugEnabled()) {
         log4j.debug("Added to pools");
       }
@@ -92,10 +92,10 @@ public class JNDIConnectionProvider implements ConnectionProvider {
       try {
         log4j.info("Initializing connection...");
         con = ds.getConnection();
-        log4j.info(" Got connection {}",  con);
-        try(PreparedStatement pstmt = con.prepareStatement(dbSessionConfig)) {
+        log4j.info(" Got connection {}", con);
+        try (PreparedStatement pstmt = con.prepareStatement(dbSessionConfig)) {
           log4j.debug("Prepared statement with query: {}", dbSessionConfig);
-          try(var ignored = pstmt.executeQuery()) {
+          try (var ignored = pstmt.executeQuery()) {
             log4j.debug("Executed query");
           }
         }
@@ -109,7 +109,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
     } catch (Exception var17) {
       log4j.error("Error creating JNDI connection", var17);
       throw new PoolNotFoundException(
-        "Failed when creating database connections pool: " + var17.getMessage());
+          "Failed when creating database connections pool: " + var17.getMessage());
     }
   }
 
@@ -122,7 +122,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
 
     try {
       conn = ((org.etendorx.database.JNDIConnectionProvider.PoolInfo) pools.get(
-        poolName)).ds.getConnection();
+          poolName)).ds.getConnection();
       return conn;
     } catch (SQLException var4) {
       throw new NoConnectionAvailableException(var4.getMessage());
@@ -182,7 +182,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
   }
 
   public PreparedStatement getPreparedStatement(String poolName, String SQLPreparedStatement)
-    throws Exception {
+      throws Exception {
     if (poolName != null && !poolName.equals("")) {
       if (log4j.isDebugEnabled()) {
         log4j.debug("connection requested");
@@ -200,7 +200,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
   }
 
   public PreparedStatement getPreparedStatement(Connection conn, String SQLPreparedStatement)
-    throws SQLException {
+      throws SQLException {
     if (conn != null && SQLPreparedStatement != null && !SQLPreparedStatement.equals("")) {
       PreparedStatement ps = null;
 
@@ -230,7 +230,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
   }
 
   public CallableStatement getCallableStatement(String poolName, String SQLCallableStatement)
-    throws Exception {
+      throws Exception {
     if (poolName != null && !poolName.equals("")) {
       Connection conn = this.getConnection(poolName);
       return this.getCallableStatement(conn, SQLCallableStatement);
@@ -240,7 +240,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
   }
 
   public CallableStatement getCallableStatement(Connection conn, String SQLCallableStatement)
-    throws SQLException {
+      throws SQLException {
     if (conn != null && SQLCallableStatement != null && !SQLCallableStatement.equals("")) {
       CallableStatement cs = null;
 
@@ -339,7 +339,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
   }
 
   public void releaseTransactionalPreparedStatement(PreparedStatement preparedStatement)
-    throws SQLException {
+      throws SQLException {
     if (preparedStatement != null) {
       preparedStatement.close();
     }

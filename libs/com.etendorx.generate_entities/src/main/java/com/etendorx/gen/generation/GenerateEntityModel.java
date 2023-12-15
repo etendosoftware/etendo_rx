@@ -1,18 +1,12 @@
 package com.etendorx.gen.generation;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
 import com.etendorx.gen.generation.interfaces.EntityGenerator;
 import com.etendorx.gen.util.TemplateUtil;
-
 import freemarker.template.Template;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class GenerateEntityModel implements EntityGenerator {
 
@@ -25,7 +19,8 @@ public class GenerateEntityModel implements EntityGenerator {
    * @throws FileNotFoundException
    */
   @Override
-  public void generate(Map<String, Object> data, GeneratePaths path, boolean dataRestEnabled) throws FileNotFoundException {
+  public void generate(Map<String, Object> data, GeneratePaths path, boolean dataRestEnabled)
+      throws FileNotFoundException {
 
     String ftlFileNameEntitiesModel = "/org/openbravo/base/gen/entityModel.ftl";
     Template templateEntityModelRX = TemplateUtil.createTemplateImplementation(
@@ -33,8 +28,8 @@ public class GenerateEntityModel implements EntityGenerator {
 
     final String packageEntityModel = "com.etendorx.entitiesmodel";
     data.put("packageEntityModel", packageEntityModel);
-    final String fullPathClientRest = path.pathEtendoRx + "/modules_gen/com.etendorx.entitiesModel" + "/src/main/java/" + packageEntityModel.toLowerCase().replace(
-        '.', '/');
+    final String fullPathClientRest = path.pathEtendoRx + "/modules_gen/com.etendorx.entitiesModel" + "/src/main/java/" + packageEntityModel.toLowerCase()
+        .replace('.', '/');
     final String repositoryClassEntityModel = data.get("repositoryClassEntityModel").toString();
 
     var outFileEntityModel = new File(fullPathClientRest, repositoryClassEntityModel);

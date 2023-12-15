@@ -15,7 +15,6 @@
  */
 package com.etendorx.entities.mapper.lib;
 
-
 public interface DASRepository<E extends BaseDTOModel, F extends BaseDTOModel> {
 
   Iterable<E> findAll();

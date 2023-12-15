@@ -2,7 +2,6 @@ package com.etendorx.auth.auth;
 
 import com.etendorx.auth.auth.hashing.PasswordHash;
 import com.etendorx.auth.auth.jwt.JwtRequest;
-import com.etendorx.auth.feign.ServiceClient;
 import com.etendorx.auth.feign.model.RxService;
 import com.etendorx.auth.feign.model.ServiceAccess;
 import com.etendorx.auth.feign.model.UserModel;
@@ -70,11 +69,8 @@ public class AuthService {
   /**
    * Connects with the DAS server to authenticate the user credentials
    *
-   * @param username
-   *   The username used to log in.
-   * @param password
-   *   The password used to log in.
-   *
+   * @param username The username used to log in.
+   * @param password The password used to log in.
    * @return {@link UserModel}
    */
   public UserModel validateCredentials(String username, String password) {
@@ -95,25 +91,26 @@ public class AuthService {
       List<ServiceAccess> accessList = userModel.geteTRXRxServicesAccessList();
       if (accessList.isEmpty()) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                "ServicesAccessList can not be empty. This user do not have access to this service");
+            "ServicesAccessList can not be empty. This user do not have access to this service");
       }
 
       String rxServiceId = accessList.get(0).getRxServiceId();
       HttpHeaders headers = new HttpHeaders();
       headers.add(HEADER_TOKEN, token);
-      RxService rxService = restUtils.getEntity("/auth/ETRX_Rx_Services/" + rxServiceId, RxService.class);
+      RxService rxService = restUtils.getEntity("/auth/ETRX_Rx_Services/" + rxServiceId,
+          RxService.class);
       if (!StringUtils.equals(rxService.getSearchkey(), authRequest.getService())) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_SERVICE_MESSAGE);
       }
-      if (! StringUtils.equals(rxService.getSecret(), authRequest.getSecret())) {
+      if (!StringUtils.equals(rxService.getSecret(), authRequest.getSecret())) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_SECRET_MESSAGE);
       }
       return rxService.getSearchkey();
     } catch (RestClientException e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error during DAS connection.", e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+          "Error during DAS connection.", e);
     }
   }
-
 
   /**
    * Generates JWT claims for a user.
@@ -128,12 +125,15 @@ public class AuthService {
       servicesAccess = userModel.geteTRXRxServicesAccessList().get(0);
     }
     claims.put(JwtKeyUtils.USER_ID_CLAIM, userModel.getId());
-    claims.put(JwtKeyUtils.CLIENT_ID_CLAIM, getOrDefaultValue(userModel.getDefaultClient(), userModel.getClient()));
-    claims.put(JwtKeyUtils.ORG_ID, getOrDefaultValue(servicesAccess.getDefaultOrgId(), SUPER_USER_ORG_ID));
-    claims.put(JwtKeyUtils.ROLE_ID, getOrDefaultValue(servicesAccess.getDefaultRoleId(), SUPER_USER_ORG_ID));
-    claims.put(JwtKeyUtils.SERVICE_SEARCH_KEY,
-            getOrDefaultValue(searchKey, EMPTY_SERVICE));
-    claims.put(JwtKeyUtils.SERVICE_ID, getOrDefaultValue(servicesAccess.getRxServiceId(), EMPTY_SERVICE));
+    claims.put(JwtKeyUtils.CLIENT_ID_CLAIM,
+        getOrDefaultValue(userModel.getDefaultClient(), userModel.getClient()));
+    claims.put(JwtKeyUtils.ORG_ID,
+        getOrDefaultValue(servicesAccess.getDefaultOrgId(), SUPER_USER_ORG_ID));
+    claims.put(JwtKeyUtils.ROLE_ID,
+        getOrDefaultValue(servicesAccess.getDefaultRoleId(), SUPER_USER_ORG_ID));
+    claims.put(JwtKeyUtils.SERVICE_SEARCH_KEY, getOrDefaultValue(searchKey, EMPTY_SERVICE));
+    claims.put(JwtKeyUtils.SERVICE_ID,
+        getOrDefaultValue(servicesAccess.getRxServiceId(), EMPTY_SERVICE));
 
     return claims;
   }

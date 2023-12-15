@@ -62,7 +62,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public ConnectionProviderImpl(String file, boolean isRelative, String _context)
-    throws PoolNotFoundException {
+      throws PoolNotFoundException {
     this.defaultPoolName = "";
     this.bbdd = "";
     this.rdbms = "";
@@ -71,10 +71,10 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   private void create(String file, boolean isRelative, String _context)
-    throws PoolNotFoundException {
+      throws PoolNotFoundException {
     Properties properties = new Properties();
 
-    try(FileInputStream fis = new FileInputStream(file)) {
+    try (FileInputStream fis = new FileInputStream(file)) {
       properties.load(fis);
       this.create(properties, isRelative, _context);
     } catch (IOException var6) {
@@ -83,7 +83,8 @@ public class ConnectionProviderImpl implements ConnectionProvider {
 
   }
 
-  private void create(Properties properties, boolean isRelative, String providedContext) throws PoolNotFoundException {
+  private void create(Properties properties, boolean isRelative, String providedContext)
+      throws PoolNotFoundException {
     log4j.debug("Creating ConnectionProviderImpl");
 
     // Set context if provided
@@ -140,7 +141,6 @@ public class ConnectionProviderImpl implements ConnectionProvider {
     }
   }
 
-
   public void destroy(String name) throws Exception {
     if (externalConnectionPool != null) {
       externalConnectionPool.closePool();
@@ -162,8 +162,8 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public void addNewPool(String dbDriver, String dbServer, String dbLogin, String dbPassword,
-                         int minConns, int maxConns, double maxConnTime, String dbSessionConfig, String _rdbms,
-                         String name) throws Exception {
+      int minConns, int maxConns, double maxConnTime, String dbSessionConfig, String _rdbms,
+      String name) throws Exception {
     if (this.defaultPoolName == null || this.defaultPoolName.equals("")) {
       this.defaultPoolName = name;
       this.bbdd = dbServer;
@@ -188,9 +188,9 @@ public class ConnectionProviderImpl implements ConnectionProvider {
       connectionPool.setTestWhileIdle(false);
       KeyedObjectPoolFactory keyedObject = new StackKeyedObjectPoolFactory();
       ConnectionFactory connectionFactory = new OpenbravoDriverManagerConnectionFactory(dbServer,
-        dbLogin, dbPassword, dbSessionConfig, _rdbms);
+          dbLogin, dbPassword, dbSessionConfig, _rdbms);
       new PoolableConnectionFactory(connectionFactory, connectionPool, keyedObject, (String) null,
-        false, true);
+          false, true);
       Class.forName("org.apache.commons.dbcp.PoolingDriver");
       PoolingDriver driver = (PoolingDriver) DriverManager.getDriver("jdbc:apache:commons:dbcp:");
       driver.registerPool(this.contextName + "_" + name, connectionPool);
@@ -247,7 +247,8 @@ public class ConnectionProviderImpl implements ConnectionProvider {
     }
 
     // Check and instantiate externalConnectionPool if necessary
-    if (externalConnectionPool == null && this.externalPoolClassName != null && !this.externalPoolClassName.trim().isEmpty()) {
+    if (externalConnectionPool == null && this.externalPoolClassName != null && !this.externalPoolClassName.trim()
+        .isEmpty()) {
       try {
         externalConnectionPool = ExternalConnectionPool.getInstance(this.externalPoolClassName);
       } catch (ReflectiveOperationException throwable) {
@@ -257,25 +258,24 @@ public class ConnectionProviderImpl implements ConnectionProvider {
     }
 
     // Obtain the connection from the relevant pool
-    return (externalConnectionPool != null)
-        ? externalConnectionPool.getConnection()
-        : this.getCommonsDbcpPoolConnection(poolName);
+    return (externalConnectionPool != null) ?
+        externalConnectionPool.getConnection() :
+        this.getCommonsDbcpPoolConnection(poolName);
   }
 
-
   private Connection getCommonsDbcpPoolConnection(String poolName)
-    throws NoConnectionAvailableException {
+      throws NoConnectionAvailableException {
     if (poolName != null && !poolName.equals("")) {
       Connection conn = null;
 
       try {
         conn = DriverManager.getConnection(
-          "jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
+            "jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
         return conn;
       } catch (SQLException var4) {
         log4j.error("Error getting connection", var4);
         throw new NoConnectionAvailableException(
-          "There are no connections available in jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
+            "There are no connections available in jdbc:apache:commons:dbcp:" + this.contextName + "_" + poolName);
       }
     } else {
       throw new NoConnectionAvailableException(ERROR_GET_CONNECTION_UNNAMED_POOL);
@@ -353,7 +353,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public PreparedStatement getPreparedStatement(String poolName, String SQLPreparedStatement)
-    throws Exception {
+      throws Exception {
     if (poolName != null && !poolName.equals("")) {
       log4j.debug("connection requested");
       Connection conn = this.getConnection(poolName);
@@ -365,7 +365,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public PreparedStatement getPreparedStatement(Connection conn, String SQLPreparedStatement)
-    throws SQLException {
+      throws SQLException {
     if (conn != null && SQLPreparedStatement != null && !SQLPreparedStatement.equals("")) {
       PreparedStatement ps = null;
 
@@ -389,7 +389,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public CallableStatement getCallableStatement(String poolName, String SQLCallableStatement)
-    throws Exception {
+      throws Exception {
     if (poolName != null && !poolName.equals("")) {
       Connection conn = this.getConnection(poolName);
       return this.getCallableStatement(conn, SQLCallableStatement);
@@ -399,7 +399,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public CallableStatement getCallableStatement(Connection conn, String SQLCallableStatement)
-    throws SQLException {
+      throws SQLException {
     if (conn != null && SQLCallableStatement != null && !SQLCallableStatement.equals("")) {
       CallableStatement cs = null;
 
@@ -498,7 +498,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
   }
 
   public void releaseTransactionalPreparedStatement(PreparedStatement preparedStatement)
-    throws SQLException {
+      throws SQLException {
     if (preparedStatement != null) {
       preparedStatement.close();
     }

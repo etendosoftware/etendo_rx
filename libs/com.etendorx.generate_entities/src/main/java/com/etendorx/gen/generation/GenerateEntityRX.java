@@ -1,19 +1,13 @@
 package com.etendorx.gen.generation;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
+import com.etendorx.gen.generation.interfaces.EntityGenerator;
+import com.etendorx.gen.util.TemplateUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.etendorx.gen.generation.interfaces.EntityGenerator;
-import com.etendorx.gen.util.TemplateUtil;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class GenerateEntityRX implements EntityGenerator {
   private static final Logger log = LogManager.getLogger();
@@ -27,7 +21,8 @@ public class GenerateEntityRX implements EntityGenerator {
    * @throws FileNotFoundException
    */
   @Override
-  public void generate(Map<String, Object> data, GeneratePaths paths, boolean dataRestEnabled) throws FileNotFoundException {
+  public void generate(Map<String, Object> data, GeneratePaths paths, boolean dataRestEnabled)
+      throws FileNotFoundException {
     final String className = data.get(GenerateEntitiesConstants.CLASS_NAME).toString();
     final String fullPathEntities = paths.pathEntitiesRx + GenerateEntitiesConstants.SRC_MAIN_ENTITIES;
     var classfileName = className + GenerateEntitiesConstants.JAVA;

@@ -7,11 +7,7 @@ import com.etendorx.gen.beans.ProjectionEntity;
 import org.openbravo.base.model.Entity;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ProjectionsConverter {
 
@@ -25,7 +21,8 @@ public class ProjectionsConverter {
     List<Projection> projections = new ArrayList<>();
     for (ETRXProjection etrxProjection : etrxProjections) {
       Projection projection = new Projection(etrxProjection);
-      File moduleLocation = getModuleLocation(paths.pathEtendoRx, etrxProjection.getModule().getRxJavaPackage());
+      File moduleLocation = getModuleLocation(paths.pathEtendoRx,
+          etrxProjection.getModule().getRxJavaPackage());
       projection.setModuleLocation(moduleLocation);
       convert(projection, etrxProjection.getEntities());
       projections.add(projection);
@@ -42,7 +39,8 @@ public class ProjectionsConverter {
         break;
       }
     }
-    var moduleLocation = new File(pathEtendoRx + File.separator + defaultDir + File.separator + rxJavaPackage);
+    var moduleLocation = new File(
+        pathEtendoRx + File.separator + defaultDir + File.separator + rxJavaPackage);
     if (moduleLocation.exists()) {
       moduleLocation.mkdirs();
     }

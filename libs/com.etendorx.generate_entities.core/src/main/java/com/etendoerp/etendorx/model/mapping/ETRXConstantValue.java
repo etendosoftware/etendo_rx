@@ -16,7 +16,6 @@
 package com.etendoerp.etendorx.model.mapping;
 
 import org.openbravo.base.model.ModelObject;
-import org.openbravo.base.model.Table;
 
 public class ETRXConstantValue extends ModelObject {
 

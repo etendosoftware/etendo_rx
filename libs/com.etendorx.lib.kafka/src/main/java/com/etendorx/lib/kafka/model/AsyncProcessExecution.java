@@ -36,8 +36,7 @@ public class AsyncProcessExecution implements Comparable<AsyncProcessExecution> 
   private String description;
   private String params;
 
-  @JsonFormat(shape = JsonFormat.Shape.STRING,
-    pattern = "dd-MM-yyyy hh:mm:ss")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
   private Date time;
   @Builder.Default
   private AsyncProcessState state = AsyncProcessState.ACCEPTED;
@@ -45,7 +44,8 @@ public class AsyncProcessExecution implements Comparable<AsyncProcessExecution> 
   @Override
   public int compareTo(AsyncProcessExecution o) {
     var r = o.time.compareTo(this.time);
-    if (r == 0) return o.id == null ? -1 : o.id.compareTo(this.id);
+    if (r == 0)
+      return o.id == null ? -1 : o.id.compareTo(this.id);
     return r;
   }
 

@@ -54,7 +54,7 @@ public class FilterContext extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     String token = request.getHeader(HEADER_TOKEN);
-    if(StringUtils.isEmpty(token)) {
+    if (StringUtils.isEmpty(token)) {
       String authHeader = request.getHeader(HEADER_AUTHORIZATION);
       token = StringUtils.substringAfter(authHeader, "Bearer ");
     }

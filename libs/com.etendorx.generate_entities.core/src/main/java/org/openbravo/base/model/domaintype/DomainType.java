@@ -37,8 +37,7 @@ public interface DomainType {
    * The ModelReference is instantiated for each reference record in AD_Reference. When it is
    * instantiated the original id of the reference record is passed in using this method.
    *
-   * @param reference
-   *   the record for which the ModelReference is instantiated.
+   * @param reference the record for which the ModelReference is instantiated.
    */
   void setReference(Reference reference);
 
@@ -51,8 +50,7 @@ public interface DomainType {
    * The reference classes are instantiated by the {@link ModelProvider}. The ModelProvider can be
    * used by the reference class to obtain other model related information.
    *
-   * @param modelProvider
-   *   the ModelProvider instance responsible for building the internal and in-memory model.
+   * @param modelProvider the ModelProvider instance responsible for building the internal and in-memory model.
    */
   void setModelProvider(ModelProvider modelProvider);
 
@@ -73,20 +71,16 @@ public interface DomainType {
   /**
    * Checks if a certain value is valid according to the type of the reference.
    *
-   * @param property
-   *   the property which has this value
-   * @param value
-   *   the value
+   * @param property the property which has this value
+   * @param value    the value
    */
   void checkIsValidValue(Property property, Object value) throws ValidationException;
 
   /**
    * Checks if a certain property has a valid value taking into account other values in the object.
    *
-   * @param obObject
-   *   the overall object to check
-   * @param property
-   *   the property to check
+   * @param obObject the overall object to check
+   * @param property the property to check
    */
   void checkObjectIsValid(BaseOBObjectDef obObject, Property property) throws ValidationException;
 }

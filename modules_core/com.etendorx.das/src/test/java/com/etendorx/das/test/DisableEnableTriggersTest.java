@@ -16,10 +16,9 @@
 
 package com.etendorx.das.test;
 
-
-import static com.etendorx.utils.auth.key.context.FilterContext.setUserContextFromToken;
-
-
+import com.etendorx.utils.auth.key.context.AppContext;
+import com.etendorx.utils.auth.key.context.FilterContext;
+import com.etendorx.utils.auth.key.context.UserContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -29,9 +28,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.etendorx.utils.auth.key.context.AppContext;
-import com.etendorx.utils.auth.key.context.FilterContext;
-import com.etendorx.utils.auth.key.context.UserContext;
+import static com.etendorx.utils.auth.key.context.FilterContext.setUserContextFromToken;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19091")

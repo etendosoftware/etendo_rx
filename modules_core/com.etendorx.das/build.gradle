@@ -82,7 +82,7 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.22'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
-    if(project.hasProperty('grpc.enabled') && project.property('grpc.enabled') == "true") {
+    if (project.hasProperty('grpc.enabled') && project.property('grpc.enabled') == "true") {
         println "GRP Enabled"
         codegen project(':com.etendorx.grpc.common')
         implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
@@ -90,7 +90,7 @@ dependencies {
         testImplementation 'io.grpc:grpc-testing:1.49.0'
         testImplementation 'io.github.lognet:grpc-spring-boot-starter:4.6.0'
     }
-    if(project.hasProperty('data-rest.enabled') && project.property('data-rest.enabled') == "true") {
+    if (project.hasProperty('data-rest.enabled') && project.property('data-rest.enabled') == "true") {
         implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.5.10'
     } else {
         testImplementation 'org.springframework.data:spring-data-rest-core:4.1.4'

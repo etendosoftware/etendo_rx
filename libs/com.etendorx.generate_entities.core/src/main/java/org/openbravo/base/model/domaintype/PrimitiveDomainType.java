@@ -33,13 +33,9 @@ public interface PrimitiveDomainType extends DomainType {
    * Converts an object value of this type to a locale/system neutral String. Is used in XML
    * conversion. The opposite of this method is the {@link #createFromString(String)} method.
    *
-   * @param value
-   *   the value to convert to a string.
-   *
+   * @param value the value to convert to a string.
    * @return the String representation, if the value is null then an empty String is returned
-   *
-   * @exception IllegalArgumentException
-   *   if the conversion is not possible
+   * @throws IllegalArgumentException if the conversion is not possible
    */
   String convertToString(Object value);
 
@@ -48,19 +44,15 @@ public interface PrimitiveDomainType extends DomainType {
    * represented by this DomainType. This method is the opposite of the
    * {@link #convertToString(Object)} method.
    *
-   * @param strValue
-   *   the string value to convert
-   *
+   * @param strValue the string value to convert
    * @return the object value, null is returned if an empty string or null are passed as parameter.
-   *
-   * @exception IllegalArgumentException
-   *   if the conversion is not possible
+   * @throws IllegalArgumentException if the conversion is not possible
    */
   Object createFromString(String strValue);
 
   /**
    * @return the xml schema type which matches the primitive type, is used to create the XML Schema
-   *   for the REST web services.
+   * for the REST web services.
    */
   String getXMLSchemaType();
 
@@ -86,7 +78,7 @@ public interface PrimitiveDomainType extends DomainType {
    * example the id 'integer' maps to all the Format.xml entries with integer as a prefix.
    *
    * @return the name of the format definition in the format.xml, if not relevant then null is
-   *   returned.
+   * returned.
    */
   String getFormatId();
 }

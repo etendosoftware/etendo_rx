@@ -47,7 +47,8 @@ public class MetadataUtil {
    * @param moduleLocation
    */
   public static String getBasePackageGenLocationPath(File moduleLocation) {
-    return getSrcGenLocation(moduleLocation) + File.separator + "/main/java" + File.separator + getBasePackageGenPath(
+    return getSrcGenLocation(
+        moduleLocation) + File.separator + "/main/java" + File.separator + getBasePackageGenPath(
         moduleLocation);
   }
 
@@ -73,9 +74,7 @@ public class MetadataUtil {
   /**
    * Generates a Map between the 'newClassname' (the name of the {@link ProjectionEntity} defined in a projection) and the corresponding {@link Entity}.
    *
-   * @param entities
-   *     List of entities to map
-   *
+   * @param entities List of entities to map
    * @return Map
    */
   public static Map<String, Entity> generateEntitiesMap(List<Entity> entities) {
@@ -90,9 +89,7 @@ public class MetadataUtil {
   /**
    * Creates a new {@link ProjectionEntity} based on a {@link Entity}
    *
-   * @param entityModel
-   *     {@link Entity}
-   *
+   * @param entityModel {@link Entity}
    * @return {@link ProjectionEntity}
    */
   public static ProjectionEntity generateProjectionEntity(Entity entityModel) {
@@ -100,12 +97,12 @@ public class MetadataUtil {
     ProjectionEntity projectionEntity = new ProjectionEntity(newClassName, false);
 
     // Filter the valid properties of the entityModel
-    var filteredProperties = entityModel.getProperties().stream().filter(property ->
-        !property.isComputedColumn() &&
-            !StringUtils.isBlank(property.getTypeName())
-            && (property.isId() || (property.isPrimitive() && !property.getPrimitiveType().isArray())
-            || (property.getTargetEntity() != null && !property.isOneToMany() && !property.getTargetEntity().isView()))
-    );
+    var filteredProperties = entityModel.getProperties()
+        .stream()
+        .filter(property -> !property.isComputedColumn() && !StringUtils.isBlank(
+            property.getTypeName()) && (property.isId() || (property.isPrimitive() && !property.getPrimitiveType()
+            .isArray()) || (property.getTargetEntity() != null && !property.isOneToMany() && !property.getTargetEntity()
+            .isView())));
 
     // Fill the projectionEntity fields with the entityModel filteredProperties
     filteredProperties.forEach(property -> {
@@ -119,9 +116,7 @@ public class MetadataUtil {
   /**
    * Creates a new {@link ProjectionEntityField} based on a {@link Property}
    *
-   * @param propertyModel
-   *     {@link Property}
-   *
+   * @param propertyModel {@link Property}
    * @return {@link ProjectionEntityField}
    */
   public static ProjectionEntityField generateProjectionEntityField(Property propertyModel) {
@@ -136,7 +131,8 @@ public class MetadataUtil {
    */
   static String generateClassName(Property propertyModel) {
     String className = "";
-    if (propertyModel.getTargetEntity() != null && propertyModel.getTargetEntity().getName() != null) {
+    if (propertyModel.getTargetEntity() != null && propertyModel.getTargetEntity()
+        .getName() != null) {
       var tableNameSplit = propertyModel.getTargetEntity().getTableName().split("_");
       var cn = "";
       for (String s : tableNameSplit) {

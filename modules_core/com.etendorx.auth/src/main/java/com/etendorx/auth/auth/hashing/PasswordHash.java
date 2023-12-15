@@ -70,7 +70,7 @@ public class PasswordHash {
 
     if (algorithm == null) {
       throw new IllegalStateException(
-        "Hashing algorithm version " + getVersion(hash) + " is not implemented");
+          "Hashing algorithm version " + getVersion(hash) + " is not implemented");
     }
 
     return algorithm;

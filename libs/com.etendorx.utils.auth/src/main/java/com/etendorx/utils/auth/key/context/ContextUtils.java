@@ -17,7 +17,6 @@
 package com.etendorx.utils.auth.key.context;
 
 import com.etendorx.utils.auth.key.JwtKeyUtils;
-
 import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -35,10 +34,11 @@ public class ContextUtils {
 
   public static Map<String, Object> getTokenValues(String publicKey, String token) {
     Map<String, Object> tokenValuesMap = JwtKeyUtils.getTokenValues(publicKey, token);
-    if(tokenValuesMap == null) {
+    if (tokenValuesMap == null) {
       throw new ForbiddenException("Invalid token");
     }
-    if(tokenValuesMap.containsKey("aud") && StringUtils.equals((String) tokenValuesMap.get("aud"), "sws")) {
+    if (tokenValuesMap.containsKey("aud") && StringUtils.equals((String) tokenValuesMap.get("aud"),
+        "sws")) {
       // SWS
       // Convert the token values to the expected values
       Map<String, Object> convertedMap = new HashMap<>();

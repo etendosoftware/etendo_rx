@@ -15,10 +15,6 @@
  */
 package com.etendorx.clientrest.base;
 
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Objects;
-
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +27,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Utility class for REST calls.
@@ -51,15 +51,11 @@ public class RestUtils {
    * Get a list of entities from a URL.
    * The URL must return a HAL list.
    *
-   * @param url
-   *     URL. Important: Do not include DAS url on the url variable.
-   * @param responseType
-   *     Entity type
-   * @param <T>
-   *     Entity type
+   * @param url          URL. Important: Do not include DAS url on the url variable.
+   * @param responseType Entity type
+   * @param <T>          Entity type
    * @return List of entities
-   * @throws RestUtilsException
-   *     If there is an error getting the list
+   * @throws RestUtilsException If there is an error getting the list
    */
   @Nullable
   public <T> Collection<T> getList(String url, Class<T> responseType) throws RestUtilsException {
@@ -80,15 +76,11 @@ public class RestUtils {
   /**
    * Get an entity from a URL.
    *
-   * @param url
-   *     URL. Important: Do not include DAS url on the url variable.
-   * @param responseType
-   *     Entity type
-   * @param <T>
-   *     Entity type
+   * @param url          URL. Important: Do not include DAS url on the url variable.
+   * @param responseType Entity type
+   * @param <T>          Entity type
    * @return Entity
-   * @throws RestUtilsException
-   *     If there is an error getting the entity
+   * @throws RestUtilsException If there is an error getting the entity
    */
   public <T> T getEntity(String url, Class<T> responseType) throws RestUtilsException {
     var typeRef = new ParameterizedTypeReference<EntityModel<T>>() {
@@ -99,7 +91,7 @@ public class RestUtils {
       }
     };
     ResponseEntity<EntityModel<T>> entity = exchange(url, typeRef);
-    if(entity.getBody() != null) {
+    if (entity.getBody() != null) {
       return Objects.requireNonNull(entity.getBody()).getContent();
     }
     throw new RestUtilsException("Error getting entity: " + entity.getStatusCodeValue());
@@ -108,19 +100,16 @@ public class RestUtils {
   /**
    * Perform an exchange.
    *
-   * @param url
-   *     URL. Important: Do not include DAS url on the url variable.
-   * @param responseType
-   *     Response type
-   * @param <T>
-   *     Response type
+   * @param url          URL. Important: Do not include DAS url on the url variable.
+   * @param responseType Response type
+   * @param <T>          Response type
    * @return Response
-   * @throws RestUtilsException
-   *     If there is an error performing the exchange
+   * @throws RestUtilsException If there is an error performing the exchange
    */
-  private <T> ResponseEntity<T> exchange(String url,
-      ParameterizedTypeReference<T> responseType) throws RestUtilsException {
-    ResponseEntity<T> response = restTemplate.exchange(dasUrl + url, HttpMethod.GET, null, responseType);
+  private <T> ResponseEntity<T> exchange(String url, ParameterizedTypeReference<T> responseType)
+      throws RestUtilsException {
+    ResponseEntity<T> response = restTemplate.exchange(dasUrl + url, HttpMethod.GET, null,
+        responseType);
     if (response.getStatusCode().is2xxSuccessful()) {
       return response;
     }

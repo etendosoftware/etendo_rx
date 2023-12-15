@@ -16,29 +16,6 @@
 
 package com.etendorx.gen.process;
 
-import static com.etendorx.gen.metadata.MetadataProjectionsAnalyzer.getProjectionEntity;
-import static com.etendorx.gen.metadata.MetadataProjectionsAnalyzer.getProjectionEntityField;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.openbravo.base.model.Entity;
-
 import com.etendorx.gen.beans.Metadata;
 import com.etendorx.gen.beans.Projection;
 import com.etendorx.gen.beans.ProjectionEntity;
@@ -46,8 +23,19 @@ import com.etendorx.gen.metadata.MetadataContainer;
 import com.etendorx.gen.metadata.MetadataUtil;
 import com.etendorx.gen.util.CodeGenerationException;
 import com.etendorx.gen.util.TemplateUtil;
-
 import freemarker.template.Template;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openbravo.base.model.Entity;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static com.etendorx.gen.metadata.MetadataProjectionsAnalyzer.getProjectionEntity;
+import static com.etendorx.gen.metadata.MetadataProjectionsAnalyzer.getProjectionEntityField;
 
 public class GenerateProtoFile {
   private static final Logger log = LogManager.getLogger();
@@ -60,23 +48,26 @@ public class GenerateProtoFile {
    * The projections contain a merge from multiple projections with the same entity.
    * The entity will contain all the declared fields.
    *
-   * @param moduleMetadata
-   *     The module from where the projection will be obtained
-   * @param projectionFilter
-   *     A lambda function used to filter the module projections
+   * @param moduleMetadata   The module from where the projection will be obtained
+   * @param projectionFilter A lambda function used to filter the module projections
    * @return A Projection.
    */
-  public static Projection generateProjectionMix(Metadata moduleMetadata, Predicate<Projection> projectionFilter) {
+  public static Projection generateProjectionMix(Metadata moduleMetadata,
+      Predicate<Projection> projectionFilter) {
     Projection projectionMix = new Projection("mix");
 
-    moduleMetadata.getProjections().values().stream()
+    moduleMetadata.getProjections()
+        .values()
+        .stream()
         .filter(projectionFilter)
         .flatMap(p -> p.getEntities().values().stream())
         .forEach(entity -> {
-          ProjectionEntity projectionEntityMix = getProjectionEntity(projectionMix, entity.getName(), false);
-          entity.getFields().values().forEach(field ->
-              getProjectionEntityField(projectionEntityMix, field.getName(), field.getValue(), field.getType())
-          );
+          ProjectionEntity projectionEntityMix = getProjectionEntity(projectionMix,
+              entity.getName(), false);
+          entity.getFields()
+              .values()
+              .forEach(field -> getProjectionEntityField(projectionEntityMix, field.getName(),
+                  field.getValue(), field.getType()));
         });
 
     return projectionMix;
@@ -94,13 +85,14 @@ public class GenerateProtoFile {
    * @throws FileNotFoundException
    */
   public void generate(String pathEtendoRx, List<HashMap<String, Object>> repositories,
-      Collection<Projection> projections, MetadataContainer metadataContainer, boolean computedColumns,
-      boolean includeViews) throws FileNotFoundException {
+      Collection<Projection> projections, MetadataContainer metadataContainer,
+      boolean computedColumns, boolean includeViews) throws FileNotFoundException {
 
     this.generate(pathEtendoRx, metadataContainer, computedColumns, includeViews);
 
     var filteredProjections = projections.stream()
-        .filter(projection -> projection.getName().compareTo("default") != 0 && projection.getGrpc())
+        .filter(
+            projection -> projection.getName().compareTo("default") != 0 && projection.getGrpc())
         .collect(Collectors.toList());
 
     for (Projection projection : filteredProjections) {
@@ -109,13 +101,17 @@ public class GenerateProtoFile {
 
       generateGRPCDto(pathEtendoRx, projection, repositories, computedColumns, includeViews);
 
-      generateGRPCDtoProjection(pathEtendoRx, projection, repositories, computedColumns, includeViews);
+      generateGRPCDtoProjection(pathEtendoRx, projection, repositories, computedColumns,
+          includeViews);
 
-      generateProjectionDTO2Grpc(pathEtendoRx, projection, repositories, computedColumns, includeViews);
+      generateProjectionDTO2Grpc(pathEtendoRx, projection, repositories, computedColumns,
+          includeViews);
 
-      generateClientServiceInterface(pathEtendoRx, projection, repositories, computedColumns, includeViews);
+      generateClientServiceInterface(pathEtendoRx, projection, repositories, computedColumns,
+          includeViews);
 
-      generateClientGrpcService(pathEtendoRx, projection, repositories, computedColumns, includeViews);
+      generateClientGrpcService(pathEtendoRx, projection, repositories, computedColumns,
+          includeViews);
     }
   }
 
@@ -128,13 +124,15 @@ public class GenerateProtoFile {
    * @param includeViews
    * @throws FileNotFoundException
    */
-  private void generate(String pathEtendoRx, MetadataContainer metadataContainer, boolean computedColumns,
-      boolean includeViews) throws FileNotFoundException {
+  private void generate(String pathEtendoRx, MetadataContainer metadataContainer,
+      boolean computedColumns, boolean includeViews) throws FileNotFoundException {
 
     // Filter the metadata modules which contains a projection with the 'grpc' set to true.
-    List<Metadata> grpcModulesMetadata = metadataContainer.getMetadataList().stream().filter(metadata ->
-        metadata.getProjections().values().stream().anyMatch(Projection::getGrpc)
-    ).collect(Collectors.toList());
+    List<Metadata> grpcModulesMetadata = metadataContainer.getMetadataList()
+        .stream()
+        .filter(
+            metadata -> metadata.getProjections().values().stream().anyMatch(Projection::getGrpc))
+        .collect(Collectors.toList());
 
     for (Metadata moduleMetadata : grpcModulesMetadata) {
       generateProtoFile(pathEtendoRx, moduleMetadata, computedColumns, includeViews);
@@ -150,8 +148,8 @@ public class GenerateProtoFile {
    * @param includeViews
    * @throws FileNotFoundException
    */
-  private void generateProtoFile(String pathEtendoRx, Metadata moduleMetadata, boolean computedColumns,
-      boolean includeViews) throws FileNotFoundException {
+  private void generateProtoFile(String pathEtendoRx, Metadata moduleMetadata,
+      boolean computedColumns, boolean includeViews) throws FileNotFoundException {
 
     var outFileDir = pathEtendoRx + "/modules_gen/com.etendorx.grpc.common/src/main/proto";
     new File(outFileDir).mkdirs();
@@ -206,11 +204,11 @@ public class GenerateProtoFile {
    * @throws FileNotFoundException
    */
   private void generateSourcefile(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews, String sourcefilePath,
-      String templatePath,
-      String prefix, String sufix) throws FileNotFoundException {
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews, sourcefilePath,
-        templatePath, prefix, sufix, null);
+      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews,
+      String sourcefilePath, String templatePath, String prefix, String sufix)
+      throws FileNotFoundException {
+    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
+        sourcefilePath, templatePath, prefix, sufix, null);
   }
 
   /**
@@ -229,9 +227,8 @@ public class GenerateProtoFile {
    * @throws FileNotFoundException
    */
   private void generateSourcefile(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews, String sourcefilePath,
-      String templatePath,
-      String prefix, String sufix, String packageName)
+      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews,
+      String sourcefilePath, String templatePath, String prefix, String sufix, String packageName)
       throws FileNotFoundException {
 
     var outFileDir = pathEtendoRx + sourcefilePath;
@@ -250,16 +247,14 @@ public class GenerateProtoFile {
         entity.ifPresent(MetadataUtil.HandlingConsumer.handlingConsumerBuilder(projectionEntity -> {
           File outFile = null;
           try {
-            outFile = new File(outFileDir, repository.get("name").toString() +
-                sufix + ".java");
+            outFile = new File(outFileDir, repository.get("name").toString() + sufix + ".java");
             repository.put("fields", projectionEntity.getFieldsMap());
             StringBuilder pgkName = new StringBuilder();
             if (packageName != null) {
               pgkName.append(packageName)
                   .append(".")
-                  .append(
-                      projectionEntity.getPackageName().replace("com.etendorx.entities.entities.", "")
-                  );
+                  .append(projectionEntity.getPackageName()
+                      .replace("com.etendorx.entities.entities.", ""));
             } else {
               pgkName.append(projectionEntity.getPackageName());
             }
@@ -294,9 +289,7 @@ public class GenerateProtoFile {
 
     generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
         "/modules_core/com.etendorx.das/src-gen/main/java/com/etendorx/das/grpcrepo",
-        "/org/openbravo/base/process/grpcservice.ftl",
-        "",
-        "GrpcService");
+        "/org/openbravo/base/process/grpcservice.ftl", "", "GrpcService");
 
   }
 
@@ -314,12 +307,9 @@ public class GenerateProtoFile {
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns,
-        includeViews,
+    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
         "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/dto",
-        "/org/openbravo/base/process/grpcentitydto.ftl",
-        "",
-        "DTO");
+        "/org/openbravo/base/process/grpcentitydto.ftl", "", "DTO");
 
   }
 
@@ -337,15 +327,11 @@ public class GenerateProtoFile {
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns,
-        includeViews,
+    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
         "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/dto",
-        "/org/openbravo/base/process/entitydtogrpc2model.ftl",
-        "",
-        "DTOGrpc2" + projection.getName()
-            .substring(0, 1)
-            .toUpperCase() + projection.getName().substring(1),
-        "com.etendorx.integration.mobilesync.entities"
+        "/org/openbravo/base/process/entitydtogrpc2model.ftl", "",
+        "DTOGrpc2" + projection.getName().substring(0, 1).toUpperCase() + projection.getName()
+            .substring(1), "com.etendorx.integration.mobilesync.entities"
 
     );
   }
@@ -364,16 +350,11 @@ public class GenerateProtoFile {
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns,
-        includeViews,
+    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
         "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/dto",
-        "/org/openbravo/base/process/entitydtoprojection2grpc.ftl",
-        "",
-        "DTO" +
-            projection.getName().substring(0, 1).toUpperCase() + projection.getName().substring(1) +
-            "2Grpc",
-        "com.etendorx.integration.mobilesync.entities"
-    );
+        "/org/openbravo/base/process/entitydtoprojection2grpc.ftl", "",
+        "DTO" + projection.getName().substring(0, 1).toUpperCase() + projection.getName()
+            .substring(1) + "2Grpc", "com.etendorx.integration.mobilesync.entities");
 
   }
 
@@ -391,16 +372,11 @@ public class GenerateProtoFile {
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns,
-        includeViews,
+    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
         "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/service/",
-        "/org/openbravo/base/process/grpcclientservice.ftl",
-        "",
-        "" +
-            projection.getName().substring(0, 1).toUpperCase() + projection.getName().substring(1) +
-            "DasServiceGrpcImpl",
-        "com.etendorx.integration.mobilesync.entities"
-    );
+        "/org/openbravo/base/process/grpcclientservice.ftl", "",
+        "" + projection.getName().substring(0, 1).toUpperCase() + projection.getName()
+            .substring(1) + "DasServiceGrpcImpl", "com.etendorx.integration.mobilesync.entities");
 
   }
 
@@ -418,15 +394,11 @@ public class GenerateProtoFile {
       List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns,
-        includeViews,
+    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
         "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/service/",
-        "/org/openbravo/base/process/grpcclientinterface.ftl",
-        "",
-        projection.getName().substring(0, 1).toUpperCase() + projection.getName().substring(1) +
-            "DasService",
-        "com.etendorx.integration.mobilesync.entities"
-    );
+        "/org/openbravo/base/process/grpcclientinterface.ftl", "",
+        projection.getName().substring(0, 1).toUpperCase() + projection.getName()
+            .substring(1) + "DasService", "com.etendorx.integration.mobilesync.entities");
 
   }
 

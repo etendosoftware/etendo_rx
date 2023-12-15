@@ -16,22 +16,14 @@
 
 package com.etendorx.gen;
 
-import java.io.File;
-
 import com.etendorx.gen.commandline.CommandLineProcess;
-import com.etendorx.gen.process.GenerateMetadata;
-import com.etendorx.gen.process.GenerateProtoFile;
-import com.etendorx.gen.util.*;
-import freemarker.template.Template;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import com.etendorx.gen.generation.GenerateEntities;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import com.etendorx.gen.commandline.CommandLineProcess;
-import com.etendorx.gen.generation.GenerateEntities;
+import java.io.File;
 
 /**
  * Task generates the entities using the freemarker template engine.
@@ -48,6 +40,7 @@ public class GenerateEntitiesApplication {
 
   /**
    * Run the task based on the command line arguments
+   *
    * @param args
    */
   public void run(String... args) {
@@ -57,7 +50,8 @@ public class GenerateEntitiesApplication {
     boolean friendlyWarnings = false;
     final File baseDir = new File(srcPath);
     var generateEntities = new GenerateEntities();
-    generateEntities.setPropertiesFile(baseDir.getAbsolutePath() + File.separator + "gradle.properties");
+    generateEntities.setPropertiesFile(
+        baseDir.getAbsolutePath() + File.separator + "gradle.properties");
     generateEntities.setFriendlyWarnings(friendlyWarnings);
     generateEntities.execute(commandLineProcess);
   }

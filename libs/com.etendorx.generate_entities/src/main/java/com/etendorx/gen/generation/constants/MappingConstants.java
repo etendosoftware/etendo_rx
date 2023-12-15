@@ -17,7 +17,8 @@ package com.etendorx.gen.generation.constants;
 
 public class MappingConstants {
 
-  private MappingConstants() {}
+  private MappingConstants() {
+  }
 
   public static final String MAPPING_TYPE_READ = "R";
   public static final String MAPPING_TYPE_WRITE = "W";

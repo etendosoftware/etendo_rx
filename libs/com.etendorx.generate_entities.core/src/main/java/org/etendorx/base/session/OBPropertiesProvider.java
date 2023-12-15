@@ -90,13 +90,13 @@ public class OBPropertiesProvider {
       is.close();
 
       if (OBConfigFileProvider.getInstance() == null || OBConfigFileProvider.getInstance()
-        .getServletContext() == null) {
+          .getServletContext() == null) {
         log.debug("ServletContext is not set, not trying to override Openbravo.properties");
         return;
       }
 
       ConfigParameters.overrideProperties(obProperties,
-        OBConfigFileProvider.getInstance().getServletContext().getRealPath("/WEB-INF"));
+          OBConfigFileProvider.getInstance().getServletContext().getRealPath("/WEB-INF"));
     } catch (final Exception e) {
       throw new OBException(e);
     }
@@ -114,7 +114,7 @@ public class OBPropertiesProvider {
   public void setProperties(String fileLocation) {
     log.debug("Setting Openbravo.properties through file: {}", fileLocation);
     obProperties = new Properties();
-    try(FileInputStream fis = new FileInputStream(fileLocation)) {
+    try (FileInputStream fis = new FileInputStream(fileLocation)) {
       obProperties.load(fis);
     } catch (final Exception e) {
       throw new OBException(e);
@@ -135,7 +135,8 @@ public class OBPropertiesProvider {
     if (value == null) {
       return false;
     }
-    return StringUtils.equalsIgnoreCase(value, "true") || StringUtils.equalsIgnoreCase(value, "yes");
+    return StringUtils.equalsIgnoreCase(value, "true") || StringUtils.equalsIgnoreCase(value,
+        "yes");
   }
 
   // tries to read the properties from the openbravo development project
@@ -146,8 +147,7 @@ public class OBPropertiesProvider {
       return;
     }
     setProperties(propertiesFile.getAbsolutePath());
-    OBConfigFileProvider.getInstance()
-      .setFileLocation(propertiesFile.getAbsolutePath());
+    OBConfigFileProvider.getInstance().setFileLocation(propertiesFile.getAbsolutePath());
   }
 
   private File getFileFromDevelopmentPath(String fileName) {

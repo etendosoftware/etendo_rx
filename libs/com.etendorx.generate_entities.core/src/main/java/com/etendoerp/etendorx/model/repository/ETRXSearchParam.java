@@ -3,7 +3,7 @@ package com.etendoerp.etendorx.model.repository;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import org.openbravo.base.model.ModelObject;
 
-@JsonIncludeProperties({"name", "type"})
+@JsonIncludeProperties({ "name", "type" })
 public class ETRXSearchParam extends ModelObject {
 
   private ETRXEntitySearch entitySearch;

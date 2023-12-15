@@ -82,7 +82,7 @@ public class SessionInfo {
 
     try {
       PreparedStatement psCreate = getPreparedStatement(conn, sql);
-      if(psCreate == null) {
+      if (psCreate == null) {
         throw new IllegalStateException("Error creating AD_CONTEXT_INFO table");
       }
       try {
@@ -128,17 +128,15 @@ public class SessionInfo {
 
   private static boolean usingJdbcConnectionPool() {
     return org.etendorx.database.ExternalConnectionPool.getInstance() == null ?
-      false :
-      "org.openbravo.apachejdbcconnectionpool.JdbcExternalConnectionPool".equals(
-        ExternalConnectionPool.getInstance().getClass().getName());
+        false :
+        "org.openbravo.apachejdbcconnectionpool.JdbcExternalConnectionPool".equals(
+            ExternalConnectionPool.getInstance().getClass().getName());
   }
 
   private static boolean adContextInfoExists(Connection conn) {
     String query = "select count(*) from information_schema.tables where table_name='ad_context_info' and table_type = 'LOCAL TEMPORARY'";
-    try (
-        PreparedStatement psQuery = conn.prepareStatement(query);
-        ResultSet rs = psQuery.executeQuery()
-    ) {
+    try (PreparedStatement psQuery = conn.prepareStatement(query);
+        ResultSet rs = psQuery.executeQuery()) {
       return rs.next() && !rs.getString(1).equals("0");
     } catch (SQLException ex) {
       log4j.error("Error checking if the ad_context_info table exists", ex);
@@ -154,8 +152,8 @@ public class SessionInfo {
     if (!isAuditActive || onlyIfChanged && (changedInfo.get() == null || !(Boolean) changedInfo.get())) {
       if (log4j.isDebugEnabled()) {
         boolean var10001 = isAuditActive;
-        log4j.debug(
-          "No session info set isAuditActive: {} - changes in info: {}", var10001, changedInfo.get());
+        log4j.debug("No session info set isAuditActive: {} - changes in info: {}", var10001,
+            changedInfo.get());
       }
     } else {
       saveContextInfoIntoDB(conn);
@@ -177,20 +175,20 @@ public class SessionInfo {
 
       try {
         boolean infoModified = Boolean.TRUE.equals(
-          changedInfo.get()) || sessionConnection.get() == null || !conn.equals(
-          sessionConnection.get());
+            changedInfo.get()) || sessionConnection.get() == null || !conn.equals(
+            sessionConnection.get());
         if (infoModified && !Boolean.FALSE.equals(auditThisThread.get()) && !isReadOnly(conn)) {
           if (log4j.isDebugEnabled()) {
             Logger var10000 = log4j;
             String var10001 = getUserId();
             var10000.debug(
-              "saving DB context info " + var10001 + " - " + getSessionId() + " - " + getProcessType() + " - " + getProcessId());
+                "saving DB context info " + var10001 + " - " + getSessionId() + " - " + getProcessType() + " - " + getProcessId());
           }
 
           psCleanUp = getPreparedStatement(conn, "delete from ad_context_info");
           psCleanUp.executeUpdate();
           psInsert = getPreparedStatement(conn,
-            "insert into ad_context_info (ad_user_id, ad_session_id, processType, processId) values (?, ?, ?, ?)");
+              "insert into ad_context_info (ad_user_id, ad_session_id, processType, processId) values (?, ?, ?, ?)");
           psInsert.setString(1, getUserId());
           psInsert.setString(2, getSessionId());
           psInsert.setString(3, getProcessType());
@@ -241,7 +239,7 @@ public class SessionInfo {
   }
 
   private static PreparedStatement getPreparedStatement(Connection conn, String sql)
-    throws SQLException {
+      throws SQLException {
     if (conn != null && sql != null && !sql.equals("")) {
       PreparedStatement ps = null;
 

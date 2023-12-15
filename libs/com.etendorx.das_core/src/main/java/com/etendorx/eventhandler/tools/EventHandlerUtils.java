@@ -1,11 +1,11 @@
 package com.etendorx.eventhandler.tools;
 
-import java.util.Arrays;
-
 import org.hibernate.event.spi.AbstractEvent;
 import org.hibernate.event.spi.AbstractPreDatabaseOperationEvent;
 import org.hibernate.event.spi.SaveOrUpdateEvent;
 import org.hibernate.persister.entity.EntityPersister;
+
+import java.util.Arrays;
 
 public class EventHandlerUtils {
 
@@ -36,7 +36,9 @@ public class EventHandlerUtils {
       return specificEvent.getPersister().getPropertyValue(specificEvent.getEntity(), index);
     } else if (event instanceof SaveOrUpdateEvent) {
       SaveOrUpdateEvent specificEvent = (SaveOrUpdateEvent) event;
-      return specificEvent.getEntry().getPersister().getPropertyValue(specificEvent.getEntity(), index);
+      return specificEvent.getEntry()
+          .getPersister()
+          .getPropertyValue(specificEvent.getEntity(), index);
     } else {
       throw new IllegalArgumentException("Unsupported event type: " + event.getClass());
     }

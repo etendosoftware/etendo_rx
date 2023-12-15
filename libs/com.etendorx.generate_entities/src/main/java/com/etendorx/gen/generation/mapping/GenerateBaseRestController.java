@@ -29,14 +29,14 @@ public class GenerateBaseRestController extends MappingGenerationBase {
 
   @Override
   protected boolean isValid(ETRXProjectionEntity etrxProjectionEntity) {
-    return (
-        StringUtils.equals(etrxProjectionEntity.getMappingType(), MappingConstants.MAPPING_TYPE_READ) && BooleanUtils.isTrue(etrxProjectionEntity.isRestEndPoint())
-    );
+    return (StringUtils.equals(etrxProjectionEntity.getMappingType(),
+        MappingConstants.MAPPING_TYPE_READ) && BooleanUtils.isTrue(
+        etrxProjectionEntity.isRestEndPoint()));
   }
 
   @Override
   protected String getOutFileName(ETRXProjectionEntity etrxProjectionEntity) {
-    return etrxProjectionEntity.getExternalName()+ "RestController.java";
+    return etrxProjectionEntity.getExternalName() + "RestController.java";
   }
 
 }

@@ -17,7 +17,8 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="com.etendoerp.etendorx.model.mapping.ETRXJavaMapping" lazy="false" table="etrx_java_mapping">
+    <class name="com.etendoerp.etendorx.model.mapping.ETRXJavaMapping" lazy="false"
+           table="etrx_java_mapping">
         <cache usage="read-write"/>
 
         <id name="id" type="string" column="etrx_java_mapping_id">

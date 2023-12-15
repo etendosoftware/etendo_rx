@@ -17,7 +17,8 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="com.etendoerp.etendorx.model.projection.ETRXEntityField" lazy="false" table="etrx_entity_field">
+    <class name="com.etendoerp.etendorx.model.projection.ETRXEntityField" lazy="false"
+           table="etrx_entity_field">
         <cache usage="read-write"/>
 
         <id name="id" type="string" column="etrx_entity_field_id">
@@ -38,16 +39,21 @@
         <property name="line" column="line"/>
         <property name="jsonPath" column="jsonpath"/>
 
-        <many-to-one name="entity" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
+        <many-to-one name="entity" not-null="true"
+                     class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
                      column="etrx_projection_entity_id"/>
 
-        <many-to-one name="javaMapping" not-null="true" class="com.etendoerp.etendorx.model.mapping.ETRXJavaMapping"
+        <many-to-one name="javaMapping" not-null="true"
+                     class="com.etendoerp.etendorx.model.mapping.ETRXJavaMapping"
                      column="etrx_java_mapping_id"/>
 
-        <many-to-one name="etrxProjectionEntityRelated" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
-                     column="etrx_projection_entity_rel_id" foreign-key="etrx_projection_entity_id"/>
+        <many-to-one name="etrxProjectionEntityRelated" not-null="true"
+                     class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
+                     column="etrx_projection_entity_rel_id"
+                     foreign-key="etrx_projection_entity_id"/>
 
-        <many-to-one name="constantValue" not-null="true" class="com.etendoerp.etendorx.model.mapping.ETRXConstantValue"
+        <many-to-one name="constantValue" not-null="true"
+                     class="com.etendoerp.etendorx.model.mapping.ETRXConstantValue"
                      column="etrx_constant_value_id" foreign-key="etrx_constant_value_id"/>
     </class>
 </hibernate-mapping>

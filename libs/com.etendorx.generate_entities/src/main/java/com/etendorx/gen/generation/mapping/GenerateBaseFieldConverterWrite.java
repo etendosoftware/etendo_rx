@@ -28,7 +28,8 @@ public class GenerateBaseFieldConverterWrite extends MappingGenerationBase {
 
   @Override
   protected boolean isValid(ETRXProjectionEntity etrxProjectionEntity) {
-    return StringUtils.equals(etrxProjectionEntity.getMappingType(), MappingConstants.MAPPING_TYPE_WRITE);
+    return StringUtils.equals(etrxProjectionEntity.getMappingType(),
+        MappingConstants.MAPPING_TYPE_WRITE);
   }
 
   @Override
