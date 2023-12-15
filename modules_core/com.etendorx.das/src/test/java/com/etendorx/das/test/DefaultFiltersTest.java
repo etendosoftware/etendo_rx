@@ -1,5 +1,7 @@
 package com.etendorx.das.test;
 
+import com.etendorx.das.utils.DefaultFilters;
+import com.etendorx.das.utils.TestcontainersUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,10 +14,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.etendorx.das.utils.DefaultFilters;
-import com.etendorx.das.utils.TestcontainersUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19090")
@@ -87,7 +87,7 @@ class DefaultFiltersTest {
         // Assert
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', '456') " +
             "and etrx_role_organizations('456', '101112', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         Assertions.assertEquals(expected, result);
     }
 
@@ -114,7 +114,7 @@ class DefaultFiltersTest {
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -139,7 +139,7 @@ class DefaultFiltersTest {
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -163,7 +163,7 @@ class DefaultFiltersTest {
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 
@@ -187,7 +187,7 @@ class DefaultFiltersTest {
 
         String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " +
             "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " +
-            "limit 10"; //NOSONAR
+            "and table0_.isactive = 'Y' limit 10"; //NOSONAR
         assertEquals(expected, result);
     }
 

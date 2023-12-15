@@ -195,7 +195,11 @@ public class NamingUtil {
     }
   }
 
-  static String getSafeJavaName(String name) {
+  public static boolean isJavaReservedWord(String name) {
+    return reservedNames.get(name) != null;
+  }
+
+  public static String getSafeJavaName(String name) {
     if (reservedNames.get(name) != null) {
       return reservedNames.get(name);
     }

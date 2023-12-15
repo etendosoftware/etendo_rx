@@ -33,6 +33,8 @@
         <property name="identity" type="org.etendorx.base.session.OBYesNoType"
                   column="isidentity"/>
 
+        <property name="mappingType" column="mapping_type"/>
+
         <many-to-one name="projection" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjection"
                      column="etrx_projection_id"/>
 
@@ -40,7 +42,7 @@
                      column="ad_table_id"/>
 
         <set name="fields" table="etrx_entity_field" inverse="true"
-             cascade="save-update" lazy="true" fetch="select">
+             cascade="save-update" lazy="true" fetch="select" order-by="line desc">
             <key>
                 <column name="etrx_projection_entity_id" not-null="true"/>
             </key>

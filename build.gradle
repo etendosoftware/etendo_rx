@@ -1,15 +1,15 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.14'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.springframework.boot' version '3.1.4'
+    id 'io.spring.dependency-management' version '1.1.3'
     id 'java'
     id 'java-library'
     id 'groovy'
-    id 'com.etendorx.gradlepluginrx' version '1.1.0'
+    id 'com.etendorx.gradlepluginrx' version '1.2.0'
 }
 
 group = 'com.etendorx'
 version = "$gradle.ext.version"
-sourceCompatibility = '11'
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -71,4 +71,3 @@ task upgradeRxVersion() {
 test {
     useJUnitPlatform()
 }
-

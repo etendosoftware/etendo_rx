@@ -1,18 +1,18 @@
 package com.etendorx.gen.process;
 
-import com.etendoerp.etendorx.model.ETRXModelProvider;
-import com.etendoerp.etendorx.model.ETRXModule;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.etendorx.base.provider.OBProvider;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.etendorx.base.provider.OBProvider;
+
+import com.etendoerp.etendorx.model.ETRXModelProvider;
+import com.etendoerp.etendorx.model.ETRXModule;
 
 public class GenerateMetadata {
   private static final Logger log = LogManager.getLogger();
@@ -65,6 +65,10 @@ public class GenerateMetadata {
     this.defaultDirectory = defaultDirectory;
   }
 
+  /**
+   * Generates the metadata.json files for all the modules
+   * @param pathEtendoRx
+   */
   public void generate(String pathEtendoRx) {
     // Search the module location
     File etendoRxLocation = new File(pathEtendoRx);

@@ -8,14 +8,14 @@ plugins {
 
 group = 'com.etendorx'
 version = "$gradle.ext.version"
-sourceCompatibility = '11'
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
 }
 
 ext {
-    set('springCloudVersion', "2021.0.8")
+    set('springCloudVersion', "2022.0.4")
 }
 
 dependencyManagement {

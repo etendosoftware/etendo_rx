@@ -36,10 +36,8 @@ directories.each {
         }
     }
 
-    println subDirs.toString()
     subDirs.each { File dir ->
         include dir.name
-
         project(":" + dir.name).projectDir = dir
     }
 }

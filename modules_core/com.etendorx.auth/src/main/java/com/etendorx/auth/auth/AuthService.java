@@ -3,28 +3,23 @@ package com.etendorx.auth.auth;
 import com.etendorx.auth.auth.hashing.PasswordHash;
 import com.etendorx.auth.auth.jwt.JwtRequest;
 import com.etendorx.auth.feign.ServiceClient;
-import com.etendorx.auth.feign.UserClient;
 import com.etendorx.auth.feign.model.RxService;
-import com.etendorx.auth.feign.model.ServicesAccessModel;
+import com.etendorx.auth.feign.model.ServiceAccess;
 import com.etendorx.auth.feign.model.UserModel;
+import com.etendorx.clientrest.base.RestUtils;
 import com.etendorx.utils.auth.key.JwtKeyUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -46,10 +41,7 @@ public class AuthService {
   public static final String SUPER_USER_ID = "100";
 
   @Autowired
-  private UserClient userClient;
-
-  @Autowired
-  private ServiceClient serviceClient;
+  private RestUtils restUtils;
 
   @Value("${token}")
   private String token;
@@ -86,26 +78,11 @@ public class AuthService {
    * @return {@link UserModel}
    */
   public UserModel validateCredentials(String username, String password) {
-    // Send a request to the DAS server
     log.debug("Sending request to the DAS server.");
-    HttpHeaders headers = new HttpHeaders();
-    headers.add(HEADER_TOKEN, token);
-    ResponseEntity<CollectionModel<UserModel>> modelResponseEntity = userClient.searchUserByUsername(username, "true", PROJECTION, headers);
-    if (modelResponseEntity.getStatusCode() != HttpStatus.OK) {
-      throw new ResponseStatusException(modelResponseEntity.getStatusCode(), "Unsuccessful DAS connection.");
-    }
-
-    CollectionModel<UserModel> collectionModel = modelResponseEntity.getBody();
-    if (collectionModel == null || collectionModel.getContent().isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_MESSAGE);
-    }
-
-    UserModel userModel = collectionModel.iterator().next();
-    // Verify the user password
+    UserModel userModel = restUtils.getEntity("/auth/ADUser/" + username, UserModel.class);
     if (!PasswordHash.matches(password, userModel.getPassword())) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_MESSAGE);
     }
-
     return userModel;
   }
 
@@ -115,35 +92,16 @@ public class AuthService {
         return null;
       }
 
-      List<HashMap<String, String>> accessList = userModel.getETRXRxServicesAccessList();
+      List<ServiceAccess> accessList = userModel.geteTRXRxServicesAccessList();
       if (accessList.isEmpty()) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "ServicesAccessList can not be empty. This user do not have access to this service");
       }
 
-      String rxServiceId = accessList.get(0).get("rxServiceId");
+      String rxServiceId = accessList.get(0).getRxServiceId();
       HttpHeaders headers = new HttpHeaders();
       headers.add(HEADER_TOKEN, token);
-
-      ResponseEntity<String> rxServiceResponse = serviceClient.searchServiceByServiceId(rxServiceId, true, headers);
-      HttpStatus statusCode = rxServiceResponse.getStatusCode();
-      if (statusCode != HttpStatus.OK) {
-        throw new ResponseStatusException(statusCode, "Unsuccessful DAS connection.");
-      }
-
-      String rxServiceJson = rxServiceResponse.getBody();
-      ObjectMapper mapper = new ObjectMapper();
-      ServicesAccessModel servicesAccessModel = mapper.readValue(rxServiceJson, ServicesAccessModel.class);
-      if (servicesAccessModel == null) {
-        throw new ResponseStatusException(HttpStatus.NO_CONTENT, "DAS server respond with not content.");
-      }
-
-      List<RxService> rxServicesList = servicesAccessModel.get_embedded().getRxServiceses();
-      if (rxServicesList.isEmpty()) {
-        throw new ResponseStatusException(HttpStatus.NO_CONTENT, "RxServices list is empty.");
-      }
-
-      RxService rxService = rxServicesList.get(0);
+      RxService rxService = restUtils.getEntity("/auth/ETRX_Rx_Services/" + rxServiceId, RxService.class);
       if (!StringUtils.equals(rxService.getSearchkey(), authRequest.getService())) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_SERVICE_MESSAGE);
       }
@@ -153,8 +111,6 @@ public class AuthService {
       return rxService.getSearchkey();
     } catch (RestClientException e) {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error during DAS connection.", e);
-    } catch (JsonProcessingException e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error during JSON parsing.", e);
     }
   }
 
@@ -167,17 +123,18 @@ public class AuthService {
    */
   public Claims generateUserClaims(UserModel userModel, String searchKey) {
     Claims claims = new DefaultClaims();
-    HashMap<String, String> servicesAccess = new HashMap<>();
+    ServiceAccess servicesAccess = new ServiceAccess();
     if (!isSuperUser(userModel)) {
-      servicesAccess = userModel.getETRXRxServicesAccessList().get(0);
+      servicesAccess = userModel.geteTRXRxServicesAccessList().get(0);
     }
     claims.put(JwtKeyUtils.USER_ID_CLAIM, userModel.getId());
-    claims.put(JwtKeyUtils.CLIENT_ID_CLAIM, getOrDefaultValue(userModel.getDefaultClientId(), userModel.getClientId()));
-    claims.put(JwtKeyUtils.ORG_ID, getOrDefaultValue(servicesAccess.get("defaultOrgId"), SUPER_USER_ORG_ID));
-    claims.put(JwtKeyUtils.ROLE_ID, getOrDefaultValue(servicesAccess.get("defaultRoleId"), SUPER_USER_ORG_ID));
+    claims.put(JwtKeyUtils.CLIENT_ID_CLAIM, getOrDefaultValue(userModel.getDefaultClient(), userModel.getClient()));
+    claims.put(JwtKeyUtils.ORG_ID, getOrDefaultValue(servicesAccess.getDefaultOrgId(), SUPER_USER_ORG_ID));
+    claims.put(JwtKeyUtils.ROLE_ID, getOrDefaultValue(servicesAccess.getDefaultRoleId(), SUPER_USER_ORG_ID));
     claims.put(JwtKeyUtils.SERVICE_SEARCH_KEY,
             getOrDefaultValue(searchKey, EMPTY_SERVICE));
-    claims.put(JwtKeyUtils.SERVICE_ID, getOrDefaultValue(servicesAccess.get("rxServiceId"), EMPTY_SERVICE));
+    claims.put(JwtKeyUtils.SERVICE_ID, getOrDefaultValue(servicesAccess.getRxServiceId(), EMPTY_SERVICE));
+
     return claims;
   }
 

@@ -15,6 +15,7 @@ dasPushImage=
 authPushImage=
 edgePushImage=
 zapierIntegrationPushImage=
+asyncPushImage=
 pushUrl=
 pushUsername=
 pushPassword=
@@ -34,3 +35,9 @@ rx.generateCode=true
 
 rx.computedColumns=true
 rx.views=true
+
+grpc.enabled=false
+data-rest.enabled=false
+
+springdoc.show-actuator=true
+
