@@ -92,6 +92,7 @@ public class GenerateEntities {
     if (getBasePath() == null) {
       setBasePath(".");
     }
+    ETRXModelProvider.getInstance().verifyModule();
     log.debug("initializating dal layer, getting properties from {}", getPropertiesFile());
     OBPropertiesProvider.getInstance().setProperties(getPropertiesFile());
 
