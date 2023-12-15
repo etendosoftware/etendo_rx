@@ -46,5 +46,8 @@
 
         <many-to-one name="etrxProjectionEntityRelated" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
                      column="etrx_projection_entity_rel_id" foreign-key="etrx_projection_entity_id"/>
+
+        <many-to-one name="constantValue" not-null="true" class="com.etendoerp.etendorx.model.mapping.ETRXConstantValue"
+                     column="etrx_constant_value_id" foreign-key="etrx_constant_value_id"/>
     </class>
 </hibernate-mapping>

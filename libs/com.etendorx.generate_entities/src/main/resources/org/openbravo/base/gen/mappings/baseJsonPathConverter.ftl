@@ -102,22 +102,27 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
     </#if>
   </#if>
   <#assign returnClass = ""/>
-  <#if hasRetriever>
-    var ${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(ctx.read("${field.jsonPath!"$."+field.name}"));
-  <#elseif field.property??>
-    <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + field.property) ! "" />
-    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class</#if>);
+  // ${field.name}
+  <#if field.fieldMapping == "CM">
+    dto.set<@toCamelCase field.name />(mappingUtils.constantValue("${field.constantValue.id}"));
   <#else>
+    <#if hasRetriever>
+    var ${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(ctx.read("${field.jsonPath!"$."+field.name}"));
+    <#elseif field.property??>
+      <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + field.property) ! "" />
+    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class</#if>);
+    <#else>
     var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"$."+field.name}");
-  </#if>
+    </#if>
     log.debug("pathConverter ${entity.externalName} \"${field.jsonPath!"$."+field.name}\": {}", ${NamingUtil.getSafeJavaName(field.name)});
     dto.set<@toCamelCase field.name />(
-  <#if returnClass=="java.util.Date">
+    <#if returnClass=="java.util.Date">
       mappingUtils.parseDate(${NamingUtil.getSafeJavaName(field.name)})
-  <#else>
+    <#else>
       ${NamingUtil.getSafeJavaName(field.name)}
-  </#if>
+    </#if>
     );
+  </#if>
   </#list>
     return dto;
   }

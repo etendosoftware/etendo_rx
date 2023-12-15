@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import com.etendoerp.etendorx.data.ConstantValue;
+import com.etendorx.entities.jparepo.ETRX_Constant_ValueRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.stereotype.Component;
@@ -38,6 +40,11 @@ import com.etendorx.utils.auth.key.context.AppContext;
 @Slf4j
 public class MappingUtilsImpl implements MappingUtils {
 
+  private final ETRX_Constant_ValueRepository constantValueRepository;
+
+  public MappingUtilsImpl(ETRX_Constant_ValueRepository constantValueRepository) {
+    this.constantValueRepository = constantValueRepository;
+  }
   /**
    * Handle base object. If the object is a BaseSerializableObject, it will return the identifier
    * of the object. If the object is a PersistentBag, it will return a list of identifiers of the
@@ -99,5 +106,11 @@ public class MappingUtilsImpl implements MappingUtils {
       }
     }
     return null;
+  }
+
+  @Override
+  public String constantValue(String id) {
+    var constantValue = constantValueRepository.findById(id);
+    return constantValue.map(ConstantValue::getDefaultValue).orElse(null);
   }
 }
