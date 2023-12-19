@@ -25,13 +25,13 @@ import java.util.List;
 @Slf4j
 public class AuthService {
 
-  public static final String UNAUTHORIZED_MESSAGE = "Invalid username or password.";
-  public static final String UNDEFINED_USERNAME_MESSAGE = "The username is not defined.";
-  public static final String UNDEFINED_PASSWORD_MESSAGE = "The password is not defined.";
-  public static final String UNDEFINED_SERVICE_MESSAGE = "The service is not defined.";
-  public static final String UNDEFINED_SECRET_MESSAGE = "The secret is not defined.";
-  public static final String UNAUTHORIZED_SECRET_MESSAGE = "The secret is not match.";
-  public static final String UNAUTHORIZED_SERVICE_MESSAGE = "The service is not match.";
+  public static final String UNAUTHORIZED_MESSAGE = "Invalid username or password";
+  public static final String UNDEFINED_USERNAME_MESSAGE = "Username is not defined";
+  public static final String UNDEFINED_PASSWORD_MESSAGE = "Password is not defined";
+  public static final String UNDEFINED_SERVICE_MESSAGE = "Service is not defined";
+  public static final String UNDEFINED_SECRET_MESSAGE = "Secret is not defined";
+  public static final String UNAUTHORIZED_SECRET_MESSAGE = "Secret does not match";
+  public static final String UNAUTHORIZED_SERVICE_MESSAGE = "Service does not match";
 
   public static final String PROJECTION = "auth";
   public static final String HEADER_TOKEN = "X-TOKEN";
