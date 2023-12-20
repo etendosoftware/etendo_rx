@@ -39,17 +39,22 @@ public class GenerateReactCode implements ProjectionGenerator {
     freemarker.template.Template template = TemplateUtil.createTemplateImplementation(ftlFileName);
     var outFile = TemplateUtil.prepareOutputFile(projection.getModuleLocation() + "/lib/data_gen",
         fileName);
+
+    ProjectionEntity projectionEntity = projection.getEntities()
+        .getOrDefault(data.get("newClassName").toString(), null);
+    if(projectionEntity == null) {
+      throw new RuntimeException("Projection entity not found for " + data.get("newClassName").toString());
+    }
+
     data.put("projectionName", projection.getName());
-    data.put("projectionFields", getProjectionFields(data, projection));
+    data.put("externalName", projectionEntity.getExternalName());
+    data.put("projectionFields", getProjectionFields(projectionEntity));
     data.put("projection", projection);
     TemplateUtil.processTemplate(template, data, new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8)));
   }
 
-  private List<Map<String, String>> getProjectionFields(Map<String, Object> data,
-      Projection projection) {
-    ProjectionEntity projectionEntity = projection.getEntities()
-        .getOrDefault(data.get("newClassName").toString(), null);
+  private List<Map<String, String>> getProjectionFields(ProjectionEntity projectionEntity) {
     return projectionEntity != null ? projectionEntity.getFieldsMap() : new ArrayList<>();
   }
 

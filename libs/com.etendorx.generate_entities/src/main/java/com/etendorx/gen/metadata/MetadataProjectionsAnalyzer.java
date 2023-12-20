@@ -15,12 +15,12 @@ public class MetadataProjectionsAnalyzer {
    * @return
    */
   public static ProjectionEntity getProjectionEntity(Projection projection, String entityName,
-      Boolean identity) {
+      String externalName, Boolean identity) {
     ProjectionEntity projectionEntity;
     if (projection.getEntities().containsKey(entityName)) {
       projectionEntity = projection.getEntities().get(entityName);
     } else {
-      projectionEntity = new ProjectionEntity(entityName, identity);
+      projectionEntity = new ProjectionEntity(entityName, externalName, identity);
       projection.getEntities().put(entityName, projectionEntity);
     }
     return projectionEntity;

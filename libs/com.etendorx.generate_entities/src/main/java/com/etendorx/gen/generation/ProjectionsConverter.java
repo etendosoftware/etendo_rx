@@ -77,7 +77,7 @@ public class ProjectionsConverter {
    * @param entity
    */
   private ProjectionEntity convertEntity(ETRXProjectionEntity entity) {
-    return new ProjectionEntity(entity.getTable().getName(), entity.getIdentity());
+    return new ProjectionEntity(entity.getTable().getName(), entity.getExternalName(), entity.getIdentity());
   }
 
   /**
@@ -86,7 +86,7 @@ public class ProjectionsConverter {
    * @param entity
    */
   private ProjectionEntity convertEntity(Entity entity) {
-    var projectionEntity = new ProjectionEntity(entity.getName(), false);
+    var projectionEntity = new ProjectionEntity(entity.getName(), entity.getName(), false);
     projectionEntity.setPackageName(entity.getPackageName());
     projectionEntity.setClassName(entity.getClassName());
     return projectionEntity;
