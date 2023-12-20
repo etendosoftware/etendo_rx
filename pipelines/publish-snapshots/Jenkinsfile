@@ -24,6 +24,7 @@ pipeline {
     COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
     SUCCESS             = "SUCCESS"
     FAILED              = "FAILED"
+    JAVA_HOME           = "/usr/lib/jvm/java-17-openjdk-amd64"
   }
 
   agent {
@@ -50,7 +51,7 @@ spec:
         type: ''
   containers:
     - name: compiler
-      image: etendo/compiler_jenkins:1.0.6
+      image: etendo/compiler_jenkins:1.0.7
       ports:
         - name: ssh
           containerPort: 22
@@ -106,7 +107,9 @@ spec:
   stages {
     stage ('Build Environment Etendo Classic') {
       when {
-          branch 'develop'
+        expression {
+          return (env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'release/2.0')
+        }
       }
       steps {
         container('compiler') {
@@ -133,7 +136,9 @@ spec:
               githubUser=${GITHUB_USER}\n
               githubToken=${GITHUB_TOKEN}\n
               allow.root=true\n
-              org.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8\" > gradle.properties
+              org.gradle.parallel=false\n
+              org.gradle.daemon=false\n
+              org.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8\" > gradle.properties
               """
 
               echo "---------------- Clone RX module of Classic ---------------"
@@ -142,7 +147,7 @@ spec:
                 cd etendo_base
                 mkdir modules
                 cd modules
-                GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop $MODULE_RX_URL
+                GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch ${env.BRANCH_NAME} $MODULE_RX_URL
                 """
               }
 
@@ -171,9 +176,8 @@ spec:
     stage ('Build Environment Etendo RX') {
       when {
         allOf {
-          branch 'develop'
           expression {
-            currentBuild.result == SUCCESS
+            return currentBuild.result == SUCCESS && (env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'release/2.0')
           }
         }
       }
@@ -201,6 +205,7 @@ spec:
               authPushImage=\n
               edgePushImage=\n
               zapierIntegrationPushImage=\n
+              asyncPushImage=\n
               pushUrl=\n
               pushUsername=\n
               pushPassword=\n
@@ -246,9 +251,8 @@ spec:
     stage ("Publish JARs") {
       when {
         allOf {
-          branch 'develop'
-          expression {
-            currentBuild.result == SUCCESS
+           expression {
+            return currentBuild.result == SUCCESS && (env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'release/2.0')
           }
         }
       }
