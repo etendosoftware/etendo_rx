@@ -63,7 +63,7 @@ public class GenerateProtoFile {
         .flatMap(p -> p.getEntities().values().stream())
         .forEach(entity -> {
           ProjectionEntity projectionEntityMix = getProjectionEntity(projectionMix,
-              entity.getName(), false);
+              entity.getName(), entity.getName(), false);
           entity.getFields()
               .values()
               .forEach(field -> getProjectionEntityField(projectionEntityMix, field.getName(),

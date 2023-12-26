@@ -94,7 +94,7 @@ public class MetadataUtil {
    */
   public static ProjectionEntity generateProjectionEntity(Entity entityModel) {
     String newClassName = entityModel.getName();
-    ProjectionEntity projectionEntity = new ProjectionEntity(newClassName, false);
+    ProjectionEntity projectionEntity = new ProjectionEntity(newClassName, entityModel.getName(), false);
 
     // Filter the valid properties of the entityModel
     var filteredProperties = entityModel.getProperties()

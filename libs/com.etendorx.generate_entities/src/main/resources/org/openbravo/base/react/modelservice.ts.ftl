@@ -17,11 +17,12 @@ import {BaseService} from '../base/baseservice';
 import {${entity.name}, ${entity.name}List, <#if searches??><#list searches as s>${s.method?cap_first}Params<#if !s?is_last>, </#if></#list></#if>} from './${entity.name?lower_case}.types';
 
 class BackService extends BaseService<${entity.name}> {
-  private static modelName = '${entity.name}';
+  private static projection = '${projectionName?lower_case}';
+  private static modelName = '${externalName}';
   private static fetchName = '${entity.name?uncap_first}';
 
   getModelName(): string {
-    return BackService.modelName;
+    return BackService.projection + "/" + BackService.modelName;
   }
   getFetchName(): string {
     return BackService.fetchName;
@@ -44,10 +45,8 @@ class BackService extends BaseService<${entity.name}> {
   </#list>  page?: number,
     size?: number,
   ): Promise<${entity.name}List> {
-    return this._fetchSearch<${s.method?cap_first}Params>(
-      '${s.method}', {
+    return this._fetchSearch<${s.method?cap_first}Params>('${s.method}', {
       <#list s.params as p>${p.name}, </#list>
-      projection: '${projectionName}',
       page,
       size,
     });
