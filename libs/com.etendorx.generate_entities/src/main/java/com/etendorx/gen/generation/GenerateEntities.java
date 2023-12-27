@@ -97,8 +97,8 @@ public class GenerateEntities {
     final boolean generateRxCode = Boolean.parseBoolean(
         obProperties.getProperty("rx.generateCode"));
     final boolean computedColumns = Boolean.parseBoolean(
-        obProperties.getProperty("rx.computedColumns"));
-    final boolean includeViews = Boolean.parseBoolean(obProperties.getProperty("rx.views"));
+        obProperties.getProperty("rx.computedColumns", "true"));
+    final boolean includeViews = Boolean.parseBoolean(obProperties.getProperty("rx.views", "true"));
     final boolean dataRestEnabled = Boolean.parseBoolean(
         obProperties.getProperty("data-rest.enabled"));
 
