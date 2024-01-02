@@ -56,14 +56,14 @@ class BackService extends BaseService<${entity.name}> {
 
 }
 
-class FrontService extends BaseService<Product> {
+class FrontService extends BaseService<${entity.name}> {
   getModelName(): string {
     throw new Error('Method not implemented.');
   }
   getFetchName(): string {
     throw new Error('Method not implemented.');
   }
-  mapManyToOne(entity: Product): void {
+  mapManyToOne(entity: ${entity.name}): void {
     throw new Error('Method not implemented.');
   }
 }
