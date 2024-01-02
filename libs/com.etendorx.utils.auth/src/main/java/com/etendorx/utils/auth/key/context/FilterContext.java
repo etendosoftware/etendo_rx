@@ -16,6 +16,7 @@
 
 package com.etendorx.utils.auth.key.context;
 
+import com.etendorx.utils.auth.key.config.JwtClassicConfig;
 import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -49,6 +50,8 @@ public class FilterContext extends OncePerRequestFilter {
   private Set<AllowedURIS> allowedURIS;
   @Value("${public-key:}")
   String publicKey;
+  @Autowired(required = false)
+  private JwtClassicConfig jwtClassicConfig;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -59,7 +62,17 @@ public class FilterContext extends OncePerRequestFilter {
       token = StringUtils.substringAfter(authHeader, "Bearer ");
     }
     if (!StringUtils.isEmpty(token)) {
-      setUserContextFromToken(publicKey, token, request);
+      // The token can be signed by RX Auth key or Etendo Classic SWS key
+      // First try with RX Auth key
+      try {
+        setUserContextFromToken(publicKey, token, request);
+      } catch (Exception e) {
+        if(jwtClassicConfig == null) {
+          throw e;
+        }
+        // If it fails, try with Etendo Classic SWS key
+        setUserContextFromToken(jwtClassicConfig, token, request);
+      }
     } else {
       if (allowedURIS == null) {
         throw new ForbiddenException("No URIs are allowed for this service");
@@ -77,12 +90,16 @@ public class FilterContext extends OncePerRequestFilter {
   }
 
   public void setUserContextFromToken(String publicKey, String token, HttpServletRequest request) {
-    setUserContextFromToken(userContext, publicKey, token, request);
+    setUserContextFromToken(userContext, publicKey, null , token, request);
+  }
+
+  public void setUserContextFromToken(JwtClassicConfig classicConfig, String token, HttpServletRequest request) {
+    setUserContextFromToken(userContext, null, classicConfig, token, request);
   }
 
   public static void setUserContextFromToken(UserContext userContext, String publicKey,
-      String token, HttpServletRequest req) {
-    TokenUtil.convertToken(userContext, publicKey, token);
+      JwtClassicConfig jwtClassicConfig, String token, HttpServletRequest req) {
+    TokenUtil.convertToken(userContext, publicKey, jwtClassicConfig, token);
     String noActiveFilterParameter = req.getParameter(NO_ACTIVE_FILTER_PARAMETER);
     String triggerEnabledParam = req.getParameter(TRIGGER_ENABLED_PARAMETER);
     String dateFormatParam = req.getParameter(DATE_FORMAT_PARAMETER);
