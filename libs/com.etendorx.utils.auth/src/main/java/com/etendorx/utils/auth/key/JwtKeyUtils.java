@@ -8,7 +8,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
@@ -34,8 +33,6 @@ public class JwtKeyUtils {
   public static final String ROLE_ID = "ad_role_id";
   public static final String SERVICE_SEARCH_KEY = "search_key";
   public static final String SERVICE_ID = "service_id";
-  @Value("${public-key:}")
-  String publicKey;
 
   /**
    * Generates a {@link PrivateKey} from a key String

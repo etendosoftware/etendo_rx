@@ -68,7 +68,7 @@ import static com.etendorx.utils.auth.key.context.FilterContext.setUserContextFr
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
-    "grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey })
+    "grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey , "scan.basePackage=com.etendorx.subapp.product.javamap", "data-rest.enabled=true"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @AutoConfigureMockMvc
@@ -112,7 +112,7 @@ public class RepositoryTest {
     MockHttpServletRequest request = new MockHttpServletRequest();
     request.setParameter(FilterContext.NO_ACTIVE_FILTER_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
-    setUserContextFromToken(userContext, publicKey, TOKEN, request);
+    setUserContextFromToken(userContext, publicKey, null, TOKEN, request);
     AppContext.setCurrentUser(userContext);
     var allUsers = userRepository.findAll();
     assert allUsers.iterator().hasNext();
@@ -126,7 +126,7 @@ public class RepositoryTest {
     request.setParameter(FilterContext.NO_ACTIVE_FILTER_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
     UserContext userContext = new UserContext();
-    setUserContextFromToken(userContext, publicKey, TOKEN, request);
+    setUserContextFromToken(userContext, publicKey, null, TOKEN, request);
     var userList = userRepository.searchByUsername("admin", null);
     assert userList.getSize() == 1;
     assert userList.getContent().get(0) != null;
