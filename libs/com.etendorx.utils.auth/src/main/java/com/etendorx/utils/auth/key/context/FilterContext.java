@@ -63,16 +63,7 @@ public class FilterContext extends OncePerRequestFilter {
     }
     if (!StringUtils.isEmpty(token)) {
       // The token can be signed by RX Auth key or Etendo Classic SWS key
-      // First try with RX Auth key
-      try {
-        setUserContextFromToken(publicKey, token, request);
-      } catch (Exception e) {
-        if(jwtClassicConfig == null) {
-          throw e;
-        }
-        // If it fails, try with Etendo Classic SWS key
-        setUserContextFromToken(jwtClassicConfig, token, request);
-      }
+      setUserContextFromToken(publicKey, jwtClassicConfig, token, request);
     } else {
       if (allowedURIS == null) {
         throw new ForbiddenException("No URIs are allowed for this service");
@@ -89,17 +80,14 @@ public class FilterContext extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
-  public void setUserContextFromToken(String publicKey, String token, HttpServletRequest request) {
-    setUserContextFromToken(userContext, publicKey, null , token, request);
-  }
-
-  public void setUserContextFromToken(JwtClassicConfig classicConfig, String token, HttpServletRequest request) {
-    setUserContextFromToken(userContext, null, classicConfig, token, request);
+  public void setUserContextFromToken(String publicKey, JwtClassicConfig classicConfig, String token, HttpServletRequest request) {
+    setUserContextFromToken(userContext, publicKey, classicConfig , token, request);
   }
 
   public static void setUserContextFromToken(UserContext userContext, String publicKey,
       JwtClassicConfig jwtClassicConfig, String token, HttpServletRequest req) {
     TokenUtil.convertToken(userContext, publicKey, jwtClassicConfig, token);
+    // Get request parameters and set them in the user context
     String noActiveFilterParameter = req.getParameter(NO_ACTIVE_FILTER_PARAMETER);
     String triggerEnabledParam = req.getParameter(TRIGGER_ENABLED_PARAMETER);
     String dateFormatParam = req.getParameter(DATE_FORMAT_PARAMETER);

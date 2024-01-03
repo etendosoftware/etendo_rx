@@ -34,17 +34,18 @@ public class TokenUtil {
    * @param token     the token
    */
   public static void convertToken(UserContext userContext, String publicKey, JwtClassicConfig jwtClassicConfig, String token) {
-
     Map<String, Object> tokenValuesMap = null;
     if(publicKey != null) {
       tokenValuesMap = ContextUtils.getTokenValues(publicKey, token);
     }
-    if(jwtClassicConfig != null) {
+    if(tokenValuesMap == null && jwtClassicConfig != null) {
       try {
         tokenValuesMap = ContextUtils.getTokenValues(jwtClassicConfig, token);
-      } catch (UnsupportedEncodingException e) {
-        throw new ForbiddenException("Invalid token");
+      } catch (UnsupportedEncodingException ignored) {
       }
+    }
+    if(tokenValuesMap == null) {
+      throw new ForbiddenException("Invalid token");
     }
     userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
     userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
