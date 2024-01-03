@@ -68,7 +68,7 @@ import static com.etendorx.utils.auth.key.context.FilterContext.setUserContextFr
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
-    "grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey })
+    "grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey , "scan.basePackage=com.etendorx.subapp.product.javamap", "data-rest.enabled=true"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @AutoConfigureMockMvc
