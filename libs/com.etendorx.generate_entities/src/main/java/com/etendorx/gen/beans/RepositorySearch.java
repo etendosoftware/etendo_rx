@@ -15,11 +15,10 @@
  */
 package com.etendorx.gen.beans;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * RepositorySearch class needed for code generation
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 public class RepositorySearch {
   private String query;
   private String method;
-  private Map<String, RepositorySearchParam> searchParams = new LinkedHashMap<>();
+  private Map<String, RepositorySearchParam> searchParams;
 
   public RepositorySearch(String method, String query,
       Map<String, RepositorySearchParam> searchParams) {
@@ -59,11 +58,13 @@ public class RepositorySearch {
   }
 
   public List<Map<String, String>> getSearchParamsMap() {
-    return searchParams.values().stream().map(v -> {
+    List<Map<String, String>> list = new ArrayList<>();
+    for (RepositorySearchParam repositorySearchParam : searchParams.values()) {
       var m = new HashMap<String, String>();
-      m.put("name", v.getName());
-      m.put("type", v.getType());
-      return m;
-    }).collect(Collectors.toList());
+      m.put("name", repositorySearchParam.getName());
+      m.put("type", repositorySearchParam.getType());
+      list.add(m);
+    }
+    return list;
   }
 }

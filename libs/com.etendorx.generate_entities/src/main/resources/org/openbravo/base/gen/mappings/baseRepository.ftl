@@ -25,7 +25,7 @@ public class ${mappingPrefix}${entity.externalName}DTORepositoryDefault extends 
 
   <#list modelProviderRX.getETRXRepositories(entity) as repo>
     <#list repo.searches as search>
-  Page<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>String ${param.name}, </#list>Pageable page) {
+  Page<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>${param.type} ${param.name}, </#list>Pageable page) {
       var repository = ((${entity.table.name}Repository) getRepository()).${search.method}(<#list search.params as param>${param.name}, </#list>page);
       return getConverter().convert(repository);
   }

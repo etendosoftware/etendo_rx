@@ -19,7 +19,6 @@ import com.etendorx.utils.auth.key.JwtKeyUtils;
 import com.etendorx.utils.auth.key.config.JwtClassicConfig;
 import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 public class TokenUtil {
@@ -36,12 +35,15 @@ public class TokenUtil {
   public static void convertToken(UserContext userContext, String publicKey, JwtClassicConfig jwtClassicConfig, String token) {
     Map<String, Object> tokenValuesMap = null;
     if(publicKey != null) {
-      tokenValuesMap = ContextUtils.getTokenValues(publicKey, token);
+      try {
+        tokenValuesMap = ContextUtils.getTokenValues(publicKey, token);
+      } catch (Exception ignored) {
+      }
     }
     if(tokenValuesMap == null && jwtClassicConfig != null) {
       try {
         tokenValuesMap = ContextUtils.getTokenValues(jwtClassicConfig, token);
-      } catch (UnsupportedEncodingException ignored) {
+      } catch (Exception ignored) {
       }
     }
     if(tokenValuesMap == null) {

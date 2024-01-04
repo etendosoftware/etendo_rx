@@ -9,6 +9,7 @@ public class ETRXSearchParam extends ModelObject {
   private ETRXEntitySearch entitySearch;
   private String name;
   private String type;
+  private Long line;
 
   public ETRXEntitySearch getEntitySearch() {
     return entitySearch;
@@ -34,5 +35,13 @@ public class ETRXSearchParam extends ModelObject {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public Long getLine() {
+    return line;
+  }
+
+  public void setLine(Long line) {
+    this.line = line;
   }
 }

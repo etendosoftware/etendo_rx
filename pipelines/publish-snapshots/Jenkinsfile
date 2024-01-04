@@ -141,13 +141,16 @@ spec:
               org.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8\" > gradle.properties
               """
 
-              echo "---------------- Clone RX module of Classic ---------------"
+              echo "---------------- Clone modules of Classic ---------------"
               withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
                 sh """
                 cd etendo_base
                 mkdir modules
                 cd modules
+                # Clone module etendo_rx
                 GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch ${env.BRANCH_NAME} $MODULE_RX_URL
+                # Clone com.etendoerp.test.order
+                GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.test.order.git
                 """
               }
 

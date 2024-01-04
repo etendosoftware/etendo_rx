@@ -32,6 +32,7 @@
 
         <property name="name"/>
         <property name="type"/>
+        <property name="line"/>
 
         <many-to-one name="entitySearch" not-null="true"
                      class="com.etendoerp.etendorx.model.repository.ETRXEntitySearch"
