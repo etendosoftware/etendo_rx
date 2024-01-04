@@ -24,6 +24,8 @@ import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.val;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -56,13 +58,9 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
    */
   @Override
   @Transactional
-  public Iterable<E> findAll() {
-    List<E> dtos = new ArrayList<>();
-    Iterable<T> entities = repository.findAll();
-    for (val entity : entities) {
-      dtos.add(converter.convert(entity));
-    }
-    return dtos;
+  public Page<E> findAll(Pageable pageable) {
+    Page<T> entities = repository.findAll(pageable);
+    return entities.map(converter::convert);
   }
 
   /**

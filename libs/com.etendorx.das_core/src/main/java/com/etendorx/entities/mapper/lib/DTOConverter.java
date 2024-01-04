@@ -15,6 +15,8 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import org.springframework.data.domain.Page;
+
 /**
  * Generic interface for DTO converters
  *
@@ -40,6 +42,14 @@ public interface DTOConverter<E, F, G> {
    * @return Entity updated
    */
   E convert(G dto, E entity);
+
+  /**
+   * Read Entity list and transform to DTO list (GET Method)
+   *
+   * @param entities
+   * @return a list of DTOs converted
+   */
+  Page<F> convert(Page<E> entities);
 
   /**
    * Read Entity list and transform to DTO list (GET Method)

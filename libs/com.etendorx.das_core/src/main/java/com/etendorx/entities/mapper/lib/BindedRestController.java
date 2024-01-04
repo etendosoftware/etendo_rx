@@ -19,10 +19,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public abstract class BindedRestController<E extends BaseDTOModel, F extends BaseDTOModel> {
   private final JsonPathConverter<F> converter;
@@ -37,8 +41,9 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   @GetMapping
   @Transactional
   @Operation(security = { @SecurityRequirement(name = "basicScheme") })
-  public ResponseEntity<Iterable<E>> findAll() {
-    return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+  public Page<E> findAll(
+      @PageableDefault(size = 20) final Pageable pageable) {
+    return repository.findAll(pageable);
   }
 
   @GetMapping("/{id}")

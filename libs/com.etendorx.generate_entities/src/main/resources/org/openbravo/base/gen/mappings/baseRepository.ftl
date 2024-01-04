@@ -6,6 +6,7 @@ import com.etendorx.entities.jparepo.${entity.table.name}Repository;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +25,9 @@ public class ${mappingPrefix}${entity.externalName}DTORepositoryDefault extends 
 
   <#list modelProviderRX.getETRXRepositories(entity) as repo>
     <#list repo.searches as search>
-  Iterable<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>String ${param.name}, </#list>Pageable page) {
+  Page<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>String ${param.name}, </#list>Pageable page) {
       var repository = ((${entity.table.name}Repository) getRepository()).${search.method}(<#list search.params as param>${param.name}, </#list>page);
-      return getConverter().convert(repository.toList());
+      return getConverter().convert(repository);
   }
     </#list>
   </#list>
