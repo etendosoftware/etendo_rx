@@ -5,10 +5,10 @@
  <#switch string>
   <#case "java.lang.String"><#return "string"><#break>
   <#case "String"><#return "string"><#break>
-  <#case "java.math.BigDecimal"><#return "double"><#break>
-  <#case "java.lang.Long"><#return "int64"><#break>
-  <#case "java.util.Date"><#return "google.protobuf.Timestamp"><#break>
-  <#case "java.sql.Timestamp"><#return "google.protobuf.Timestamp"><#break>
+  <#case "java.math.BigDecimal"><#return "number"><#break>
+  <#case "java.lang.Long"><#return "number"><#break>
+  <#case "java.util.Date"><#return "Date"><#break>
+  <#case "java.sql.Timestamp"><#return "Date"><#break>
   <#case "java.lang.Boolean"><#return "boolean"><#break>
   <#default><#return string>
  </#switch>
@@ -63,7 +63,7 @@ class FrontService extends BaseService<${entity.name}> {
   getFetchName(): string {
     throw new Error('Method not implemented.');
   }
-  mapManyToOne(entity: Product): void {
+  mapManyToOne(entity: ${entity.name}): void {
     throw new Error('Method not implemented.');
   }
 }

@@ -4,10 +4,17 @@ import com.etendoerp.etendorx.model.projection.ETRXProjection;
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.beans.Projection;
 import com.etendorx.gen.beans.ProjectionEntity;
+import com.etendorx.gen.beans.ProjectionEntityField;
+import org.apache.commons.lang3.StringUtils;
 import org.openbravo.base.model.Entity;
+import org.openbravo.base.model.ModelProvider;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ProjectionsConverter {
 
@@ -55,7 +62,9 @@ public class ProjectionsConverter {
    */
   public void convert(Projection projection, Set<ETRXProjectionEntity> entities) {
     for (ETRXProjectionEntity entity : entities) {
-      projection.getEntities().put(entity.getTable().getName(), convertEntity(entity));
+      if(StringUtils.equals(entity.getMappingType(), "R")) {
+        projection.getEntities().put(entity.getTable().getName(), convertEntity(entity));
+      }
     }
   }
 
@@ -77,7 +86,18 @@ public class ProjectionsConverter {
    * @param entity
    */
   private ProjectionEntity convertEntity(ETRXProjectionEntity entity) {
-    return new ProjectionEntity(entity.getTable().getName(), entity.getExternalName(), entity.getIdentity());
+    var projection = new ProjectionEntity(entity.getTable().getName(), entity.getExternalName(), entity.getIdentity());
+    entity.getFields().forEach(f -> {
+      var type =
+          ModelProvider.getInstance().getColumnTypeName(entity.getTable(),
+              entity.getTable().getName() + "." + f.getProperty());
+      if(type == null) {
+        type = "Object";
+      }
+      var field = new ProjectionEntityField(f.getName(), f.getProperty(), type);
+      projection.getFields().put(field.getName(), field);
+    });
+    return projection;
   }
 
   /**
