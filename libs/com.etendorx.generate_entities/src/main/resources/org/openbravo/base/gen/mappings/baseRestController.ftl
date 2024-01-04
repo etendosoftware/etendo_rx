@@ -45,7 +45,7 @@ public class ${mappingPrefix}${entity.externalName}RestController extends Binded
   @GetMapping("/searches/${search.method}")
   @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   @Transactional
-  Page<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>String ${param.name}, </#list> @PageableDefault(size = 20) final Pageable pageable) {
+  Page<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>${param.type} ${param.name}, </#list> @PageableDefault(size = 20) final Pageable pageable) {
     return ((${mappingPrefix}${entity.externalName}DTORepositoryDefault)getRepository()).${search.method}(<#list search.params as param>${param.name}, </#list> pageable);
   }
     </#list>

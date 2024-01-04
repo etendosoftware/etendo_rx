@@ -8,7 +8,7 @@ import com.etendorx.gen.beans.RepositorySearch;
 import com.etendorx.gen.beans.RepositorySearchParam;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class RepositoriesConverter {
     for (ETRXRepository etrxRepository : etrxRepositories) {
       Repository repository = new Repository(etrxRepository.getEntityName(), true);
       for (ETRXEntitySearch search : etrxRepository.getSearches()) {
-        Map<String, RepositorySearchParam> params = new HashMap<>();
+        Map<String, RepositorySearchParam> params = new LinkedHashMap<>();
         for (ETRXSearchParam etrxSearchParam : search.getParams()) {
           RepositorySearchParam param = new RepositorySearchParam(etrxSearchParam.getName(),
               etrxSearchParam.getType());
