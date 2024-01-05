@@ -242,6 +242,7 @@ public class GenerateEntities {
   private List<EntityGenerator> getGenerators(ArrayList<Projection> projections) {
     List<EntityGenerator> generators = new ArrayList<>();
     generators.add(new GenerateEntityRX());
+    generators.add(new GenerateEntityMetadata());
     generators.add(new GenerateJPARepo());
     generators.add(new GenerateClientRestRX());
     generators.add(new GenerateEntityModel());
