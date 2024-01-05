@@ -38,7 +38,7 @@
         "name": "Agua sin Gas 1L"
       },
       "invoicedQuantity": 25000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.53,
       "grossAmount": 0,
@@ -67,7 +67,7 @@
         "name": "Bebida Energética 0,5L"
       },
       "invoicedQuantity": 45000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.49,
       "grossAmount": 0,
@@ -96,7 +96,7 @@
         "name": "Cerveza Ale 0,5L"
       },
       "invoicedQuantity": 33000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 2.04,
       "grossAmount": 0,
@@ -125,7 +125,7 @@
         "name": "Cerveza Lager 0,5L"
       },
       "invoicedQuantity": 45000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 2.64,
       "grossAmount": 0,
@@ -154,7 +154,7 @@
         "name": "Cola 0,5L"
       },
       "invoicedQuantity": 33000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 0.83,
       "grossAmount": 0,
@@ -183,7 +183,7 @@
         "name": "Cola de Cereza 0,5L"
       },
       "invoicedQuantity": 40000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 0.83,
       "grossAmount": 0,
@@ -212,7 +212,7 @@
         "name": "Limonada 0,5L"
       },
       "invoicedQuantity": 47000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 0.83,
       "grossAmount": 0,
@@ -241,7 +241,7 @@
         "name": "Vino Blanco 0,75L"
       },
       "invoicedQuantity": 56000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 5.33,
       "grossAmount": 0,
@@ -270,7 +270,7 @@
         "name": "Vino Rosado 0,75L"
       },
       "invoicedQuantity": 12000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 5.63,
       "grossAmount": 0,
@@ -299,7 +299,7 @@
         "name": "Vino Tinto 0,75L"
       },
       "invoicedQuantity": 13000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 5.17999999999999971578290569595992565155,
       "grossAmount": 0,
@@ -328,7 +328,7 @@
         "name": "Zumo de Naranja Bio 0,33L"
       },
       "invoicedQuantity": 45000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.34,
       "grossAmount": 0,
@@ -357,7 +357,7 @@
         "name": "Zumo de Pera 0,5L"
       },
       "invoicedQuantity": 25000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.13,
       "grossAmount": 0,
@@ -386,7 +386,7 @@
         "name": "Zumo de Piña 0,5L"
       },
       "invoicedQuantity": 13000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.13,
       "grossAmount": 0,

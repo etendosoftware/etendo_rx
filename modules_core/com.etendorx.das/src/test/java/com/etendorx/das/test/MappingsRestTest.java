@@ -59,6 +59,10 @@ public class MappingsRestTest {
   public static final String X_TOKEN = "X-TOKEN";
   private static final String INVOICE_MODEL = "Invoice";
   private static final String ORDER_MODEL = "Order";
+  private static final String PRODUCT_MODEL = "Product";
+  private static final String PRICINGPRICELIST_MODEL = "PricingPriceList";
+  private static final String PRICINGPRICELISTVERSION_MODEL = "PricingPriceListVersion";
+  private static final String PRODUCTPRICE_MODEL = "ProductPrice";
   private static final String BASE_URL = "/obmap/";
   private static final String DATE_FORMAT = "?_dateFormat=yyyy-MM-dd HH:mm:ss";
   private static final String TIME_ZONE = "&_timeZone=GMT-3";
@@ -142,4 +146,59 @@ public class MappingsRestTest {
     performPostRequestAndAssertResponse(ORDER_MODEL, jsonFile, responseJsonFile);
   }
 
+  @Test
+  void shouldReturnProductWhenRequested() throws Exception {
+    String id = "0DC5C5281B3643DEAB978EB04139516B";
+    String jsonFile = "/jsons/product.read.json";
+    performGetRequestAndAssertResponse(PRODUCT_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnProductWhenPosted() throws Exception {
+    String jsonFile = "/jsons/product.write.json";
+    String responseJsonFile = "/jsons/product.write.response.json";
+    performPostRequestAndAssertResponse(PRODUCT_MODEL, jsonFile, responseJsonFile);
+  }
+
+  @Test
+  void shouldReturnPricingPriceListWhenRequested() throws Exception {
+    String id = "AEE66281A08F42B6BC509B8A80A33C29";
+    String jsonFile = "/jsons/pricingPriceList.read.json";
+    performGetRequestAndAssertResponse(PRICINGPRICELIST_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnPricingPriceListWhenPosted() throws Exception {
+    String jsonFile = "/jsons/pricingPriceList.write.json";
+    String responseJsonFile = "/jsons/pricingPriceList.write.response.json";
+    performPostRequestAndAssertResponse(PRICINGPRICELIST_MODEL, jsonFile, responseJsonFile);
+  }
+
+  @Test
+  void shouldReturnPricingPriceListVersionWhenRequested() throws Exception {
+    String id = "FDE536FE9D8C4B068C32CD6C3650B6B8";
+    String jsonFile = "/jsons/pricingPriceListVersion.read.json";
+    performGetRequestAndAssertResponse(PRICINGPRICELISTVERSION_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnPricingPriceListVersionWhenPosted() throws Exception {
+    String jsonFile = "/jsons/pricingPriceListVersion.write.json";
+    String responseJsonFile = "/jsons/pricingPriceListVersion.write.response.json";
+    performPostRequestAndAssertResponse(PRICINGPRICELISTVERSION_MODEL, jsonFile, responseJsonFile);
+  }
+
+  @Test
+  void shouldReturnProductPriceWhenRequested() throws Exception {
+    String id = "41732EFCA6374148BFD8B08C8B12DB73";
+    String jsonFile = "/jsons/productPrice.read.json";
+    performGetRequestAndAssertResponse(PRODUCTPRICE_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnProductPriceWhenPosted() throws Exception {
+    String jsonFile = "/jsons/productPrice.write.json";
+    String responseJsonFile = "/jsons/productPrice.write.response.json";
+    performPostRequestAndAssertResponse(PRODUCTPRICE_MODEL, jsonFile, responseJsonFile);
+  }
 }

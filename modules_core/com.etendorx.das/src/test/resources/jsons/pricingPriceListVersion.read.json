@@ -1,0 +1,14 @@
+{
+  "id": "FDE536FE9D8C4B068C32CD6C3650B6B8",
+  "basePriceListVersion": null,
+  "priceListSchema": {
+    "id": "462566C882A340BEB6E968AED8476697",
+    "organization": "B843C30461EA4501935CB1D125C9C25A",
+    "description": null,
+    "active": true,
+    "name": "Esquema de tarificación"
+  },
+  "description": null,
+  "active": true,
+  "validFromDate": "2011-01-01 00:00:00"
+}

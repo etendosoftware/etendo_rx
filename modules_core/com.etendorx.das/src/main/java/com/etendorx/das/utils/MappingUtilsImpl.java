@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.stereotype.Component;
 
@@ -87,7 +89,7 @@ public class MappingUtilsImpl implements MappingUtils {
   public Date parseDate(String date) {
     var dateFormat = AppContext.getCurrentUser().getDateFormat();
     var timeZone = AppContext.getCurrentUser().getTimeZone();
-    if(dateFormat != null) {
+    if(dateFormat != null && StringUtils.isNotBlank(date) && !StringUtils.equalsIgnoreCase(date,"null")) {
       SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
       if(timeZone != null) {
         sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
