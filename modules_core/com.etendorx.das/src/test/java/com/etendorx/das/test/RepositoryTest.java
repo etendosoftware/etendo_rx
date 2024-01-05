@@ -16,8 +16,38 @@
 
 package com.etendorx.das.test;
 
-
-import static com.etendorx.utils.auth.key.context.FilterContext.setUserContextFromToken;
+import com.etendorx.das.utils.TestcontainersUtils;
+import com.etendorx.entities.jparepo.ADUserRepository;
+import com.etendorx.utils.auth.key.context.AppContext;
+import com.etendorx.utils.auth.key.context.FilterContext;
+import com.etendorx.utils.auth.key.context.UserContext;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,42 +64,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvFileSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import com.etendorx.das.utils.TestcontainersUtils;
-import com.etendorx.entities.jparepo.ADUserRepository;
-import com.etendorx.utils.auth.key.context.AppContext;
-import com.etendorx.utils.auth.key.context.FilterContext;
-import com.etendorx.utils.auth.key.context.UserContext;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static com.etendorx.utils.auth.key.context.FilterContext.setUserContextFromToken;
 
 @Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {"grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
+    "grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey , "scan.basePackage=com.etendorx.subapp.product.javamap", "data-rest.enabled=true"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @AutoConfigureMockMvc
@@ -113,7 +112,7 @@ public class RepositoryTest {
     MockHttpServletRequest request = new MockHttpServletRequest();
     request.setParameter(FilterContext.NO_ACTIVE_FILTER_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
-    setUserContextFromToken(userContext, publicKey, TOKEN, request);
+    setUserContextFromToken(userContext, publicKey, null, TOKEN, request);
     AppContext.setCurrentUser(userContext);
     var allUsers = userRepository.findAll();
     assert allUsers.iterator().hasNext();
@@ -127,14 +126,15 @@ public class RepositoryTest {
     request.setParameter(FilterContext.NO_ACTIVE_FILTER_PARAMETER, FilterContext.TRUE);
     request.setMethod("GET");
     UserContext userContext = new UserContext();
-    setUserContextFromToken(userContext, publicKey, TOKEN, request);
+    setUserContextFromToken(userContext, publicKey, null, TOKEN, request);
     var userList = userRepository.searchByUsername("admin", null);
     assert userList.getSize() == 1;
     assert userList.getContent().get(0) != null;
   }
 
   @Test
-  public void generateCsvFileForQueryIsOkWhenDefaultFiltersIsApplyWithCsvParameterTest() throws Exception {
+  public void generateCsvFileForQueryIsOkWhenDefaultFiltersIsApplyWithCsvParameterTest()
+      throws Exception {
     String endpoint = "http://localhost:" + port + "/";
     List<String> resultUrls = extractHrefsFromEtendoPath(endpoint);
     List<String> cleanUrls = new ArrayList<>();
@@ -161,7 +161,8 @@ public class RepositoryTest {
 
   @ParameterizedTest
   @CsvFileSource(resources = "/urlData.csv", numLinesToSkip = 1)
-  public void queryIsOkWhenDefaultFiltersIsApplyWithCsvParameter(String parametrizedUrl) throws IOException, InterruptedException {
+  public void queryIsOkWhenDefaultFiltersIsApplyWithCsvParameter(String parametrizedUrl)
+      throws IOException, InterruptedException {
 
     HttpClient client = HttpClient.newHttpClient();
     HttpRequest request = HttpRequest.newBuilder()
@@ -174,8 +175,8 @@ public class RepositoryTest {
 
   }
 
-
-  public List<String> extractHrefsFromEtendoPath(String endpointUrl) throws JsonProcessingException {
+  public List<String> extractHrefsFromEtendoPath(String endpointUrl)
+      throws JsonProcessingException {
     RestTemplate restTemplate = new RestTemplateBuilder(rt -> {
       rt.getInterceptors().add(((request, body, execution) -> {
         request.getHeaders().add("X-TOKEN", TOKEN);

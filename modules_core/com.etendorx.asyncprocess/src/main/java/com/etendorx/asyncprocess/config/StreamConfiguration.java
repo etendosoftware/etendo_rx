@@ -16,13 +16,7 @@
 
 package com.etendorx.asyncprocess.config;
 
-import static com.etendorx.lib.kafka.topology.AsyncProcessTopology.ASYNC_PROCESS;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
+import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -33,13 +27,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
-
 import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.receiver.internals.ConsumerFactory;
 import reactor.kafka.receiver.internals.DefaultKafkaReceiver;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import static com.etendorx.lib.kafka.topology.AsyncProcessTopology.ASYNC_PROCESS;
 
 /**
  * Initial configuration of stream services
@@ -71,7 +69,8 @@ public class StreamConfiguration {
   }
 
   @Bean
-  public KafkaStreams kafkaStreams(@Qualifier("kafkaStreamsConfiguration") Properties streamConfiguration) {
+  public KafkaStreams kafkaStreams(
+      @Qualifier("kafkaStreamsConfiguration") Properties streamConfiguration) {
     var topology = AsyncProcessTopology.buildTopology();
     var kafkaStreams = new KafkaStreams(topology, streamConfiguration);
 
@@ -101,9 +100,8 @@ public class StreamConfiguration {
         com.etendorx.asyncprocess.serdes.AsyncProcessDeserializer.class.getName());
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
     props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
-    return new DefaultKafkaReceiver(ConsumerFactory.INSTANCE, ReceiverOptions.create(props).subscription(
-        Collections.singleton(ASYNC_PROCESS)));
+    return new DefaultKafkaReceiver(ConsumerFactory.INSTANCE,
+        ReceiverOptions.create(props).subscription(Collections.singleton(ASYNC_PROCESS)));
   }
-
 
 }

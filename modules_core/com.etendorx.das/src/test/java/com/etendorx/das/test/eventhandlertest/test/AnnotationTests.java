@@ -1,33 +1,29 @@
 package com.etendorx.das.test.eventhandlertest.test;
 
+import com.etendorx.das.test.eventhandlertest.component.HibernateEventListenerComponent;
+import com.etendorx.das.test.eventhandlertest.domain.ParentEntity;
+import com.etendorx.das.test.eventhandlertest.repository.ParentEntityRepository;
+import org.hibernate.event.spi.PostUpdateEvent;
+import org.hibernate.event.spi.PreInsertEvent;
+import org.hibernate.event.spi.PreUpdateEvent;
+import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import org.hibernate.event.spi.PostUpdateEvent;
-import org.hibernate.event.spi.PreUpdateEvent;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.hibernate.event.spi.PreInsertEvent;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-
-import com.etendorx.das.test.eventhandlertest.component.HibernateEventListenerComponent;
-import com.etendorx.das.test.eventhandlertest.domain.ParentEntity;
-import com.etendorx.das.test.eventhandlertest.repository.ParentEntityRepository;
-
-@EntityScan(basePackages = {"com.etendorx.das.test.eventhandlertest.*"})
+@EntityScan(basePackages = { "com.etendorx.das.test.eventhandlertest.*" })
 @EnableJpaRepositories(basePackages = "com.etendorx.das.test.eventhandlertest.*")
 @SpringBootTest
 public class AnnotationTests {
@@ -93,7 +89,8 @@ public class AnnotationTests {
     parentEntity = parentEntityRepository.save(parentEntity);
 
     InOrder orderVerifier = Mockito.inOrder(component);
-    orderVerifier.verify(component).handlePreUpdateFirst(eq(parentEntity), any(PreUpdateEvent.class));
+    orderVerifier.verify(component)
+        .handlePreUpdateFirst(eq(parentEntity), any(PreUpdateEvent.class));
     orderVerifier.verify(component).handlePostUpdate(eq(parentEntity), any(PostUpdateEvent.class));
   }
 
@@ -106,7 +103,9 @@ public class AnnotationTests {
     parentEntity = parentEntityRepository.save(parentEntity);
 
     InOrder orderVerifier = Mockito.inOrder(component);
-    orderVerifier.verify(component).handlePreUpdateFirst(eq(parentEntity), any(PreUpdateEvent.class));
-    orderVerifier.verify(component).handlePreUpdateSecond(eq(parentEntity), any(PreUpdateEvent.class));
+    orderVerifier.verify(component)
+        .handlePreUpdateFirst(eq(parentEntity), any(PreUpdateEvent.class));
+    orderVerifier.verify(component)
+        .handlePreUpdateSecond(eq(parentEntity), any(PreUpdateEvent.class));
   }
 }

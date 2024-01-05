@@ -78,7 +78,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
 
 </#list>
 <#list entity.fields as field>
-  <#if (field.fieldMapping == "DM" || field.fieldMapping == "EM")>
+  <#if (field.fieldMapping == "DM" || field.fieldMapping == "EM" || field.fieldMapping == "CM")>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     <#if field.property??>
     entity.set${NamingUtil.getSafeJavaName(field.property)?cap_first}(dto.get<@toCamelCase field.name/>());

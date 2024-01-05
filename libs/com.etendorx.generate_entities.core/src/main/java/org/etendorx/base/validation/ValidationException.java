@@ -55,9 +55,9 @@ public class ValidationException extends OBException {
     }
 
     return msgs.entrySet()
-      .stream()
-      .map(msgEntry -> msgEntry.getKey().getEntity().getName() + "." + msgEntry.getKey()
-        .getName() + ": " + msgEntry.getValue())
-      .collect(Collectors.joining("\n"));
+        .stream()
+        .map(msgEntry -> msgEntry.getKey().getEntity().getName() + "." + msgEntry.getKey()
+            .getName() + ": " + msgEntry.getValue())
+        .collect(Collectors.joining("\n"));
   }
 }

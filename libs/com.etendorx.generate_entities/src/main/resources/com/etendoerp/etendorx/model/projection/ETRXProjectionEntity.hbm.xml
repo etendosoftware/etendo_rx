@@ -35,7 +35,8 @@
 
         <property name="mappingType" column="mapping_type"/>
 
-        <many-to-one name="projection" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjection"
+        <many-to-one name="projection" not-null="true"
+                     class="com.etendoerp.etendorx.model.projection.ETRXProjection"
                      column="etrx_projection_id"/>
 
         <many-to-one name="table" not-null="true" class="org.openbravo.base.model.Table"

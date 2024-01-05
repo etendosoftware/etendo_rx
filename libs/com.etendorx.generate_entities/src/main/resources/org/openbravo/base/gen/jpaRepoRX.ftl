@@ -51,7 +51,7 @@ public interface ${entity.name}Repository extends BaseDASRepository<${entity.sim
     <#if searches??>
 
     <#list searches as s>
-    @Query(value = "${s.query}")
+    @Query(value = "${s.query?replace("^\\s+|\\s+$|\\n|\\r", " ", "rm")}")
     <#if (s.fetchAttributes??) && (s.fetchAttributes?size > 0)>
     @EntityGraph(value = "${newClassName}.detail", type = EntityGraph.EntityGraphType.LOAD, attributePaths = { <#list s.fetchAttributes as attr>"${attr}"<#if !attr?is_last>, </#if></#list> })
     </#if>

@@ -37,10 +37,8 @@ public interface EntityXMLProcessor {
    * This method can access the database using the Data Access Layer. It will operate in the same
    * transaction as the import process itself.
    *
-   * @param newObjects
-   *   the list of objects which will be inserted into the database
-   * @param updatedObjects
-   *   the list of objects which will be updated in the database
+   * @param newObjects     the list of objects which will be inserted into the database
+   * @param updatedObjects the list of objects which will be updated in the database
    */
   public void process(List<BaseOBObject> newObjects, List<BaseOBObject> updatedObjects);
 
@@ -53,13 +51,9 @@ public interface EntityXMLProcessor {
    * <p>
    * This method is not called for one-to-many properties.
    *
-   * @param owner
-   *   the owner object of the property
-   * @param property
-   *   the property being set
-   * @param importedValue
-   *   the value converted from the import xml
-   *
+   * @param owner         the owner object of the property
+   * @param property      the property being set
+   * @param importedValue the value converted from the import xml
    * @return a new value which is used by the import process
    */
   public Object replaceValue(BaseOBObject owner, Property property, Object importedValue);

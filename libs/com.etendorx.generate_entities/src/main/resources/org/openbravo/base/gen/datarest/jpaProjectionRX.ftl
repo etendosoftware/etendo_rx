@@ -92,24 +92,4 @@ public interface ${entity.simpleClassName}${projectionName?cap_first}Projection 
         </#if>
     </#if>
 </#list>
-<#list projectionFields as field>
-    <#if field.value??>
-        <#if field.notNullValue??>
-    @Value("${'#'}{${field.notNullValue?replace('#TARGET#', 'target')} ? target${field.value?replace('#TARGET#', 'target')} : null}")
-        <#else>
-    @Value("${'#'}{${field.value?replace('#TARGET#', 'target')}}")
-        </#if>
-        <#if field.type??>${field.type}<#else>String</#if> get${field.name?cap_first}();
-
-    <#elseif field.projectedEntity??>
-        <#if field.projectedEntity == "target">
-    @Value("${'#'}{target.get${field.projectedField?cap_first}()}")
-        <#else>
-    @Value("${'#'}{target.get${field.projectedEntity?cap_first}() != null ? target.get${field.projectedEntity?cap_first}().get${field.projectedField?cap_first}() : null }")
-        </#if>
-    @JsonProperty("${field.name}")
-        <#if field.type??>${field.type}<#else>String</#if> get${field.name?cap_first}();
-
-    </#if>
-</#list>
 }

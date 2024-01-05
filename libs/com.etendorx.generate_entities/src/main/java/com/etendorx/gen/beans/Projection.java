@@ -15,13 +15,13 @@
  */
 package com.etendorx.gen.beans;
 
+import com.etendoerp.etendorx.model.projection.ETRXProjection;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.etendoerp.etendorx.model.projection.ETRXProjection;
 
 /**
  * Projection class needed for code generation
@@ -86,6 +86,7 @@ public class Projection {
       var d = new HashMap<String, Object>();
       d.put("packageName", v.getPackageName());
       d.put("name", v.getName());
+      d.put("externalName", v.getExternalName());
       d.put("className", v.getClassName());
       d.put("identity", v.getIdentity());
       d.put("fields", v.getFieldsMap());

@@ -15,11 +15,6 @@
  */
 package com.etendorx.clientrest.base;
 
-import static com.etendorx.clientrest.base.ClientRestConstants.DAS_AUTH_METHOD_GLOBAL;
-import static com.etendorx.clientrest.base.ClientRestConstants.X_TOKEN;
-
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -27,6 +22,11 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+
+import static com.etendorx.clientrest.base.ClientRestConstants.DAS_AUTH_METHOD_GLOBAL;
+import static com.etendorx.clientrest.base.ClientRestConstants.X_TOKEN;
 
 /**
  * Factory for RestTemplate with HAL support.

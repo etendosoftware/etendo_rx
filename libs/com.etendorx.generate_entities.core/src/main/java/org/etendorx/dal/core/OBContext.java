@@ -108,7 +108,7 @@ public class OBContext implements OBNotSingleton, Serializable {
   private enum AdminType {
     ADMIN_MODE("setAdminMode", "restorePreviousMode", adminModeStack, adminModeTrace), //
     CROSS_ORG_ADMIN_MODE("setCrossOrgReferenceAdminMode", "restorePreviousCrossOrgReferenceMode",
-      crossOrgAdminModeStack, crossOrgAdminModeTrace);
+        crossOrgAdminModeStack, crossOrgAdminModeTrace);
 
     private String setMethod;
     private String restoreMethod;
@@ -116,7 +116,7 @@ public class OBContext implements OBNotSingleton, Serializable {
     private ThreadLocal<List<String>> trace;
 
     private AdminType(String setMethod, String restoreMethod, ThreadLocal<Stack<OBAdminMode>> stack,
-                      ThreadLocal<List<String>> trace) {
+        ThreadLocal<List<String>> trace) {
       this.setMethod = setMethod;
       this.restoreMethod = restoreMethod;
       this.stack = stack;
@@ -179,9 +179,7 @@ public class OBContext implements OBNotSingleton, Serializable {
    * <p>
    * To restore the previous privileges call the {@link #restorePreviousMode()}.
    *
-   * @param doOrgClientAccessCheck
-   *   Whether entity access (client+org) should also be checked
-   *
+   * @param doOrgClientAccessCheck Whether entity access (client+org) should also be checked
    * @see OBContext#restorePreviousMode()
    * @since 2.50MP18
    */
@@ -322,11 +320,11 @@ public class OBContext implements OBNotSingleton, Serializable {
     }
     if (printLocationOfCaller) {
       log.warn(
-        "Unbalanced calls to " + type.setMethod + " and " + type.restoreMethod + sb.toString(),
-        new IllegalStateException());
+          "Unbalanced calls to " + type.setMethod + " and " + type.restoreMethod + sb.toString(),
+          new IllegalStateException());
     } else {
       log.warn(
-        "Unbalanced calls to " + type.setMethod + " and " + type.restoreMethod + sb.toString());
+          "Unbalanced calls to " + type.setMethod + " and " + type.restoreMethod + sb.toString());
     }
   }
 
@@ -404,10 +402,8 @@ public class OBContext implements OBNotSingleton, Serializable {
    * Sets the passed OBContext in the http session. Will not set it if the passed context is the
    * admin context or if the http session is invalidated.
    *
-   * @param request
-   *   the http request used to get the http session
-   * @param context
-   *   the context which will be stored in the session
+   * @param request the http request used to get the http session
+   * @param context the context which will be stored in the session
    */
   public static void setOBContextInSession(HttpServletRequest request, OBContext context) {
     final HttpSession session = request.getSession(false);
@@ -417,7 +413,7 @@ public class OBContext implements OBNotSingleton, Serializable {
     }
     if (context != null && context == adminContext) {
       log.warn(
-        "Trying to set the admin context in the session, " + "this means that the context has not been reset correctly in a finally block." + " When using the admin context it should always be removed in a finally block by the application");
+          "Trying to set the admin context in the session, " + "this means that the context has not been reset correctly in a finally block." + " When using the admin context it should always be removed in a finally block by the application");
       return;
     }
 
@@ -436,8 +432,7 @@ public class OBContext implements OBNotSingleton, Serializable {
    * Creates the context using the userId and sets it in the thread (as a ThreadLocal). The user
    * denoted by the userId will be automatically logged in.
    *
-   * @param userId
-   *   the id of the user (as present in the database)
+   * @param userId the id of the user (as present in the database)
    */
   public static void setOBContext(String userId) {
     setOBContext(userId, null, null, null);
@@ -447,14 +442,10 @@ public class OBContext implements OBNotSingleton, Serializable {
    * Creates the context using the userId, roleId, clientId, orgId and sets it in the thread (as
    * ThreadLocal).
    *
-   * @param userId
-   *   the id of the user
-   * @param roleId
-   *   the id of the role under which the user is currently working
-   * @param clientId
-   *   the id of the user's client
-   * @param orgId
-   *   the ud of the user's organization
+   * @param userId   the id of the user
+   * @param roleId   the id of the role under which the user is currently working
+   * @param clientId the id of the user's client
+   * @param orgId    the ud of the user's organization
    */
   public static void setOBContext(String userId, String roleId, String clientId, String orgId) {
     setOBContext(userId, roleId, clientId, orgId, null, null);
@@ -464,19 +455,14 @@ public class OBContext implements OBNotSingleton, Serializable {
    * Creates the context using the userId, roleId, clientId, orgId and sets it in the thread (as
    * ThreadLocal).
    *
-   * @param userId
-   *   the id of the user
-   * @param roleId
-   *   the id of the role under which the user is currently working
-   * @param clientId
-   *   the id of the user's client
-   * @param orgId
-   *   the ud of the user's organization
-   * @param languageCode
-   *   the selected language, if null then the user language is read.
+   * @param userId       the id of the user
+   * @param roleId       the id of the role under which the user is currently working
+   * @param clientId     the id of the user's client
+   * @param orgId        the ud of the user's organization
+   * @param languageCode the selected language, if null then the user language is read.
    */
   public static void setOBContext(String userId, String roleId, String clientId, String orgId,
-                                  String languageCode) {
+      String languageCode) {
     setOBContext(userId, roleId, clientId, orgId, languageCode, null);
   }
 
@@ -484,21 +470,15 @@ public class OBContext implements OBNotSingleton, Serializable {
    * Creates the context using the userId, roleId, clientId, orgId and sets it in the thread (as
    * ThreadLocal).
    *
-   * @param userId
-   *   the id of the user
-   * @param roleId
-   *   the id of the role under which the user is currently working
-   * @param clientId
-   *   the id of the user's client
-   * @param orgId
-   *   the ud of the user's organization
-   * @param languageCode
-   *   the selected language, if null then the user language is read.
-   * @param warehouseId
-   *   the id of the current warehouse of the user.
+   * @param userId       the id of the user
+   * @param roleId       the id of the role under which the user is currently working
+   * @param clientId     the id of the user's client
+   * @param orgId        the ud of the user's organization
+   * @param languageCode the selected language, if null then the user language is read.
+   * @param warehouseId  the id of the current warehouse of the user.
    */
   public static void setOBContext(String userId, String roleId, String clientId, String orgId,
-                                  String languageCode, String warehouseId) {
+      String languageCode, String warehouseId) {
     final OBContext context = OBProvider.getInstance().get(OBContext.class);
     setOBContext((OBContext) null);
     context.initialize(userId, roleId, clientId, orgId, languageCode, warehouseId);
@@ -508,9 +488,7 @@ public class OBContext implements OBNotSingleton, Serializable {
   /**
    * Creates the context without setting the context in the thread.
    *
-   * @param userId
-   *   the user used for creating the context
-   *
+   * @param userId the user used for creating the context
    * @return the created context
    */
   public static OBContext createOBContext(String userId) {
@@ -523,8 +501,7 @@ public class OBContext implements OBNotSingleton, Serializable {
    * Set the context in the thread, this context will then be used by the Data Access Layer
    * internals.
    *
-   * @param obContext
-   *   the context to set in the thread
+   * @param obContext the context to set in the thread
    */
   public static void setOBContext(OBContext obContext) {
     // if (obContext != null && instance.get() != null)
@@ -560,8 +537,7 @@ public class OBContext implements OBNotSingleton, Serializable {
   /**
    * Computes the clients allowed for read access using the user level and the client of the role.
    *
-   * @param role
-   *   the role used to initialize the readable clients
+   * @param role the role used to initialize the readable clients
    */
   /*
   public void setReadableClients(Role role) {
@@ -721,8 +697,7 @@ public class OBContext implements OBNotSingleton, Serializable {
   /**
    * Adds a new organization for which write access is allowed.
    *
-   * @param orgId
-   *   the id of the additional writable organization
+   * @param orgId the id of the additional writable organization
    */
   public void addWritableOrganization(String orgId) {
     additionalWritableOrganizations.add(orgId);
@@ -737,9 +712,7 @@ public class OBContext implements OBNotSingleton, Serializable {
   /**
    * Sets the OBContext using the information stored in the HttpSession
    *
-   * @param request
-   *   the http request used to set the OBContext
-   *
+   * @param request the http request used to set the OBContext
    * @return false if no user was specified in the session, true otherwise
    */
   public boolean setFromRequest(HttpServletRequest request) {
@@ -763,7 +736,7 @@ public class OBContext implements OBNotSingleton, Serializable {
     }
     try {
       return initialize(userId, getSessionValue(request, ROLE), getSessionValue(request, CLIENT),
-        getSessionValue(request, ORG));
+          getSessionValue(request, ORG));
     } catch (final OBSecurityException e) {
       // remove the authenticated user
       session.setAttribute(AUTHENTICATED_USER, null);
@@ -798,13 +771,13 @@ public class OBContext implements OBNotSingleton, Serializable {
 
   // sets the context by reading all user information
   private boolean initialize(String userId, String roleId, String clientId, String orgId,
-                             String languageCode) {
+      String languageCode) {
     return initialize(userId, roleId, clientId, orgId, languageCode, null);
   }
 
   // sets the context by reading all user information
   private boolean initialize(String userId, String roleId, String clientId, String orgId,
-                             String languageCode, String warehouseId) {
+      String languageCode, String warehouseId) {
     userID = userId;
     roleID = roleId;
     clientID = clientId;
@@ -1049,14 +1022,14 @@ public class OBContext implements OBNotSingleton, Serializable {
   }
 
   private <T extends Object> T getOne(Class<T> clz, String qryStr, Map<String, String> parameters,
-                                      boolean doCheck) {
+      boolean doCheck) {
     final Query<T> qry = SessionHandler.getInstance().createQuery(qryStr, clz);
     qry.setProperties(parameters);
     qry.setMaxResults(1);
     final List<T> result = qry.list();
     if (doCheck && result.size() != 1) {
       log.error(
-        "The query '" + qryStr + "' returned " + result.size() + " results while only 1 result was expected");
+          "The query '" + qryStr + "' returned " + result.size() + " results while only 1 result was expected");
     }
     if (result.isEmpty()) {
       return null;
@@ -1177,7 +1150,7 @@ public class OBContext implements OBNotSingleton, Serializable {
 
   public boolean isInAdministratorMode() {
     if (getAdminModeStack(AdminType.ADMIN_MODE).size() > 0 && getAdminModeStack(
-      AdminType.ADMIN_MODE).peek().isAdminMode()) {
+        AdminType.ADMIN_MODE).peek().isAdminMode()) {
       return true;
     }
     return adminModeSet.get() != null || isAdministrator;
@@ -1185,12 +1158,12 @@ public class OBContext implements OBNotSingleton, Serializable {
 
   public boolean isInCrossOrgAdministratorMode() {
     return getAdminModeStack(AdminType.CROSS_ORG_ADMIN_MODE).size() > 0 && getAdminModeStack(
-      AdminType.CROSS_ORG_ADMIN_MODE).peek().isCrossOrgAdminMode();
+        AdminType.CROSS_ORG_ADMIN_MODE).peek().isCrossOrgAdminMode();
   }
 
   public boolean doOrgClientAccessCheck() {
     if (getAdminModeStack(AdminType.ADMIN_MODE).size() > 0 && !getAdminModeStack(
-      AdminType.ADMIN_MODE).peek().doOrgClientAccessCheck()) {
+        AdminType.ADMIN_MODE).peek().doOrgClientAccessCheck()) {
       return false;
     }
     return !(adminModeSet.get() != null || isAdministrator);

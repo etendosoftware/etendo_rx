@@ -16,20 +16,21 @@
 
 package org.etendorx.data;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class UtilSql {
   protected static Logger log4j = LogManager.getLogger();
+
   public UtilSql() {
   }
 
   public static boolean setValue(PreparedStatement ps, int posicion, int tipo, String strDefault,
-                                 String _strValor) {
+      String _strValor) {
     String strValor = _strValor;
 
     try {
@@ -85,7 +86,7 @@ public class UtilSql {
   }
 
   public static String getDateValue(ResultSet result, String strField, String strDateFormat)
-    throws SQLException {
+      throws SQLException {
     Date date = result.getDate(strField);
     String strValueReturn;
     if (result.wasNull()) {
@@ -99,7 +100,7 @@ public class UtilSql {
   }
 
   public static String getDateTimeValue(ResultSet result, String strField, String strDateFormat)
-    throws SQLException {
+      throws SQLException {
     Timestamp timestamp = result.getTimestamp(strField);
     String strValueReturn;
     if (result.wasNull()) {
@@ -132,7 +133,7 @@ public class UtilSql {
   }
 
   public static String getStringCallableStatement(CallableStatement cs, int intField)
-    throws SQLException {
+      throws SQLException {
     String strValueReturn = cs.getString(intField);
     if (strValueReturn == null) {
       strValueReturn = "";

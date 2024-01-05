@@ -1,9 +1,9 @@
 package com.etendorx.gen.metadata;
 
+import com.etendorx.gen.beans.Metadata;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.etendorx.gen.beans.Metadata;
 
 public class MetadataContainer {
 

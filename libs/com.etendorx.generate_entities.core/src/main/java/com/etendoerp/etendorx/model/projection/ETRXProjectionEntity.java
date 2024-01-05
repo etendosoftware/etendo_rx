@@ -22,7 +22,7 @@ import org.openbravo.base.model.Table;
 
 import java.util.Set;
 
-@JsonIncludeProperties({"identity", "name", "fields"})
+@JsonIncludeProperties({ "identity", "name", "fields" })
 public class ETRXProjectionEntity extends ModelObject {
 
   private ETRXProjection projection;

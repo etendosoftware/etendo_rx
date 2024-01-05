@@ -16,6 +16,8 @@
 package com.etendorx.utils.auth.key.context;
 
 import com.etendorx.utils.auth.key.JwtKeyUtils;
+import com.etendorx.utils.auth.key.config.JwtClassicConfig;
+import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 
 import java.util.Map;
 
@@ -30,8 +32,23 @@ public class TokenUtil {
    * @param publicKey the public key
    * @param token     the token
    */
-  public static void convertToken(UserContext userContext, String publicKey, String token) {
-    Map<String, Object> tokenValuesMap = ContextUtils.getTokenValues(publicKey, token);
+  public static void convertToken(UserContext userContext, String publicKey, JwtClassicConfig jwtClassicConfig, String token) {
+    Map<String, Object> tokenValuesMap = null;
+    if(publicKey != null) {
+      try {
+        tokenValuesMap = ContextUtils.getTokenValues(publicKey, token);
+      } catch (Exception ignored) {
+      }
+    }
+    if(tokenValuesMap == null && jwtClassicConfig != null) {
+      try {
+        tokenValuesMap = ContextUtils.getTokenValues(jwtClassicConfig, token);
+      } catch (Exception ignored) {
+      }
+    }
+    if(tokenValuesMap == null) {
+      throw new ForbiddenException("Invalid token");
+    }
     userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
     userContext.setClientId((String) tokenValuesMap.get(JwtKeyUtils.CLIENT_ID_CLAIM));
     userContext.setOrganizationId((String) tokenValuesMap.get(JwtKeyUtils.ORG_ID));

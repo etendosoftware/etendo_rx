@@ -23,7 +23,8 @@ import com.jayway.jsonpath.Option;
 public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
   @Override
   public DocumentContext getReadContext(String rawData) {
-    Configuration conf = Configuration.defaultConfiguration().addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL);
+    Configuration conf = Configuration.defaultConfiguration()
+        .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL);
     return JsonPath.using(conf).parse(rawData);
   }
 }

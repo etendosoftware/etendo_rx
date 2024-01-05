@@ -23,6 +23,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,8 +45,8 @@ public class ${mappingPrefix}${entity.externalName}RestController extends Binded
   @GetMapping("/searches/${search.method}")
   @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   @Transactional
-  Iterable<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>String ${param.name}<#if !param?is_last>, </#if></#list>) {
-    return ((${mappingPrefix}${entity.externalName}DTORepositoryDefault)getRepository()).${search.method}(<#list search.params as param>${param.name}, </#list>null);
+  Page<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>${param.type} ${param.name}, </#list> @PageableDefault(size = 20) final Pageable pageable) {
+    return ((${mappingPrefix}${entity.externalName}DTORepositoryDefault)getRepository()).${search.method}(<#list search.params as param>${param.name}, </#list> pageable);
   }
     </#list>
   </#list>

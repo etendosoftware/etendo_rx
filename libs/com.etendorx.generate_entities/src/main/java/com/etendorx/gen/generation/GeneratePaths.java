@@ -35,7 +35,8 @@ public class GeneratePaths {
     this.pathEtendoRx = pathEtendoRx;
     this.pathEntitiesRx = pathEtendoRx + File.separator + MODULES_GEN + File.separator + "com.etendorx.entities";
     this.pathEntitiesModelRx = pathEtendoRx + File.separator + MODULES_GEN + File.separator + "com.etendorx.entitiesModel";
-    this.packageEntities = this.pathEntitiesRx.substring(this.pathEntitiesRx.lastIndexOf('/') + 1) + ".entities";
+    this.packageEntities = this.pathEntitiesRx.substring(
+        this.pathEntitiesRx.lastIndexOf('/') + 1) + ".entities";
     // Static files from entities
     this.baseRXObject = "BaseRXObject";
     this.baseDASRepository = "BaseDASRepository";

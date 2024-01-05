@@ -19,7 +19,6 @@ package com.etendorx.das.test;
 import com.etendorx.das.utils.TestcontainersUtils;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.provider.Arguments;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -38,14 +37,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.stream.Stream;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
@@ -91,25 +86,27 @@ public class MappingsRestTest {
       .withExposedPorts(5432)
       .waitingFor(Wait.forLogMessage(".*database system is ready to accept connections*\\n", 1));
 
-
-  private void performGetRequestAndAssertResponse(String model, String id, String jsonFile) throws Exception {
+  private void performGetRequestAndAssertResponse(String model, String id, String jsonFile)
+      throws Exception {
     String expectedJsonData = TestcontainersUtils.getJsonFromFile(jsonFile);
-    var result = mockMvc.perform(get(BASE_URL + model + "/" + id + DATE_FORMAT + TIME_ZONE)
-            .header(X_TOKEN, TOKEN)
-            .header("Accept", ACCEPT_HEADER)
-            .characterEncoding(UTF_8.toString()))
-        .andExpect(MockMvcResultMatchers.status().is2xxSuccessful()).andReturn();
+    var result = mockMvc.perform(
+            get(BASE_URL + model + "/" + id + DATE_FORMAT + TIME_ZONE).header(X_TOKEN, TOKEN)
+                .header("Accept", ACCEPT_HEADER)
+                .characterEncoding(UTF_8.toString()))
+        .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+        .andReturn();
     assertResponse(result, expectedJsonData);
   }
 
-  private void performPostRequestAndAssertResponse(String model, String jsonFile, String responseJsonFile) throws Exception {
+  private void performPostRequestAndAssertResponse(String model, String jsonFile,
+      String responseJsonFile) throws Exception {
     String postedJsonData = TestcontainersUtils.getJsonFromFile(jsonFile);
     String expectedJsonData = TestcontainersUtils.getJsonFromFile(responseJsonFile);
-    var result = mockMvc.perform(post(BASE_URL + model + DATE_FORMAT + TIME_ZONE + "&_triggerEnabled=false")
-            .header(X_TOKEN, TOKEN)
-            .header("Accept", ACCEPT_HEADER)
-            .content(postedJsonData))
-        .andExpect(MockMvcResultMatchers.status().is2xxSuccessful()).andReturn();
+    var result = mockMvc.perform(
+            post(BASE_URL + model + DATE_FORMAT + TIME_ZONE + "&_triggerEnabled=false").header(X_TOKEN,
+                TOKEN).header("Accept", ACCEPT_HEADER).content(postedJsonData))
+        .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+        .andReturn();
     assertResponse(result, expectedJsonData);
   }
 

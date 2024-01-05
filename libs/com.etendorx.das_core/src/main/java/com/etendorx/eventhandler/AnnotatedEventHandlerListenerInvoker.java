@@ -1,26 +1,10 @@
 package com.etendorx.eventhandler;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-
+import com.etendorx.eventhandler.annotation.EventHandlerListener;
+import com.etendorx.eventhandler.exception.AssignableParameterException;
+import com.etendorx.eventhandler.exception.InvalidParameterCount;
 import org.hibernate.HibernateException;
-import org.hibernate.event.spi.AbstractEvent;
-import org.hibernate.event.spi.PostDeleteEvent;
-import org.hibernate.event.spi.PostDeleteEventListener;
-import org.hibernate.event.spi.PostInsertEvent;
-import org.hibernate.event.spi.PostInsertEventListener;
-import org.hibernate.event.spi.PostUpdateEvent;
-import org.hibernate.event.spi.PostUpdateEventListener;
-import org.hibernate.event.spi.PreDeleteEvent;
-import org.hibernate.event.spi.PreDeleteEventListener;
-import org.hibernate.event.spi.PreInsertEvent;
-import org.hibernate.event.spi.PreInsertEventListener;
-import org.hibernate.event.spi.PreUpdateEvent;
-import org.hibernate.event.spi.PreUpdateEventListener;
-import org.hibernate.event.spi.SaveOrUpdateEvent;
-import org.hibernate.event.spi.SaveOrUpdateEventListener;
+import org.hibernate.event.spi.*;
 import org.hibernate.persister.entity.EntityPersister;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -33,19 +17,15 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
 
-import com.etendorx.eventhandler.annotation.EventHandlerListener;
-import com.etendorx.eventhandler.exception.AssignableParameterException;
-import com.etendorx.eventhandler.exception.InvalidParameterCount;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 
-public class AnnotatedEventHandlerListenerInvoker implements
-    SaveOrUpdateEventListener,
-    PreInsertEventListener,
-    PreDeleteEventListener,
-    PreUpdateEventListener,
-    PostInsertEventListener,
-    PostDeleteEventListener,
-    PostUpdateEventListener,
-    BeanPostProcessor {
+public class AnnotatedEventHandlerListenerInvoker
+    implements SaveOrUpdateEventListener, PreInsertEventListener, PreDeleteEventListener,
+    PreUpdateEventListener, PostInsertEventListener, PostDeleteEventListener,
+    PostUpdateEventListener, BeanPostProcessor {
 
   private final MultiValueMap<Class<?>, EventHandlerMethod> handlerMethods = new LinkedMultiValueMap<>();
 
@@ -102,7 +82,8 @@ public class AnnotatedEventHandlerListenerInvoker implements
   }
 
   @Override
-  public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+  public Object postProcessBeforeInitialization(Object bean, String beanName)
+      throws BeansException {
     return bean;
   }
 
@@ -112,15 +93,16 @@ public class AnnotatedEventHandlerListenerInvoker implements
       try {
         register(bean, method);
       } catch (InvalidParameterCount | AssignableParameterException e) {
-        throw new BeanInitializationException("@EventHandlerListener method could not be registered.", e);
+        throw new BeanInitializationException(
+            "@EventHandlerListener method could not be registered.", e);
       }
     }
 
     return bean;
   }
 
-  private <T extends Annotation> void register(Object bean,
-      Method method) throws InvalidParameterCount, AssignableParameterException {
+  private <T extends Annotation> void register(Object bean, Method method)
+      throws InvalidParameterCount, AssignableParameterException {
     Class<EventHandlerListener> annotationType = EventHandlerListener.class;
     if (AnnotationUtils.findAnnotation(method, annotationType) == null)
       return;

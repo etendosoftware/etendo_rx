@@ -16,12 +16,9 @@
 package com.etendorx.gen.generation.mapping;
 
 import com.etendoerp.etendorx.model.projection.ETRXProjection;
-import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.generation.GeneratePaths;
 import com.etendorx.gen.generation.utils.CodeGenerationUtils;
 import com.etendorx.gen.util.TemplateUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.Writer;
@@ -33,8 +30,8 @@ public class GenerateGroupedOpenApi {
   private static final String FTL_FILE = "/org/openbravo/base/gen/mappings/groupedOpenApi.ftl"; // NOSONAR
   private static final String OUT_FILE_NAME = "OpenApiConfig.java";
 
-  public void generate(List<ETRXProjection> projections, GeneratePaths path) throws
-      FileNotFoundException {
+  public void generate(List<ETRXProjection> projections, GeneratePaths path)
+      throws FileNotFoundException {
     freemarker.template.Template templateJPARepoRX = TemplateUtil.createTemplateImplementation(
         FTL_FILE);
     final Writer outWriterRepo = CodeGenerationUtils.getWriter("", OUT_FILE_NAME, path);

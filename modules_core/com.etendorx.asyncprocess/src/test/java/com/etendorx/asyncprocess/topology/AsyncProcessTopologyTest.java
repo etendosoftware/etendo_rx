@@ -55,10 +55,14 @@ class AsyncProcessTopologyTest {
     var asyncProcessJsonSerde = new JsonSerde<>(AsyncProcess.class);
     var asyncProcessExecutionJsonSerde = new JsonSerde<>(AsyncProcessExecution.class);
 
-    asyncProcessExecutionTopic = testDriver.createInputTopic(AsyncProcessTopology.ASYNC_PROCESS_EXECUTION, Serdes.String().serializer(), asyncProcessExecutionJsonSerde.serializer());
+    asyncProcessExecutionTopic = testDriver.createInputTopic(
+        AsyncProcessTopology.ASYNC_PROCESS_EXECUTION, Serdes.String().serializer(),
+        asyncProcessExecutionJsonSerde.serializer());
 
-    asyncProcessTopic = testDriver.createOutputTopic(AsyncProcessTopology.ASYNC_PROCESS, Serdes.String().deserializer(), asyncProcessJsonSerde.deserializer());
-    rejectedProcessTopic = testDriver.createOutputTopic(AsyncProcessTopology.REJECTED_PROCESS, Serdes.String().deserializer(), asyncProcessExecutionJsonSerde.deserializer());
+    asyncProcessTopic = testDriver.createOutputTopic(AsyncProcessTopology.ASYNC_PROCESS,
+        Serdes.String().deserializer(), asyncProcessJsonSerde.deserializer());
+    rejectedProcessTopic = testDriver.createOutputTopic(AsyncProcessTopology.REJECTED_PROCESS,
+        Serdes.String().deserializer(), asyncProcessExecutionJsonSerde.deserializer());
   }
 
   @AfterEach
@@ -68,21 +72,11 @@ class AsyncProcessTopologyTest {
 
   @Test
   void testTopology() {
-    List.of(
-        AsyncProcessExecution.builder()
-          .asyncProcessId("1")
-          .time(new Date())
-          .build(),
-        AsyncProcessExecution.builder()
-          .asyncProcessId("2")
-          .time(new Date())
-          .build(),
-        AsyncProcessExecution.builder()
-          .asyncProcessId("1")
-          .time(new Date())
-          .build()
-      )
-      .forEach(asyncProcessExecution -> asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution));
+    List.of(AsyncProcessExecution.builder().asyncProcessId("1").time(new Date()).build(),
+            AsyncProcessExecution.builder().asyncProcessId("2").time(new Date()).build(),
+            AsyncProcessExecution.builder().asyncProcessId("1").time(new Date()).build())
+        .forEach(asyncProcessExecution -> asyncProcessExecutionTopic.pipeInput(
+            asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution));
 
     var firstAsyncProcess = asyncProcessTopic.readValue();
 
@@ -102,25 +96,22 @@ class AsyncProcessTopologyTest {
   @Test
   void testTopologyWhenRejection() {
     var rejectedTransactionId = UUID.randomUUID().toString();
-    List.of(
-        AsyncProcessExecution.builder()
-          .id(rejectedTransactionId)
-          .asyncProcessId("1")
-          .time(new Date())
-          .state(AsyncProcessState.REJECTED)
-          .build(),
-        AsyncProcessExecution.builder()
-          .id(UUID.randomUUID().toString())
-          .asyncProcessId("2")
-          .time(new Date())
-          .build(),
-        AsyncProcessExecution.builder()
-          .id(UUID.randomUUID().toString())
-          .asyncProcessId("1")
-          .time(new Date())
-          .build()
-      )
-      .forEach(asyncProcessExecution -> asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution));
+    List.of(AsyncProcessExecution.builder()
+            .id(rejectedTransactionId)
+            .asyncProcessId("1")
+            .time(new Date())
+            .state(AsyncProcessState.REJECTED)
+            .build(), AsyncProcessExecution.builder()
+            .id(UUID.randomUUID().toString())
+            .asyncProcessId("2")
+            .time(new Date())
+            .build(), AsyncProcessExecution.builder()
+            .id(UUID.randomUUID().toString())
+            .asyncProcessId("1")
+            .time(new Date())
+            .build())
+        .forEach(asyncProcessExecution -> asyncProcessExecutionTopic.pipeInput(
+            asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution));
 
     var firstAsyncProcess = asyncProcessTopic.readValue();
 
@@ -140,43 +131,45 @@ class AsyncProcessTopologyTest {
     assertEquals(AsyncProcessState.REJECTED, asyncProcessExecution.getState());
   }
 
-
   @Test
   void testAsyncProcessTopologyWhenDone() {
 
     var asyncProcessId = UUID.randomUUID().toString();
 
     var asyncProcessExecution = AsyncProcessExecution.builder()
-      .id(asyncProcessId)
-      .asyncProcessId("1")
-      .time(new Date())
-      .state(AsyncProcessState.ACCEPTED)
-      .build();
-    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution);
+        .id(asyncProcessId)
+        .asyncProcessId("1")
+        .time(new Date())
+        .state(AsyncProcessState.ACCEPTED)
+        .build();
+    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(),
+        asyncProcessExecution);
 
     var acceptedStateProcess = asyncProcessTopic.readValue();
 
     assertEquals(AsyncProcessState.ACCEPTED, acceptedStateProcess.getState());
 
     asyncProcessExecution = AsyncProcessExecution.builder()
-      .id(asyncProcessId)
-      .asyncProcessId("1")
-      .time(new Date())
-      .state(AsyncProcessState.WAITING)
-      .build();
-    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution);
+        .id(asyncProcessId)
+        .asyncProcessId("1")
+        .time(new Date())
+        .state(AsyncProcessState.WAITING)
+        .build();
+    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(),
+        asyncProcessExecution);
 
     var waitingStateProcess = asyncProcessTopic.readValue();
 
     assertEquals(AsyncProcessState.WAITING, waitingStateProcess.getState());
 
     asyncProcessExecution = AsyncProcessExecution.builder()
-      .id(asyncProcessId)
-      .asyncProcessId("1")
-      .time(new Date())
-      .state(AsyncProcessState.DONE)
-      .build();
-    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution);
+        .id(asyncProcessId)
+        .asyncProcessId("1")
+        .time(new Date())
+        .state(AsyncProcessState.DONE)
+        .build();
+    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(),
+        asyncProcessExecution);
 
     var doneStateProcess = asyncProcessTopic.readValue();
 
@@ -189,36 +182,39 @@ class AsyncProcessTopologyTest {
     var asyncProcessId = UUID.randomUUID().toString();
 
     var asyncProcessExecution = AsyncProcessExecution.builder()
-      .id(asyncProcessId)
-      .asyncProcessId("1")
-      .time(new Date())
-      .state(AsyncProcessState.ACCEPTED)
-      .build();
-    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution);
+        .id(asyncProcessId)
+        .asyncProcessId("1")
+        .time(new Date())
+        .state(AsyncProcessState.ACCEPTED)
+        .build();
+    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(),
+        asyncProcessExecution);
 
     var acceptedStateProcess = asyncProcessTopic.readValue();
 
     assertEquals(AsyncProcessState.ACCEPTED, acceptedStateProcess.getState());
 
     asyncProcessExecution = AsyncProcessExecution.builder()
-      .id(asyncProcessId)
-      .asyncProcessId("1")
-      .time(new Date())
-      .state(AsyncProcessState.WAITING)
-      .build();
-    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution);
+        .id(asyncProcessId)
+        .asyncProcessId("1")
+        .time(new Date())
+        .state(AsyncProcessState.WAITING)
+        .build();
+    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(),
+        asyncProcessExecution);
 
     var waitingStateProcess = asyncProcessTopic.readValue();
 
     assertEquals(AsyncProcessState.WAITING, waitingStateProcess.getState());
 
     asyncProcessExecution = AsyncProcessExecution.builder()
-      .id(asyncProcessId)
-      .asyncProcessId("1")
-      .time(new Date())
-      .state(AsyncProcessState.REJECTED)
-      .build();
-    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(), asyncProcessExecution);
+        .id(asyncProcessId)
+        .asyncProcessId("1")
+        .time(new Date())
+        .state(AsyncProcessState.REJECTED)
+        .build();
+    asyncProcessExecutionTopic.pipeInput(asyncProcessExecution.getAsyncProcessId(),
+        asyncProcessExecution);
 
     var doneStateProcess = asyncProcessTopic.readValue();
 

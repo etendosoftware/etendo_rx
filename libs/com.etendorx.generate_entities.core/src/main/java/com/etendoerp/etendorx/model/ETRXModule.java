@@ -3,7 +3,6 @@ package com.etendoerp.etendorx.model;
 import com.etendoerp.etendorx.model.projection.ETRXProjection;
 import com.etendoerp.etendorx.model.repository.ETRXRepository;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-
 import org.openbravo.base.model.Module;
 
 import java.util.Set;

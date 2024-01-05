@@ -37,7 +37,7 @@ import java.io.Serializable;
  * @author mtaal
  */
 public class OBYesNoType extends AbstractSingleColumnStandardBasicType<Boolean>
-  implements PrimitiveType<Boolean>, DiscriminatorType<Boolean> {
+    implements PrimitiveType<Boolean>, DiscriminatorType<Boolean> {
   private static final long serialVersionUID = 1L;
 
   public OBYesNoType() {

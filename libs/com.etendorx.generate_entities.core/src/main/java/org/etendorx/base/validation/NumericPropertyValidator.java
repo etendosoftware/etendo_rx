@@ -43,7 +43,7 @@ public class NumericPropertyValidator extends BasePropertyValidator {
 
   public void initialize() {
     Check.isTrue(getProperty().getFieldLength() > 0,
-      "Fieldlength should be larger than 0 for validation");
+        "Fieldlength should be larger than 0 for validation");
     if (getProperty().getMinValue() != null) {
       minValue = new BigDecimal(getProperty().getMinValue());
     }
@@ -60,13 +60,13 @@ public class NumericPropertyValidator extends BasePropertyValidator {
     }
     final BigDecimal localValue;
     if (float.class.isAssignableFrom(value.getClass()) || Float.class.isAssignableFrom(
-      value.getClass())) {
+        value.getClass())) {
       localValue = new BigDecimal((Float) value);
     } else if (int.class.isAssignableFrom(value.getClass()) || Integer.class.isAssignableFrom(
-      value.getClass())) {
+        value.getClass())) {
       localValue = new BigDecimal((Integer) value);
     } else if (long.class.isAssignableFrom(value.getClass()) || Long.class.isAssignableFrom(
-      value.getClass())) {
+        value.getClass())) {
       localValue = new BigDecimal((Long) value);
     } else {
       Check.isInstanceOf(value, BigDecimal.class);

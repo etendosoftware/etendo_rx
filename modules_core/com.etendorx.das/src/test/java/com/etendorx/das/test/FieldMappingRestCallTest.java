@@ -44,9 +44,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
-    "grpc.server.port=19090",
-    "public-key=" + FieldMappingRestCallTest.publicKey
-})
+    "grpc.server.port=19090", "public-key=" + FieldMappingRestCallTest.publicKey })
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @AutoConfigureMockMvc
@@ -80,33 +78,38 @@ public class FieldMappingRestCallTest {
 
   public static Stream<Arguments> validRequestParams() {
     return Stream.of(
-      // Undefined username
-      Arguments.of(AD_USER, "0", "System", 1, "System Administrator", true),
-      Arguments.of(AD_USER, "100", "Admin", 13, "QA Testing Admin", false),
-      Arguments.of(AD_USER, "167450A5BB284AB29C4FEF039E98C963", "F&B ES User", 4, "F&B España, S.A - Sales", false),
-      Arguments.of(AD_USER, "20C5D31133D949F0BD25412DD1069612", " Rome", 0, null, false),
-      Arguments.of(AD_USER, "26EF171A1D75485083D276D49AAACD45", "F&BESRSUser", 1, "F&BESRSUser", true),
-      Arguments.of(AD_USER, "2748452130E84FF0B1A8292D88570F8F", "Joe Matt", 0, null, false),
-      Arguments.of(AD_USER, "6628F632D484407CBCBD8E71C123A263", "Tom", 0, null, false),
-      Arguments.of(AD_USER, "D249DE7A14FB4F77BC056A3738A63477", "F&BUSECUser", 1, "F&BUSECUser", true),
-      Arguments.of(AD_USER, "E12DC7B3FF8C4F64924A98195223B1F8", "F&BUser", 1, "F&BUser", true),
-      Arguments.of(AD_USER, "4028E6C72959682B01295F40C1D702E6", "John", 0, null, false),
-      Arguments.of(AD_USER, "4028E6C72959682B01295F40C30F02EA", "Albert", 0, null, false)
-    );
+        // Undefined username
+        Arguments.of(AD_USER, "0", "System", 1, "System Administrator", true),
+        Arguments.of(AD_USER, "100", "Admin", 13, "QA Testing Admin", false),
+        Arguments.of(AD_USER, "167450A5BB284AB29C4FEF039E98C963", "F&B ES User", 4,
+            "F&B España, S.A - Sales", false),
+        Arguments.of(AD_USER, "20C5D31133D949F0BD25412DD1069612", " Rome", 0, null, false),
+        Arguments.of(AD_USER, "26EF171A1D75485083D276D49AAACD45", "F&BESRSUser", 1, "F&BESRSUser",
+            true),
+        Arguments.of(AD_USER, "2748452130E84FF0B1A8292D88570F8F", "Joe Matt", 0, null, false),
+        Arguments.of(AD_USER, "6628F632D484407CBCBD8E71C123A263", "Tom", 0, null, false),
+        Arguments.of(AD_USER, "D249DE7A14FB4F77BC056A3738A63477", "F&BUSECUser", 1, "F&BUSECUser",
+            true),
+        Arguments.of(AD_USER, "E12DC7B3FF8C4F64924A98195223B1F8", "F&BUser", 1, "F&BUser", true),
+        Arguments.of(AD_USER, "4028E6C72959682B01295F40C1D702E6", "John", 0, null, false),
+        Arguments.of(AD_USER, "4028E6C72959682B01295F40C30F02EA", "Albert", 0, null, false));
   }
 
   @ParameterizedTest
   @MethodSource("validRequestParams")
-  public void whenRestRead(String model, String id, String mappedName, int numRoles, String roleName, boolean isAdmin) throws Exception {
+  public void whenRestRead(String model, String id, String mappedName, int numRoles,
+      String roleName, boolean isAdmin) throws Exception {
     var result = mockMvc.perform(
-      get("/" + model + "/" + id + "?projection=mapping-test").header(X_TOKEN, TOKEN)
-    );
+        get("/" + model + "/" + id + "?projection=mapping-test").header(X_TOKEN, TOKEN));
     result.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
     result.andExpect(MockMvcResultMatchers.jsonPath("$.name.mappedName").value(mappedName));
     result.andExpect(MockMvcResultMatchers.jsonPath("$.roles.length()").value(numRoles));
-    if(numRoles > 0) {
-      result.andExpect(MockMvcResultMatchers.jsonPath("$.roles[?(@.name == \"" + roleName + "\")]").exists());
-      result.andExpect(MockMvcResultMatchers.jsonPath("$.roles[?(@.name == \"" + roleName + "\" && @.isAdmin == " + BooleanUtils.toStringTrueFalse(isAdmin) +")]").exists());
+    if (numRoles > 0) {
+      result.andExpect(
+          MockMvcResultMatchers.jsonPath("$.roles[?(@.name == \"" + roleName + "\")]").exists());
+      result.andExpect(MockMvcResultMatchers.jsonPath(
+          "$.roles[?(@.name == \"" + roleName + "\" && @.isAdmin == " + BooleanUtils.toStringTrueFalse(
+              isAdmin) + ")]").exists());
     }
   }
 }

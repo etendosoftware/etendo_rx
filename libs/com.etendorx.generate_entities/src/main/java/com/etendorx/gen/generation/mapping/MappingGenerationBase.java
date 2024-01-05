@@ -44,8 +44,9 @@ public abstract class MappingGenerationBase implements MappingGenerator {
   }
 
   @Override
-  public void generate(ETRXProjectionEntity etrxProjectionEntity, GeneratePaths path) throws FileNotFoundException {
-    if(!isValid(etrxProjectionEntity)) {
+  public void generate(ETRXProjectionEntity etrxProjectionEntity, GeneratePaths path)
+      throws FileNotFoundException {
+    if (!isValid(etrxProjectionEntity)) {
       return;
     }
 
@@ -59,14 +60,16 @@ public abstract class MappingGenerationBase implements MappingGenerator {
 
     freemarker.template.Template templateJPARepoRX = TemplateUtil.createTemplateImplementation(
         ftlFileNameRX);
-    TemplateUtil.processTemplate(templateJPARepoRX, getData(mappingPrefix, etrxProjectionEntity), outWriterRepo);
+    TemplateUtil.processTemplate(templateJPARepoRX, getData(mappingPrefix, etrxProjectionEntity),
+        outWriterRepo);
   }
 
   protected abstract boolean isValid(ETRXProjectionEntity etrxProjectionEntity);
 
   protected abstract String getOutFileName(ETRXProjectionEntity etrxProjectionEntity);
 
-  private Map<String, Object> getData(String mappingPrefix, ETRXProjectionEntity etrxProjectionEntity) {
+  private Map<String, Object> getData(String mappingPrefix,
+      ETRXProjectionEntity etrxProjectionEntity) {
     BeansWrapper wrapper = new BeansWrapperBuilder(Configuration.VERSION_2_3_31).build();
     TemplateHashModel staticModels = wrapper.getStaticModels();
 

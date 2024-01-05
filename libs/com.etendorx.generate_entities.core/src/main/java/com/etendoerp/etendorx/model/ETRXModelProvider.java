@@ -15,6 +15,7 @@
  */
 package com.etendoerp.etendorx.model;
 
+import com.etendoerp.etendorx.model.mapping.ETRXConstantValue;
 import com.etendoerp.etendorx.model.mapping.ETRXJavaMapping;
 import com.etendoerp.etendorx.model.projection.ETRXEntityField;
 import com.etendoerp.etendorx.model.projection.ETRXProjection;
@@ -29,12 +30,8 @@ import org.apache.logging.log4j.Logger;
 import org.etendorx.base.provider.OBProvider;
 import org.etendorx.base.provider.OBSingleton;
 import org.hibernate.Session;
-import org.openbravo.base.model.Entity;
-import org.openbravo.base.model.ModelObject;
-import org.openbravo.base.model.ModelProvider;
-import org.openbravo.base.model.ModelSessionFactoryController;
 import org.openbravo.base.model.Module;
-import org.openbravo.base.model.Table;
+import org.openbravo.base.model.*;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -57,16 +54,11 @@ public class ETRXModelProvider implements OBSingleton {
       // Modules
       ETRXModule.class,
       // Projections
-      ETRXProjection.class,
-      ETRXProjectionEntity.class,
-      ETRXEntityField.class,
+      ETRXProjection.class, ETRXProjectionEntity.class, ETRXEntityField.class,
       // Repositories
-      ETRXRepository.class,
-      ETRXEntitySearch.class,
-      ETRXSearchParam.class,
+      ETRXRepository.class, ETRXEntitySearch.class, ETRXSearchParam.class,
       // Mappings
-      ETRXJavaMapping.class
-  );
+      ETRXJavaMapping.class, ETRXConstantValue.class);
 
   public static synchronized ETRXModelProvider getInstance() {
     // set in a localInstance to prevent threading issues when
@@ -118,9 +110,7 @@ public class ETRXModelProvider implements OBSingleton {
   /**
    * Generates a Map of ETRXModules with the json representation.
    *
-   * @param etrxModules
-   *     List of modules to parse
-   *
+   * @param etrxModules List of modules to parse
    * @return Map of json values
    */
   public Map<ETRXModule, String> modulesToJsonMap(List<ETRXModule> etrxModules) {
@@ -159,23 +149,49 @@ public class ETRXModelProvider implements OBSingleton {
     final ModelSessionFactoryController sessionFactoryController = new ModelSessionFactoryController();
     Session session = sessionFactoryController.getSessionFactory().openSession();
     try {
-      if (retrieveModulesByPackage(session, javaPackage).isEmpty()) {
+      Module module = retrieveModulesByPackage(session, javaPackage);
+      if (module == null) {
         throw new IllegalArgumentException("The module '" + javaPackage + "' is not installed.");
       }
+      if (!module.isActive()) {
+        throw new IllegalArgumentException("The module '" + javaPackage + "' is not active.");
+      }
+      String version = EtendoRX.currentVersion();
+      if (version != null && compareVersion(module.getVersion(), version) < 0) {
+        throw new IllegalArgumentException(
+            "The module '" + javaPackage + "' is not compatible with this version of Etendo RX.");
+      }
+
     } finally {
       session.close();
       sessionFactoryController.getSessionFactory().close();
     }
   }
 
-  private List<Module> retrieveModulesByPackage(Session session, String javaPackage) {
+  public int compareVersion(String version1, String version2) {
+    String[] parts1 = version1.split("\\.");
+    String[] parts2 = version2.split("\\.");
+
+    int length = Math.max(parts1.length, parts2.length);
+    for (int i = 0; i < length; i++) {
+      int num1 = i < parts1.length ? Integer.parseInt(parts1[i]) : 0;
+      int num2 = i < parts2.length ? Integer.parseInt(parts2[i]) : 0;
+
+      if (num1 != num2) {
+        return num1 - num2;
+      }
+    }
+    return 0; // versions are equal
+  }
+
+  private Module retrieveModulesByPackage(Session session, String javaPackage) {
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Module> criteria = builder.createQuery(Module.class);
     Root<Module> root = criteria.from(Module.class);
     criteria.select(root);
     criteria.where(builder.equal(root.get("javaPackage"), javaPackage));
 
-    return session.createQuery(criteria).list();
+    return session.createQuery(criteria).uniqueResult();
   }
 
   private List<ETRXModule> retrieveRXModules(Session session) {
@@ -193,11 +209,8 @@ public class ETRXModelProvider implements OBSingleton {
   /**
    * Retrieves a list of model objects of the class passed as parameter.
    *
-   * @param session
-   *     the session used to query for the objects
-   * @param clazz
-   *     the class of the model objects to be retrieved
-   *
+   * @param session the session used to query for the objects
+   * @param clazz   the class of the model objects to be retrieved
    * @return a list of model objects
    */
   public <T extends Object> List<T> list(Session session, Class<T> clazz) {
@@ -278,7 +291,8 @@ public class ETRXModelProvider implements OBSingleton {
     return getData(ETRXProjectionEntity.class, s -> retrieveETRXProjectionEntity(s, table));
   }
 
-  public List<ETRXProjectionEntity> retrieveETRXProjectionEntity(Session session, ETRXProjection projection) {
+  public List<ETRXProjectionEntity> retrieveETRXProjectionEntity(Session session,
+      ETRXProjection projection) {
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<ETRXProjectionEntity> criteria = builder.createQuery(ETRXProjectionEntity.class);
     Root<ETRXProjectionEntity> root = criteria.from(ETRXProjectionEntity.class);
@@ -290,5 +304,9 @@ public class ETRXModelProvider implements OBSingleton {
 
   public List<ETRXProjectionEntity> getETRXProjectionEntity(ETRXProjection projection) {
     return getData(ETRXProjectionEntity.class, s -> retrieveETRXProjectionEntity(s, projection));
+  }
+
+  public void verifyModule() {
+    verifyModule(ETENDO_RX_MODULE);
   }
 }

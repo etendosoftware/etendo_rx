@@ -63,7 +63,7 @@ public class ConfigParameters implements Serializable {
 
   public static org.etendorx.base.ConfigParameters retrieveFrom(ServletContext context) {
     org.etendorx.base.ConfigParameters params = (org.etendorx.base.ConfigParameters) context.getAttribute(
-      "openbravoConfig");
+        "openbravoConfig");
     if (params == null) {
       params = new org.etendorx.base.ConfigParameters(context);
       params.storeIn(context);
@@ -87,7 +87,7 @@ public class ConfigParameters implements Serializable {
     String s = "FormatFile";
     this.strFileFormat = this.getResolvedParameter(context, s);
     this.strBaseDesignPath = this.trimTrailing(this.getResolvedParameter(context, "BaseDesignPath"),
-      "/");
+        "/");
     this.isFullPathBaseDesignPath = this.determineIsFullDesignPath();
     this.strDefaultDesignPath = this.getResolvedParameter(context, "DefaultDesignPath");
     this.strDefaultServlet = this.getResolvedParameter(context, "DefaultServlet");
@@ -105,10 +105,10 @@ public class ConfigParameters implements Serializable {
     this.strServletGoBack = this.getResolvedParameter(context, "ServletGoBack");
     log4j.debug("strServletGoBack: {}", this.strServletGoBack);
     this.periodicBackgroundTime = this.asLong(
-      this.getResolvedParameter(context, "PeriodicBackgroundTime"));
+        this.getResolvedParameter(context, "PeriodicBackgroundTime"));
     String var10001 = this.prefix;
     this.strLogFileAcctServer = var10001 + "/" + this.strBaseConfigPath + "/" + this.getResolvedParameter(
-      context, "LogFileAcctServer");
+        context, "LogFileAcctServer");
     this.strFTPDirectory = this.getResolvedParameter(context, "AttachmentDirectory");
 
     try {
@@ -125,9 +125,9 @@ public class ConfigParameters implements Serializable {
   private String getResolvedParameter(ServletContext context, String name) {
     String value = context.getInitParameter(name);
     return value != null ?
-      value.replace("@actual_path_context@", this.getActualPathContext())
-        .replace("@application_context@", this.getApplicationContext()) :
-      value;
+        value.replace("@actual_path_context@", this.getActualPathContext())
+            .replace("@application_context@", this.getApplicationContext()) :
+        value;
   }
 
   private String getApplicationContext() {
@@ -195,8 +195,8 @@ public class ConfigParameters implements Serializable {
 
   public String getBaseDesignPath() {
     return this.isFullPathBaseDesignPath ?
-      this.strBaseDesignPath :
-      this.prefix + "/" + this.strBaseDesignPath;
+        this.strBaseDesignPath :
+        this.prefix + "/" + this.strBaseDesignPath;
   }
 
   public String getXmlEngineFileFormatPath() {
@@ -238,7 +238,7 @@ public class ConfigParameters implements Serializable {
   public Properties loadOBProperties() {
     Properties obProperties = new Properties();
 
-    try(FileInputStream fis = new FileInputStream(this.stcFileProperties)) {
+    try (FileInputStream fis = new FileInputStream(this.stcFileProperties)) {
       obProperties.load(fis);
       log4j.info("Properties file: " + this.stcFileProperties);
       overrideProperties(obProperties, this.stcFileProperties);
@@ -260,7 +260,7 @@ public class ConfigParameters implements Serializable {
         if (absPath != null && !absPath.isEmpty()) {
           propertiesFile = new File(absPath);
           log4j.info(
-            "Looking for override properties file in " + absPath + ". Found: " + propertiesFile.exists());
+              "Looking for override properties file in " + absPath + ". Found: " + propertiesFile.exists());
         } else {
           String fileName = getMachineName();
           if (fileName == null || fileName.isEmpty()) {
@@ -288,12 +288,12 @@ public class ConfigParameters implements Serializable {
               String obProperty = (String) em.nextElement();
               String overrideValue = overrideProperties.getProperty(obProperty);
               Object object = obProperties.setProperty(obProperty, overrideValue);
-              log4j.info(
-                "Overriding property {}: {} -> {}",
-                  obProperty, object, obProperties.getProperty(obProperty));
+              log4j.info("Overriding property {}: {} -> {}", obProperty, object,
+                  obProperties.getProperty(obProperty));
             }
           } catch (Exception var19) {
-            log4j.error("Error loading override Openbravo.properties from {} {}", propertiesFile, var19);
+            log4j.error("Error loading override Openbravo.properties from {} {}", propertiesFile,
+                var19);
           } finally {
             if (fis != null) {
               try {

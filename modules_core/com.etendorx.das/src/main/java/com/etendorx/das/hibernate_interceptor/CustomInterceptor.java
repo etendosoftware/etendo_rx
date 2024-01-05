@@ -11,15 +11,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CustomInterceptor implements StatementInspector {
 
-    @Override
-    public String inspect(String sql) {
-        UserContext userContext = AppContext.getCurrentUser();
-        String userId = userContext.getUserId();
-        String clientId = userContext.getClientId();
-        String roleId = userContext.getRoleId();
-        boolean isActive = userContext.isActive();
-        String restMethod = userContext.getRestMethod();
-      return DefaultFilters.addFilters(sql, userId, clientId, roleId, isActive, restMethod);
-    }
+  @Override
+  public String inspect(String sql) {
+    UserContext userContext = AppContext.getCurrentUser();
+    String userId = userContext.getUserId();
+    String clientId = userContext.getClientId();
+    String roleId = userContext.getRoleId();
+    boolean isActive = userContext.isActive();
+    String restMethod = userContext.getRestMethod();
+    return DefaultFilters.addFilters(sql, userId, clientId, roleId, isActive, restMethod);
+  }
 }
 

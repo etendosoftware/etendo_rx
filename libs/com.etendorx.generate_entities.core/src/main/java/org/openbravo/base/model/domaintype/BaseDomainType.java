@@ -69,7 +69,7 @@ public abstract class BaseDomainType implements DomainType {
 
   @Override
   public void checkObjectIsValid(BaseOBObjectDef obObject, Property property)
-    throws ValidationException {
+      throws ValidationException {
     checkIsValidValue(property, obObject.get(property.getName()));
   }
 

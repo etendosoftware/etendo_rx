@@ -31,7 +31,8 @@ public class GenerateBaseDTO extends MappingGenerationBase {
 
   @Override
   protected String getOutFileName(ETRXProjectionEntity etrxProjectionEntity) {
-    return etrxProjectionEntity.getExternalName() + "DTO" + type(etrxProjectionEntity.getMappingType()) + ".java";
+    return etrxProjectionEntity.getExternalName() + "DTO" + type(
+        etrxProjectionEntity.getMappingType()) + ".java";
   }
 
   private String type(String mappingType) {
@@ -44,6 +45,5 @@ public class GenerateBaseDTO extends MappingGenerationBase {
         return mappingType;
     }
   }
-
 
 }
