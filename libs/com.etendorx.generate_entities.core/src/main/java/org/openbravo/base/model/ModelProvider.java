@@ -110,8 +110,7 @@ public class ModelProvider implements OBSingleton {
   /**
    * Makes it possible to override the default ModelProvider with a custom implementation.
    *
-   * @param instance
-   *     the custom ModelProvider
+   * @param instance the custom ModelProvider
    */
   public static synchronized void setInstance(ModelProvider instance) {
     ModelProvider.instance = instance;
@@ -280,7 +279,7 @@ public class ModelProvider implements OBSingleton {
       buildUniqueConstraints(initsession, sessionFactoryController);
 
       final Map<String, Boolean> colMandatories = getColumnMandatories(initsession,
-        sessionFactoryController);
+          sessionFactoryController);
 
       // initialize the name and also set the mandatory value on the basis
       // of the real not-null in the database!
@@ -292,13 +291,13 @@ public class ModelProvider implements OBSingleton {
             // tables
             if (!e.isView() && p.getColumnName() != null && !e.isDataSourceBased() && !e.isHQLBased() && !e.isVirtualEntity()) {
               final Boolean mandatory = colMandatories.get(
-                createColumnMandatoryKey(e.getTableName(), p.getColumnName()));
+                  createColumnMandatoryKey(e.getTableName(), p.getColumnName()));
               if (mandatory != null) {
                 p.setMandatory(mandatory);
               } else if (!p.isComputedColumn() && !p.isProxy() && !e.isVirtualEntity()) {
                 // only log in case the sql logic is not set and it is not a proxy
                 log.warn(
-                  "Column " + p + " mandatory setting not found in the database metadata. " + "A cause can be that the column does not exist in the database schema");
+                    "Column " + p + " mandatory setting not found in the database metadata. " + "A cause can be that the column does not exist in the database schema");
               }
             }
           }
@@ -447,8 +446,8 @@ public class ModelProvider implements OBSingleton {
 
   /**
    * @return the last time that one of the relevant Application Dictionary objects was modified.
-   *     Relevant AD objects are: Table, Column, Reference, RefList, RefSearch, RefTable,
-   *     Module, Package.
+   * Relevant AD objects are: Table, Column, Reference, RefList, RefSearch, RefTable,
+   * Module, Package.
    */
   public long computeLastUpdateModelTime() {
     final SessionFactoryController sessionFactoryController = new ModelSessionFactoryController();
@@ -589,12 +588,13 @@ public class ModelProvider implements OBSingleton {
     for (final Column c : t.getColumns()) {
       if (!c.isPrimitiveType()) {
         final Property thisProp = c.getProperty();
-        log.debug("Setting targetEntity and reference Property for {}",thisProp);
+        log.debug("Setting targetEntity and reference Property for {}", thisProp);
         final Column thatColumn = c.getReferenceType();
         if (thatColumn == null) {
           if (!OBPropertiesProvider.isFriendlyWarnings()) {
             log.error(
-              "Property {} is mapped incorrectly, there is no referenced column for it, removing from the mapping", thisProp);
+                "Property {} is mapped incorrectly, there is no referenced column for it, removing from the mapping",
+                thisProp);
           }
           thisProp.getEntity().getProperties().remove(thisProp);
           if (thisProp.getEntity().getIdProperties().remove(thisProp)) {
@@ -744,7 +744,7 @@ public class ModelProvider implements OBSingleton {
   // expects that there is only one property
   private void createIdReferenceProperty(Entity e) {
     var idProperties = e.getIdProperties();
-    if(idProperties == null) {
+    if (idProperties == null) {
       throw new OBException("No id properties found for entity " + e.getName());
     }
     Check.isTrue(idProperties.size() == 1 && !idProperties.get(0).isPrimitive(),
@@ -780,7 +780,9 @@ public class ModelProvider implements OBSingleton {
     // this assumes that the column in the target entity is itself
     // not a foreign key!
     var targetIdProps = idProperty.getTargetEntity().getIdProperties();
-    final Property targetIdProp = targetIdProps != null && !targetIdProps.isEmpty() ? targetIdProps.get(0) : null;
+    final Property targetIdProp = targetIdProps != null && !targetIdProps.isEmpty() ?
+        targetIdProps.get(0) :
+        null;
     Check.isTrue(Objects.requireNonNull(targetIdProp).isPrimitive(),
         "Entity " + e + ", The ID property of the referenced class should be primitive, an other case is not supported");
     idProperty.setDomainType(targetIdProp.getDomainType());
@@ -880,11 +882,8 @@ public class ModelProvider implements OBSingleton {
   /**
    * Retrieves a list of model objects of the class passed as parameter.
    *
-   * @param session
-   *     the session used to query for the objects
-   * @param clazz
-   *     the class of the model objects to be retrieved
-   *
+   * @param session the session used to query for the objects
+   * @param clazz   the class of the model objects to be retrieved
    * @return a list of model objects
    */
   public <T extends Object> List<T> list(Session session, Class<T> clazz) {
@@ -917,7 +916,6 @@ public class ModelProvider implements OBSingleton {
    * Return the table using the tableName. If not found then a CheckException is thrown.
    *
    * @param tableName
-   *
    * @return the Table object
    */
   public Table getTable(String tableName) throws CheckException {
@@ -949,9 +947,7 @@ public class ModelProvider implements OBSingleton {
   /**
    * Retrieves an Entity using the entityName. If not found then a CheckException is thrown.
    *
-   * @param entityName
-   *     the name used for searching the Entity.
-   *
+   * @param entityName the name used for searching the Entity.
    * @return the Entity object
    */
   public Entity getEntity(String entityName) throws CheckException {
@@ -963,11 +959,8 @@ public class ModelProvider implements OBSingleton {
    * Retrieves an Entity using the entityName. If not found then a CheckException is thrown if the
    * checkIfNotExists parameter is true.
    *
-   * @param entityName
-   *     the name used for searching the Entity.
-   * @param checkIfNotExists
-   *     a boolean that is true calls to Check.fail if the entity does not exist
-   *
+   * @param entityName       the name used for searching the Entity.
+   * @param checkIfNotExists a boolean that is true calls to Check.fail if the entity does not exist
    * @return the Entity object
    */
   public Entity getEntity(String entityName, boolean checkIfNotExists) throws CheckException {
@@ -987,9 +980,7 @@ public class ModelProvider implements OBSingleton {
    * <p>
    * Note: the AD_Table.tablename should be used here, not the AD_Table.name!
    *
-   * @param tableName
-   *     the name used to search for the Entity
-   *
+   * @param tableName the name used to search for the Entity
    * @return the Entity or null if not found
    */
   public Entity getEntityByTableName(String tableName) {
@@ -1008,9 +999,7 @@ public class ModelProvider implements OBSingleton {
    * Returns an Entity based on the ID of the table belonging to the Entity. If no Entity is found
    * then null is returned, no Exception is thrown.
    *
-   * @param tableId
-   *     the ID of the table belonging to the table
-   *
+   * @param tableId the ID of the table belonging to the table
    * @return the Entity or null if not found
    */
   public Entity getEntityByTableId(String tableId) {
@@ -1031,9 +1020,7 @@ public class ModelProvider implements OBSingleton {
    * Searches for an Entity using the business object class implementing the Entity in the business
    * code. Throws a CheckException if the Entity can not be found.
    *
-   * @param clz
-   *     the java class used for the Entity
-   *
+   * @param clz the java class used for the Entity
    * @return the Entity
    */
   public Entity getEntity(Class<?> clz) throws CheckException {
@@ -1052,7 +1039,6 @@ public class ModelProvider implements OBSingleton {
    * Returns a reference instance from the org.etendorx.base.model package.
    *
    * @param referenceId
-   *
    * @return the reference identified by the referenceId, if not found then null is returned
    */
   public Reference getReference(String referenceId) {
@@ -1072,13 +1058,11 @@ public class ModelProvider implements OBSingleton {
    * Returns the entity for a specific tree type. The tree type is used to link an entity to a tree
    * (see the AD_Tree table).
    *
-   * @param treeType
-   *     the tree type
-   *
+   * @param treeType the tree type
    * @return Entity or null if none found
    */
   public Entity getEntityFromTreeType(String treeType) {
-    if(treeType == null) {
+    if (treeType == null) {
       return null;
     }
     for (Entity entity : entitiesWithTreeType) {
@@ -1135,8 +1119,8 @@ public class ModelProvider implements OBSingleton {
       + "FROM AD_TABLE ";
     //@formatter:on
     try (Connection connection = getConnection();
-         PreparedStatement ps = connection.prepareStatement(qry);
-         ResultSet resultSet = ps.executeQuery()) {
+        PreparedStatement ps = connection.prepareStatement(qry);
+        ResultSet resultSet = ps.executeQuery()) {
       while (resultSet.next()) {
         Entity entity = entitiesByTableId.get(UtilSql.getValue(resultSet, "ad_table_id"));
         String helpComment = UtilSql.getValue(resultSet, "help");
@@ -1165,8 +1149,8 @@ public class ModelProvider implements OBSingleton {
       "FROM AD_COLUMN";
     //@formatter:on
     try (Connection connection = getConnection();
-         PreparedStatement ps = connection.prepareStatement(qry);
-         ResultSet resultSet = ps.executeQuery()) {
+        PreparedStatement ps = connection.prepareStatement(qry);
+        ResultSet resultSet = ps.executeQuery()) {
       while (resultSet.next()) {
         Entity entity = entitiesByTableId.get(UtilSql.getValue(resultSet, "ad_table_id"));
         if (entity == null) {
@@ -1217,7 +1201,8 @@ public class ModelProvider implements OBSingleton {
   /**
    * Method to obtain the column object from a table and a property name. Is needed to pass the property in the format:
    * <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate.
-   * @param table Table object
+   *
+   * @param table    Table object
    * @param property String with the property name to search
    * @return Column object or null if not found
    */
@@ -1234,13 +1219,14 @@ public class ModelProvider implements OBSingleton {
   /**
    * Method to obtain the column type from a table and a property name. Is needed to pass the property in the format:
    * <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate. See {@link #getColumn(Table, String)}
-   * @param table Table object to search
+   *
+   * @param table    Table object to search
    * @param property String with the property name to search
    * @return String with the column type or null if not found
    */
   public String getColumnTypeName(Table table, String property) {
     var column = getColumn(table, property);
-    if(column != null) {
+    if (column != null) {
       return column.getTypeName();
     }
     return null;
@@ -1250,13 +1236,14 @@ public class ModelProvider implements OBSingleton {
    * Method to obtain the column type with javapackage from a table and a property name. Is needed to pass the property
    * in the format: <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate.
    * See {@link #getColumn(Table, String)}
+   *
    * @param table
    * @param property
    * @return
    */
   public String getColumnTypeFullQualified(Table table, String property) {
     var column = getColumn(table, property);
-    if(column != null && column.getProperty().getTargetEntity() != null) {
+    if (column != null && column.getProperty().getTargetEntity() != null) {
       return column.getProperty().getTargetEntity().getClassName();
     }
     return null;
@@ -1266,13 +1253,14 @@ public class ModelProvider implements OBSingleton {
    * Method to obtain the entity name from a property. Is needed to pass the property in the format:
    * <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate.
    * See {@link #getColumn(Table, String)}
-   * @param table Table object to search
+   *
+   * @param table    Table object to search
    * @param property String with the property name to search
    * @return String with the entity name or null if not found
    */
   public String getColumnEntityName(Table table, String property) {
     var column = getColumn(table, property);
-    if(column != null && column.getProperty().getTargetEntity() != null) {
+    if (column != null && column.getProperty().getTargetEntity() != null) {
       return column.getProperty().getTargetEntity().getName();
     }
     return null;
@@ -1282,16 +1270,25 @@ public class ModelProvider implements OBSingleton {
    * Method to obtain the column primitive type from a table and a property name. Is needed to pass the property in the
    * format: <<TableName>>.<<PropertyName>>. Ex: BusinessPartner.creationDate.
    * See {@link #getColumn(Table, String)}
-   * @param table Table object to search
+   *
+   * @param table    Table object to search
    * @param property String with the property name to search
    * @return String with the column primitive type or null if not found
    */
   public String getColumnPrimitiveType(Table table, String property) {
     var column = getColumn(table, property);
-    if(column != null && column.getProperty().getPrimitiveType() != null) {
+    if (column != null && column.getProperty().getPrimitiveType() != null) {
       return column.getProperty().getPrimitiveType().getName();
     }
     return null;
   }
 
+  public boolean isColumnIsOneToMany(Table table, String property) {
+    // TODO Improve is many to one detection
+    if (property == null) {
+      return false;
+    }
+    var column = getColumn(table, property);
+    return column == null && property.endsWith("List");
+  }
 }

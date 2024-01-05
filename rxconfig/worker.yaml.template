@@ -2,3 +2,6 @@ server:
   port: 0
 openbravo:
   url:
+
+classic:
+  token:

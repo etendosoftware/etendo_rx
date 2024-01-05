@@ -15,16 +15,18 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface DASRepository<E extends BaseDTOModel, F extends BaseDTOModel> {
 
-  Iterable<E> findAll();
+  Page<E> findAll(Pageable pageable);
 
   E findById(String id);
 
   E save(F dtoEntity);
 
-  E updated(F dtoEntity);
+  E update(F dtoEntity);
 
 }
 

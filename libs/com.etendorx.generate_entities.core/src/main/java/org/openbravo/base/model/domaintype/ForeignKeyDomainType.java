@@ -33,9 +33,7 @@ public interface ForeignKeyDomainType extends DomainType {
    * The foreign key column to which a certain column refers. Is only relevant if this reference is
    * a foreign key.
    *
-   * @param columnName
-   *   the refering foreign key column
-   *
+   * @param columnName the refering foreign key column
    * @return the refered-to column, often the primary key column of the table.
    */
   Column getForeignKeyColumn(String columnName);

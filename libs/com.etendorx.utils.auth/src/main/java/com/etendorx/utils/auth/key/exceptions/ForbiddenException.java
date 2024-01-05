@@ -13,7 +13,7 @@ public class ForbiddenException extends RuntimeException {
    * Constructor for throw a {@link ForbiddenException}
    */
   public ForbiddenException() {
-   super();
+    super();
   }
 
   /**

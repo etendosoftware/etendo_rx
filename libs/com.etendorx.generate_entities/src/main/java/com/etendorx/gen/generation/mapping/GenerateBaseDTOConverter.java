@@ -24,6 +24,7 @@ import com.etendorx.gen.util.TemplateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openbravo.base.model.ModelProvider;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -41,47 +42,63 @@ public class GenerateBaseDTOConverter {
 
   /**
    * Generate Base DTO Converter
+   *
    * @param projectionEntities
    * @param path
    * @throws FileNotFoundException
    */
-  public void generate(List<ETRXProjectionEntity> projectionEntities, GeneratePaths path) throws FileNotFoundException {
+  public void generate(List<ETRXProjectionEntity> projectionEntities, GeneratePaths path)
+      throws FileNotFoundException {
     freemarker.template.Template templateJPARepoRX = TemplateUtil.createTemplateImplementation(
         FTL_FILE);
 
-    List<String> projectionsId = projectionEntities.stream().map(m -> m.getProjection().getId()).distinct().collect(
-        Collectors.toList());
+    List<String> projectionsId = projectionEntities.stream()
+        .map(m -> m.getProjection().getId())
+        .distinct()
+        .collect(Collectors.toList());
     for (String projectionId : projectionsId) {
-      var filteredProjectionEntities = projectionEntities.stream().filter(
-          m -> m.getProjection().getId().equals(projectionId)).collect(
-          Collectors.toList());;
+      var filteredProjectionEntities = projectionEntities.stream()
+          .filter(m -> m.getProjection().getId().equals(projectionId))
+          .collect(Collectors.toList());
+      ;
       ETRXProjection projection = filteredProjectionEntities.get(0).getProjection();
-      ETRXProjectionEntity readEntity = filteredProjectionEntities.stream()
-          .filter(e -> StringUtils.equals(e.getMappingType(), MappingConstants.MAPPING_TYPE_READ)).findFirst().orElse(
-              null);
-      ETRXProjectionEntity writeEntity = filteredProjectionEntities.stream()
-          .filter(e -> StringUtils.equals(e.getMappingType(), MappingConstants.MAPPING_TYPE_WRITE)).findFirst().orElse(
-              null);
-      if (readEntity == null || writeEntity == null) {
-        log.info("No read or write entity found for projection {}", projection.getName());
-        continue;
-      }
+      // Lookup external names
+      List<String> externalNames = filteredProjectionEntities.stream()
+          .map(m -> m.getExternalName())
+          .distinct()
+          .collect(Collectors.toList());
       final String mappingPrefix = projection.getName().toUpperCase();
-      TemplateUtil.processTemplate(
-          templateJPARepoRX,
-          getData(mappingPrefix, projection, readEntity, writeEntity),
-          CodeGenerationUtils.getWriter(mappingPrefix, readEntity.getName() + "DTOConverter.java", path)
-      );
+      for (String externalName : externalNames) {
+        ETRXProjectionEntity readEntity = filteredProjectionEntities.stream()
+            .filter(e -> StringUtils.equals(e.getMappingType(),
+                MappingConstants.MAPPING_TYPE_READ) && StringUtils.equals(e.getExternalName(),
+                externalName))
+            .findFirst()
+            .orElse(null);
+        ETRXProjectionEntity writeEntity = filteredProjectionEntities.stream()
+            .filter(e -> StringUtils.equals(e.getMappingType(),
+                MappingConstants.MAPPING_TYPE_WRITE) && StringUtils.equals(e.getExternalName(),
+                externalName))
+            .findFirst()
+            .orElse(null);
+        if (readEntity != null) {
+          TemplateUtil.processTemplate(templateJPARepoRX,
+              getData(mappingPrefix, projection, readEntity, writeEntity),
+              CodeGenerationUtils.getWriter(mappingPrefix, externalName + "DTOConverter.java",
+                  path));
+        }
+      }
     }
   }
 
-  private Map<String, Object> getData(String mappingPrefix, ETRXProjection projection, ETRXProjectionEntity readEntity,
-      ETRXProjectionEntity writeEntity) {
+  private Map<String, Object> getData(String mappingPrefix, ETRXProjection projection,
+      ETRXProjectionEntity readEntity, ETRXProjectionEntity writeEntity) {
     Map<String, Object> data = new HashMap<>();
     data.put("mappingPrefix", mappingPrefix);
     data.put("projection", projection);
     data.put("readEntity", readEntity);
     data.put("writeEntity", writeEntity);
+    data.put("modelProvider", ModelProvider.getInstance());
     return data;
   }
 

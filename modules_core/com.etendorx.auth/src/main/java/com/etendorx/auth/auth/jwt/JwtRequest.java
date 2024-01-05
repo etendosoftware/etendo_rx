@@ -1,15 +1,14 @@
 package com.etendorx.auth.auth.jwt;
 
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+
 public class JwtRequest implements Serializable {
   private String username;
   private String password;
   private String service;
   private String secret;
-
 
   /**
    * default constructor for JSON Parsing
@@ -40,7 +39,10 @@ public class JwtRequest implements Serializable {
     this.password = password;
   }
 
-  public String getSecret() { return secret; }
+  public String getSecret() {
+    return secret;
+  }
+
   public void setSecret(String secret) {
     if (StringUtils.isEmpty(secret)) {
       throw new IllegalArgumentException("Secret cannot be null or empty");
@@ -48,7 +50,10 @@ public class JwtRequest implements Serializable {
     this.secret = secret;
   }
 
-  public String getService() { return service; }
+  public String getService() {
+    return service;
+  }
+
   public void setService(String service) {
     if (StringUtils.isEmpty(service)) {
       throw new IllegalArgumentException("Service cannot be null or empty");

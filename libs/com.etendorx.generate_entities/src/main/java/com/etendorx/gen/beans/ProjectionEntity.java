@@ -15,13 +15,13 @@
  */
 package com.etendorx.gen.beans;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Projection Entity class needed for code generation
@@ -33,12 +33,14 @@ public class ProjectionEntity {
   private final Boolean identity;
 
   private String name;
+  private String externalName;
   private Map<String, ProjectionEntityField> fields = new HashMap<>();
   private String packageName;
   private String className;
 
-  public ProjectionEntity(String name, Boolean identity) {
+  public ProjectionEntity(String name, String externalName, Boolean identity) {
     this.name = name;
+    this.externalName = externalName;
     this.identity = identity;
   }
 
@@ -72,6 +74,14 @@ public class ProjectionEntity {
 
   public void setClassName(String className) {
     this.className = className;
+  }
+
+  public String getExternalName() {
+    return externalName;
+  }
+
+  public void setExternalName(String externalName) {
+    this.externalName = externalName;
   }
 
   public List<Map<String, String>> getFieldsMap() {

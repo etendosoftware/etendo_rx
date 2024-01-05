@@ -8,17 +8,19 @@ public class MetadataProjectionsAnalyzer {
 
   /**
    * Get projection based on projection name, entity name and field name
+   *
    * @param projection
    * @param entityName
    * @param identity
    * @return
    */
-  public static ProjectionEntity getProjectionEntity(Projection projection, String entityName, Boolean identity) {
+  public static ProjectionEntity getProjectionEntity(Projection projection, String entityName,
+      String externalName, Boolean identity) {
     ProjectionEntity projectionEntity;
     if (projection.getEntities().containsKey(entityName)) {
       projectionEntity = projection.getEntities().get(entityName);
     } else {
-      projectionEntity = new ProjectionEntity(entityName, identity);
+      projectionEntity = new ProjectionEntity(entityName, externalName, identity);
       projection.getEntities().put(entityName, projectionEntity);
     }
     return projectionEntity;
@@ -26,6 +28,7 @@ public class MetadataProjectionsAnalyzer {
 
   /**
    * Get projection entity field based on projection entity, field name, field value and field type
+   *
    * @param projectionEntity
    * @param fieldName
    * @param fieldValue
@@ -43,6 +46,5 @@ public class MetadataProjectionsAnalyzer {
     }
     return projectionEntityField;
   }
-
 
 }

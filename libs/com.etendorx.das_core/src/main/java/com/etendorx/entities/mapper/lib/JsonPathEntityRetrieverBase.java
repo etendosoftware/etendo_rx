@@ -15,6 +15,7 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import org.hibernate.NonUniqueResultException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,7 +32,7 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
   public abstract String[] getKeys();
 
   @Override
-  public E get(Object key) {
+  public E get(Object key) throws NonUniqueResultException {
     if (key == null) {
       return null;
     }
@@ -41,7 +42,7 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
   }
 
   @Override
-  public E get(TreeSet<String> keyValues) {
+  public E get(TreeSet<String> keyValues) throws NonUniqueResultException {
     Iterator<String> valueIterator = keyValues.iterator();
     if (keyValues.size() != getKeys().length) {
       throw new IllegalArgumentException("Mapping has misconfigured identifiers");
@@ -52,7 +53,6 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
       String value = valueIterator.next();
       specs.add((root, query, builder) -> builder.equal(root.get(key), value));
     }
-
     Specification<E> combinedSpec = specs.stream().reduce(Specification::and).orElse(null);
     return getRepository().findOne(combinedSpec).orElse(null);
   }

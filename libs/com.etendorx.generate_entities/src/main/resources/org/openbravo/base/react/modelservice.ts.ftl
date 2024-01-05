@@ -5,27 +5,24 @@
  <#switch string>
   <#case "java.lang.String"><#return "string"><#break>
   <#case "String"><#return "string"><#break>
-  <#case "java.math.BigDecimal"><#return "double"><#break>
-  <#case "java.lang.Long"><#return "int64"><#break>
-  <#case "java.util.Date"><#return "google.protobuf.Timestamp"><#break>
-  <#case "java.sql.Timestamp"><#return "google.protobuf.Timestamp"><#break>
+  <#case "java.math.BigDecimal"><#return "number"><#break>
+  <#case "java.lang.Long"><#return "number"><#break>
+  <#case "java.util.Date"><#return "Date"><#break>
+  <#case "java.sql.Timestamp"><#return "Date"><#break>
   <#case "java.lang.Boolean"><#return "boolean"><#break>
   <#default><#return string>
  </#switch>
 </#function>
-import {BaseService} from '../base/baseservice'
-import {
-  ${entity.name},
-  ${entity.name}List,
-  <#if searches??><#list searches as s>${s.method?cap_first}Params<#if !s?is_last>, </#if></#list></#if>
-} from "./${entity.name?lower_case}.types";
+import {BaseService} from '../base/baseservice';
+import {${entity.name}, ${entity.name}List, <#if searches??><#list searches as s>${s.method?cap_first}Params<#if !s?is_last>, </#if></#list></#if>} from './${entity.name?lower_case}.types';
 
 class BackService extends BaseService<${entity.name}> {
-  private static modelName = '${entity.name}';
+  private static projection = '${projectionName?lower_case}';
+  private static modelName = '${externalName}';
   private static fetchName = '${entity.name?uncap_first}';
 
   getModelName(): string {
-    return BackService.modelName;
+    return BackService.projection + "/" + BackService.modelName;
   }
   getFetchName(): string {
     return BackService.fetchName;
@@ -43,28 +40,31 @@ class BackService extends BaseService<${entity.name}> {
 <#if searches??>
 
 <#list searches as s>
-  async ${s.method}(<#list s.params as p>${p.name}: ${react_type(p.type)}<#if p?has_next>, </#if></#list>): Promise<${entity.name}List> {
-    return this._fetchSearch<${s.method?cap_first}Params>(
-      '${s.method}',
-      {<#list s.params as p>${p.name}: ${p.name}<#if p?has_next>, </#if></#list>},
-      '${projectionName}',
-    )
+  async ${s.method}(
+  <#list s.params as p>  ${p.name}: ${react_type(p.type)},
+  </#list>  page?: number,
+    size?: number,
+  ): Promise<${entity.name}List> {
+    return this._fetchSearch<${s.method?cap_first}Params>('${s.method}', {
+      <#list s.params as p>${p.name}, </#list>
+      page,
+      size,
+    });
   }
 </#list>
 </#if>
 
 }
 
-class FrontService {
-  async save(data: ${entity.name}): Promise<${entity.name}> {
-    const req = await fetch(
-      `/api/${entity.name}/${'$'}{data.id}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(data),
-      },
-    );
-    return await req.json();
+class FrontService extends BaseService<${entity.name}> {
+  getModelName(): string {
+    throw new Error('Method not implemented.');
+  }
+  getFetchName(): string {
+    throw new Error('Method not implemented.');
+  }
+  mapManyToOne(entity: ${entity.name}): void {
+    throw new Error('Method not implemented.');
   }
 }
 

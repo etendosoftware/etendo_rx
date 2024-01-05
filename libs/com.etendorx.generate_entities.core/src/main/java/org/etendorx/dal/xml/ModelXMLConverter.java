@@ -81,7 +81,7 @@ public class ModelXMLConverter implements OBSingleton {
   public Document getSchema() {
     final Document doc = XMLUtil.getInstance().createDomDocument();
     doc.addComment(
-      "\n* ***********************************************************************************\n" + "* The contents of this file are subject to the etendorx  Public  License" + "* Version  1.1  (the  \"License\"),  being   the  Mozilla   Public  License" + "* Version 1.1  with a permitted attribution clause; you may not  use this" + "* file except in compliance with the License. You  may  obtain  a copy of" + "* the License at http://www.etendorx.com/legal/license.html " + "* Software distributed under the License  is  distributed  on  an \"AS IS\"" + "* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the" + "* License for the specific  language  governing  rights  and  limitations" + "* under the License. " + "* The Original Code is etendorx ERP. " + "* The Initial Developer of the Original Code is etendorx SLU" + "* All portions are Copyright (C) 2008-2011 etendorx SLU" + "* All Rights Reserved. " + "* Contributor(s):  ______________________________________." + "* ***********************************************************************************\n");
+        "\n* ***********************************************************************************\n" + "* The contents of this file are subject to the etendorx  Public  License" + "* Version  1.1  (the  \"License\"),  being   the  Mozilla   Public  License" + "* Version 1.1  with a permitted attribution clause; you may not  use this" + "* file except in compliance with the License. You  may  obtain  a copy of" + "* the License at http://www.etendorx.com/legal/license.html " + "* Software distributed under the License  is  distributed  on  an \"AS IS\"" + "* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the" + "* License for the specific  language  governing  rights  and  limitations" + "* under the License. " + "* The Original Code is etendorx ERP. " + "* The Initial Developer of the Original Code is etendorx SLU" + "* All portions are Copyright (C) 2008-2011 etendorx SLU" + "* All Rights Reserved. " + "* Contributor(s):  ______________________________________." + "* ***********************************************************************************\n");
     final Element root = doc.addElement("xs:schema");
     root.addNamespace("xs", "http://www.w3.org/2001/XMLSchema");
     root.addNamespace("ob", "http://www.etendorx.com");
@@ -116,17 +116,17 @@ public class ModelXMLConverter implements OBSingleton {
       addPropertyElements(typeSequenceElement, ModelProvider.getInstance().getEntity(entityName));
 
       typeElement.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ID_ATTRIBUTE)
-        .addAttribute("type", "xs:string")
-        .addAttribute("use", "optional");
+          .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ID_ATTRIBUTE)
+          .addAttribute("type", "xs:string")
+          .addAttribute("use", "optional");
       typeElement.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.IDENTIFIER_ATTRIBUTE)
-        .addAttribute("type", "xs:string")
-        .addAttribute("use", "optional");
+          .addAttribute("name", org.etendorx.dal.xml.XMLConstants.IDENTIFIER_ATTRIBUTE)
+          .addAttribute("type", "xs:string")
+          .addAttribute("use", "optional");
       typeElement.addElement("xs:attribute")
-        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.REFERENCE_ATTRIBUTE)
-        .addAttribute("type", "xs:boolean")
-        .addAttribute("use", "optional");
+          .addAttribute("name", org.etendorx.dal.xml.XMLConstants.REFERENCE_ATTRIBUTE)
+          .addAttribute("type", "xs:boolean")
+          .addAttribute("use", "optional");
       typeElement.addElement("xs:anyAttribute");
     }
 
@@ -177,27 +177,27 @@ public class ModelXMLConverter implements OBSingleton {
 
   private void addReferenceType(Element schemaElement) {
     final Element complexElem = schemaElement.addElement("xs:complexType")
-      .addAttribute("name", "ReferenceType");
+        .addAttribute("name", "ReferenceType");
     complexElem.addElement("xs:attribute")
-      .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ID_ATTRIBUTE)
-      .addAttribute("type", "xs:string")
-      .addAttribute("use", "optional");
+        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ID_ATTRIBUTE)
+        .addAttribute("type", "xs:string")
+        .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")
-      .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ENTITYNAME_ATTRIBUTE)
-      .addAttribute("type", "xs:string")
-      .addAttribute("use", "optional");
+        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ENTITYNAME_ATTRIBUTE)
+        .addAttribute("type", "xs:string")
+        .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")
-      .addAttribute("name", org.etendorx.dal.xml.XMLConstants.IDENTIFIER_ATTRIBUTE)
-      .addAttribute("type", "xs:string")
-      .addAttribute("use", "optional");
+        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.IDENTIFIER_ATTRIBUTE)
+        .addAttribute("type", "xs:string")
+        .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")
-      .addAttribute("name", org.etendorx.dal.xml.XMLConstants.TRANSIENT_ATTRIBUTE)
-      .addAttribute("type", "xs:boolean")
-      .addAttribute("use", "optional");
+        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.TRANSIENT_ATTRIBUTE)
+        .addAttribute("type", "xs:boolean")
+        .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")
-      .addAttribute("name", org.etendorx.dal.xml.XMLConstants.INACTIVE_ATTRIBUTE)
-      .addAttribute("type", "xs:boolean")
-      .addAttribute("use", "optional");
+        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.INACTIVE_ATTRIBUTE)
+        .addAttribute("type", "xs:boolean")
+        .addAttribute("use", "optional");
   }
 
   private void addSimpleTypeDeclarations(Element schema) {
@@ -214,14 +214,14 @@ public class ModelXMLConverter implements OBSingleton {
     final Element complex = schema.addElement("xs:complexType").addAttribute("name", typeName);
     final Element simple = complex.addElement("xs:simpleContent");
     final Element extension = simple.addElement("xs:extension")
-      .addAttribute("base", "xs:" + typeName);
+        .addAttribute("base", "xs:" + typeName);
     extension.addElement("xs:attribute")
-      .addAttribute("name", org.etendorx.dal.xml.XMLConstants.TRANSIENT_ATTRIBUTE)
-      .addAttribute("type", "xs:boolean");
+        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.TRANSIENT_ATTRIBUTE)
+        .addAttribute("type", "xs:boolean");
     extension.addElement("xs:attribute")
-      .addAttribute("name", org.etendorx.dal.xml.XMLConstants.INACTIVE_ATTRIBUTE)
-      .addAttribute("type", "xs:boolean")
-      .addAttribute("use", "optional");
+        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.INACTIVE_ATTRIBUTE)
+        .addAttribute("type", "xs:boolean")
+        .addAttribute("use", "optional");
   }
 
   protected void addErrorSchema(Element rootSchema) {
@@ -229,15 +229,15 @@ public class ModelXMLConverter implements OBSingleton {
     final Element complexType = errElem.addElement("xs:complexType");
     final Element seqElement = complexType.addElement("xs:sequence");
     seqElement.addElement("xs:element")
-      .addAttribute("name", "message")
-      .addAttribute("type", "xs:string");
+        .addAttribute("name", "message")
+        .addAttribute("type", "xs:string");
   }
 
   private void addResultSchema(Element schemaElement) {
     final Element resultElem = schemaElement.addElement("xs:element")
-      .addAttribute("name", "result");
+        .addAttribute("name", "result");
     final Element complexType = resultElem.addElement("xs:complexType")
-      .addAttribute("mixed", "true");
+        .addAttribute("mixed", "true");
     final Element seqElement = complexType.addElement("xs:sequence");
     addStringElement(seqElement, "msg");
     addStringElement(seqElement, "log");
@@ -250,21 +250,21 @@ public class ModelXMLConverter implements OBSingleton {
 
   private void addStringElement(Element sequence, String name) {
     sequence.addElement("xs:element")
-      .addAttribute("name", name)
-      .addAttribute("minOccurs", "0")
-      .addAttribute("type", "xs:string");
+        .addAttribute("name", name)
+        .addAttribute("minOccurs", "0")
+        .addAttribute("type", "xs:string");
   }
 
   private void addGroupTypeElement(Element sequence, String name) {
     sequence.addElement("xs:element")
-      .addAttribute("name", name)
-      .addAttribute("minOccurs", "0")
-      .addAttribute("type", "ob:ResultEntitiesType");
+        .addAttribute("name", name)
+        .addAttribute("minOccurs", "0")
+        .addAttribute("type", "ob:ResultEntitiesType");
   }
 
   private void addGroupResultType(Element schemaElement) {
     final Element complexElem = schemaElement.addElement("xs:complexType")
-      .addAttribute("name", "ResultEntitiesType");
+        .addAttribute("name", "ResultEntitiesType");
     final Element choiceElement = complexElem.addElement("xs:choice");
     choiceElement.addAttribute("minOccurs", "0");
     choiceElement.addAttribute("maxOccurs", "unbounded");
@@ -276,23 +276,23 @@ public class ModelXMLConverter implements OBSingleton {
     Collections.sort(entityNames);
     for (String entityName : entityNames) {
       choiceElement.addElement("xs:element")
-        .addAttribute("name", entityName)
-        .addAttribute("type", "ob:ResultEntityType");
+          .addAttribute("name", entityName)
+          .addAttribute("type", "ob:ResultEntityType");
     }
     addGroupTypeDef(schemaElement);
   }
 
   private void addGroupTypeDef(Element schemaElement) {
     final Element complexElem = schemaElement.addElement("xs:complexType")
-      .addAttribute("name", "ResultEntityType");
+        .addAttribute("name", "ResultEntityType");
     complexElem.addElement("xs:attribute")
-      .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ID_ATTRIBUTE)
-      .addAttribute("type", "xs:string")
-      .addAttribute("use", "optional");
+        .addAttribute("name", org.etendorx.dal.xml.XMLConstants.ID_ATTRIBUTE)
+        .addAttribute("type", "xs:string")
+        .addAttribute("use", "optional");
     complexElem.addElement("xs:attribute")
-      .addAttribute("name", XMLConstants.IDENTIFIER_ATTRIBUTE)
-      .addAttribute("type", "xs:string")
-      .addAttribute("use", "optional");
+        .addAttribute("name", XMLConstants.IDENTIFIER_ATTRIBUTE)
+        .addAttribute("type", "xs:string")
+        .addAttribute("use", "optional");
   }
 
 }

@@ -26,8 +26,8 @@ public class UUIDGenerator extends org.hibernate.id.UUIDGenerator {
 
   @SneakyThrows
   @Override
-  public Serializable generate(SharedSessionContractImplementor session, Object obj) throws
-    HibernateException {
+  public Serializable generate(SharedSessionContractImplementor session, Object obj)
+      throws HibernateException {
     String result = ((String) super.generate(session, obj)).toUpperCase();
     result = result.replace("-", "");
     if (result.length() != 32) {

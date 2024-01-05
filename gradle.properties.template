@@ -41,3 +41,4 @@ data-rest.enabled=false
 
 springdoc.show-actuator=true
 
+rx.version=

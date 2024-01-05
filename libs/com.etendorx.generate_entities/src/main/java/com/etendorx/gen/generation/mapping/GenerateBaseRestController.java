@@ -17,6 +17,7 @@ package com.etendorx.gen.generation.mapping;
 
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.generation.constants.MappingConstants;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class GenerateBaseRestController extends MappingGenerationBase {
@@ -28,13 +29,14 @@ public class GenerateBaseRestController extends MappingGenerationBase {
 
   @Override
   protected boolean isValid(ETRXProjectionEntity etrxProjectionEntity) {
-    return StringUtils.equals(etrxProjectionEntity.getMappingType(), MappingConstants.MAPPING_TYPE_READ);
+    return (StringUtils.equals(etrxProjectionEntity.getMappingType(),
+        MappingConstants.MAPPING_TYPE_READ) && BooleanUtils.isTrue(
+        etrxProjectionEntity.isRestEndPoint()));
   }
 
   @Override
   protected String getOutFileName(ETRXProjectionEntity etrxProjectionEntity) {
-    final String name = etrxProjectionEntity.getTable().getName();
-    return name + "RestController.java";
+    return etrxProjectionEntity.getExternalName() + "RestController.java";
   }
 
 }

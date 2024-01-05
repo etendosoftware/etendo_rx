@@ -1,10 +1,8 @@
 package com.etendorx.auth.feign.model;
 
-import com.fasterxml.jackson.annotation.JacksonAnnotation;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Data

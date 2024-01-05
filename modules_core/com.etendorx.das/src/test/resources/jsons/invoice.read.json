@@ -1,0 +1,422 @@
+{
+  "id": "5057F53393774AC3A952F9143426A922",
+  "creationDate": "2013-07-04 23:45:45",
+  "client": "F&B International Group",
+  "organization": "F&B España - Región Sur",
+  "organization_info": {
+    "name": "F&B España - Región Sur"
+  },
+  "legalOrganization": "F&B España, S.A",
+  "legalOrganization_info": {
+    "name": "F&B España, S.A"
+  },
+  "invoiceDate": "2011-02-15 00:00:00",
+  "documentNo": "1000000",
+  "documentType": "AR Invoice",
+  "isSale": true,
+  "priceList": "Tarifa de ventas",
+  "priceIncludesTax": false,
+  "businessPartner": "ES-C2/0001",
+  "bussinespartner_info": {
+    "name": "Restaurantes Luna Llena, S.A.",
+    "businessPartnerCategory": "Customer - Tier 2"
+  },
+  "partnerAddress": "Sevilla, Pl. Mayor, 78",
+  "order": "1000002",
+  "accountingDate": "2011-02-15 00:00:00",
+  "paymentTerms": "30 days",
+  "paymentMethod": "Transferencia",
+  "grossAmount": 1094615.2,
+  "netAmount": 927640,
+  "currency": "EUR",
+  "lines": [
+    {
+      "id": "3CE4C27E2B544B49835D87AF930C066D",
+      "lineNo": 10,
+      "product": "ES/0024",
+      "product_info": {
+        "name": "Agua sin Gas 1L"
+      },
+      "invoicedQuantity": 25000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 1.53,
+      "grossAmount": 0,
+      "netAmount": 38250,
+      "grossListPrice": 0,
+      "netListPrice": 1.53,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 38250,
+          "taxAmount": 6885,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 1.53
+    },
+    {
+      "id": "F0DA508497AB425F90083B5BEC52B0AA",
+      "lineNo": 20,
+      "product": "ES/0021",
+      "product_info": {
+        "name": "Bebida Energética 0,5L"
+      },
+      "invoicedQuantity": 45000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 1.49,
+      "grossAmount": 0,
+      "netAmount": 67050,
+      "grossListPrice": 0,
+      "netListPrice": 1.49,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 67050,
+          "taxAmount": 12069,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 1.49
+    },
+    {
+      "id": "76AB1764FFE3482987E9C60637E3167B",
+      "lineNo": 30,
+      "product": "ES/0001",
+      "product_info": {
+        "name": "Cerveza Ale 0,5L"
+      },
+      "invoicedQuantity": 33000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 2.04,
+      "grossAmount": 0,
+      "netAmount": 67320,
+      "grossListPrice": 0,
+      "netListPrice": 2.04,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 67320,
+          "taxAmount": 12117.6,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 2.04
+    },
+    {
+      "id": "B98422162BD849519C707E1A84B20B35",
+      "lineNo": 40,
+      "product": "ES/0002",
+      "product_info": {
+        "name": "Cerveza Lager 0,5L"
+      },
+      "invoicedQuantity": 45000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 2.64,
+      "grossAmount": 0,
+      "netAmount": 118800,
+      "grossListPrice": 0,
+      "netListPrice": 2.64,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 118800,
+          "taxAmount": 21384,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 2.64
+    },
+    {
+      "id": "E6D59508435C4590B9B4FA1F0446199B",
+      "lineNo": 50,
+      "product": "ES/0019",
+      "product_info": {
+        "name": "Cola 0,5L"
+      },
+      "invoicedQuantity": 33000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 0.83,
+      "grossAmount": 0,
+      "netAmount": 27390,
+      "grossListPrice": 0,
+      "netListPrice": 0.83,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 27390,
+          "taxAmount": 4930.2,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 0.83
+    },
+    {
+      "id": "C9A31419AE214E20A3A20A63C31A0003",
+      "lineNo": 60,
+      "product": "ES/0018",
+      "product_info": {
+        "name": "Cola de Cereza 0,5L"
+      },
+      "invoicedQuantity": 40000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 0.83,
+      "grossAmount": 0,
+      "netAmount": 33200,
+      "grossListPrice": 0,
+      "netListPrice": 0.83,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 33200,
+          "taxAmount": 5976,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 0.83
+    },
+    {
+      "id": "03A52AB2F51549358BFDB7DD430903DE",
+      "lineNo": 70,
+      "product": "ES/0022",
+      "product_info": {
+        "name": "Limonada 0,5L"
+      },
+      "invoicedQuantity": 47000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 0.83,
+      "grossAmount": 0,
+      "netAmount": 39010,
+      "grossListPrice": 0,
+      "netListPrice": 0.83,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 39010,
+          "taxAmount": 7021.8,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 0.83
+    },
+    {
+      "id": "0734A72CEFE9480F9E577D86894E004B",
+      "lineNo": 80,
+      "product": "ES/0005",
+      "product_info": {
+        "name": "Vino Blanco 0,75L"
+      },
+      "invoicedQuantity": 56000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 5.33,
+      "grossAmount": 0,
+      "netAmount": 298480,
+      "grossListPrice": 0,
+      "netListPrice": 5.33,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 298480,
+          "taxAmount": 53726.4,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 5.33
+    },
+    {
+      "id": "7D266A8299CE4B459043CC02E1D664EF",
+      "lineNo": 90,
+      "product": "ES/0004",
+      "product_info": {
+        "name": "Vino Rosado 0,75L"
+      },
+      "invoicedQuantity": 12000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 5.63,
+      "grossAmount": 0,
+      "netAmount": 67560,
+      "grossListPrice": 0,
+      "netListPrice": 5.63,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 67560,
+          "taxAmount": 12160.8,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 5.63
+    },
+    {
+      "id": "1E2D69ED239E40DD8D9BDA878FEAFCA4",
+      "lineNo": 100,
+      "product": "ES/0003",
+      "product_info": {
+        "name": "Vino Tinto 0,75L"
+      },
+      "invoicedQuantity": 13000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 5.17999999999999971578290569595992565155,
+      "grossAmount": 0,
+      "netAmount": 67340,
+      "grossListPrice": 0,
+      "netListPrice": 5.17999999999999971578290569595992565155,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 67340,
+          "taxAmount": 12121.2,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 5.18
+    },
+    {
+      "id": "00F04C8493A34357AEFDED9910C6E578",
+      "lineNo": 110,
+      "product": "ES/0007",
+      "product_info": {
+        "name": "Zumo de Naranja Bio 0,33L"
+      },
+      "invoicedQuantity": 45000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 1.34,
+      "grossAmount": 0,
+      "netAmount": 60300,
+      "grossListPrice": 0,
+      "netListPrice": 1.34,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 60300,
+          "taxAmount": 10854,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 1.34
+    },
+    {
+      "id": "58ABD49585C44B0580F294B106BF1CFF",
+      "lineNo": 120,
+      "product": "ES/0013",
+      "product_info": {
+        "name": "Zumo de Pera 0,5L"
+      },
+      "invoicedQuantity": 25000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 1.13,
+      "grossAmount": 0,
+      "netAmount": 28250,
+      "grossListPrice": 0,
+      "netListPrice": 1.13,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 28250,
+          "taxAmount": 5085,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 1.13
+    },
+    {
+      "id": "6A2E8B4EEA78431F86FDEEC956477368",
+      "lineNo": 130,
+      "product": "ES/0014",
+      "product_info": {
+        "name": "Zumo de Piña 0,5L"
+      },
+      "invoicedQuantity": 13000,
+      "uOM": "Unit",
+      "grossUnitPrice": 0,
+      "netUnitPrice": 1.13,
+      "grossAmount": 0,
+      "netAmount": 14690,
+      "grossListPrice": 0,
+      "netListPrice": 1.13,
+      "taxCategory": "IVA Normal",
+      "taxes": [
+        {
+          "lineNo": 10,
+          "tax": "Entregas IVA 18%",
+          "rate": 18,
+          "taxableAmount": 14690,
+          "taxAmount": 2644.2,
+          "docTaxAmount": "D"
+        }
+      ],
+      "discount_info": [],
+      "unitPrice": 1.13
+    }
+  ],
+  "taxes": [
+    {
+      "lineNo": 10,
+      "tax": "Entregas IVA 18%",
+      "rate": 18,
+      "taxableAmount": 927640,
+      "taxAmount": 166975.2,
+      "docTaxAmount": "D"
+    }
+  ],
+  "isReturn": false
+}

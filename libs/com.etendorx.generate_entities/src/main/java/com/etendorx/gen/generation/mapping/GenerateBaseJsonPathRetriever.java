@@ -15,10 +15,9 @@
  */
 package com.etendorx.gen.generation.mapping;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.generation.constants.MappingConstants;
+import org.apache.commons.lang3.StringUtils;
 
 public class GenerateBaseJsonPathRetriever extends MappingGenerationBase {
   private static final String FTL_FILE = "/org/openbravo/base/gen/mappings/baseJsonPathRetriever.ftl"; // NOSONAR
@@ -29,12 +28,13 @@ public class GenerateBaseJsonPathRetriever extends MappingGenerationBase {
 
   @Override
   protected boolean isValid(ETRXProjectionEntity etrxProjectionEntity) {
-    return StringUtils.equals(etrxProjectionEntity.getMappingType(), MappingConstants.MAPPING_TYPE_WRITE);
+    return StringUtils.equals(etrxProjectionEntity.getMappingType(),
+        MappingConstants.MAPPING_TYPE_WRITE);
   }
 
   @Override
   protected String getOutFileName(ETRXProjectionEntity etrxProjectionEntity) {
-    return etrxProjectionEntity.getTable().getName() + "JsonPathRetriever.java";
+    return etrxProjectionEntity.getExternalName() + "JsonPathRetriever.java";
   }
 
 }

@@ -53,13 +53,15 @@ public class Repository {
   }
 
   public List<HashMap<String, Object>> getSearchesMap() {
-    return searches.values().stream().map(v -> {
+    List<HashMap<String, Object>> list = new ArrayList<>();
+    for (RepositorySearch repositorySearch : searches.values()) {
       var searchesMap = new HashMap<String, Object>();
-      searchesMap.put("query", v.getQuery());
-      searchesMap.put("method", v.getMethod());
-      searchesMap.put("params", v.getSearchParamsMap());
+      searchesMap.put("query", repositorySearch.getQuery());
+      searchesMap.put("method", repositorySearch.getMethod());
+      searchesMap.put("params", repositorySearch.getSearchParamsMap());
       searchesMap.put("fetchAttributes", new ArrayList<>());
-      return searchesMap;
-    }).collect(Collectors.toList());
+      list.add(searchesMap);
+    }
+    return list;
   }
 }

@@ -38,7 +38,7 @@ public class DataPoolChecker implements OBSingleton {
 
   private Map<String, String> reportPoolMap = new HashMap<>();
   private final List<String> validPoolValues = Arrays.asList(ExternalConnectionPool.DEFAULT_POOL,
-    ExternalConnectionPool.READONLY_POOL);
+      ExternalConnectionPool.READONLY_POOL);
   private String defaultReadOnlyPool = ExternalConnectionPool.READONLY_POOL;
 
   private static DataPoolChecker instance;
@@ -81,8 +81,8 @@ public class DataPoolChecker implements OBSingleton {
         " where dps.active = true";
     //@formatter:on
     Query<Object[]> query = org.etendorx.dal.service.OBDal.getInstance()
-      .getSession()
-      .createQuery(hql, Object[].class);
+        .getSession()
+        .createQuery(hql, Object[].class);
     List<Object[]> queryResults = query.list();
 
     Map<String, String> selection = new HashMap<>(queryResults.size());
@@ -103,17 +103,16 @@ public class DataPoolChecker implements OBSingleton {
         "   and p.visibleAtOrganization.id = '0' ";
     //@formatter:on
     Query<String> defaultPoolQuery = OBDal.getInstance()
-      .getSession()
-      .createQuery(hql, String.class)
-      .setMaxResults(1);
+        .getSession()
+        .createQuery(hql, String.class)
+        .setMaxResults(1);
     setDefaultReadOnlyPool(defaultPoolQuery.uniqueResult());
   }
 
   /**
    * Set the default pool used when requesting the read-only pool
    *
-   * @param defaultPool
-   *   the ID of the default pool returned when requesting a read-only instance
+   * @param defaultPool the ID of the default pool returned when requesting a read-only instance
    */
   private void setDefaultReadOnlyPool(String defaultPool) {
     if (validPoolValues.contains(defaultPool)) {
@@ -121,8 +120,8 @@ public class DataPoolChecker implements OBSingleton {
       defaultReadOnlyPool = defaultPool;
     } else {
       log.warn(
-        "Preference value {} is not a valid Database pool. Using READONLY_POOL as the default value",
-        defaultPool);
+          "Preference value {} is not a valid Database pool. Using READONLY_POOL as the default value",
+          defaultPool);
     }
   }
 

@@ -15,8 +15,11 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import org.springframework.data.domain.Page;
+
 /**
  * Generic interface for DTO converters
+ *
  * @param <E> Entity object to convert
  * @param <F> Read DTO model
  * @param <G> Write DTO model
@@ -25,6 +28,7 @@ public interface DTOConverter<E, F, G> {
 
   /**
    * Read Entity and transform to DTO (GET Method)
+   *
    * @param entity
    * @return DTO converted
    */
@@ -32,6 +36,7 @@ public interface DTOConverter<E, F, G> {
 
   /**
    * Read DTO and transform to Entity (POST Method)
+   *
    * @param dto
    * @param entity
    * @return Entity updated
@@ -40,9 +45,24 @@ public interface DTOConverter<E, F, G> {
 
   /**
    * Read Entity list and transform to DTO list (GET Method)
+   *
+   * @param entities
+   * @return a list of DTOs converted
+   */
+  Page<F> convert(Page<E> entities);
+
+  /**
+   * Read Entity list and transform to DTO list (GET Method)
+   *
    * @param entities
    * @return a list of DTOs converted
    */
   Iterable<F> convert(Iterable<E> entities);
 
+  /**
+   * @param dto
+   * @param entity
+   * @return
+   */
+  E convertOneToMany(G dto, E entity);
 }

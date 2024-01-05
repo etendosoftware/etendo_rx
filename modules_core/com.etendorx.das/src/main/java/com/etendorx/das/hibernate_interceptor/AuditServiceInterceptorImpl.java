@@ -1,12 +1,12 @@
 /**
  * Copyright 2022-2023 Futit Services SL
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,19 +15,17 @@
  */
 package com.etendorx.das.hibernate_interceptor;
 
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.etendorx.entities.entities.AuditServiceInterceptor;
 import com.etendorx.entities.entities.BaseRXObject;
 import com.etendorx.entities.jparepo.ADClientRepository;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import com.etendorx.entities.jparepo.OrganizationRepository;
 import com.etendorx.utils.auth.key.context.UserContext;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -38,26 +36,28 @@ public class AuditServiceInterceptorImpl implements AuditServiceInterceptor {
   private final OrganizationRepository organizationRepository;
   private final UserContext userContext;
 
-  public AuditServiceInterceptorImpl(ADUserRepository adUserRepository, ADClientRepository adClientRepository, OrganizationRepository organizationRepository,
-      @Autowired UserContext
-      userContext) {
+  public AuditServiceInterceptorImpl(ADUserRepository adUserRepository,
+      ADClientRepository adClientRepository, OrganizationRepository organizationRepository,
+      @Autowired UserContext userContext) {
     this.adUserRepository = adUserRepository;
     this.adClientRepository = adClientRepository;
     this.organizationRepository = organizationRepository;
     this.userContext = userContext;
   }
+
   @Override
   public void setAuditValues(BaseRXObject baseObject, boolean newRecord) {
     log.debug("Setting audit values for {}", baseObject.getClass().getSimpleName());
     log.debug("UserContext: {}", userContext);
     log.debug("UserContext.userId {}", userContext.getUserId());
     log.debug("UserContext.clientId {}", userContext.getClientId());
-    if(newRecord) {
+    if (newRecord) {
       baseObject.setClient(adClientRepository.findById(userContext.getClientId()).orElse(null));
       baseObject.setActive(true);
       baseObject.setCreatedBy(adUserRepository.findById(userContext.getUserId()).orElse(null));
       baseObject.setCreationDate(new Date());
-      baseObject.setOrganization(organizationRepository.findById(userContext.getOrganizationId()).orElse(null));
+      baseObject.setOrganization(
+          organizationRepository.findById(userContext.getOrganizationId()).orElse(null));
     }
     baseObject.setUpdatedBy(adUserRepository.findById(userContext.getUserId()).orElse(null));
     baseObject.setUpdated(new Date());

@@ -50,11 +50,13 @@ public class AsyncProcessExecutionService {
   public void save(AsyncProcessExecution asyncProcessExecution) {
     asyncProcessExecution.setTime(new Date());
     asyncProcessExecution.setId(UUID.randomUUID().toString());
-    send(producer, new ProducerRecord<>(AsyncProcessTopology.ASYNC_PROCESS_EXECUTION, asyncProcessExecution.getAsyncProcessId(), toJson(asyncProcessExecution)));
+    send(producer, new ProducerRecord<>(AsyncProcessTopology.ASYNC_PROCESS_EXECUTION,
+        asyncProcessExecution.getAsyncProcessId(), toJson(asyncProcessExecution)));
   }
 
   @SneakyThrows
-  private static void send(KafkaProducer<String, String> asyncProcessExecutionProducer, ProducerRecord<String, String> record) {
+  private static void send(KafkaProducer<String, String> asyncProcessExecutionProducer,
+      ProducerRecord<String, String> record) {
     log.info("send {} {}", record.key(), record.value());
     asyncProcessExecutionProducer.send(record).get();
   }

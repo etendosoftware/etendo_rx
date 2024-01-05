@@ -24,6 +24,8 @@ import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.val;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -50,63 +52,94 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
     this.retriever = retriever;
   }
 
+  /**
+   * Find all entities
+   * @return
+   */
   @Override
   @Transactional
-  public Iterable<E> findAll() {
-    List<E> dtos = new ArrayList<>();
-    Iterable<T> entities = repository.findAll();
-    for (val entity : entities) {
-      dtos.add(converter.convert(entity));
-    }
-    return dtos;
+  public Page<E> findAll(Pageable pageable) {
+    Page<T> entities = repository.findAll(pageable);
+    return entities.map(converter::convert);
   }
 
+  /**
+   * Find entity by id
+   * @param id
+   * @return
+   */
   @Transactional
   public E findById(String id) {
     var entity = retriever.get(id);
     return converter.convert(entity);
   }
 
+  /**
+   * Save entity
+   * @param dtoEntity
+   * @return
+   */
   @Override
-  @Transactional
   public E save(F dtoEntity) {
+    return performSaveOrUpdate(dtoEntity, true);
+  }
+
+  /**
+   * Update entity
+   * @param dtoEntity
+   * @return
+   */
+  @Override
+  public E update(F dtoEntity) {
+    return performSaveOrUpdate(dtoEntity, false);
+  }
+
+  /**
+   * Perform save or update depending on isNew. This method is transactional and will rollback if
+   * any exception is thrown. It will also check for duplicates if the entity has an id.
+   * @param dtoEntity
+   * @param isNew
+   * @return
+   */
+  private E performSaveOrUpdate(F dtoEntity, boolean isNew) {
+    String newId;
     try {
       transactionHandler.begin();
-      if (dtoEntity.getId() != null) {
-        var dto = retriever.get(dtoEntity.getId());
-        if (dto != null) {
-          throw new ResponseStatusException(HttpStatus.CONFLICT, "Record already exists");
-        }
+      if (isNew) {
+        checkForDuplicate(dtoEntity);
       }
-      var entity = converter.convert(dtoEntity, null);
-      if (BaseRXObject.class.isAssignableFrom(entity.getClass())) {
-        var baseObject = (BaseRXObject) entity;
-        auditService.setAuditValues(baseObject, true);
+      var entity = converter.convert(dtoEntity, isNew ? null : retriever.get(dtoEntity.getId()));
+      if (entity == null) {
+        throw new IllegalStateException("Entity conversion failed");
       }
+      setAuditValuesIfApplicable(entity, isNew);
       repository.save(entity);
-      return converter.convert(entity);
+      repository.save(converter.convertOneToMany(dtoEntity, entity));
+      newId = converter.convert(entity).getId();
     } finally {
       transactionHandler.commit();
     }
+    return converter.convert(retriever.get(newId));
   }
 
-  @Override
-  @Transactional
-  public E updated(F dtoEntity) {
-    try {
-      transactionHandler.begin();
-      var entity = retriever.get(dtoEntity.getId());
-      if (entity == null) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found");
-      }
-      if (BaseRXObject.class.isAssignableFrom(entity.getClass())) {
-        var baseObject = (BaseRXObject) entity;
-        auditService.setAuditValues(baseObject, false);
-      }
-      repository.save(converter.convert(dtoEntity, entity));
-      return converter.convert(entity);
-    } finally {
-      transactionHandler.commit();
+  /**
+   * Check for duplicate
+   * @param dtoEntity
+   */
+  private void checkForDuplicate(F dtoEntity) {
+    if (dtoEntity.getId() != null && retriever.get(dtoEntity.getId()) != null) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Record already exists");
+    }
+  }
+
+  /**
+   * Set audit values if applicable
+   * @param entity
+   * @param isNew
+   */
+  private void setAuditValuesIfApplicable(Object entity, boolean isNew) {
+    if (BaseRXObject.class.isAssignableFrom(entity.getClass())) {
+      auditService.setAuditValues((BaseRXObject) entity, isNew);
     }
   }
 

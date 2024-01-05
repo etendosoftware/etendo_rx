@@ -38,16 +38,16 @@ import ${readEntity.table.thePackage.javaPackage}.${readEntity.table.className};
 import org.springframework.stereotype.Component;
 
 @Component
-public class ${mappingPrefix}${readEntity.name}DTOConverter extends
-    DTOConverterBase<${readEntity.table.className}, ${mappingPrefix}${readEntity.name}DTORead, ${mappingPrefix}${readEntity.name}DTOWrite> {
+public class ${mappingPrefix}${readEntity.externalName}DTOConverter extends
+    DTOConverterBase<${readEntity.table.className}, ${mappingPrefix}${readEntity.externalName}DTORead, ${mappingPrefix}${readEntity.externalName}DTOWrite> {
 
-  private final ${mappingPrefix}${readEntity.name}FieldConverterRead readConverter;
+  private final ${mappingPrefix}${readEntity.externalName}FieldConverterRead readConverter;
   <#if writeEntity??>
-  private final ${mappingPrefix}${writeEntity.name}FieldConverterWrite writeConverter;
+  private final ${mappingPrefix}${writeEntity.externalName}FieldConverterWrite writeConverter;
   </#if>
 
-  public ${mappingPrefix}${readEntity.name}DTOConverter(
-    ${mappingPrefix}${readEntity.name}FieldConverterRead readConverter<#if writeEntity??>, ${mappingPrefix}${writeEntity.name}FieldConverterWrite writeConverter</#if>) {
+  public ${mappingPrefix}${readEntity.externalName}DTOConverter(
+    ${mappingPrefix}${readEntity.externalName}FieldConverterRead readConverter<#if writeEntity??>, ${mappingPrefix}${writeEntity.externalName}FieldConverterWrite writeConverter</#if>) {
     this.readConverter = readConverter;
 <#if writeEntity??>
     this.writeConverter = writeConverter;
@@ -56,8 +56,8 @@ public class ${mappingPrefix}${readEntity.name}DTOConverter extends
 
   // READ
   @Override
-  public ${mappingPrefix}${readEntity.name}DTORead convert(${readEntity.table.className} entity) {
-    ${mappingPrefix}${readEntity.name}DTORead dto = new ${mappingPrefix}${readEntity.name}DTORead();
+  public ${mappingPrefix}${readEntity.externalName}DTORead convert(${readEntity.table.className} entity) {
+    ${mappingPrefix}${readEntity.externalName}DTORead dto = new ${mappingPrefix}${readEntity.externalName}DTORead();
 <#list readEntity.fields as field>
     dto.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(readConverter.get<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity));
 </#list>
@@ -67,18 +67,32 @@ public class ${mappingPrefix}${readEntity.name}DTOConverter extends
   // WRITE
 <#if writeEntity??>
   @Override
-  public ${writeEntity.table.className} convert(${mappingPrefix}${writeEntity.name}DTOWrite dto, ${writeEntity.table.className} entity) {
+  public ${writeEntity.table.className} convert(${mappingPrefix}${writeEntity.externalName}DTOWrite dto, ${writeEntity.table.className} entity) {
     if (entity == null) {
       entity = new ${writeEntity.table.className}();
     }
 <#list writeEntity.fields as field>
+  <#assign isOneToMany = field.property?? && modelProvider.isColumnIsOneToMany(writeEntity.table, writeEntity.table.name + "." + field.property)>
+  <#if !isOneToMany>
     writeConverter.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity, dto);
+  </#if>
+</#list>
+    return entity;
+  }
+
+  @Override
+  public ${writeEntity.table.className} convertOneToMany(${mappingPrefix}${writeEntity.externalName}DTOWrite dto, ${writeEntity.table.className}  entity) {
+<#list writeEntity.fields as field>
+  <#assign isOneToMany = field.property?? && modelProvider.isColumnIsOneToMany(writeEntity.table, writeEntity.table.name + "." + field.property)>
+  <#if isOneToMany>
+    writeConverter.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity, dto);
+  </#if>
 </#list>
     return entity;
   }
 <#else>
   @Override
-  public ${readEntity.table.className} convert((String) ${mappingPrefix}${readEntity.name}DTO dto, ${readEntity.table.className} entity) {
+  public ${readEntity.table.className} convert((String) ${mappingPrefix}${readEntity.externalName}DTO dto, ${readEntity.table.className} entity) {
     return entity;
   }
 </#if>

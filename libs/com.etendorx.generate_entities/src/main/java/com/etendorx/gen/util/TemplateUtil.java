@@ -16,25 +16,19 @@
 
 package com.etendorx.gen.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import com.etendorx.gen.generation.GeneratePaths;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.TemplateException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openbravo.base.model.Entity;
 
-import com.etendorx.gen.generation.GeneratePaths;
-
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.TemplateException;
+import java.io.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class TemplateUtil {
   private static final Logger log = LogManager.getLogger();
@@ -54,7 +48,6 @@ public class TemplateUtil {
       throw new IllegalStateException(e);
     }
   }
-
 
   /**
    * Create a template implementation from the given file
@@ -105,8 +98,7 @@ public class TemplateUtil {
         .substring(data.get("className").toString().lastIndexOf('/') + 1));
     data.put("repositoryClassEntityModel", data.get("className")
         .toString()
-        .replace(data.get("onlyClassName").toString(),
-            entity.getName()) + "Model.java");
+        .replace(data.get("onlyClassName").toString(), entity.getName()) + "Model.java");
     data.put("tableName", entity.getTableName());
     data.put("packageEntities", paths.packageEntities);
     data.put("packageName", data.get("packageEntities").toString());

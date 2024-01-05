@@ -1,18 +1,12 @@
 package com.etendorx.gen.generation;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
-import org.openbravo.base.model.Entity;
-
 import com.etendorx.gen.generation.interfaces.EntityGenerator;
 import com.etendorx.gen.util.TemplateUtil;
+import org.openbravo.base.model.Entity;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class GenerateJPARepo implements EntityGenerator {
 
@@ -25,16 +19,17 @@ public class GenerateJPARepo implements EntityGenerator {
    * @throws FileNotFoundException
    */
   @Override
-  public void generate(Map<String, Object> data, GeneratePaths path, boolean dataRestEnabled) throws FileNotFoundException {
+  public void generate(Map<String, Object> data, GeneratePaths path, boolean dataRestEnabled)
+      throws FileNotFoundException {
     String ftlFileNameJPARepo = "/org/openbravo/base/gen/jpaRepoRX.ftl";
     freemarker.template.Template templateJPARepoRX = TemplateUtil.createTemplateImplementation(
         ftlFileNameJPARepo);
 
-    final String packageJPARepo = path.pathEntitiesRx.substring(path.pathEntitiesRx.lastIndexOf('/') + 1) + ".jparepo";
+    final String packageJPARepo = path.pathEntitiesRx.substring(
+        path.pathEntitiesRx.lastIndexOf('/') + 1) + ".jparepo";
     final String fullPathJPARepo = path.pathEntitiesRx + "/src/main/jparepo/" + packageJPARepo.replace(
         '.', '/');
-    final String repositoryClass =
-        ((Entity) data.get("entity")).getName() + "Repository.java";
+    final String repositoryClass = ((Entity) data.get("entity")).getName() + "Repository.java";
     new File(fullPathJPARepo).mkdirs();
     var outFileRepo = new File(fullPathJPARepo, repositoryClass);
 

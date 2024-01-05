@@ -1,18 +1,17 @@
 package com.etendorx.gen.process;
 
+import com.etendoerp.etendorx.model.ETRXModelProvider;
+import com.etendoerp.etendorx.model.ETRXModule;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.etendorx.base.provider.OBProvider;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.etendorx.base.provider.OBProvider;
-
-import com.etendoerp.etendorx.model.ETRXModelProvider;
-import com.etendoerp.etendorx.model.ETRXModule;
 
 public class GenerateMetadata {
   private static final Logger log = LogManager.getLogger();
@@ -67,28 +66,36 @@ public class GenerateMetadata {
 
   /**
    * Generates the metadata.json files for all the modules
+   *
    * @param pathEtendoRx
    */
   public void generate(String pathEtendoRx) {
     // Search the module location
     File etendoRxLocation = new File(pathEtendoRx);
     if (!etendoRxLocation.exists()) {
-      throw new IllegalArgumentException("The Etendo RX location '" + pathEtendoRx + "' does not exists.");
+      throw new IllegalArgumentException(
+          "The Etendo RX location '" + pathEtendoRx + "' does not exists.");
     }
 
     // Filter the excluded or included modules
-    List<ETRXModule> filteredModules = ETRXModelProvider.getInstance().getEtendoRxModules().stream()
+    List<ETRXModule> filteredModules = ETRXModelProvider.getInstance()
+        .getEtendoRxModules()
+        .stream()
         .filter(moduleToGenerate -> {
           // Filters the excluded modules
-          return excludedModules.stream().noneMatch(s -> s.equalsIgnoreCase(moduleToGenerate.getJavaPackage()));
-        }).filter(moduleToGenerate -> {
+          return excludedModules.stream()
+              .noneMatch(s -> s.equalsIgnoreCase(moduleToGenerate.getJavaPackage()));
+        })
+        .filter(moduleToGenerate -> {
           // Filter the included modules if the 'includedModules' list is not empty and contains the 'moduleToGenerate'
-          return includedModules.isEmpty() || includedModules.stream().anyMatch(
-              s -> s.equalsIgnoreCase(moduleToGenerate.getJavaPackage()));
-        }).collect(Collectors.toList());
+          return includedModules.isEmpty() || includedModules.stream()
+              .anyMatch(s -> s.equalsIgnoreCase(moduleToGenerate.getJavaPackage()));
+        })
+        .collect(Collectors.toList());
 
     if (!filteredModules.isEmpty()) {
-      Map<ETRXModule, String> modulesJsonMap = ETRXModelProvider.getInstance().modulesToJsonMap(filteredModules);
+      Map<ETRXModule, String> modulesJsonMap = ETRXModelProvider.getInstance()
+          .modulesToJsonMap(filteredModules);
 
       modulesJsonMap.forEach((module, json) -> {
         createMetadataJson(etendoRxLocation, module, json);
@@ -118,8 +125,10 @@ public class GenerateMetadata {
       }
 
       if (moduleLocation == null || !moduleLocation.exists()) {
-        log.info("Using the default module location '{}' to generate the metadata.", defaultDirectory);
-        moduleLocation = new File(etendoRxLocation, defaultDirectory + File.separator + moduleJavaPackage);
+        log.info("Using the default module location '{}' to generate the metadata.",
+            defaultDirectory);
+        moduleLocation = new File(etendoRxLocation,
+            defaultDirectory + File.separator + moduleJavaPackage);
       }
 
       File metadataLocation = new File(moduleLocation,
@@ -134,10 +143,12 @@ public class GenerateMetadata {
         writer.write(jsonMetadata);
       }
 
-      log.info("Metadata generated for '{}' in: {}", moduleJavaPackage, metadataLocation.getAbsolutePath());
+      log.info("Metadata generated for '{}' in: {}", moduleJavaPackage,
+          metadataLocation.getAbsolutePath());
       return true;
     } catch (Exception e) {
-      log.error("Error creating the '{}' for the module: {}", "metadata.json", module.getJavaPackage(), e);
+      log.error("Error creating the '{}' for the module: {}", "metadata.json",
+          module.getJavaPackage(), e);
       return false;
     }
   }

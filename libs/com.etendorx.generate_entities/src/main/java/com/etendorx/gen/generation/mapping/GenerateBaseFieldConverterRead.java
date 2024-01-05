@@ -28,12 +28,13 @@ public class GenerateBaseFieldConverterRead extends MappingGenerationBase {
 
   @Override
   protected boolean isValid(ETRXProjectionEntity etrxProjectionEntity) {
-    return StringUtils.equals(etrxProjectionEntity.getMappingType(), MappingConstants.MAPPING_TYPE_READ);
+    return StringUtils.equals(etrxProjectionEntity.getMappingType(),
+        MappingConstants.MAPPING_TYPE_READ);
   }
 
   @Override
   protected String getOutFileName(ETRXProjectionEntity etrxProjectionEntity) {
-    return etrxProjectionEntity.getTable().getName() + "FieldConverterRead.java";
+    return etrxProjectionEntity.getExternalName() + "FieldConverterRead.java";
   }
 
 }

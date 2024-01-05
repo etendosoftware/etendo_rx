@@ -17,22 +17,20 @@ package com.etendorx.gen.generation.utils;
 
 import com.etendorx.gen.generation.GeneratePaths;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class CodeGenerationUtils {
 
-  private CodeGenerationUtils() {}
-  
-  public static Writer getWriter(String mappingPrefix, String outFileName,
-      GeneratePaths path) throws FileNotFoundException {
-    final String packageJPARepo = path.pathEntitiesRx.substring(path.pathEntitiesRx.lastIndexOf('/')) + ".mappings";
-    final String fullPathJPARepo = path.pathEntitiesRx + "/src/main/mappings/" + packageJPARepo.replace('.', '/');
+  private CodeGenerationUtils() {
+  }
+
+  public static Writer getWriter(String mappingPrefix, String outFileName, GeneratePaths path)
+      throws FileNotFoundException {
+    final String packageJPARepo = path.pathEntitiesRx.substring(
+        path.pathEntitiesRx.lastIndexOf('/')) + ".mappings";
+    final String fullPathJPARepo = path.pathEntitiesRx + "/src/main/mappings/" + packageJPARepo.replace(
+        '.', '/');
     final String repositoryClass = mappingPrefix + outFileName;
     new File(fullPathJPARepo).mkdirs();
     var outFileRepo = new File(fullPathJPARepo, repositoryClass);

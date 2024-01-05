@@ -19,24 +19,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public abstract class BindedRestController<E extends BaseDTOModel, F extends BaseDTOModel> {
   private final JsonPathConverter<F> converter;
   @Getter
   private final DASRepository<E, F> repository;
 
-  protected BindedRestController(
-      JsonPathConverter<F> converter,
-      DASRepository<E, F> repository) {
+  protected BindedRestController(JsonPathConverter<F> converter, DASRepository<E, F> repository) {
     this.converter = converter;
     this.repository = repository;
   }
@@ -44,8 +41,9 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   @GetMapping
   @Transactional
   @Operation(security = { @SecurityRequirement(name = "basicScheme") })
-  public ResponseEntity<Iterable<E>> findAll() {
-    return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+  public Page<E> findAll(
+      @PageableDefault(size = 20) final Pageable pageable) {
+    return repository.findAll(pageable);
   }
 
   @GetMapping("/{id}")
@@ -75,6 +73,6 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   public ResponseEntity<E> put(@PathVariable String id, @RequestBody String rawEntity) {
     F dtoEntity = converter.convert(rawEntity);
     dtoEntity.setId(id);
-    return new ResponseEntity<>(repository.updated(dtoEntity), HttpStatus.CREATED);
+    return new ResponseEntity<>(repository.update(dtoEntity), HttpStatus.CREATED);
   }
 }

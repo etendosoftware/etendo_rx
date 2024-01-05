@@ -44,17 +44,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-  <#list entity.fields as field>
-    <#if field.property??>
-      <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "" />
-      <#if columnType?? && columnType != "">
-import ${columnType};
-
-      </#if>
-    </#if>
-  </#list>
-
-public class ${mappingPrefix}${entity.name}DTO<#if entity.mappingType == "R">Read<#else>Write</#if> implements BaseDTOModel {
+public class ${mappingPrefix}${entity.externalName}DTO<#if entity.mappingType == "R">Read<#else>Write</#if> implements BaseDTOModel {
   <#if entity.mappingType == "R">
   @JsonProperty("id")
   </#if>
@@ -71,6 +61,9 @@ public class ${mappingPrefix}${entity.name}DTO<#if entity.mappingType == "R">Rea
       </#if>
       <#assign columnType = "Object">
       <#if field.property??>
+        <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "Object">
+      </#if>
+      <#if field.property?? && columnType == "Object">
         <#assign columnType = modelProvider.getColumnTypeName(entity.table, entity.table.name + "." + field.property) ! "Object">
       </#if>
   <#if entity.mappingType == "R">Object<#else>${columnType}</#if> <@toCamelCase field.name/>;

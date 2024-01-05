@@ -105,8 +105,7 @@ public class Entity {
    * Initializes the entity from a table, also creates the properties from the list of Columns of
    * the table.
    *
-   * @param table
-   *   the table used to initialize the Entity
+   * @param table the table used to initialize the Entity
    */
   public void initialize(Table table) {
     table.setEntity(this);
@@ -218,7 +217,7 @@ public class Entity {
       setAccessLevel(AccessLevel.ALL);
     } else {
       Check.fail(
-        "Access level " + table.getAccessLevel() + " for table " + table.getName() + " is not supported");
+          "Access level " + table.getAccessLevel() + " for table " + table.getName() + " is not supported");
     }
 
     setModule(table.getThePackage().getModule());
@@ -250,7 +249,7 @@ public class Entity {
     setTableName(t.getTableName() + "_CC");
     setTableId(t.getId() + "_CC");
     setClassName(
-      e.getPackageName() + "." + e.getSimpleClassName() + COMPUTED_COLUMNS_CLASS_APPENDIX);
+        e.getPackageName() + "." + e.getSimpleClassName() + COMPUTED_COLUMNS_CLASS_APPENDIX);
     setName(e.getSimpleClassName() + COMPUTED_COLUMNS_CLASS_APPENDIX);
     setDeletable(false);
     setMutable(false);
@@ -266,7 +265,7 @@ public class Entity {
 
     for (final Column c : t.getColumns()) {
       if (!(c.isKey() || c.getSqlLogic() != null || "AD_Client_ID".equalsIgnoreCase(
-        c.getColumnName()) || "AD_Org_ID".equalsIgnoreCase(c.getColumnName()))) {
+          c.getColumnName()) || "AD_Org_ID".equalsIgnoreCase(c.getColumnName()))) {
         continue;
       }
       final Property p = new Property();
@@ -298,8 +297,7 @@ public class Entity {
   /**
    * Add a property to the internal arrays of properties (common, identifier, etc.)
    *
-   * @param property
-   *   the Property to add
+   * @param property the Property to add
    */
   public void addProperty(Property property) {
     getProperties().add(property);
@@ -338,10 +336,8 @@ public class Entity {
    * orgId passed as parameters. Throws an OBSecurityException if the clientId and/or orgId are not
    * valid.
    *
-   * @param clientId
-   *   the clientId which is checked against the accessLevel
+   * @param clientId the clientId which is checked against the accessLevel
    * @param orgId
-   *
    * @see AccessLevelChecker
    */
   public void checkAccessLevel(String clientId, String orgId) {
@@ -351,9 +347,7 @@ public class Entity {
   /**
    * Validates the passed object using the property validators of this Entity.
    *
-   * @param obj
-   *   the object to validate
-   *
+   * @param obj the object to validate
    * @see EntityValidator
    * @see PropertyValidator
    */
@@ -390,14 +384,14 @@ public class Entity {
     }
     if (nameChanged) {
       log.warn(
-        "The entity name " + fromName + " contains illegal characters, it has been repaired to " + newName);
+          "The entity name " + fromName + " contains illegal characters, it has been repaired to " + newName);
     } else {
       // check for other less normal characters
       for (char c : fromName.trim().toCharArray()) {
         final boolean normalChar = ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || c == '_';
         if (!normalChar) {
           log.warn(
-            "The entity name " + fromName + " contains a character (" + c + ") which could result in issues in HQL or " + "webservices. Use characters from a to z, A to Z or 0 to 9 or the _");
+              "The entity name " + fromName + " contains a character (" + c + ") which could result in issues in HQL or " + "webservices. Use characters from a to z, A to Z or 0 to 9 or the _");
         }
       }
     }
@@ -417,7 +411,7 @@ public class Entity {
    * the system will use a DynamicOBObject as the runtime class.
    *
    * @return the java class implementing this Entity, or null if the class is not available (not
-   *   found)
+   * found)
    */
   public Class<?> getMappingClass() {
     if (mappingClass == null && !mappingClassComputed) {
@@ -500,9 +494,7 @@ public class Entity {
   /**
    * Checks if the class has a certain property by name.
    *
-   * @param propertyName
-   *   the name used to search for the property
-   *
+   * @param propertyName the name used to search for the property
    * @return returns true if there is a property with this name, false otherwise
    */
   // TODO: it is saver to also check for the type!
@@ -514,23 +506,20 @@ public class Entity {
    * Check if there is a property with the name propertyName. If not then a CheckException is
    * thrown.
    *
-   * @param propertyName
-   *   the name used to search for a property
+   * @param propertyName the name used to search for a property
    */
   public void checkIsValidProperty(String propertyName) {
     Check.isNotNull(propertiesByName.get(propertyName),
-      "Property " + propertyName + " not defined for entity " + this);
+        "Property " + propertyName + " not defined for entity " + this);
   }
 
   /**
    * Checks if there is a property with the name propName and if so checks that the value is of the
    * correct type and is valid.
    *
-   * @param propName
-   *   the name used to search for the property
-   * @param value
-   *   the value is checked against the constraints for the property (for example length,
-   *   nullable, etc.)
+   * @param propName the name used to search for the property
+   * @param value    the value is checked against the constraints for the property (for example length,
+   *                 nullable, etc.)
    */
   public void checkValidPropertyAndValue(String propName, Object value) {
     Property p;
@@ -548,9 +537,7 @@ public class Entity {
    * Retrieves the property using the propertyName. Throws a CheckException if no property exists
    * with that name.
    *
-   * @param propertyName
-   *   the name used to search for the property.
-   *
+   * @param propertyName the name used to search for the property.
    * @return the found property
    */
   public Property getProperty(String propertyName) {
@@ -561,12 +548,9 @@ public class Entity {
    * Retrieves the property using the propertyName. Throws a CheckException if no property exists
    * with that name in case checkIsNotNull is true.
    *
-   * @param propertyName
-   *   the name used to search for the property.
-   * @param checkIsNotNull
-   *   if true, fails if property does not exists in entity, if false, returns null in this
-   *   case
-   *
+   * @param propertyName   the name used to search for the property.
+   * @param checkIsNotNull if true, fails if property does not exists in entity, if false, returns null in this
+   *                       case
    * @return the found property
    */
   public Property getProperty(String propertyName, boolean checkIsNotNull) {
@@ -581,9 +565,7 @@ public class Entity {
    * Retrieves the property using the columnName. Throws a CheckException if no property exists with
    * that columnName.
    *
-   * @param columnName
-   *   the name used to search for the property.
-   *
+   * @param columnName the name used to search for the property.
    * @return the found property
    */
   public Property getPropertyByColumnName(String columnName) {
@@ -596,12 +578,9 @@ public class Entity {
    * Retrieves the property using the columnName. Throws a CheckException if no property exists with
    * that columnName in case checkIsNotNull is true.
    *
-   * @param columnName
-   *   the name used to search for the property.
-   * @param checkIsNotNull
-   *   if true, fails if property does not exists in entity, if false, returns null in this
-   *   case
-   *
+   * @param columnName     the name used to search for the property.
+   * @param checkIsNotNull if true, fails if property does not exists in entity, if false, returns null in this
+   *                       case
    * @return the found property
    */
   public Property getPropertyByColumnName(String columnName, boolean checkIsNotNull) {
@@ -684,16 +663,14 @@ public class Entity {
    * virtual property. If <code>includeComputed</code> parameter is <code>true</code>, all computed
    * columns are also excluded.
    *
-   * @param includeComputed
-   *   should properties for computed columns be excluded from the list
-   *
+   * @param includeComputed should properties for computed columns be excluded from the list
    * @return all the properties excluding proxy and, optionally, computed columns
    */
   public List<Property> getRealProperties(boolean includeComputed) {
     List<Property> result = new ArrayList<Property>();
     for (Property p : properties) {
       if ((includeComputed || !p.isComputedColumn()) && !Entity.COMPUTED_COLUMNS_PROXY_PROPERTY.equals(
-        p.getName())) {
+          p.getName())) {
         result.add(p);
       }
     }
@@ -720,7 +697,7 @@ public class Entity {
    * an Order.
    *
    * @return the list of properties pointing to the parent, an emptylist if there is no such
-   *   association to a parent
+   * association to a parent
    */
   public List<Property> getParentProperties() {
     return parentProperties;
@@ -863,8 +840,7 @@ public class Entity {
    * Adds help to this Entity from corresponding table Removes comment escape character sequence and
    * wraps comments over 100 characters. Makes sure it doesn't generate warnings by escaping "@"
    *
-   * @param help
-   *   Help comment to add to this entity
+   * @param help Help comment to add to this entity
    */
   public void setHelp(String help) {
     if (help != null) {

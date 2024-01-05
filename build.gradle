@@ -65,6 +65,10 @@ task upgradeRxVersion() {
         def settingsGradleContent = file('settings.gradle').text
         settingsGradleContent = settingsGradleContent.replaceAll(/gradle.ext.version = '\d+.\d+.\d+'/, "gradle.ext.version = '${nextVersion}'")
         file('settings.gradle').write(settingsGradleContent)
+        // Update version in libs/com.etendorx.generate_entities/src/main/resources/version.properties
+        def versionPropertiesContent = file('libs/com.etendorx.generate_entities/src/main/resources/version.properties').text
+        versionPropertiesContent = versionPropertiesContent.replaceAll(/version=\d+.\d+.\d+/, "version=${nextVersion}")
+        file('libs/com.etendorx.generate_entities/src/main/resources/version.properties').write(versionPropertiesContent)
     }
 }
 

@@ -15,33 +15,8 @@
  */
 package com.etendorx.gen.generation;
 
-import static com.etendorx.gen.generation.GenerateEntitiesConstants.PROJECTION_DEFAULT;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
-import com.etendoerp.etendorx.model.projection.ETRXProjection;
-import com.etendorx.gen.generation.mapping.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.etendorx.base.session.OBPropertiesProvider;
-import org.openbravo.base.model.Entity;
-import org.openbravo.base.model.ModelProvider;
-import org.openbravo.base.model.Table;
-
 import com.etendoerp.etendorx.model.ETRXModelProvider;
+import com.etendoerp.etendorx.model.projection.ETRXProjection;
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.beans.Metadata;
 import com.etendorx.gen.beans.Projection;
@@ -49,9 +24,23 @@ import com.etendorx.gen.beans.Repository;
 import com.etendorx.gen.commandline.CommandLineProcess;
 import com.etendorx.gen.generation.interfaces.EntityGenerator;
 import com.etendorx.gen.generation.interfaces.MappingGenerator;
+import com.etendorx.gen.generation.mapping.*;
 import com.etendorx.gen.metadata.MetadataContainer;
 import com.etendorx.gen.process.GenerateProtoFile;
 import com.etendorx.gen.util.TemplateUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.etendorx.base.session.OBPropertiesProvider;
+import org.openbravo.base.model.Entity;
+import org.openbravo.base.model.ModelProvider;
+import org.openbravo.base.model.Table;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.etendorx.gen.generation.GenerateEntitiesConstants.PROJECTION_DEFAULT;
 
 public class GenerateEntities {
   public static final String ERROR_GENERATING_FILE = "Error generating file: ";
@@ -85,13 +74,13 @@ public class GenerateEntities {
   /**
    * Executes the command
    *
-   * @param cmdProcess
-   *     the command line process
+   * @param cmdProcess the command line process
    */
   public void execute(CommandLineProcess cmdProcess) {
     if (getBasePath() == null) {
       setBasePath(".");
     }
+    ETRXModelProvider.getInstance().verifyModule();
     log.debug("initializating dal layer, getting properties from {}", getPropertiesFile());
     OBPropertiesProvider.getInstance().setProperties(getPropertiesFile());
 
@@ -105,10 +94,13 @@ public class GenerateEntities {
 
     var paths = new GeneratePaths(pathEtendoRx);
 
-    final boolean generateRxCode = Boolean.parseBoolean(obProperties.getProperty("rx.generateCode"));
-    final boolean computedColumns = Boolean.parseBoolean(obProperties.getProperty("rx.computedColumns"));
-    final boolean includeViews = Boolean.parseBoolean(obProperties.getProperty("rx.views"));
-    final boolean dataRestEnabled = Boolean.parseBoolean(obProperties.getProperty("data-rest.enabled"));
+    final boolean generateRxCode = Boolean.parseBoolean(
+        obProperties.getProperty("rx.generateCode"));
+    final boolean computedColumns = Boolean.parseBoolean(
+        obProperties.getProperty("rx.computedColumns", "true"));
+    final boolean includeViews = Boolean.parseBoolean(obProperties.getProperty("rx.views", "true"));
+    final boolean dataRestEnabled = Boolean.parseBoolean(
+        obProperties.getProperty("data-rest.enabled"));
 
     log.info("Generate Etendo Rx Code={}", generateRxCode);
     log.info("Path Project Rx={}", pathEtendoRx);
@@ -125,7 +117,8 @@ public class GenerateEntities {
           continue;
         }
         if (generateRxCode && !entity.isVirtualEntity() && (includeViews || !entity.isView())) {
-          var data = TemplateUtil.getModelData(paths, entity, getSearchesMap(entity), computedColumns, includeViews);
+          var data = TemplateUtil.getModelData(paths, entity, getSearchesMap(entity),
+              computedColumns, includeViews);
           generateEntityCode(data, paths, generators, dataRestEnabled);
           generateMappingCode(entity, paths, mappingGenerators);
         }
@@ -144,25 +137,26 @@ public class GenerateEntities {
 
   private void generateMappingGroup(GeneratePaths paths,
       GenerateGroupedOpenApi generateGroupedOpenApi) throws FileNotFoundException {
-      List<ETRXProjection> list = ETRXModelProvider.getInstance().getETRXProjection();
-      generateGroupedOpenApi.generate(list, paths);
+    List<ETRXProjection> list = ETRXModelProvider.getInstance().getETRXProjection();
+    generateGroupedOpenApi.generate(list, paths);
   }
 
-  private void generateGlobalCode(GeneratePaths paths, List<Entity> entities) throws FileNotFoundException {
+  private void generateGlobalCode(GeneratePaths paths, List<Entity> entities)
+      throws FileNotFoundException {
     generateEntityScan(entities, paths.pathEntitiesRx);
 
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseSerializableObject, Templates.BASE_SERIALIZABLE_OBJECT_FTL,
-        paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject, Templates.BASE_ENTITY_RX_FTL,
-        paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository, Templates.BASE_DASREPOSITORY_FTL,
-        paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository, Templates.BASE_DTOREPOSITORY_FTL,
-        paths.packageEntities);
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.mappingUtils, Templates.MAPPING_UTILS_FTL,
-        paths.packageEntities + ".mappings");
-    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.auditServiceInterceptor, Templates.AUDIT_SERVICE_INTERCEPTOR_FTL,
-        paths.packageEntities);
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseSerializableObject,
+        Templates.BASE_SERIALIZABLE_OBJECT_FTL, paths.packageEntities);
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseRXObject,
+        Templates.BASE_ENTITY_RX_FTL, paths.packageEntities);
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDASRepository,
+        Templates.BASE_DASREPOSITORY_FTL, paths.packageEntities);
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.baseDTORepository,
+        Templates.BASE_DTOREPOSITORY_FTL, paths.packageEntities);
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.mappingUtils,
+        Templates.MAPPING_UTILS_FTL, paths.packageEntities + ".mappings");
+    generateBaseEntityRx(new HashMap<>(), paths.pathEntitiesRx, paths.auditServiceInterceptor,
+        Templates.AUDIT_SERVICE_INTERCEPTOR_FTL, paths.packageEntities);
   }
 
   private List<MappingGenerator> getMappingGenerators() {
@@ -184,16 +178,27 @@ public class GenerateEntities {
     }
   }
 
-  private void generateMappingCode(Entity entity, GeneratePaths paths, List<MappingGenerator> mappingGenerators) throws FileNotFoundException {
+  private void generateMappingCode(Entity entity, GeneratePaths paths,
+      List<MappingGenerator> mappingGenerators) throws FileNotFoundException {
     // Mappings
     Table table = ModelProvider.getInstance().getTable(entity.getTableName());
-    List<ETRXProjectionEntity> list = ETRXModelProvider.getInstance().getETRXProjectionEntity(table);
+    List<ETRXProjectionEntity> list = ETRXModelProvider.getInstance()
+        .getETRXProjectionEntity(table);
     new GenerateBaseDTOConverter().generate(list, paths);
-    // mappings
-    for (ETRXProjectionEntity etrxProjectionEntity : list) {
-      if (hasReadWrite(list, etrxProjectionEntity)) {
-        for (MappingGenerator mappingGenerator : mappingGenerators) {
-          mappingGenerator.generate(etrxProjectionEntity, paths);
+    List<String> externalNames = list.stream()
+        .map(m -> m.getExternalName())
+        .distinct()
+        .collect(Collectors.toList());
+    for (String externalName : externalNames) {
+      // mappings
+      var filteredList = list.stream()
+          .filter(m -> m.getExternalName().equals(externalName))
+          .toList();
+      for (ETRXProjectionEntity etrxProjectionEntity : filteredList) {
+        if (hasReadWrite(filteredList, etrxProjectionEntity)) {
+          for (MappingGenerator mappingGenerator : mappingGenerators) {
+            mappingGenerator.generate(etrxProjectionEntity, paths);
+          }
         }
       }
     }
@@ -208,11 +213,8 @@ public class GenerateEntities {
   /**
    * Generates the projections
    *
-   * @param paths
-   *     the paths
-   * @param entities
-   *     the entities
-   *
+   * @param paths    the paths
+   * @param entities the entities
    * @return the projections
    */
   private ArrayList<Projection> getProjections(GeneratePaths paths, List<Entity> entities) {
@@ -226,9 +228,7 @@ public class GenerateEntities {
   /**
    * Generates the generators
    *
-   * @param projections
-   *     the projections
-   *
+   * @param projections the projections
    * @return the generators
    */
   private List<EntityGenerator> getGenerators(ArrayList<Projection> projections) {
@@ -245,22 +245,16 @@ public class GenerateEntities {
   /**
    * Generates the protofile
    *
-   * @param projections
-   *     the projections
-   * @param entities
-   *     the entities
-   * @param paths
-   *     the paths
-   * @param computedColumns
-   *     the computed columns
-   * @param includeViews
-   *     the include views
-   *
-   * @exception FileNotFoundException
-   *     the file not found exception
+   * @param projections     the projections
+   * @param entities        the entities
+   * @param paths           the paths
+   * @param computedColumns the computed columns
+   * @param includeViews    the include views
+   * @throws FileNotFoundException the file not found exception
    */
-  private void generateProtofile(ArrayList<Projection> projections, List<Entity> entities, GeneratePaths paths,
-      boolean computedColumns, boolean includeViews) throws FileNotFoundException {
+  private void generateProtofile(ArrayList<Projection> projections, List<Entity> entities,
+      GeneratePaths paths, boolean computedColumns, boolean includeViews)
+      throws FileNotFoundException {
     List<Repository> repositories = new ArrayList<>();
     repositories.addAll(getRepositories());
 
@@ -276,17 +270,15 @@ public class GenerateEntities {
     GenerateProtoFile generateProtoFile = new GenerateProtoFile();
     generateProtoFile.setEntitiesModel(entities);
     // Generate Proto File
-    generateProtoFile.generate(paths.pathEtendoRx, metadata.getRepositoriesMap(), projections, metadataContainer,
-        computedColumns, includeViews);
+    generateProtoFile.generate(paths.pathEtendoRx, metadata.getRepositoriesMap(), projections,
+        metadataContainer, computedColumns, includeViews);
 
   }
 
   /**
    * Gets the default projection
    *
-   * @param entities
-   *     the entities
-   *
+   * @param entities the entities
    * @return the generated projections
    */
   private Projection getDefaultProjection(List<Entity> entities) {
@@ -298,9 +290,7 @@ public class GenerateEntities {
   /**
    * Get the search map
    *
-   * @param entity
-   *     the entity
-   *
+   * @param entity the entity
    * @return the search map
    */
   private List<HashMap<String, Object>> getSearchesMap(Entity entity) {
@@ -315,15 +305,12 @@ public class GenerateEntities {
   /**
    * Get repositories from entity
    *
-   * @param entity
-   *     the entity
-   *
+   * @param entity the entity
    * @return the repository list
    */
   private List<Repository> getRepositories(Entity entity) {
     return new RepositoriesConverter().convert(
-        ETRXModelProvider.getInstance().getETRXRepositories(entity)
-    );
+        ETRXModelProvider.getInstance().getETRXRepositories(entity));
   }
 
   /**
@@ -333,39 +320,33 @@ public class GenerateEntities {
    */
   private List<Repository> getRepositories() {
     return new RepositoriesConverter().convert(
-        ETRXModelProvider.getInstance().getETRXRepositories()
-    );
+        ETRXModelProvider.getInstance().getETRXRepositories());
   }
 
   /**
    * Get projections
    *
-   * @param paths
-   *     the paths
-   *
+   * @param paths the paths
    * @return the projections
    */
   private List<Projection> getProjections(GeneratePaths paths) {
-    return new ProjectionsConverter().convert(
-        paths,
-        ETRXModelProvider.getInstance().getETRXProjection()
-    );
+    return new ProjectionsConverter().convert(paths,
+        ETRXModelProvider.getInstance().getETRXProjection());
   }
 
   /**
    * Generates the entity scan
    *
-   * @param entities
-   *     the entities
-   * @param pathEntitiesRx
-   *     the path entities rx
+   * @param entities       the entities
+   * @param pathEntitiesRx the path entities rx
    */
-  private void generateEntityScan(List<Entity> entities, String pathEntitiesRx) throws FileNotFoundException {
+  private void generateEntityScan(List<Entity> entities, String pathEntitiesRx)
+      throws FileNotFoundException {
     Map<String, Object> data = new HashMap<>();
-    data.put("packages", entities.stream().map(Entity::getPackageName)
-        .distinct()
-        .collect(Collectors.toList()));
-    var outFile = new File(pathEntitiesRx, "src/main/entities/com/etendorx/das/scan/EntityScan.java");
+    data.put("packages",
+        entities.stream().map(Entity::getPackageName).distinct().collect(Collectors.toList()));
+    var outFile = new File(pathEntitiesRx,
+        "src/main/entities/com/etendorx/das/scan/EntityScan.java");
     new File(outFile.getParent()).mkdirs();
     String ftlFileNameRX = "/org/openbravo/base/gen/entityscan.ftl";
     freemarker.template.Template templateRX = TemplateUtil.createTemplateImplementation(
@@ -378,21 +359,16 @@ public class GenerateEntities {
   /**
    * Generates the baseRestController.ftl entity rx
    *
-   * @param data
-   *     the data
-   * @param pathEntitiesRx
-   *     the path entities rx
-   * @param className
-   *     the class name
-   * @param packageName
-   *     the package name
-   *
-   * @exception FileNotFoundException
-   *     the file not found exception
+   * @param data           the data
+   * @param pathEntitiesRx the path entities rx
+   * @param className      the class name
+   * @param packageName    the package name
+   * @throws FileNotFoundException the file not found exception
    */
-  private void generateBaseEntityRx(Map<String, Object> data, String pathEntitiesRx, String className, String template,
-      String packageName) throws FileNotFoundException {
-    final String fullPathEntities = pathEntitiesRx + "/src/main/entities/" + packageName.replace(".", "/");
+  private void generateBaseEntityRx(Map<String, Object> data, String pathEntitiesRx,
+      String className, String template, String packageName) throws FileNotFoundException {
+    final String fullPathEntities = pathEntitiesRx + "/src/main/entities/" + packageName.replace(
+        ".", "/");
     var classfileName = className + ".java";
     var outFile = new File(fullPathEntities, classfileName);
     new File(outFile.getParent()).mkdirs();
