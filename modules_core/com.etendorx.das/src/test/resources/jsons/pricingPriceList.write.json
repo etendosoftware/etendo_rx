@@ -1,0 +1,30 @@
+{
+  "default": false,
+  "active": true,
+  "pricingPriceListVersionList": [
+    {
+      "name": "Version Tarifa Demo",
+      "pricingProductPriceList": [
+        {
+          "active": true,
+          "listPrice": 0.83,
+          "standardPrice": 0.83,
+          "product": "C790C795FFC74E8F9789E65FFEA4F1EF",
+          "priceLimit": 0
+        }
+      ],
+      "basePriceListVersion": null,
+      "priceListSchema": "462566C882A340BEB6E968AED8476697",
+      "description": null,
+      "active": true,
+      "validFromDate": "2011-01-01 00:00:00"
+    }
+  ],
+  "costBased": false,
+  "salesPriceList": true,
+  "taxIncluded": false,
+  "description": null,
+  "currency": "EUR",
+  "organization": "B843C30461EA4501935CB1D125C9C25A",
+  "name": "Tarifa de ventas Demo"
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Version Tarifa Demo",
+  "pricingProductPriceList": [
+    {
+      "active": true,
+      "listPrice": 0.83,
+      "standardPrice": 0.83,
+      "product": "C790C795FFC74E8F9789E65FFEA4F1EF",
+      "priceLimit": 0
+    }
+  ],
+  "basePriceListVersion": null,
+  "priceListSchema": "462566C882A340BEB6E968AED8476697",
+  "description": null,
+  "active": true,
+  "validFromDate": "2024-01-01 00:00:00",
+  "priceList":"91AE1E96A30844209CD996917E193BE1"
+}

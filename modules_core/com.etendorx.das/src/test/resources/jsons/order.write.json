@@ -54,10 +54,11 @@
       "grossAmount": 0,
       "netUnitPrice": 1.49,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 55000,
       "product_info": {
         "id": "C11ECF6EF3BC4240B374DD5A76163A85",
+        "searchKey": "ES/0021",
         "name": "Bebida Energética 0,5L"
       },
       "product": "ES/0021",
@@ -100,10 +101,11 @@
       "grossAmount": 0,
       "netUnitPrice": 2.04,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 73000,
       "product_info": {
         "id": "DA7FC1BB3BA44EC48EC1AB9C74168CED",
+        "searchKey": "ES/0001",
         "name": "Cerveza Ale 0,5L"
       },
       "product": "ES/0001",
@@ -147,10 +149,11 @@
       "grossAmount": 0,
       "netUnitPrice": 0.83,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 85000,
       "product_info": {
         "id": "3BD16BA206D24E41B56E0964854220EA",
+        "searchKey": "ES/0022",
         "name": "Limonada 0,5L"
       },
       "product": "ES/0022",
@@ -195,10 +198,11 @@
       "grossAmount": 0,
       "netUnitPrice": 0.83,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 90000,
       "product_info": {
         "id": "C790C795FFC74E8F9789E65FFEA4F1EF",
+        "searchKey": "ES/0018",
         "name": "Cola de Cereza 0,5L"
       },
       "product": "ES/0018",
@@ -243,10 +247,11 @@
       "grossAmount": 0,
       "netUnitPrice": 5.33,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 75000,
       "product_info": {
         "id": "20EA4222B741434A9203471A3B29C343",
+        "searchKey": "ES/0005",
         "name": "Vino Blanco 0,75L"
       },
       "product": "ES/0005",
@@ -291,10 +296,11 @@
       "grossAmount": 0,
       "netUnitPrice": 1.13,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 52000,
       "product_info": {
         "id": "F8383209982D467EBAA87460953694D1",
+        "searchKey": "ES/0013",
         "name": "Zumo de Pera 0,5L"
       },
       "product": "ES/0013",
@@ -339,10 +345,11 @@
       "grossAmount": 0,
       "netUnitPrice": 1.53,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 75000,
       "product_info": {
         "id": "BDE2F1CF46B54EF58D33E20A230DA8D2",
+        "searchKey": "ES/0024",
         "name": "Agua sin Gas 1L"
       },
       "product": "ES/0024",
@@ -387,10 +394,11 @@
       "grossAmount": 0,
       "netUnitPrice": 1.13,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 22000,
       "product_info": {
         "id": "C970393BDF6C43E2B030D23482D88EED",
+        "searchKey": "ES/0014",
         "name": "Zumo de Piña 0,5L"
       },
       "product": "ES/0014",
@@ -435,10 +443,11 @@
       "grossAmount": 0,
       "netUnitPrice": 0.83,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 35000,
       "product_info": {
         "id": "7206FAA45A3842659D93F59CCA2B0613",
+        "searchKey": "ES/0019",
         "name": "Cola 0,5L"
       },
       "product": "ES/0019",
@@ -483,10 +492,11 @@
       "grossAmount": 0,
       "netUnitPrice": 2.64,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 85000,
       "product_info": {
         "id": "C0E3824CC5184B7F9746D195ACAC2CCF",
+        "searchKey": "ES/0002",
         "name": "Cerveza Lager 0,5L"
       },
       "product": "ES/0002",
@@ -531,10 +541,11 @@
       "grossAmount": 0,
       "netUnitPrice": 1.34,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 45000,
       "product_info": {
         "id": "61047A6B06B3452B85260C7BCF08E78D",
+        "searchKey": "ES/0007",
         "name": "Zumo de Naranja Bio 0,33L"
       },
       "product": "ES/0007",
@@ -579,10 +590,11 @@
       "grossAmount": 0,
       "netUnitPrice": 5.63,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 35000,
       "product_info": {
         "id": "B3D8E5B7C9924F96A26D21ACA275D5C4",
+        "searchKey": "ES/0004",
         "name": "Vino Rosado 0,75L"
       },
       "product": "ES/0004",
@@ -627,10 +639,11 @@
       "grossAmount": 0,
       "netUnitPrice": 5.18,
       "grossUnitPrice": 0,
-      "uOM": "Unit",
+      "uOM": "EA",
       "invoicedQuantity": 25000,
       "product_info": {
         "id": "FDDBB89508D24D2C8D97A2A57BEA8788",
+        "searchKey": "ES/0003",
         "name": "Vino Tinto 0,75L"
       },
       "product": "ES/0003",

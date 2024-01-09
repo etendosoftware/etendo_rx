@@ -1,0 +1,194 @@
+{
+  "default": false,
+  "id": "AEE66281A08F42B6BC509B8A80A33C29",
+  "active": true,
+  "pricingPriceListVersionList": [
+    {
+      "id": "FDE536FE9D8C4B068C32CD6C3650B6B8",
+      "pricingProductPriceList": [
+        {
+          "id": "1B08ACC405C24D3A8064DFB35B2BFB13",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 5.18,
+          "standardPrice": 5.18,
+          "product": {
+            "id": "FDDBB89508D24D2C8D97A2A57BEA8788",
+            "searchKey": "ES/0003",
+            "name": "Vino Tinto 0,75L"
+          }
+        },
+        {
+          "id": "2B2780D0929E4E9A87F70013FE719A92",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 0.83,
+          "standardPrice": 0.83,
+          "product": {
+            "id": "3BD16BA206D24E41B56E0964854220EA",
+            "searchKey": "ES/0022",
+            "name": "Limonada 0,5L"
+          }
+        },
+        {
+          "id": "316F95A165914A538D923F3CA815E4D4",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 2.04,
+          "standardPrice": 2.04,
+          "product": {
+            "id": "DA7FC1BB3BA44EC48EC1AB9C74168CED",
+            "searchKey": "ES/0001",
+            "name": "Cerveza Ale 0,5L"
+          }
+        },
+        {
+          "id": "41732EFCA6374148BFD8B08C8B12DB73",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 1.53,
+          "standardPrice": 1.53,
+          "product": {
+            "id": "BDE2F1CF46B54EF58D33E20A230DA8D2",
+            "searchKey": "ES/0024",
+            "name": "Agua sin Gas 1L"
+          }
+        },
+        {
+          "id": "65AFE199A49747E48AAE418D611FCAFD",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 1.13,
+          "standardPrice": 1.13,
+          "product": {
+            "id": "F8383209982D467EBAA87460953694D1",
+            "searchKey": "ES/0013",
+            "name": "Zumo de Pera 0,5L"
+          }
+        },
+        {
+          "id": "7FC508ACC07F4708BAB4AB77C330C785",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 0.83,
+          "standardPrice": 0.83,
+          "product": {
+            "id": "7206FAA45A3842659D93F59CCA2B0613",
+            "searchKey": "ES/0019",
+            "name": "Cola 0,5L"
+          }
+        },
+        {
+          "id": "8E40E3D07CDC445695AA76C09811E7CB",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 2.64,
+          "standardPrice": 2.64,
+          "product": {
+            "id": "C0E3824CC5184B7F9746D195ACAC2CCF",
+            "searchKey": "ES/0002",
+            "name": "Cerveza Lager 0,5L"
+          }
+        },
+        {
+          "id": "98282367B4E846D0AB45CAB5DAFBC86B",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 1.49,
+          "standardPrice": 1.49,
+          "product": {
+            "id": "C11ECF6EF3BC4240B374DD5A76163A85",
+            "searchKey": "ES/0021",
+            "name": "Bebida Energética 0,5L"
+          }
+        },
+        {
+          "id": "9B4BE02E6A994F7CA479BBB34725AE81",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 5.63,
+          "standardPrice": 5.63,
+          "product": {
+            "id": "B3D8E5B7C9924F96A26D21ACA275D5C4",
+            "searchKey": "ES/0004",
+            "name": "Vino Rosado 0,75L"
+          }
+        },
+        {
+          "id": "9E3BFC94D38B430791C6B48FC282E6D1",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 0.83,
+          "standardPrice": 0.83,
+          "product": {
+            "id": "C790C795FFC74E8F9789E65FFEA4F1EF",
+            "searchKey": "ES/0018",
+            "name": "Cola de Cereza 0,5L"
+          }
+        },
+        {
+          "id": "D52EF0DFF6B846FF9DA4DD39E47FCB3D",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 1.13,
+          "standardPrice": 1.13,
+          "product": {
+            "id": "C970393BDF6C43E2B030D23482D88EED",
+            "searchKey": "ES/0014",
+            "name": "Zumo de Piña 0,5L"
+          }
+        },
+        {
+          "id": "E62528EBFAA645709A2F1B80B8987804",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 1.34,
+          "standardPrice": 1.34,
+          "product": {
+            "id": "61047A6B06B3452B85260C7BCF08E78D",
+            "searchKey": "ES/0007",
+            "name": "Zumo de Naranja Bio 0,33L"
+          }
+        },
+        {
+          "id": "F27D658BEA6C43BC86443F37A48E87C6",
+          "priceLimit": 0,
+          "active": true,
+          "listPrice": 5.33,
+          "standardPrice": 5.33,
+          "product": {
+            "id": "20EA4222B741434A9203471A3B29C343",
+            "searchKey": "ES/0005",
+            "name": "Vino Blanco 0,75L"
+          }
+        }
+      ],
+      "basePriceListVersion": null,
+      "priceListSchema": {
+        "id": "462566C882A340BEB6E968AED8476697",
+        "organization": "B843C30461EA4501935CB1D125C9C25A",
+        "description": null,
+        "active": true,
+        "name": "Esquema de tarificación"
+      },
+      "description": null,
+      "active": true,
+      "validFromDate": "2011-01-01 00:00:00",
+      "name": "Tarifa de ventas"
+    }
+  ],
+  "costBased": false,
+  "salesPriceList": true,
+  "taxIncluded": false,
+  "description": null,
+  "currency": "EUR",
+  "organization": {
+    "id": "B843C30461EA4501935CB1D125C9C25A",
+    "currency_info": {
+      "id": "102"
+    },
+    "searchKey": "F&B España, S.A",
+    "name": "F&B España, S.A"
+  },
+  "name": "Tarifa de ventas"
+}

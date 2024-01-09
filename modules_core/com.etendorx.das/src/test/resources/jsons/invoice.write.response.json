@@ -39,7 +39,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Agua sin Gas 1L"
@@ -69,7 +69,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Bebida Energética 0,5L"
@@ -99,7 +99,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Cerveza Ale 0,5L"
@@ -129,7 +129,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Cerveza Lager 0,5L"
@@ -159,7 +159,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Cola 0,5L"
@@ -189,7 +189,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Cola de Cereza 0,5L"
@@ -219,7 +219,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Limonada 0,5L"
@@ -249,7 +249,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Vino Blanco 0,75L"
@@ -279,7 +279,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Vino Rosado 0,75L"
@@ -309,7 +309,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Vino Tinto 0,75L"
@@ -339,7 +339,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Zumo de Naranja Bio 0,33L"
@@ -369,7 +369,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Zumo de Pera 0,5L"
@@ -399,7 +399,7 @@
         }
       ],
       "taxCategory": "IVA Normal",
-      "uOM": "Unit",
+      "uOM": "EA",
       "product_info": {
         "id": null,
         "name": "Zumo de Piña 0,5L"

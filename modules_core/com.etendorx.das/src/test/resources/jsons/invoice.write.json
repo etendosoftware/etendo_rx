@@ -30,7 +30,7 @@
         "id": "BDE2F1CF46B54EF58D33E20A230DA8D2"
       },
       "invoicedQuantity": 25000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.53,
       "grossAmount": 0,
@@ -61,7 +61,7 @@
         "id": "C11ECF6EF3BC4240B374DD5A76163A85"
       },
       "invoicedQuantity": 45000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.49,
       "grossAmount": 0,
@@ -92,7 +92,7 @@
         "id": "DA7FC1BB3BA44EC48EC1AB9C74168CED"
       },
       "invoicedQuantity": 33000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 2.04,
       "grossAmount": 0,
@@ -123,7 +123,7 @@
         "id": "C0E3824CC5184B7F9746D195ACAC2CCF"
       },
       "invoicedQuantity": 45000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 2.64,
       "grossAmount": 0,
@@ -154,7 +154,7 @@
         "id": "7206FAA45A3842659D93F59CCA2B0613"
       },
       "invoicedQuantity": 33000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 0.83,
       "grossAmount": 0,
@@ -185,7 +185,7 @@
         "id": "C790C795FFC74E8F9789E65FFEA4F1EF"
       },
       "invoicedQuantity": 40000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 0.83,
       "grossAmount": 0,
@@ -216,7 +216,7 @@
         "id": "3BD16BA206D24E41B56E0964854220EA"
       },
       "invoicedQuantity": 47000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 0.83,
       "grossAmount": 0,
@@ -247,7 +247,7 @@
         "id": "20EA4222B741434A9203471A3B29C343"
       },
       "invoicedQuantity": 56000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 5.33,
       "grossAmount": 0,
@@ -278,7 +278,7 @@
         "id": "B3D8E5B7C9924F96A26D21ACA275D5C4"
       },
       "invoicedQuantity": 12000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 5.63,
       "grossAmount": 0,
@@ -309,7 +309,7 @@
         "id": "FDDBB89508D24D2C8D97A2A57BEA8788"
       },
       "invoicedQuantity": 13000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 5.18,
       "grossAmount": 0,
@@ -340,7 +340,7 @@
         "id": "61047A6B06B3452B85260C7BCF08E78D"
       },
       "invoicedQuantity": 45000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.34,
       "grossAmount": 0,
@@ -371,7 +371,7 @@
         "id": "F8383209982D467EBAA87460953694D1"
       },
       "invoicedQuantity": 25000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.13,
       "grossAmount": 0,
@@ -402,7 +402,7 @@
         "id": "C970393BDF6C43E2B030D23482D88EED"
       },
       "invoicedQuantity": 13000,
-      "uOM": "Unit",
+      "uOM": "EA",
       "grossUnitPrice": 0,
       "netUnitPrice": 1.13,
       "grossAmount": 0,
