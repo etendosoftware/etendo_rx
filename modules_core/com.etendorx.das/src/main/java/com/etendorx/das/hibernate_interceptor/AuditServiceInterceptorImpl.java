@@ -24,6 +24,7 @@ import com.etendorx.utils.auth.key.context.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.Date;
 
@@ -56,8 +57,10 @@ public class AuditServiceInterceptorImpl implements AuditServiceInterceptor {
       baseObject.setActive(true);
       baseObject.setCreatedBy(adUserRepository.findById(userContext.getUserId()).orElse(null));
       baseObject.setCreationDate(new Date());
-      baseObject.setOrganization(
-          organizationRepository.findById(userContext.getOrganizationId()).orElse(null));
+      if(baseObject.getOrganization() == null) {
+        baseObject.setOrganization(
+            organizationRepository.findById(userContext.getOrganizationId()).orElse(null));
+      }
     }
     baseObject.setUpdatedBy(adUserRepository.findById(userContext.getUserId()).orElse(null));
     baseObject.setUpdated(new Date());
