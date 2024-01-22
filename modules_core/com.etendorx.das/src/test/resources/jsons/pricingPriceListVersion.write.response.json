@@ -1,6 +1,17 @@
 {
+  "organization": {
+    "id": "0",
+    "name": "*",
+    "searchKey": "0"
+  },
+  "priceList": "91AE1E96A30844209CD996917E193BE1",
   "pricingProductPriceList": [
     {
+      "organization": {
+        "id": "0",
+        "name": "*",
+        "searchKey": "0"
+      },
       "priceLimit": 0,
       "active": true,
       "listPrice": 0.83,
@@ -14,9 +25,7 @@
   ],
   "basePriceListVersion": null,
   "priceListSchema": {
-    "organization": "B843C30461EA4501935CB1D125C9C25A",
-    "description": null,
-    "active": true,
+    "id": "462566C882A340BEB6E968AED8476697",
     "name": "Esquema de tarificación"
   },
   "description": null,

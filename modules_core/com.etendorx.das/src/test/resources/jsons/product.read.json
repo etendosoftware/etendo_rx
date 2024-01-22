@@ -1,11 +1,17 @@
 {
   "id": "0DC5C5281B3643DEAB978EB04139516B",
+  "taxCategory": {
+    "id": "43A120C9377B4537B5D1976D9B1233D7"
+  },
   "weight": 0,
   "volume": 0,
   "versionNo": null,
   "verified": false,
   "uPCEAN": null,
-  "uOM": "EA",
+  "uOM": {
+    "id": "100",
+    "eDICode": "EA"
+  },
   "unitsPerPallet": null,
   "uniquePerDocument": false,
   "summaryLevel": false,
@@ -24,12 +30,24 @@
   "productType": "I",
   "productPurchasing": [],
   "production": false,
-  "productCategory": "291B401A38354A2C8247DFF0DFBDF4AE",
+  "productCategory": {
+    "default": false,
+    "id": "291B401A38354A2C8247DFF0DFBDF4AE",
+    "summaryLevel": false,
+    "active": true,
+    "description": null,
+    "searchKey": "Bio",
+    "name": "Bio"
+  },
   "printPrice": true,
   "printDetailsOnPickList": false,
   "printDescription": false,
   "priceRuleBased": false,
-  "organization": "2E60544D37534C0B89E765FE29BC0B43",
+  "organization": {
+    "id": "2E60544D37534C0B89E765FE29BC0B43",
+    "name": "F&B US, Inc.",
+    "searchKey": "F&B US, Inc."
+  },
   "name": "Orange Juice bio",
   "linkedToProduct": false,
   "genericProduct": null,
@@ -39,7 +57,6 @@
   "discontinued": false,
   "description": "Orange juice with no chemical additifs.",
   "deferredSellMaxDays": null,
-  "client": "23C59575B9CF467C9620760EB255B389",
   "calculated": false,
   "billOfMaterials": false,
   "allowDeferredSell": false,

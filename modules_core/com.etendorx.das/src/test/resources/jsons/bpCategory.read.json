@@ -1,0 +1,13 @@
+{
+  "default": false,
+  "id": "5C9FA34263294CA694EACB9C20FB115C",
+  "active": true,
+  "description": null,
+  "name": "Employee",
+  "searchKey": "Employee",
+  "organization": {
+    "id": "19404EAD144C49A0AF37D54377CF452D",
+    "name": "F&B International Group",
+    "searchKey": "F&B International Group"
+  }
+}

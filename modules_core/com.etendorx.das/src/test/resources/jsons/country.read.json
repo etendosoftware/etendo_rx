@@ -1,0 +1,32 @@
+{
+  "default": false,
+  "id": "106",
+  "dateformat": null,
+  "datetimeformat": null,
+  "numericmask": null,
+  "groupingseparator": null,
+  "decimalseparator": null,
+  "active": true,
+  "currency": {
+    "id": "102",
+    "iSOCode": "EUR"
+  },
+  "language": "Spanish (Spain)",
+  "postalCodeFormat": null,
+  "additionalPostalFormat": null,
+  "additionalPostalCode": false,
+  "phoneNoFormat": "Y",
+  "regionName": "Provincia",
+  "iBANLength": 24,
+  "iBANCode": "ES",
+  "description": "Spain",
+  "hasRegions": true,
+  "addressPrintFormat": "E-@P@ @C@",
+  "name": "Spain",
+  "iSOCountryCode": "ES",
+  "organization": {
+    "id": "0",
+    "name": "*",
+    "searchKey": "0"
+  }
+}

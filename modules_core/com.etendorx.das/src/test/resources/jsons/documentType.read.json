@@ -1,0 +1,42 @@
+{
+  "default": false,
+  "return": false,
+  "id": "D00B3241E3D14D83A48157DEF6BB58FE",
+  "active": true,
+  "doctypeaggrinvoice": {
+    "id": "0",
+    "name": "** New **"
+  },
+  "doctypesimpinvoice": {
+    "id": "0",
+    "name": "** New **"
+  },
+  "documentTypeForOrder": {
+    "id": "466AF4B0136A4A3F9F84129711DA8BD3",
+    "name": "Standard Order"
+  },
+  "documentTypeForShipment": {
+    "id": "0",
+    "name": "** New **"
+  },
+  "documentTypeForInvoice": {
+    "id": "0",
+    "name": "** New **"
+  },
+  "documentCancelled": null,
+  "reversal": false,
+  "salesTransaction": true,
+  "table": "C_Order",
+  "documentSequence": "Quotation",
+  "sequencedDocument": true,
+  "sOSubType": "OB",
+  "documentCategory": "SOO",
+  "printText": "Binding offer",
+  "gLCategory": "ES None",
+  "name": "Quotation",
+  "organization": {
+    "id": "B843C30461EA4501935CB1D125C9C25A",
+    "name": "F&B España, S.A",
+    "searchKey": "F&B España, S.A"
+  }
+}

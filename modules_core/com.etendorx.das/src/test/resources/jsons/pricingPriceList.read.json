@@ -2,12 +2,25 @@
   "default": false,
   "id": "AEE66281A08F42B6BC509B8A80A33C29",
   "active": true,
+  "salesPriceList": true,
   "pricingPriceListVersionList": [
     {
       "id": "FDE536FE9D8C4B068C32CD6C3650B6B8",
+      "organization": {
+        "id": "B843C30461EA4501935CB1D125C9C25A",
+        "name": "F&B España, S.A",
+        "searchKey": "F&B España, S.A"
+      },
+      "priceList": "AEE66281A08F42B6BC509B8A80A33C29",
       "pricingProductPriceList": [
         {
           "id": "1B08ACC405C24D3A8064DFB35B2BFB13",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 5.18,
@@ -20,6 +33,12 @@
         },
         {
           "id": "2B2780D0929E4E9A87F70013FE719A92",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 0.83,
@@ -32,6 +51,12 @@
         },
         {
           "id": "316F95A165914A538D923F3CA815E4D4",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 2.04,
@@ -44,6 +69,12 @@
         },
         {
           "id": "41732EFCA6374148BFD8B08C8B12DB73",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 1.53,
@@ -56,6 +87,12 @@
         },
         {
           "id": "65AFE199A49747E48AAE418D611FCAFD",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 1.13,
@@ -68,6 +105,12 @@
         },
         {
           "id": "7FC508ACC07F4708BAB4AB77C330C785",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 0.83,
@@ -80,6 +123,12 @@
         },
         {
           "id": "8E40E3D07CDC445695AA76C09811E7CB",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 2.64,
@@ -92,6 +141,12 @@
         },
         {
           "id": "98282367B4E846D0AB45CAB5DAFBC86B",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 1.49,
@@ -104,6 +159,12 @@
         },
         {
           "id": "9B4BE02E6A994F7CA479BBB34725AE81",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 5.63,
@@ -116,6 +177,12 @@
         },
         {
           "id": "9E3BFC94D38B430791C6B48FC282E6D1",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 0.83,
@@ -128,6 +195,12 @@
         },
         {
           "id": "D52EF0DFF6B846FF9DA4DD39E47FCB3D",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 1.13,
@@ -140,6 +213,12 @@
         },
         {
           "id": "E62528EBFAA645709A2F1B80B8987804",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 1.34,
@@ -152,6 +231,12 @@
         },
         {
           "id": "F27D658BEA6C43BC86443F37A48E87C6",
+          "organization": {
+            "id": "B843C30461EA4501935CB1D125C9C25A",
+            "name": "F&B España, S.A",
+            "searchKey": "F&B España, S.A"
+          },
+          "priceListVersion": "FDE536FE9D8C4B068C32CD6C3650B6B8",
           "priceLimit": 0,
           "active": true,
           "listPrice": 5.33,
@@ -166,9 +251,6 @@
       "basePriceListVersion": null,
       "priceListSchema": {
         "id": "462566C882A340BEB6E968AED8476697",
-        "organization": "B843C30461EA4501935CB1D125C9C25A",
-        "description": null,
-        "active": true,
         "name": "Esquema de tarificación"
       },
       "description": null,
@@ -178,17 +260,16 @@
     }
   ],
   "costBased": false,
-  "salesPriceList": true,
   "taxIncluded": false,
   "description": null,
-  "currency": "EUR",
+  "currency": {
+    "id": "102",
+    "iSOCode": "EUR"
+  },
   "organization": {
     "id": "B843C30461EA4501935CB1D125C9C25A",
-    "currency_info": {
-      "id": "102"
-    },
-    "searchKey": "F&B España, S.A",
-    "name": "F&B España, S.A"
+    "name": "F&B España, S.A",
+    "searchKey": "F&B España, S.A"
   },
   "name": "Tarifa de ventas"
 }

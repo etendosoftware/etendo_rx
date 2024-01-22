@@ -19,6 +19,7 @@ package com.etendorx.das.test;
 import com.etendorx.das.utils.TestcontainersUtils;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import org.junit.jupiter.api.Test;
+import org.openbravo.model.common.uom.UOM;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -52,16 +53,38 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class MappingsRestTest {
 
   public static final String X_TOKEN = "X-TOKEN";
-  private static final String INVOICE_MODEL = "Invoice";
-  private static final String ORDER_MODEL = "Order";
-  private static final String PRODUCT_MODEL = "Product";
-  private static final String PRICINGPRICELIST_MODEL = "PricingPriceList";
-  private static final String PRICINGPRICELISTVERSION_MODEL = "PricingPriceListVersion";
-  private static final String PRODUCTPRICE_MODEL = "ProductPrice";
   private static final String BASE_URL = "/obmap/";
   private static final String DATE_FORMAT = "?_dateFormat=yyyy-MM-dd HH:mm:ss";
   private static final String TIME_ZONE = "&_timeZone=GMT-3";
   private static final String ACCEPT_HEADER = "application/json; charset=UTF-8";
+  private static final String ADCLIENT_MODEL = "ADClient";
+  private static final String ADUSER_MODEL = "ADUser";
+  private static final String BPCATEGORY_MODEL = "BusinessPartnerCategory";
+  private static final String BPLOCATION_MODEL = "BusinessPartnerLocation";
+  private static final String BPTAXCATEGORY_MODEL = "BusinessPartnerTaxCategory";
+  private static final String COUNTRY_MODEL = "Country";
+  private static final String CURRENCY_MODEL = "Currency";
+  private static final String DOCUMENTTYPE_MODEL = "DocumentType";
+  private static final String FINANCIALACCOUNT_MODEL = "FIN_Financial_Account";
+  private static final String PAYMENTMETHOD_MODEL = "FIN_PaymentMethod";
+  private static final String PAYMENTTERM_MODEL = "FinancialMgmtPaymentTerm";
+  private static final String GREETING_MODEL = "Greeting";
+  private static final String INVOICE_MODEL = "Invoice";
+  private static final String LOCATION_MODEL = "Location";
+  private static final String LOCATOR_MODEL = "Locator";
+  private static final String ORDER_MODEL = "Order";
+  private static final String ORGANIZATION_MODEL = "Organization";
+  private static final String PRICINGPRICELIST_MODEL = "PricingPriceList";
+  private static final String PRICINGPRICELISTVERSION_MODEL = "PricingPriceListVersion";
+  private static final String PRODUCT_MODEL = "Product";
+  private static final String PRODUCTCATEGORY_MODEL = "ProductCategory";
+  private static final String PRODUCTPRICE_MODEL = "ProductPrice";
+  private static final String REGION_MODEL = "Region";
+  private static final String TAXCATEGORY_MODEL = "FinancialMgmtTaxCategory";
+  private static final String TAXRATE_MODEL = "FinancialMgmtTaxRate";
+  private static final String UOM_MODEL = "UOM";
+  private static final String WAREHOUSE_MODEL = "Warehouse";
+
   @Autowired
   private ADUserRepository userRepository;
   @Autowired
@@ -69,7 +92,7 @@ public class MappingsRestTest {
   @Autowired
   private MockMvc mockMvc;
 
-  private static final String TOKEN = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjk5NDcyNDc3LCJhZF91c2VyX2lkIjoiMTY3NDUwQTVCQjI4NEFCMjlDNEZFRjAzOUU5OEM5NjMiLCJhZF9jbGllbnRfaWQiOiIyM0M1OTU3NUI5Q0Y0NjdDOTYyMDc2MEVCMjU1QjM4OSIsImFkX29yZ19pZCI6IkU0NDNBMzE5OTJDQjQ2MzVBRkNBRUFCRTcxODNDRTg1IiwiYWRfcm9sZV9pZCI6IkYzMTk2QTMwQjUzQTQyNzc4NzI3QjI4NTJGRjkwQzI0Iiwic2VhcmNoX2tleSI6Im9iY29ubiIsInNlcnZpY2VfaWQiOiI1OTJBRDg3OTBFQUQ0M0FCOEY0RUI0NEFFODNDNzkyNyJ9.Ghjdvd6YDHDgOfY64zC5OtrbdQvf8ZASO2B33jknSqFew7uVnz9XDWv-mZqAiUfBcu2aSGERNU7acEMy0XsQHctGdU9_B5430hO_9kpumLeqbKHrxv4nFX2JvjaVSbu4ZFsZh-lfuPyTT6SoOmerITHC-0sMKCPHoKoJ6Z35xb1hYk1OWilIGPpKFVYbBm4lppNgAMYjywhWkzVeAczkji-g4U7KilhhPJPOnx75b-6EgDe4jxcxF3z_QtXS5sS9IQFrTOYi1VpiDvkVw3ZPOPHLh6ntXELLVpYhWHsJwXtYxfdaq4kTkIHpKHW4J41tVDC-7EFaIXohGAB02wQG0A";
+  private static final String TOKEN = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNzA1NDEzNDk3LCJhZF91c2VyX2lkIjoiQTUzMEFBRTIyQzg2NDcwMkI3RTFDMjJENThFN0IxN0IiLCJhZF9jbGllbnRfaWQiOiIyM0M1OTU3NUI5Q0Y0NjdDOTYyMDc2MEVCMjU1QjM4OSIsImFkX29yZ19pZCI6IjAiLCJhZF9yb2xlX2lkIjoiNDJEMEVFQjFDNjZGNDk3QTkwREQ1MjZEQzU5N0U2RjAiLCJzZWFyY2hfa2V5IjoiT0JDb25uZWN0b3IiLCJzZXJ2aWNlX2lkIjoiMDMyRDY4QjI1NDg4NENCOThCRTg4Q0VCRjRGN0RGNEIifQ.S8vWemHh6IysmysVJW6Ighy0Pw8ROiKdyDJM0mpiBw6bDA12Xg1qhsjSuBiy7T20V4e0p22yiHZPeqbp2U_s_URR0665uktHXocSE_UAVGymyK0eEGwmOuwg1OzTLVXNEKa5Vi0wwlia6yyyb8H1VQYyVXrM5cmqptcqDiKm-ZeoG1W2jxFpFS5abeJBIFMKLBDV6Zcvwc9Q2WG9M70l7OC169eJgYxf8bvk_gCnVxb9PbIFRcJiCmaSLvvGZcfIFj6WJZ5twSxnPQ-fPsEWptv_Hv2HSIKJgKzyyeG4XViQYBlQOJhed5CYWGq6_nLb3Rb9OFT5lPvhH8BmvAHRaw";
 
   @DynamicPropertySource
   static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -116,6 +139,97 @@ public class MappingsRestTest {
   }
 
   @Test
+  void shouldReturnADClientWhenRequested() throws Exception {
+    String id = "23C59575B9CF467C9620760EB255B389";
+    String jsonFile = "/jsons/adClient.read.json";
+    performGetRequestAndAssertResponse(ADCLIENT_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnADUserWhenRequested() throws Exception {
+    String id = "A530AAE22C864702B7E1C22D58E7B17B";
+    String jsonFile = "/jsons/adUser.read.json";
+    performGetRequestAndAssertResponse(ADUSER_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnBPCategoryWhenRequested() throws Exception {
+    String id = "5C9FA34263294CA694EACB9C20FB115C";
+    String jsonFile = "/jsons/bpCategory.read.json";
+    performGetRequestAndAssertResponse(BPCATEGORY_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnBPLocationWhenRequested() throws Exception {
+    String id = "BFE1FB707BA84A6D8AF61A785F3CE1C1";
+    String jsonFile = "/jsons/bpLocation.read.json";
+    performGetRequestAndAssertResponse(BPLOCATION_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnBPTaxCategoryWhenRequested() throws Exception {
+    String id = "742AF058A304496C85A4DA39E4E35423";
+    String jsonFile = "/jsons/bpTaxCategory.read.json";
+    performGetRequestAndAssertResponse(BPTAXCATEGORY_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnCountryWhenRequested() throws Exception {
+    String id = "106";
+    String jsonFile = "/jsons/country.read.json";
+    performGetRequestAndAssertResponse(COUNTRY_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnCurrencyWhenRequested() throws Exception {
+    String id = "102";
+    String jsonFile = "/jsons/currency.read.json";
+    performGetRequestAndAssertResponse(CURRENCY_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnDocumentTypeWhenRequested() throws Exception {
+    String id = "D00B3241E3D14D83A48157DEF6BB58FE";
+    String jsonFile = "/jsons/documentType.read.json";
+    performGetRequestAndAssertResponse(DOCUMENTTYPE_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnFinancialAccountWhenRequested() throws Exception {
+    String id = "2C059762760F4F3D8A91342ED988DEB8";
+    String jsonFile = "/jsons/financialAccount.read.json";
+    performGetRequestAndAssertResponse(FINANCIALACCOUNT_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnPaymentMethodWhenRequested() throws Exception {
+    String id = "47506D4260BA4996B92768FF609E6665";
+    String jsonFile = "/jsons/paymentMethod.read.json";
+    performGetRequestAndAssertResponse(PAYMENTMETHOD_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnPaymentTermWhenRequested() throws Exception {
+    String id = "A8EB69EF071A43DDBFF1A796B59E5B1D";
+    String jsonFile = "/jsons/paymentTerm.read.json";
+    performGetRequestAndAssertResponse(PAYMENTTERM_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldCreateGreetingWhenPosted() throws Exception {
+    String jsonFile = "/jsons/greeting.write.json";
+    String responseJsonFile = "/jsons/greeting.write.response.json";
+    performPostRequestAndAssertResponse(GREETING_MODEL, jsonFile, responseJsonFile);
+  }
+
+  @Test
+  void shouldReturnProductCategoryWhenRequested() throws Exception {
+    String id = "DC7F246D248B4C54BFC5744D5C27704F";
+    String jsonFile = "/jsons/productCategory.read.json";
+    performGetRequestAndAssertResponse(PRODUCTCATEGORY_MODEL, id, jsonFile);
+  }
+
+  @Test
   void shouldReturnInvoiceWhenRequested() throws Exception {
     String id = "5057F53393774AC3A952F9143426A922";
     String jsonFile = "/jsons/invoice.read.json";
@@ -130,6 +244,20 @@ public class MappingsRestTest {
   }
 
   @Test
+  void shouldReturnLocationWhenRequested() throws Exception {
+    String id = "3E18625345CD4D27915FEDCE344FF79F";
+    String jsonFile = "/jsons/location.read.json";
+    performGetRequestAndAssertResponse(LOCATION_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnLocatorWhenRequested() throws Exception {
+    String id = "54EB861A446D464EAA433477A1D867A6";
+    String jsonFile = "/jsons/locator.read.json";
+    performGetRequestAndAssertResponse(LOCATOR_MODEL, id, jsonFile);
+  }
+
+  @Test
   void shouldReturnOrderWhenRequested() throws Exception {
     String id = "26593FEBBE40426991B6C4475DCE5BEE";
     String jsonFile = "/jsons/order.read.json";
@@ -141,6 +269,12 @@ public class MappingsRestTest {
     String jsonFile = "/jsons/order.write.json";
     String responseJsonFile = "/jsons/order.write.response.json";
     performPostRequestAndAssertResponse(ORDER_MODEL, jsonFile, responseJsonFile);
+  }
+  @Test
+  void shouldReturnOrganizationWhenRequested() throws Exception {
+    String id = "0";
+    String jsonFile = "/jsons/organization.read.json";
+    performGetRequestAndAssertResponse(ORGANIZATION_MODEL, id, jsonFile);
   }
 
   @Test
@@ -198,4 +332,40 @@ public class MappingsRestTest {
     String responseJsonFile = "/jsons/productPrice.write.response.json";
     performPostRequestAndAssertResponse(PRODUCTPRICE_MODEL, jsonFile, responseJsonFile);
   }
+
+  @Test
+  void shouldReturnRegionWhenRequested() throws Exception {
+    String id = "A44A7F2FCFD34CC78DC5546B067CD816";
+    String jsonFile = "/jsons/region.read.json";
+    performGetRequestAndAssertResponse(REGION_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnTaxCategoryWhenRequested() throws Exception {
+    String id = "57B9430EE6DA49EEBEF1AC05B8B4A54C";
+    String jsonFile = "/jsons/taxCategory.read.json";
+    performGetRequestAndAssertResponse(TAXCATEGORY_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnTaxRateWhenRequested() throws Exception {
+    String id = "4BF9470755AD4395AABCB77F5014CBE8";
+    String jsonFile = "/jsons/taxRate.read.json";
+    performGetRequestAndAssertResponse(TAXRATE_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnUOMWhenRequested() throws Exception {
+    String id = "EA";
+    String jsonFile = "/jsons/uom.read.json";
+    performGetRequestAndAssertResponse(UOM_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnWarehouseWhenRequested() throws Exception {
+    String id = "B2D40D8A5D644DD89E329DC297309055";
+    String jsonFile = "/jsons/warehouse.read.json";
+    performGetRequestAndAssertResponse(WAREHOUSE_MODEL, id, jsonFile);
+  }
+
 }

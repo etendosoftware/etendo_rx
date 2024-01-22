@@ -1,0 +1,36 @@
+{
+  "default": false,
+  "id": "4BF9470755AD4395AABCB77F5014CBE8",
+  "active": true,
+  "withholdingTax": false,
+  "validFromDate": "2000-01-01 00:00:00",
+  "taxExempt": true,
+  "taxCategory": {
+    "id": "57B9430EE6DA49EEBEF1AC05B8B4A54C",
+    "name": "Exento"
+  },
+  "taxBase": null,
+  "summaryLevel": false,
+  "salesPurchaseType": "S",
+  "region": null,
+  "rate": 0,
+  "parentTaxRate": null,
+  "organization": {
+    "id": "B843C30461EA4501935CB1D125C9C25A",
+    "name": "F&B España, S.A",
+    "searchKey": "F&B España, S.A"
+  },
+  "notTaxdeductable": false,
+  "notTaxable": false,
+  "name": "Ventas exentas",
+  "lineNo": 10,
+  "istaxdeductable": false,
+  "docTaxAmount": "D",
+  "destinationRegion": null,
+  "destinationCountry": null,
+  "description": "Ventas exentas",
+  "country": null,
+  "cascade": false,
+  "businessPartnerTaxCategory": null,
+  "baseAmount": "LNA"
+}

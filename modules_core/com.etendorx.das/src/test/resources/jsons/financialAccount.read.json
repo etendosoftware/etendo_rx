@@ -1,0 +1,34 @@
+{
+  "default": false,
+  "id": "2C059762760F4F3D8A91342ED988DEB8",
+  "accountDigitcontrol": "0",
+  "bankDigitcontrol": "3",
+  "branchCode": "1000",
+  "bankCode": "1000",
+  "bankFormat": "GENERIC",
+  "country": null,
+  "iNENo": null,
+  "swiftCode": null,
+  "iBAN": null,
+  "genericAccountNo": "0000000001",
+  "aprmGlitemDiff": null,
+  "aprmFundsTrans": null,
+  "active": true,
+  "matchingAlgorithm": "Standard",
+  "initialBalance": 0,
+  "creditLimit": 0,
+  "businessPartner": null,
+  "locationAddress": null,
+  "description": null,
+  "type": "B",
+  "currency": {
+    "id": "100",
+    "iSOCode": "USD"
+  },
+  "name": "Bank - Account 1",
+  "organization": {
+    "id": "2E60544D37534C0B89E765FE29BC0B43",
+    "name": "F&B US, Inc.",
+    "searchKey": "F&B US, Inc."
+  }
+}

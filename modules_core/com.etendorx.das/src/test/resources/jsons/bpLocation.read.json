@@ -1,0 +1,30 @@
+{
+  "id": "BFE1FB707BA84A6D8AF61A785F3CE1C1",
+  "taxLocation": false,
+  "active": true,
+  "invoiceAddress": true,
+  "shipToAddress": true,
+  "fax": null,
+  "name": ".Valencia, Av. de las Fuentes, 56",
+  "alternativePhone": null,
+  "phone": "627636151",
+  "locationAddress": {
+    "id": "53266A42D16E4E6EBF5D9C334B089CF3",
+    "organization": {
+      "id": "B843C30461EA4501935CB1D125C9C25A",
+      "name": "F&B España, S.A",
+      "searchKey": "F&B España, S.A"
+    },
+    "addressLine1": "Av. de las Fuentes, 56",
+    "countryCode": "106",
+    "region": "E2B16F8BB5344E4BB570B957DE0F83D4",
+    "regionName": null,
+    "cityName": null,
+    "postalCode": "61764"
+  },
+  "organization": {
+    "id": "B843C30461EA4501935CB1D125C9C25A",
+    "name": "F&B España, S.A",
+    "searchKey": "F&B España, S.A"
+  }
+}

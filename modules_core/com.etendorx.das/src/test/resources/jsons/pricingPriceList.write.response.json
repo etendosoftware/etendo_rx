@@ -3,8 +3,18 @@
   "active": true,
   "pricingPriceListVersionList": [
     {
+      "organization": {
+        "id": "0",
+        "name": "*",
+        "searchKey": "0"
+      },
       "pricingProductPriceList": [
         {
+          "organization": {
+            "id": "0",
+            "name": "*",
+            "searchKey": "0"
+          },
           "priceLimit": 0,
           "active": true,
           "listPrice": 0.83,
@@ -19,9 +29,6 @@
       "basePriceListVersion": null,
       "priceListSchema": {
         "id": "462566C882A340BEB6E968AED8476697",
-        "organization": "B843C30461EA4501935CB1D125C9C25A",
-        "description": null,
-        "active": true,
         "name": "Esquema de tarificación"
       },
       "description": null,
@@ -30,16 +37,18 @@
       "name": "Version Tarifa Demo"
     }
   ],
-  "costBased": false,
   "salesPriceList": true,
+  "costBased": false,
   "taxIncluded": false,
   "description": null,
-  "currency": "EUR",
+  "currency": {
+    "id": "102",
+    "iSOCode": "EUR"
+  },
   "organization": {
-    "id": "E443A31992CB4635AFCAEABE7183CE85",
-    "currency_info": null,
-    "searchKey": "F&B España - Región Norte",
-    "name": "F&B España - Región Norte"
+    "id": "B843C30461EA4501935CB1D125C9C25A",
+    "name": "F&B España, S.A",
+    "searchKey": "F&B España, S.A"
   },
   "name": "Tarifa de ventas Demo"
 }

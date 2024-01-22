@@ -1,0 +1,13 @@
+{
+  "default": false,
+  "id": "57B9430EE6DA49EEBEF1AC05B8B4A54C",
+  "active": true,
+  "asbom": false,
+  "description": "Exento",
+  "name": "Exento",
+  "organization": {
+    "id": "B843C30461EA4501935CB1D125C9C25A",
+    "name": "F&B España, S.A",
+    "searchKey": "F&B España, S.A"
+  }
+}

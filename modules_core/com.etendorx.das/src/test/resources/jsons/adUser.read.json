@@ -1,0 +1,24 @@
+{
+  "id": "A530AAE22C864702B7E1C22D58E7B17B",
+  "emailServerUsername": null,
+  "fax": null,
+  "alternativePhone": null,
+  "phone": null,
+  "birthday": null,
+  "position": null,
+  "locked": false,
+  "email": null,
+  "partnerAddress": null,
+  "businessPartner": null,
+  "active": false,
+  "description": "F&BAdmin",
+  "lastName": null,
+  "firstName": null,
+  "username": "F&BAdmin",
+  "name": "F&BAdmin",
+  "organization": {
+    "id": "0",
+    "name": "*",
+    "searchKey": "0"
+  }
+}

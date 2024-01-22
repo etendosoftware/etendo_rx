@@ -1,5 +1,5 @@
 {
-  "taxCategory_info": {
+  "taxCategory": {
     "id": "43A120C9377B4537B5D1976D9B1233D7"
   },
   "weight": 0,
@@ -7,7 +7,10 @@
   "versionNo": null,
   "verified": false,
   "uPCEAN": null,
-  "uOM": "EA",
+  "uOM": {
+    "id": "100",
+    "eDICode": "EA"
+  },
   "unitsPerPallet": null,
   "uniquePerDocument": false,
   "summaryLevel": false,
@@ -26,12 +29,24 @@
   "productType": "I",
   "productPurchasing": null,
   "production": false,
-  "productCategory": "291B401A38354A2C8247DFF0DFBDF4AE",
+  "productCategory": {
+    "default": false,
+    "id": "291B401A38354A2C8247DFF0DFBDF4AE",
+    "summaryLevel": false,
+    "active": true,
+    "description": null,
+    "searchKey": "Bio",
+    "name": "Bio"
+  },
   "printPrice": true,
   "printDetailsOnPickList": false,
   "printDescription": false,
   "priceRuleBased": false,
-  "organization": "E443A31992CB4635AFCAEABE7183CE85",
+  "organization": {
+    "id": "B843C30461EA4501935CB1D125C9C25A",
+    "name": "F&B España, S.A",
+    "searchKey": "F&B España, S.A"
+  },
   "name": "Orange Juice bio",
   "linkedToProduct": false,
   "genericProduct": null,
@@ -41,7 +56,6 @@
   "discontinued": false,
   "description": "Orange juice with no chemical additifs.",
   "deferredSellMaxDays": null,
-  "client": "23C59575B9CF467C9620760EB255B389",
   "calculated": false,
   "billOfMaterials": false,
   "allowDeferredSell": false,

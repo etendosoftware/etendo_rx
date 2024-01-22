@@ -1,0 +1,21 @@
+{
+  "default": false,
+  "id": "A8EB69EF071A43DDBFF1A796B59E5B1D",
+  "overduePaymentDayRule": null,
+  "nextBusinessDay": false,
+  "maturityDate3": 0,
+  "maturityDate2": null,
+  "maturityDate1": null,
+  "fixedDueDate": false,
+  "overduePaymentDaysRule": 0,
+  "offsetMonthDue": 0,
+  "description": null,
+  "active": true,
+  "organization": {
+    "id": "0",
+    "name": "*",
+    "searchKey": "0"
+  },
+  "name": "Immediate",
+  "searchKey": "I"
+}
