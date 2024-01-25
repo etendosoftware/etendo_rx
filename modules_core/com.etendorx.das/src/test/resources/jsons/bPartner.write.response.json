@@ -1,0 +1,82 @@
+{
+  "language": {
+    "id": null,
+    "language": "en_US"
+  },
+  "summaryLevel": false,
+  "consentPaperInfo": false,
+  "creditUsed": 0,
+  "aDUserList": null,
+  "businessPartnerLocationList": null,
+  "salaryCategory": null,
+  "isSalesRepresentative": false,
+  "employee": false,
+  "paymentOut": true,
+  "purchaseInvoice": true,
+  "goodsReceipt": false,
+  "purchaseOrder": true,
+  "vendorBlocking": false,
+  "taxCategory": null,
+  "pOMaturityDate3": null,
+  "pOMaturityDate2": null,
+  "pOMaturityDate1": null,
+  "pOFinancialAccount": null,
+  "pOPaymentTerms": null,
+  "pOPaymentMethod": null,
+  "purchasePricelist": null,
+  "vendor": false,
+  "birthPlace": null,
+  "birthDay": null,
+  "maturityDate3": null,
+  "maturityDate2": null,
+  "maturityDate1": null,
+  "sOBPTaxCategory": null,
+  "paymentIn": false,
+  "salesInvoice": true,
+  "goodsShipment": true,
+  "salesOrder": true,
+  "customerBlocking": false,
+  "taxExempt": false,
+  "invoiceSchedule": null,
+  "invoiceTerms": "D",
+  "salesRepresentative": null,
+  "account": null,
+  "paymentTerms": {
+    "id": "66BA1164A7394344BB9CD1A6ECEED05D",
+    "name": "30 days"
+  },
+  "paymentMethod": {
+    "id": "A97CFD2AFC234B59BB0A72189BD8FC2A",
+    "name": "Transferencia"
+  },
+  "priceList": {
+    "id": "AEE66281A08F42B6BC509B8A80A33C29",
+    "name": "Tarifa de ventas"
+  },
+  "customer": true,
+  "isCustomerConsent": false,
+  "currency": {
+    "id": "102",
+    "iSOCode": "EUR"
+  },
+  "creditLimit": 0,
+  "greeting": null,
+  "active": true,
+  "consumptionDays": 1500,
+  "referenceNo": null,
+  "uRL": null,
+  "description": "Demo Business Partner",
+  "name2": null,
+  "businessPartnerCategory": {
+    "id": "713643BF6582479BAD2AF21B80836AA2",
+    "name": "Customer - Tier 1"
+  },
+  "taxID": "K012345678",
+  "name": "Demo Business Partner",
+  "searchKey": "ES-C1/DEMO",
+  "organization": {
+    "id": "B843C30461EA4501935CB1D125C9C25A",
+    "name": "F&B España, S.A",
+    "searchKey": "F&B España, S.A"
+  }
+}

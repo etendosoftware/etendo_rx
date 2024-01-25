@@ -1,0 +1,122 @@
+{
+  "id": "A6750F0D15334FB890C254369AC750A8",
+  "language": {
+    "id": null,
+    "language": "en_US"
+  },
+  "summaryLevel": false,
+  "consentPaperInfo": false,
+  "creditUsed": 0,
+  "aDUserList": [
+    {
+      "id": "6B1E8F0CA1524850AB3A7F9AE475A16F",
+      "name": "Luis Rodriguez"
+    }
+  ],
+  "businessPartnerLocationList": [
+    {
+      "id": "6518D3040ED54008A1FC0C09ED140D66",
+      "taxLocation": false,
+      "active": true,
+      "invoiceAddress": true,
+      "shipToAddress": true,
+      "fax": null,
+      "name": "La Coruña, C\\Pescadores, 87",
+      "alternativePhone": null,
+      "phone": "639301719",
+      "locationAddress": {
+        "id": "A57BEC3F4C694F96B3C17105046719EB",
+        "organization": {
+          "id": "B843C30461EA4501935CB1D125C9C25A",
+          "name": "F&B España, S.A",
+          "searchKey": "F&B España, S.A"
+        },
+        "addressLine1": "C\\Pescadores, 87",
+        "countryCode": "106",
+        "region": "479B18340BF54380B0D09E77D14569FE",
+        "regionName": null,
+        "cityName": null,
+        "postalCode": "16537"
+      },
+      "organization": {
+        "id": "B843C30461EA4501935CB1D125C9C25A",
+        "name": "F&B España, S.A",
+        "searchKey": "F&B España, S.A"
+      }
+    }
+  ],
+  "salaryCategory": null,
+  "isSalesRepresentative": false,
+  "employee": false,
+  "paymentOut": true,
+  "purchaseInvoice": true,
+  "goodsReceipt": false,
+  "purchaseOrder": true,
+  "vendorBlocking": false,
+  "taxCategory": null,
+  "pOMaturityDate3": null,
+  "pOMaturityDate2": null,
+  "pOMaturityDate1": null,
+  "pOFinancialAccount": null,
+  "pOPaymentTerms": null,
+  "pOPaymentMethod": null,
+  "purchasePricelist": null,
+  "vendor": false,
+  "birthPlace": null,
+  "birthDay": null,
+  "maturityDate3": null,
+  "maturityDate2": null,
+  "maturityDate1": null,
+  "sOBPTaxCategory": null,
+  "paymentIn": false,
+  "salesInvoice": true,
+  "goodsShipment": true,
+  "salesOrder": true,
+  "customerBlocking": false,
+  "taxExempt": false,
+  "invoiceSchedule": null,
+  "invoiceTerms": "D",
+  "salesRepresentative": null,
+  "account": {
+    "id": "DEDDE613C5314ACD8DCC60C474D1A107",
+    "name": "Cuenta de Banco"
+  },
+  "paymentTerms": {
+    "id": "66BA1164A7394344BB9CD1A6ECEED05D",
+    "name": "30 days"
+  },
+  "paymentMethod": {
+    "id": "A97CFD2AFC234B59BB0A72189BD8FC2A",
+    "name": "Transferencia"
+  },
+  "priceList": {
+    "id": "AEE66281A08F42B6BC509B8A80A33C29",
+    "name": "Tarifa de ventas"
+  },
+  "customer": true,
+  "isCustomerConsent": false,
+  "currency": {
+    "id": "102",
+    "iSOCode": "EUR"
+  },
+  "creditLimit": 0,
+  "greeting": null,
+  "active": true,
+  "consumptionDays": 1500,
+  "referenceNo": null,
+  "uRL": null,
+  "description": "Cadena de 80 supermercados a nivel nacional",
+  "name2": null,
+  "businessPartnerCategory": {
+    "id": "713643BF6582479BAD2AF21B80836AA2",
+    "name": "Customer - Tier 1"
+  },
+  "taxID": "K01927367",
+  "name": "Alimentos y Supermercados, S.A",
+  "searchKey": "ES-C1/0001",
+  "organization": {
+    "id": "B843C30461EA4501935CB1D125C9C25A",
+    "name": "F&B España, S.A",
+    "searchKey": "F&B España, S.A"
+  }
+}

@@ -59,6 +59,7 @@ public class MappingsRestTest {
   private static final String ACCEPT_HEADER = "application/json; charset=UTF-8";
   private static final String ADCLIENT_MODEL = "ADClient";
   private static final String ADUSER_MODEL = "ADUser";
+  private static final String BUSINESSPARTNER_MODEL = "BusinessPartner";
   private static final String BPCATEGORY_MODEL = "BusinessPartnerCategory";
   private static final String BPLOCATION_MODEL = "BusinessPartnerLocation";
   private static final String BPTAXCATEGORY_MODEL = "BusinessPartnerTaxCategory";
@@ -150,6 +151,20 @@ public class MappingsRestTest {
     String id = "A530AAE22C864702B7E1C22D58E7B17B";
     String jsonFile = "/jsons/adUser.read.json";
     performGetRequestAndAssertResponse(ADUSER_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldReturnBPartnerWhenRequested() throws Exception {
+    String id = "A6750F0D15334FB890C254369AC750A8";
+    String jsonFile = "/jsons/bPartner.read.json";
+    performGetRequestAndAssertResponse(BUSINESSPARTNER_MODEL, id, jsonFile);
+  }
+
+  @Test
+  void shouldCreateBPartnerhenPosted() throws Exception {
+    String jsonFile = "/jsons/bPartner.write.json";
+    String responseJsonFile = "/jsons/bPartner.write.response.json";
+    performPostRequestAndAssertResponse(BUSINESSPARTNER_MODEL, jsonFile, responseJsonFile);
   }
 
   @Test
