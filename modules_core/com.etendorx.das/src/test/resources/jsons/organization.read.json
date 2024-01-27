@@ -1,8 +1,10 @@
 {
   "id": "0",
+  "active": true,
   "organizationType": "Organization",
   "description": "All Organizations",
-  "currency_info": null,
+  "currency.id": null,
+  "currency": null,
   "socialName": null,
   "name": "*",
   "searchKey": "0"

@@ -1,7 +1,5 @@
 {
-  "taxCategory_info": {
-    "id": "43A120C9377B4537B5D1976D9B1233D7"
-  },
+  "taxCategory": "43A120C9377B4537B5D1976D9B1233D7",
   "weight": 0,
   "volume": 0,
   "versionNo": null,

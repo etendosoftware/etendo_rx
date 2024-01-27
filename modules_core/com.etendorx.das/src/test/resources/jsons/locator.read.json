@@ -1,6 +1,7 @@
 {
   "default": false,
   "id": "54EB861A446D464EAA433477A1D867A6",
+  "organization.id": "E443A31992CB4635AFCAEABE7183CE85",
   "organization": {
     "id": "E443A31992CB4635AFCAEABE7183CE85",
     "name": "F&B España - Región Norte",
@@ -36,46 +37,9 @@
     "F0B8A7511EF844B78F3F6B867B8E0A8D",
     "F0CBC3AB6D864FD1B567FF5412AE93DD"
   ],
+  "warehouse.id": "B2D40D8A5D644DD89E329DC297309055",
   "warehouse": {
     "id": "B2D40D8A5D644DD89E329DC297309055",
-    "locatorList": [
-      {
-        "id": "0D6A0AB850AC4B5EB24330A29CF1E7B2",
-        "searchKey": "RN-2-0-0"
-      },
-      {
-        "id": "54EB861A446D464EAA433477A1D867A6",
-        "searchKey": "Rn-0-0-0"
-      },
-      {
-        "id": "585443B941CB434D9C0A2524E4F7E097",
-        "searchKey": "RN-1-0-0"
-      },
-      {
-        "id": "668F6C49F605408F8ED49E912718B9DD",
-        "searchKey": "RN-Dev"
-      }
-    ],
-    "locationAddress": {
-      "id": "3E18625345CD4D27915FEDCE344FF79F",
-      "organization": {
-        "id": "E443A31992CB4635AFCAEABE7183CE85",
-        "name": "F&B España - Región Norte",
-        "searchKey": "F&B España - Región Norte"
-      },
-      "addressLine1": "Pol. Industrial el Norte, 142",
-      "countryCode": "106",
-      "region": "8F27FEDD808C447484F75FA769B104DB",
-      "regionName": null,
-      "cityName": null,
-      "postalCode": "31142"
-    },
-    "organization": {
-      "id": "E443A31992CB4635AFCAEABE7183CE85",
-      "name": "F&B España - Región Norte",
-      "searchKey": "F&B España - Región Norte"
-    },
-    "active": true,
     "searchKey": "RN",
     "name": "España Región Norte"
   },
