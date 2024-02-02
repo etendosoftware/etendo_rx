@@ -72,7 +72,7 @@ bootBuildImage {
 }
 
 ext {
-    set('springCloudVersion', "2022.0.4")
+    set('springCloudVersion', "2023.0.0")
 }
 
 dependencyManagement {
