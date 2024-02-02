@@ -10,6 +10,12 @@ import com.etendorx.entities.entities.BaseRXObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
 import jakarta.persistence.Convert;
 import lombok.Getter;
@@ -34,6 +40,10 @@ import java.util.Date;
 @jakarta.persistence.Table(name = "${entity.tableName?lower_case}")
 @jakarta.persistence.Cacheable
 @EntityScan
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+property = "id")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.tableName?lower_case)>implements BaseSerializableObject<#else>extends BaseRXObject</#if> {
 <#list entity.properties as p>
     <#if !p.computedColumn>
@@ -87,6 +97,8 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     @jakarta.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.referencedProperty.columnName?lower_case}"<#if repeated>, updatable = false, insertable = false</#if>)
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
     @JsonProperty("${p.javaName}")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     ${p.targetEntity.className} ${p.javaName};
 
                     <#else>
@@ -96,7 +108,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
         <#else>
             <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.targetEntity.className?ends_with("_ComputedColumns")>
     @jakarta.persistence.OneToMany(mappedBy = "${p.referencedProperty.name}", cascade = jakarta.persistence.CascadeType.ALL)
-    @JsonIgnoreProperties("${p.referencedProperty.name}")
+    @JsonIgnore
     java.util.List<${p.targetEntity.className}> ${p.name};
 
             </#if>

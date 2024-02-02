@@ -16,9 +16,10 @@
 
 package com.etendorx.entities.entities;
 
-import java.io.Serializable;
-
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Convert;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +30,6 @@ import org.openbravo.model.common.enterprise.Organization;
 
 import jakarta.persistence.MappedSuperclass;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Getter
 @Setter
@@ -37,10 +37,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 public abstract class BaseRXObject implements BaseSerializableObject {
     @jakarta.persistence.JoinColumn(name = "ad_client_id", referencedColumnName = "AD_Client_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     Client client;
 
     @jakarta.persistence.JoinColumn(name = "ad_org_id", referencedColumnName = "AD_Org_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     Organization organization;
 
     @jakarta.persistence.Column(name = "isactive")
@@ -52,6 +56,8 @@ public abstract class BaseRXObject implements BaseSerializableObject {
 
     @jakarta.persistence.JoinColumn(name = "createdby", referencedColumnName = "AD_User_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     User createdBy;
 
     @jakarta.persistence.Column(name = "updated")
@@ -59,6 +65,8 @@ public abstract class BaseRXObject implements BaseSerializableObject {
 
     @jakarta.persistence.JoinColumn(name = "updatedby", referencedColumnName = "AD_User_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     User updatedBy;
 
     @JsonProperty("_identifier")
