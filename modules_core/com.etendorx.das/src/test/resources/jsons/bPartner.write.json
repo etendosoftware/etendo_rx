@@ -43,7 +43,7 @@
   "priceList": "AEE66281A08F42B6BC509B8A80A33C29",
   "customer": true,
   "isCustomerConsent": false,
-  "currency": "102",
+  "currency": "EUR",
   "creditLimit": 0,
   "greeting": null,
   "active": true,

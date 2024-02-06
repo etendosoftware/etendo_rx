@@ -24,7 +24,7 @@
   "salesPriceList": true,
   "taxIncluded": false,
   "description": null,
-  "currency": "102",
+  "currency": "EUR",
   "organization": "B843C30461EA4501935CB1D125C9C25A",
   "name": "Tarifa de ventas Demo"
 }

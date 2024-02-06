@@ -1,444 +1,447 @@
 {
-  "isReturn": false,
-  "taxes": [
+  "orderTaxList": [
     {
+      "active": true,
       "taxAmount": 290617.2,
       "taxableAmount": 1614540,
-      "tax_info": {
+      "tax.id": "1C844BEC532C4306950BAE1A8E89C088",
+      "tax": {
         "id": "1C844BEC532C4306950BAE1A8E89C088",
         "name": "Entregas IVA 18%"
       },
-      "lineNo": 10
+      "lineNo": 10,
+      "organization.id": "E443A31992CB4635AFCAEABE7183CE85",
+      "organization": {
+        "id": "E443A31992CB4635AFCAEABE7183CE85",
+        "name": "F&B España - Región Norte",
+        "searchKey": "F&B España - Región Norte"
+      }
     }
   ],
-  "lines": [
+  "orderLineList": [
     {
-      "tax_info": {
+      "reservedQuantity": 0,
+      "warehouse.id": "B2D40D8A5D644DD89E329DC297309055",
+      "warehouse": {
+        "id": "B2D40D8A5D644DD89E329DC297309055",
+        "searchKey": "RN",
+        "name": "España Región Norte"
+      },
+      "freightAmount": 0,
+      "standardPrice": 1.49,
+      "currency": {
+        "id": "102",
+        "iSOCode": "EUR"
+      },
+      "goodsShipmentLine.id": null,
+      "returnReason.id": null,
+      "returnReason": null,
+      "scheduledDeliveryDate": "2011-02-15 00:00:00",
+      "orderDate": "2011-02-02 00:00:00",
+      "ndDimension": null,
+      "stDimension": null,
+      "asset.id": null,
+      "costcenter.id": null,
+      "project.id": null,
+      "orderLineTaxList": [
+        {
+          "active": true,
+          "taxAmount": 14751,
+          "taxableAmount": 81950,
+          "tax.id": "1C844BEC532C4306950BAE1A8E89C088",
+          "tax": {
+            "id": "1C844BEC532C4306950BAE1A8E89C088",
+            "name": "Entregas IVA 18%"
+          },
+          "lineNo": 10,
+          "organization.id": "E443A31992CB4635AFCAEABE7183CE85",
+          "organization": {
+            "id": "E443A31992CB4635AFCAEABE7183CE85",
+            "name": "F&B España - Región Norte",
+            "searchKey": "F&B España - Región Norte"
+          }
+        }
+      ],
+      "priceLimit": 0,
+      "invoicedQuantity": 55000,
+      "overdueReturnDays": null,
+      "printDescription": false,
+      "quotationLine.id": null,
+      "quotationLine": null,
+      "deliveredQuantity": 55000,
+      "taxableAmount": 81950,
+      "createReservation": null,
+      "replacedorderline.id": null,
+      "replacedorderline": null,
+      "description": null,
+      "warehouseRule.id": null,
+      "discount": 0,
+      "grossListPrice": null,
+      "listPrice": 1.49,
+      "tax.id": "1C844BEC532C4306950BAE1A8E89C088",
+      "tax": {
         "id": "1C844BEC532C4306950BAE1A8E89C088",
         "name": "Entregas IVA 18%"
       },
-      "discountPercentage": 0,
+      "grossAmount": null,
       "lineNetAmount": 81950,
-      "priceLimit": 0,
-      "unitPrice": 1.49,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 1.49,
-      "grossListPrice": null,
-      "netAmount": 81950,
-      "grossAmount": 0,
-      "netUnitPrice": 1.49,
       "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 55000,
-      "product_info": {
+      "unitPrice": 1.49,
+      "attributeSetValue.id": null,
+      "uOM.id": "100",
+      "uOM": {
+        "id": "100",
+        "eDICode": "EA"
+      },
+      "orderedQuantity": 55000,
+      "operativeUOM.id": null,
+      "operativeUOM": null,
+      "operativeQuantity": null,
+      "product.id": "C11ECF6EF3BC4240B374DD5A76163A85",
+      "product": {
         "id": "C11ECF6EF3BC4240B374DD5A76163A85",
         "searchKey": "ES/0021",
         "name": "Bebida Energética 0,5L"
       },
-      "product": "ES/0021",
-      "lineNo": 10
+      "lineNo": 10,
+      "organization.id": "E443A31992CB4635AFCAEABE7183CE85",
+      "organization": {
+        "id": "E443A31992CB4635AFCAEABE7183CE85",
+        "name": "F&B España - Región Norte",
+        "searchKey": "F&B España - Región Norte"
+      }
     },
     {
-      "tax_info": {
+      "reservedQuantity": 0,
+      "warehouse.id": "B2D40D8A5D644DD89E329DC297309055",
+      "warehouse": {
+        "id": "B2D40D8A5D644DD89E329DC297309055",
+        "searchKey": "RN",
+        "name": "España Región Norte"
+      },
+      "freightAmount": 0,
+      "standardPrice": 2.04,
+      "currency": {
+        "id": "102",
+        "iSOCode": "EUR"
+      },
+      "goodsShipmentLine.id": null,
+      "returnReason.id": null,
+      "returnReason": null,
+      "scheduledDeliveryDate": "2011-02-15 00:00:00",
+      "orderDate": "2011-02-02 00:00:00",
+      "ndDimension": null,
+      "stDimension": null,
+      "asset.id": null,
+      "costcenter.id": null,
+      "project.id": null,
+      "orderLineTaxList": [
+        {
+          "active": true,
+          "taxAmount": 26805.6,
+          "taxableAmount": 148920,
+          "tax.id": "1C844BEC532C4306950BAE1A8E89C088",
+          "tax": {
+            "id": "1C844BEC532C4306950BAE1A8E89C088",
+            "name": "Entregas IVA 18%"
+          },
+          "lineNo": 10,
+          "organization.id": "E443A31992CB4635AFCAEABE7183CE85",
+          "organization": {
+            "id": "E443A31992CB4635AFCAEABE7183CE85",
+            "name": "F&B España - Región Norte",
+            "searchKey": "F&B España - Región Norte"
+          }
+        }
+      ],
+      "priceLimit": 0,
+      "invoicedQuantity": 73000,
+      "overdueReturnDays": null,
+      "printDescription": false,
+      "quotationLine.id": null,
+      "quotationLine": null,
+      "deliveredQuantity": 73000,
+      "taxableAmount": 148920,
+      "createReservation": null,
+      "replacedorderline.id": null,
+      "replacedorderline": null,
+      "description": null,
+      "warehouseRule.id": null,
+      "discount": 0,
+      "grossListPrice": null,
+      "listPrice": 2.04,
+      "tax.id": "1C844BEC532C4306950BAE1A8E89C088",
+      "tax": {
         "id": "1C844BEC532C4306950BAE1A8E89C088",
         "name": "Entregas IVA 18%"
       },
-      "discountPercentage": 0,
+      "grossAmount": null,
       "lineNetAmount": 148920,
-      "priceLimit": 0,
-      "unitPrice": 2.04,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 2.04,
-      "grossListPrice": null,
-      "netAmount": 148920,
-      "grossAmount": 0,
-      "netUnitPrice": 2.04,
       "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 73000,
-      "product_info": {
+      "unitPrice": 2.04,
+      "attributeSetValue.id": null,
+      "uOM.id": "100",
+      "uOM": {
+        "id": "100",
+        "eDICode": "EA"
+      },
+      "orderedQuantity": 73000,
+      "operativeUOM.id": null,
+      "operativeUOM": null,
+      "operativeQuantity": null,
+      "product.id": "DA7FC1BB3BA44EC48EC1AB9C74168CED",
+      "product": {
         "id": "DA7FC1BB3BA44EC48EC1AB9C74168CED",
         "searchKey": "ES/0001",
         "name": "Cerveza Ale 0,5L"
       },
-      "product": "ES/0001",
-      "lineNo": 20
+      "lineNo": 20,
+      "organization.id": "E443A31992CB4635AFCAEABE7183CE85",
+      "organization": {
+        "id": "E443A31992CB4635AFCAEABE7183CE85",
+        "name": "F&B España - Región Norte",
+        "searchKey": "F&B España - Región Norte"
+      }
     },
     {
-      "id": "2B7942F7845246519AA883B1F84081C9",
-      "tax_info": {
+      "reservedQuantity": 0,
+      "warehouse.id": "B2D40D8A5D644DD89E329DC297309055",
+      "warehouse": {
+        "id": "B2D40D8A5D644DD89E329DC297309055",
+        "searchKey": "RN",
+        "name": "España Región Norte"
+      },
+      "freightAmount": 0,
+      "standardPrice": 0.83,
+      "currency": {
+        "id": "102",
+        "iSOCode": "EUR"
+      },
+      "goodsShipmentLine.id": null,
+      "returnReason.id": null,
+      "returnReason": null,
+      "scheduledDeliveryDate": "2011-02-15 00:00:00",
+      "orderDate": "2011-02-02 00:00:00",
+      "ndDimension": null,
+      "stDimension": null,
+      "asset.id": null,
+      "costcenter.id": null,
+      "project.id": null,
+      "orderLineTaxList": [
+        {
+          "active": true,
+          "taxAmount": 12699,
+          "taxableAmount": 70550,
+          "tax.id": "1C844BEC532C4306950BAE1A8E89C088",
+          "tax": {
+            "id": "1C844BEC532C4306950BAE1A8E89C088",
+            "name": "Entregas IVA 18%"
+          },
+          "lineNo": 10,
+          "organization.id": "E443A31992CB4635AFCAEABE7183CE85",
+          "organization": {
+            "id": "E443A31992CB4635AFCAEABE7183CE85",
+            "name": "F&B España - Región Norte",
+            "searchKey": "F&B España - Región Norte"
+          }
+        }
+      ],
+      "priceLimit": 0,
+      "invoicedQuantity": 85000,
+      "overdueReturnDays": null,
+      "printDescription": false,
+      "quotationLine.id": null,
+      "quotationLine": null,
+      "deliveredQuantity": 85000,
+      "taxableAmount": 70550,
+      "createReservation": null,
+      "replacedorderline.id": null,
+      "replacedorderline": null,
+      "description": null,
+      "warehouseRule.id": null,
+      "discount": 0,
+      "grossListPrice": null,
+      "listPrice": 0.83,
+      "tax.id": "1C844BEC532C4306950BAE1A8E89C088",
+      "tax": {
         "id": "1C844BEC532C4306950BAE1A8E89C088",
         "name": "Entregas IVA 18%"
       },
-      "discountPercentage": 0,
+      "grossAmount": null,
       "lineNetAmount": 70550,
-      "priceLimit": 0,
-      "unitPrice": 0.83,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 0.83,
-      "grossListPrice": null,
-      "netAmount": 70550,
-      "grossAmount": 0,
-      "netUnitPrice": 0.83,
       "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 85000,
-      "product_info": {
+      "unitPrice": 0.83,
+      "attributeSetValue.id": null,
+      "uOM.id": "100",
+      "uOM": {
+        "id": "100",
+        "eDICode": "EA"
+      },
+      "orderedQuantity": 85000,
+      "operativeUOM.id": null,
+      "operativeUOM": null,
+      "operativeQuantity": null,
+      "product.id": "3BD16BA206D24E41B56E0964854220EA",
+      "product": {
         "id": "3BD16BA206D24E41B56E0964854220EA",
         "searchKey": "ES/0022",
         "name": "Limonada 0,5L"
       },
-      "product": "ES/0022",
-      "lineNo": 60
-    },
-    {
-      "id": "371F2D9738E34275ACCE2193332625E9",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 74700,
-      "priceLimit": 0,
-      "unitPrice": 0.83,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 0.83,
-      "grossListPrice": null,
-      "netAmount": 74700,
-      "grossAmount": 0,
-      "netUnitPrice": 0.83,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 90000,
-      "product_info": {
-        "id": "C790C795FFC74E8F9789E65FFEA4F1EF",
-        "searchKey": "ES/0018",
-        "name": "Cola de Cereza 0,5L"
-      },
-      "product": "ES/0018",
-      "lineNo": 50
-    },
-    {
-      "id": "3E176A737B144738839F260330905A63",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 399750,
-      "priceLimit": 0,
-      "unitPrice": 5.33,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 5.33,
-      "grossListPrice": null,
-      "netAmount": 399750,
-      "grossAmount": 0,
-      "netUnitPrice": 5.33,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 75000,
-      "product_info": {
-        "id": "20EA4222B741434A9203471A3B29C343",
-        "searchKey": "ES/0005",
-        "name": "Vino Blanco 0,75L"
-      },
-      "product": "ES/0005",
-      "lineNo": 70
-    },
-    {
-      "id": "5301BEF61B2E4158A72AE4DE4DCEE790",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 58760,
-      "priceLimit": 0,
-      "unitPrice": 1.13,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 1.13,
-      "grossListPrice": null,
-      "netAmount": 58760,
-      "grossAmount": 0,
-      "netUnitPrice": 1.13,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 52000,
-      "product_info": {
-        "id": "F8383209982D467EBAA87460953694D1",
-        "searchKey": "ES/0013",
-        "name": "Zumo de Pera 0,5L"
-      },
-      "product": "ES/0013",
-      "lineNo": 110
-    },
-    {
-      "id": "585D1FAFD72C498FAAE86DDAF2B74D4A",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 114750,
-      "priceLimit": 0,
-      "unitPrice": 1.53,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 1.53,
-      "grossListPrice": null,
-      "netAmount": 114750,
-      "grossAmount": 0,
-      "netUnitPrice": 1.53,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 75000,
-      "product_info": {
-        "id": "BDE2F1CF46B54EF58D33E20A230DA8D2",
-        "searchKey": "ES/0024",
-        "name": "Agua sin Gas 1L"
-      },
-      "product": "ES/0024",
-      "lineNo": 10
-    },
-    {
-      "id": "696896BFDF99426AAD62D26DC7B22BA9",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 24860,
-      "priceLimit": 0,
-      "unitPrice": 1.13,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 1.13,
-      "grossListPrice": null,
-      "netAmount": 24860,
-      "grossAmount": 0,
-      "netUnitPrice": 1.13,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 22000,
-      "product_info": {
-        "id": "C970393BDF6C43E2B030D23482D88EED",
-        "searchKey": "ES/0014",
-        "name": "Zumo de Piña 0,5L"
-      },
-      "product": "ES/0014",
-      "lineNo": 120
-    },
-    {
-      "id": "6FDD3CF32BD14D24BD44CC3983A5D6F9",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 29050,
-      "priceLimit": 0,
-      "unitPrice": 0.83,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 0.83,
-      "grossListPrice": null,
-      "netAmount": 29050,
-      "grossAmount": 0,
-      "netUnitPrice": 0.83,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 35000,
-      "product_info": {
-        "id": "7206FAA45A3842659D93F59CCA2B0613",
-        "searchKey": "ES/0019",
-        "name": "Cola 0,5L"
-      },
-      "product": "ES/0019",
-      "lineNo": 40
-    },
-    {
-      "id": "72955DA36CD44756871951C6D3E15FFF",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 224400,
-      "priceLimit": 0,
-      "unitPrice": 2.64,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 2.64,
-      "grossListPrice": null,
-      "netAmount": 224400,
-      "grossAmount": 0,
-      "netUnitPrice": 2.64,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 85000,
-      "product_info": {
-        "id": "C0E3824CC5184B7F9746D195ACAC2CCF",
-        "searchKey": "ES/0002",
-        "name": "Cerveza Lager 0,5L"
-      },
-      "product": "ES/0002",
-      "lineNo": 30
-    },
-    {
-      "id": "ADD2C5FAF036403CA503856015036336",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 60300,
-      "priceLimit": 0,
-      "unitPrice": 1.34,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 1.34,
-      "grossListPrice": null,
-      "netAmount": 60300,
-      "grossAmount": 0,
-      "netUnitPrice": 1.34,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 45000,
-      "product_info": {
-        "id": "61047A6B06B3452B85260C7BCF08E78D",
-        "searchKey": "ES/0007",
-        "name": "Zumo de Naranja Bio 0,33L"
-      },
-      "product": "ES/0007",
-      "lineNo": 100
-    },
-    {
-      "id": "E06A3D6273464A70B22AFDCC7B804AAA",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 197050,
-      "priceLimit": 0,
-      "unitPrice": 5.63,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 5.63,
-      "grossListPrice": null,
-      "netAmount": 197050,
-      "grossAmount": 0,
-      "netUnitPrice": 5.63,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 35000,
-      "product_info": {
-        "id": "B3D8E5B7C9924F96A26D21ACA275D5C4",
-        "searchKey": "ES/0004",
-        "name": "Vino Rosado 0,75L"
-      },
-      "product": "ES/0004",
-      "lineNo": 80
-    },
-    {
-      "id": "F84867D5E8464CF38F20623E0E5E07CB",
-      "tax_info": {
-        "id": "1C844BEC532C4306950BAE1A8E89C088",
-        "name": "Entregas IVA 18%"
-      },
-      "discountPercentage": 0,
-      "lineNetAmount": 129500,
-      "priceLimit": 0,
-      "unitPrice": 5.18,
-      "discount_info": 0,
-      "orderLineTaxList": null,
-      "taxCategory": "IVA Normal",
-      "netListPrice": 5.18,
-      "grossListPrice": null,
-      "netAmount": 129500,
-      "grossAmount": 0,
-      "netUnitPrice": 5.18,
-      "grossUnitPrice": 0,
-      "uOM": "EA",
-      "invoicedQuantity": 25000,
-      "product_info": {
-        "id": "FDDBB89508D24D2C8D97A2A57BEA8788",
-        "searchKey": "ES/0003",
-        "name": "Vino Tinto 0,75L"
-      },
-      "product": "ES/0003",
-      "lineNo": 90
+      "lineNo": 60,
+      "organization.id": "E443A31992CB4635AFCAEABE7183CE85",
+      "organization": {
+        "id": "E443A31992CB4635AFCAEABE7183CE85",
+        "name": "F&B España - Región Norte",
+        "searchKey": "F&B España - Región Norte"
+      }
     }
   ],
-  "netAmount": 1614540,
-  "grossAmount": 1905157.2,
+  "isReturn": false,
+  "externalBusinessPartnerReference": null,
+  "replacementorder.id": null,
+  "replacementorder": null,
+  "iscancelled": false,
+  "replacedorder.id": null,
+  "replacedorder": null,
+  "paymentStatus": 100,
+  "cancelledorder.id": null,
+  "cancelledorder": null,
+  "cashVAT": false,
+  "quotation.id": null,
+  "quotation": null,
+  "rejectReason.id": null,
+  "rejectReason": null,
+  "invoiceStatus": 100,
+  "costcenter.id": null,
+  "costcenter": null,
+  "validUntil": null,
+  "reservationStatus": null,
+  "deliveryStatus": 100,
+  "asset.id": null,
+  "asset": null,
+  "returnReason.id": null,
+  "returnReason": null,
+  "fINPaymentPriority.id": null,
+  "fINPaymentPriority": null,
+  "paymentMethod.id": "A97CFD2AFC234B59BB0A72189BD8FC2A",
+  "paymentMethod": {
+    "id": "A97CFD2AFC234B59BB0A72189BD8FC2A",
+    "name": "Transferencia"
+  },
+  "documentStatus": "CO",
+  "grandTotalAmount": 1905157.2,
   "invoiceTerms": "D",
-  "currency": "EUR",
+  "businessPartner.id": "A6750F0D15334FB890C254369AC750A8",
+  "businessPartner": {
+    "id": "A6750F0D15334FB890C254369AC750A8",
+    "searchKey": "ES-C1/0001",
+    "name": "Alimentos y Supermercados, S.A"
+  },
+  "transactionDocument.id": "466AF4B0136A4A3F9F84129711DA8BD3",
+  "transactionDocument": {
+    "id": "466AF4B0136A4A3F9F84129711DA8BD3",
+    "name": "Standard Order"
+  },
+  "orderDate": "2011-02-02 00:00:00",
+  "orderReference": null,
+  "documentNo": "1100000",
+  "deliveryLocation.id": null,
+  "deliveryLocation": null,
+  "iNCOTERMSDescription": null,
+  "incoterms.id": null,
+  "incoterms": null,
+  "deliveryNotes": null,
+  "stDimension.id": null,
+  "stDimension": null,
+  "ndDimension.id": null,
+  "ndDimension": null,
+  "trxOrganization.id": null,
+  "trxOrganization": null,
+  "selfService": false,
+  "dropShipLocation.id": null,
+  "dropShipLocation": null,
+  "dropShipPartner.id": null,
+  "dropShipPartner": null,
+  "dropShipContact.id": null,
+  "dropShipContact": null,
+  "selected": false,
   "priceIncludesTax": false,
-  "isCancelled": false,
-  "isSale": true,
-  "warehouse": "España Región Norte",
+  "printDiscount": false,
+  "formOfPayment": "P",
+  "freightCostRule": "I",
+  "deliveryTerms": "A",
+  "datePrinted": null,
+  "salesTransaction": true,
+  "activity.id": null,
+  "activity": null,
+  "project.id": null,
+  "project": null,
+  "partnerAddress.id": "6518D3040ED54008A1FC0C09ED140D66",
+  "partnerAddress": {
+    "id": "6518D3040ED54008A1FC0C09ED140D66",
+    "name": "La Coruña, C\\Pescadores, 87"
+  },
+  "processed": true,
+  "chargeAmount": 0,
+  "charge.id": null,
+  "charge": null,
+  "userContact.id": "6B1E8F0CA1524850AB3A7F9AE475A16F",
+  "userContact": {
+    "id": "6B1E8F0CA1524850AB3A7F9AE475A16F",
+    "name": "Luis Rodriguez"
+  },
+  "salesCampaign.id": null,
+  "salesCampaign": null,
+  "priceList.id": "AEE66281A08F42B6BC509B8A80A33C29",
+  "priceList": {
+    "id": "AEE66281A08F42B6BC509B8A80A33C29",
+    "name": "Tarifa de ventas"
+  },
+  "warehouse.id": "B2D40D8A5D644DD89E329DC297309055",
+  "warehouse": {
+    "id": "B2D40D8A5D644DD89E329DC297309055",
+    "searchKey": "RN",
+    "name": "España Región Norte"
+  },
+  "summedLineAmount": 1614540,
+  "priority": "5",
+  "shippingCompany.id": null,
+  "shippingCompany": null,
+  "deliveryMethod": "P",
+  "freightAmount": 0,
+  "currency.id": "102",
+  "currency": {
+    "id": "102",
+    "iSOCode": "EUR"
+  },
+  "invoiceAddress.id": "6518D3040ED54008A1FC0C09ED140D66",
   "invoiceAddress": {
     "id": "6518D3040ED54008A1FC0C09ED140D66",
-    "region": null,
-    "city": "La Coruña",
-    "etendoID": "6518D3040ED54008A1FC0C09ED140D66",
-    "zipCode": "16537",
-    "shippingAddress": true,
-    "organization.searchKey": "F&B España, S.A",
-    "organization.id": "B843C30461EA4501935CB1D125C9C25A",
-    "name": "La Coruña, C\\Pescadores, 87",
-    "invoiceAddress": true,
-    "country": "ES",
-    "client.id": "23C59575B9CF467C9620760EB255B389",
-    "address": "C\\Pescadores, 87",
-    "active": true
+    "name": "La Coruña, C\\Pescadores, 87"
   },
-  "shipmentAddress": {
-    "id": "6518D3040ED54008A1FC0C09ED140D66",
-    "region": null,
-    "city": "La Coruña",
-    "etendoID": "6518D3040ED54008A1FC0C09ED140D66",
-    "zipCode": "16537",
-    "shippingAddress": true,
-    "organization.searchKey": "F&B España, S.A",
-    "organization.id": "B843C30461EA4501935CB1D125C9C25A",
-    "name": "La Coruña, C\\Pescadores, 87",
-    "invoiceAddress": true,
-    "country": "ES",
-    "client.id": "23C59575B9CF467C9620760EB255B389",
-    "address": "C\\Pescadores, 87",
-    "active": true
+  "paymentTerms.id": "66BA1164A7394344BB9CD1A6ECEED05D",
+  "paymentTerms": {
+    "id": "66BA1164A7394344BB9CD1A6ECEED05D",
+    "name": "30 days"
   },
-  "businessPartner": "ES-C1/0001",
-  "priceList": "Tarifa de ventas",
-  "documentType": "Standard Order",
-  "documentNo": "1000000",
-  "orderDate": "2011-02-02 00:00:00",
-  "organization_info": {
-    "id": "0",
-    "currency_info": null,
-    "searchKey": "0",
-    "name": "*"
+  "salesRepresentative.id": null,
+  "salesRepresentative": null,
+  "accountingDate": "2011-02-02 00:00:00",
+  "scheduledDeliveryDate": "2011-02-15 00:00:00",
+  "print": false,
+  "reinvoice": false,
+  "delivered": true,
+  "description": null,
+  "documentType.id": "466AF4B0136A4A3F9F84129711DA8BD3",
+  "documentType": {
+    "id": "466AF4B0136A4A3F9F84129711DA8BD3",
+    "name": "Standard Order"
   },
-  "organization": "*",
-  "client": "System"
+  "active": true,
+  "organization.id": "E443A31992CB4635AFCAEABE7183CE85",
+  "organization": {
+    "id": "E443A31992CB4635AFCAEABE7183CE85",
+    "name": "F&B España - Región Norte",
+    "searchKey": "F&B España - Región Norte"
+  }
 }

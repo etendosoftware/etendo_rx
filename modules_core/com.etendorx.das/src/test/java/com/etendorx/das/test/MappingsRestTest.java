@@ -274,7 +274,7 @@ public class MappingsRestTest {
 
   @Test
   void shouldReturnOrderWhenRequested() throws Exception {
-    String id = "26593FEBBE40426991B6C4475DCE5BEE";
+    String id = "0AC230C0DDA4435A949B40602A183F45";
     String jsonFile = "/jsons/order.read.json";
     performGetRequestAndAssertResponse(ORDER_MODEL, id, jsonFile);
   }
