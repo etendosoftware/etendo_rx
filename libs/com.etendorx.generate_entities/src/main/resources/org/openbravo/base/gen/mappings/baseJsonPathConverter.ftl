@@ -43,6 +43,11 @@
 package com.etendorx.entities.mappings;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 import com.etendorx.entities.entities.mappings.MappingUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +96,15 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   @Override
   public ${mappingPrefix}${entity.externalName}DTOWrite convert(String rawData) {
     var ctx = getReadContext(rawData);
+    List<String> missingFields = new ArrayList<>();
+    List<String> expectedFields = new ArrayList<>();
+    Map<String, Object> json = ctx.json();
+    Set<String> receivedFields = json.keySet();
+
+    Function<String, Void> missing = (String path) -> {
+      missingFields.add(path);
+      return null;
+    };
 
     ${mappingPrefix}${entity.externalName}DTOWrite dto = new ${mappingPrefix}${entity.externalName}DTOWrite();
   <#list entity.fields as field>
@@ -102,34 +116,39 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
     </#if>
   </#if>
   <#assign returnClass = ""/>
-  // ${field.name}
+  log.debug("-- Parsing {}", "${field.name}");
+  expectedFields.add("${field.jsonPath!"$."+field.name}");
   <#if field.fieldMapping == "CM">
     dto.set<@toCamelCase field.name />(mappingUtils.constantValue("${field.constantValue.id}"));
   <#else>
     <#if hasRetriever>
-    var ${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(
       <#if field.constantValue??>
-        mappingUtils.constantValue("${field.constantValue.id}")
-      <#else>
-        ctx.read("${field.jsonPath!"$."+field.name}")
-      </#if>
+    var ${NamingUtil.getSafeJavaName(field.name)}> = Optional.of(retrieve${field.name?cap_first}(
+      mappingUtils.constantValue("${field.constantValue.id}")
     );
+      <#else>
+    var val${field.name} = getData(ctx, "${field.jsonPath!"$."+field.name}", String.class, missing);
+    var ${NamingUtil.getSafeJavaName(field.name)} = val${field.name}.map(this::retrieve${field.name?cap_first});
+      </#if>
     <#elseif field.property??>
       <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + field.property) ! "" />
-    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class</#if>);
+    var ${NamingUtil.getSafeJavaName(field.name)} = getData(ctx, "${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class</#if>, missing);
     <#else>
-    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"$."+field.name}");
+    var ${NamingUtil.getSafeJavaName(field.name)} = getData(ctx, "${field.jsonPath!"$."+field.name}", Object.class, missing);
     </#if>
     log.debug("pathConverter ${entity.externalName} \"${field.jsonPath!"$."+field.name}\": {}", ${NamingUtil.getSafeJavaName(field.name)});
     dto.set<@toCamelCase field.name />(
     <#if returnClass=="java.util.Date">
-      mappingUtils.parseDate(${NamingUtil.getSafeJavaName(field.name)})
+      mappingUtils.parseDate(${NamingUtil.getSafeJavaName(field.name)}.orElse(null))
     <#else>
-      ${NamingUtil.getSafeJavaName(field.name)}
+      ${NamingUtil.getSafeJavaName(field.name)}.orElse(null)
     </#if>
     );
   </#if>
+  log.debug("// End Parsing {}", "${field.name}");
   </#list>
+    // Debug missing fields
+    log.debug("missing fields: {}", debugFields(expectedFields, receivedFields, missingFields));
     return dto;
   }
 

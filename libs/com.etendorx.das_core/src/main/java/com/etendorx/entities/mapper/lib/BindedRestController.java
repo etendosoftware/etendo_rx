@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -28,6 +29,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.sql.SQLException;
+
+@Log4j2
 public abstract class BindedRestController<E extends BaseDTOModel, F extends BaseDTOModel> {
   private final JsonPathConverter<F> converter;
   @Getter
@@ -71,8 +75,13 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   @Transactional
   @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   public ResponseEntity<E> put(@PathVariable String id, @RequestBody String rawEntity) {
-    F dtoEntity = converter.convert(rawEntity);
-    dtoEntity.setId(id);
-    return new ResponseEntity<>(repository.update(dtoEntity), HttpStatus.CREATED);
+    try {
+      F dtoEntity = converter.convert(rawEntity);
+      dtoEntity.setId(id);
+      return new ResponseEntity<>(repository.update(dtoEntity), HttpStatus.CREATED);
+    } catch (Exception e) {
+      log.error("Error while updating entity {}", id, e);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
   }
 }
