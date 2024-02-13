@@ -30,7 +30,7 @@ import java.util.TreeSet;
 public class AsyncProcess {
 
   private String id;
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss:SSS")
   private Date lastUpdate;
   private String description;
   private AsyncProcessState state = AsyncProcessState.WAITING;
@@ -41,6 +41,7 @@ public class AsyncProcess {
     this.id = asyncProcessExecution.getAsyncProcessId();
     this.lastUpdate = asyncProcessExecution.getTime();
     this.state = asyncProcessExecution.getState();
+    this.description = asyncProcessExecution.getDescription();
     return this;
   }
 

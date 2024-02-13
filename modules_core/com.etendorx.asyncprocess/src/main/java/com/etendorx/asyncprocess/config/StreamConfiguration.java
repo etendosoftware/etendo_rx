@@ -16,10 +16,13 @@
 
 package com.etendorx.asyncprocess.config;
 
+import com.etendorx.asyncprocess.serdes.AsyncProcessSerializer;
 import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.state.HostInfo;
@@ -27,6 +30,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.receiver.internals.ConsumerFactory;
@@ -102,6 +108,20 @@ public class StreamConfiguration {
     props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
     return new DefaultKafkaReceiver(ConsumerFactory.INSTANCE,
         ReceiverOptions.create(props).subscription(Collections.singleton(ASYNC_PROCESS)));
+  }
+
+  @Bean
+  public ProducerFactory<String, String> sendRetryFactory() {
+    Map<String, Object> configProps = new HashMap<>();
+    configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+    configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+    configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AsyncProcessSerializer.class);
+    return new DefaultKafkaProducerFactory<>(configProps);
+  }
+
+  @Bean
+  public KafkaTemplate<String, String> sendRetryTemplate() {
+    return new KafkaTemplate<>(sendRetryFactory());
   }
 
 }

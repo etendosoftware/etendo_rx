@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Date;
 
@@ -35,14 +36,21 @@ public class AsyncProcessExecution implements Comparable<AsyncProcessExecution> 
   private String log;
   private String description;
   private String params;
+  private Integer lineno;
 
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss:SSS")
   private Date time;
   @Builder.Default
   private AsyncProcessState state = AsyncProcessState.ACCEPTED;
 
   @Override
   public int compareTo(AsyncProcessExecution o) {
+    if(this.time == null) {
+      return -1;
+    }
+    if(o.time == null) {
+      return 1;
+    }
     var r = o.time.compareTo(this.time);
     if (r == 0)
       return o.id == null ? -1 : o.id.compareTo(this.id);

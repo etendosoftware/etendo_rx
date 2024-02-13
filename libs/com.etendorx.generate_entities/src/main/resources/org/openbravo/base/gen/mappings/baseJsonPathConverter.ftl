@@ -123,25 +123,25 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   <#else>
     <#if hasRetriever>
       <#if field.constantValue??>
-    var ${NamingUtil.getSafeJavaName(field.name)}> = Optional.of(retrieve${field.name?cap_first}(
+    var _${NamingUtil.getSafeJavaName(field.name)}> = Optional.of(retrieve${field.name?cap_first}(
       mappingUtils.constantValue("${field.constantValue.id}")
     );
       <#else>
     var val${field.name} = getData(ctx, "${field.jsonPath!"$."+field.name}", String.class, missing);
-    var ${NamingUtil.getSafeJavaName(field.name)} = val${field.name}.map(this::retrieve${field.name?cap_first});
+    var _${NamingUtil.getSafeJavaName(field.name)} = val${field.name}.map(this::retrieve${field.name?cap_first});
       </#if>
     <#elseif field.property??>
       <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + field.property) ! "" />
-    var ${NamingUtil.getSafeJavaName(field.name)} = getData(ctx, "${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class</#if>, missing);
+    var _${NamingUtil.getSafeJavaName(field.name)} = getData(ctx, "${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class</#if>, missing);
     <#else>
-    var ${NamingUtil.getSafeJavaName(field.name)} = getData(ctx, "${field.jsonPath!"$."+field.name}", Object.class, missing);
+    var _${NamingUtil.getSafeJavaName(field.name)} = getData(ctx, "${field.jsonPath!"$."+field.name}", Object.class, missing);
     </#if>
-    log.debug("pathConverter ${entity.externalName} \"${field.jsonPath!"$."+field.name}\": {}", ${NamingUtil.getSafeJavaName(field.name)});
+    log.debug("pathConverter ${entity.externalName} \"${field.jsonPath!"$."+field.name}\": {}", _${NamingUtil.getSafeJavaName(field.name)});
     dto.set<@toCamelCase field.name />(
     <#if returnClass=="java.util.Date">
-      mappingUtils.parseDate(${NamingUtil.getSafeJavaName(field.name)}.orElse(null))
+      mappingUtils.parseDate(_${NamingUtil.getSafeJavaName(field.name)}.orElse(null))
     <#else>
-      ${NamingUtil.getSafeJavaName(field.name)}.orElse(null)
+      _${NamingUtil.getSafeJavaName(field.name)}.orElse(null)
     </#if>
     );
   </#if>
