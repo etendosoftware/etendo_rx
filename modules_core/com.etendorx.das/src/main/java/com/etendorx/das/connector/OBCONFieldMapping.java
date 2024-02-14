@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,15 +28,24 @@ public class OBCONFieldMapping implements DTOReadMapping<InstanceConnectorMappin
 
   @Override
   public Object map(InstanceConnectorMapping entity) {
-    List<Map<String, String>> fieldMapping = new ArrayList<>();
+    List<Map<String, Object>> fieldMapping = new ArrayList<>();
     for (ETRXEntityField etrxEntityField : entity.getEtrxEntityMapping().getProjectionEntity().getETRXEntityFieldList()) {
-      Map<String, String> map = new HashMap<>();
+      Map<String, Object> map = new HashMap<>();
       map.put("name", etrxEntityField.getName());
-      map.put("jsonpath", etrxEntityField.getJsonpath());
+      map.put("jsonpath", StringUtils.isBlank(
+          etrxEntityField.getJsonpath()) ? "$." + etrxEntityField.getName() : etrxEntityField.getJsonpath());
       map.put("fieldMapping", etrxEntityField.getFieldMapping());
-      var field = metadataUtil.getPropertyMetadata(
-          entity.getEtrxEntityMapping().getProjectionEntity().getTableEntity().getId(), etrxEntityField.getProperty());
-      map.put("ad_table_id", field != null ? field.getAdTableIdRel() : null);
+      map.put("isExternalIdentifier", etrxEntityField.getExternalIdentifier());
+      if (etrxEntityField.getExternalIdentifier() != null && etrxEntityField.getExternalIdentifier()) {
+        if (etrxEntityField.getTable() != null) {
+          map.put("ad_table_id", etrxEntityField.getTable().getId());
+        } else {
+          var field = metadataUtil.getPropertyMetadata(
+              entity.getEtrxEntityMapping().getProjectionEntity().getTableEntity().getId(),
+              etrxEntityField.getProperty());
+          map.put("ad_table_id", field != null ? field.getAdTableIdRel() : null);
+        }
+      }
       fieldMapping.add(map);
     }
     return fieldMapping;
