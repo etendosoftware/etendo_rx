@@ -36,7 +36,7 @@ public class OBCONFieldMapping implements DTOReadMapping<InstanceConnectorMappin
           etrxEntityField.getJsonpath()) ? "$." + etrxEntityField.getName() : etrxEntityField.getJsonpath());
       map.put("fieldMapping", etrxEntityField.getFieldMapping());
       map.put("isExternalIdentifier", etrxEntityField.getExternalIdentifier());
-      if (etrxEntityField.getExternalIdentifier() != null && etrxEntityField.getExternalIdentifier()) {
+      if (etrxEntityField.getExternalIdentifier()) {
         if (etrxEntityField.getTable() != null) {
           map.put("ad_table_id", etrxEntityField.getTable().getId());
         } else {
