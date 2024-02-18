@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Convert;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
@@ -48,6 +49,9 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
             </#if>
     @jakarta.persistence.Column(name = "${p.columnName?lower_case}"<#if entity.isView()>, insertable = false, updatable = false</#if>)
     @JsonProperty("${p.javaName}")
+    <#if p.isMandatory()>
+    @NotNull
+    </#if>
     java.lang.String ${p.javaName};
 
         </#if>
@@ -72,6 +76,9 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
                 <#else>
     @jakarta.persistence.Column(name = "${p.columnName?lower_case}")
     @JsonProperty("${p.javaName}")
+    <#if p.isMandatory()>
+    @NotNull
+    </#if>
     ${p.shorterTypeName} ${p.javaName};
 
                 </#if>
@@ -87,6 +94,9 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     @jakarta.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.referencedProperty.columnName?lower_case}"<#if repeated>, updatable = false, insertable = false</#if>)
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
     @JsonProperty("${p.javaName}")
+    <#if p.isMandatory()>
+    @NotNull
+    </#if>
     ${p.targetEntity.className} ${p.javaName};
 
                     <#else>
@@ -105,6 +115,9 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
         <#if computedColumns && p.computedColumn && !p.targetEntity??><#assign query>${p.sqlLogic}</#assign>
     @Formula("(${query?replace("^\\s+|\\s+$|\\n|\\r", " ", "rm")?replace("\"", "\\\"")})")
     @JsonProperty("${p.javaName}")
+    <#if p.isMandatory()>
+    @NotNull
+    </#if>
     @JsonIgnore
     ${p.getObjectTypeName()} ${p.javaName};
 

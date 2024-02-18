@@ -1,3 +1,18 @@
+/*
+ * Copyright 2022-2024  Futit Services SL
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.etendorx.das.test;
 
 import com.etendorx.das.utils.DefaultFilters;
@@ -17,13 +32,18 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * This class contains unit tests for the DefaultFilters class.
+ * It tests the addFilters method with different HTTP methods and SQL queries.
+ */
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19090")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
 @AutoConfigureMockMvc
-class DefaultFiltersTest {
+public class DefaultFiltersTest {
 
+  // Constants for testing
   public static final String REST_METHOD_PATCH = "PATCH";
   private static final String SELECT_QUERY = "select * from table table0_ limit 10";
   private static final String UPDATE_QUERY = "update table0_ set column = 'value' where table0_.table0_id = 1";
@@ -40,14 +60,23 @@ class DefaultFiltersTest {
   public static final String REST_METHOD_GET = "GET";
   public static final String ROLE_ID_789 = "789";
 
+  /**
+   * Sets up the PostgreSQL properties for the test environment.
+   */
   @DynamicPropertySource
   static void postgresqlProperties(DynamicPropertyRegistry registry) {
     TestcontainersUtils.setProperties(registry, postgreSQLContainer);
   }
 
+  /**
+   * Sets up the PostgreSQL container for the test environment.
+   */
   @Container
   public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
+  /**
+   * Tests the addFilters method with a null client ID and a GET request.
+   */
   @Test
   void testAddFiltersAuthServiceBypass() {
     // Arrange
@@ -61,6 +90,9 @@ class DefaultFiltersTest {
     Assertions.assertEquals(SELECT_QUERY, result);
   }
 
+  /**
+   * Tests the addFilters method with the super user ID and client ID and a GET request.
+   */
   @Test
   void testAddFiltersSuperUserBypass() {
     // Arrange
@@ -76,6 +108,9 @@ class DefaultFiltersTest {
     Assertions.assertEquals(SELECT_QUERY, result);
   }
 
+  /**
+   * Tests the addFilters method with a GET request.
+   */
   @Test
   void testAddFiltersGetMethod() {
     // Arrange
@@ -90,6 +125,9 @@ class DefaultFiltersTest {
     Assertions.assertEquals(expected, result);
   }
 
+  /**
+   * Tests the addFilters method with a PUT request.
+   */
   @Test
   void testAddFiltersPutMethod() {
     // Arrange
@@ -104,17 +142,50 @@ class DefaultFiltersTest {
     Assertions.assertEquals(expected, result);
   }
 
+  /**
+   * This test method verifies the behavior of the addFilters method in the DefaultFilters class
+   * when it is called with a POST HTTP method.
+   * <p>
+   * The addFilters method is expected to modify the provided SQL query by adding additional
+   * filters based on the provided user, client, and role identifiers, as well as the isActive flag.
+   * <p>
+   * In this test, the method is expected to add filters that restrict the query to rows where:
+   * - the client ID is either '0' or the provided client ID,
+   * - the organization ID is included in the list of organizations associated with the provided role, and
+   * - the isActive flag is 'Y'.
+   * <p>
+   * The modified query is then compared to an expected query string to verify that the method
+   * has added the correct filters.
+   */
   @Test
   void testAddFiltersPostMethod() {
+    // Arrange: Set up the isActive flag and the expected modified query
     boolean isActive = true;
+    String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.isactive = 'Y' limit 10"; //NOSONAR
 
+    // Act: Call the addFilters method with a POST HTTP method and the test constants
     String result = DefaultFilters.addFilters(SELECT_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
         REST_METHOD_POST);
 
-    String expected = "select * from table table0_ where table0_.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', table0_.ad_org_id, '|%') " + "and table0_.isactive = 'Y' limit 10"; //NOSONAR
+    // Assert: Verify that the modified query matches the expected query
     assertEquals(expected, result);
   }
 
+  /**
+   * This test method verifies the behavior of the addFilters method in the DefaultFilters class
+   * when it is called with a PUT HTTP method and the SQL query starts with "update".
+   * <p>
+   * The addFilters method is expected to modify the provided SQL query by adding additional
+   * filters based on the provided user, client, and role identifiers, as well as the isActive flag.
+   * <p>
+   * In this test, the method is expected to add filters that restrict the query to rows where:
+   * - the client ID is either '0' or the provided client ID,
+   * - the organization ID is included in the list of organizations associated with the provided role, and
+   * - the isActive flag is 'Y'.
+   * <p>
+   * The modified query is then compared to an expected query string to verify that the method
+   * has added the correct filters.
+   */
   @Test
   void testAddFiltersPutMethodStartingWithUpdate() {
     boolean isActive = true;
@@ -127,6 +198,21 @@ class DefaultFiltersTest {
     assertEquals(expected, result);
   }
 
+  /**
+   * This test method verifies the behavior of the addFilters method in the DefaultFilters class
+   * when it is called with a PUT HTTP method and the SQL query does not start with "update".
+   * <p>
+   * The addFilters method is expected to modify the provided SQL query by adding additional
+   * filters based on the provided user, client, and role identifiers, as well as the isActive flag.
+   * <p>
+   * In this test, the method is expected to add filters that restrict the query to rows where:
+   * - the client ID is either '0' or the provided client ID,
+   * - the organization ID is included in the list of organizations associated with the provided role, and
+   * - the isActive flag is 'Y'.
+   * <p>
+   * The modified query is then compared to an expected query string to verify that the method
+   * has added the correct filters.
+   */
   @Test
   void testAddFiltersPutMethodNotStartingWithUpdate() {
     boolean isActive = true;
@@ -138,6 +224,21 @@ class DefaultFiltersTest {
     assertEquals(expected, result);
   }
 
+  /**
+   * This test method verifies the behavior of the addFilters method in the DefaultFilters class
+   * when it is called with a PATCH HTTP method and the SQL query starts with "update".
+   * <p>
+   * The addFilters method is expected to modify the provided SQL query by adding additional
+   * filters based on the provided user, client, and role identifiers, as well as the isActive flag.
+   * <p>
+   * In this test, the method is expected to add filters that restrict the query to rows where:
+   * - the client ID is either '0' or the provided client ID,
+   * - the organization ID is included in the list of organizations associated with the provided role, and
+   * - the isActive flag is 'Y'.
+   * <p>
+   * The modified query is then compared to an expected query string to verify that the method
+   * has added the correct filters.
+   */
   @Test
   void testAddFilters_PatchMethod_StartingWithUpdate() {
     boolean isActive = true;
@@ -149,6 +250,21 @@ class DefaultFiltersTest {
     assertEquals(expected, result);
   }
 
+  /**
+   * This test method verifies the behavior of the addFilters method in the DefaultFilters class
+   * when it is called with a PATCH HTTP method and the SQL query does not start with "update".
+   * <p>
+   * The addFilters method is expected to modify the provided SQL query by adding additional
+   * filters based on the provided user, client, and role identifiers, as well as the isActive flag.
+   * <p>
+   * In this test, the method is expected to add filters that restrict the query to rows where:
+   * - the client ID is either '0' or the provided client ID,
+   * - the organization ID is included in the list of organizations associated with the provided role, and
+   * - the isActive flag is 'Y'.
+   * <p>
+   * The modified query is then compared to an expected query string to verify that the method
+   * has added the correct filters.
+   */
   @Test
   void testAddFilters_PatchMethod_NotStartingWithUpdate() {
     boolean isActive = true;
@@ -160,6 +276,21 @@ class DefaultFiltersTest {
     assertEquals(expected, result);
   }
 
+  /**
+   * This test method verifies the behavior of the addFilters method in the DefaultFilters class
+   * when it is called with a DELETE HTTP method and the SQL query starts with "delete".
+   * <p>
+   * The addFilters method is expected to modify the provided SQL query by adding additional
+   * filters based on the provided user, client, and role identifiers, as well as the isActive flag.
+   * <p>
+   * In this test, the method is expected to add filters that restrict the query to rows where:
+   * - the client ID is either '0' or the provided client ID,
+   * - the organization ID is included in the list of organizations associated with the provided role, and
+   * - the isActive flag is 'Y'.
+   * <p>
+   * The modified query is then compared to an expected query string to verify that the method
+   * has added the correct filters.
+   */
   @Test
   void testAddFilters_deleteMethod_StartingWithDelete() {
     boolean isActive = true;
@@ -171,6 +302,21 @@ class DefaultFiltersTest {
     assertEquals(expected, result);
   }
 
+  /**
+   * This test method verifies the behavior of the addFilters method in the DefaultFilters class
+   * when it is called with a DELETE HTTP method and the SQL query does not start with "delete".
+   * <p>
+   * The addFilters method is expected to modify the provided SQL query by adding additional
+   * filters based on the provided user, client, and role identifiers, as well as the isActive flag.
+   * <p>
+   * In this test, the method is expected to add filters that restrict the query to rows where:
+   * - the client ID is either '0' or the provided client ID,
+   * - the organization ID is included in the list of organizations associated with the provided role, and
+   * - the isActive flag is 'Y'.
+   * <p>
+   * The modified query is then compared to an expected query string to verify that the method
+   * has added the correct filters.
+   */
   @Test
   void testAddFilters_deleteMethod_NotStartingWithDelete() {
     boolean isActive = true;
@@ -182,6 +328,13 @@ class DefaultFiltersTest {
     assertEquals(expected, result);
   }
 
+  /**
+   * This test method verifies the behavior of the addFilters method in the DefaultFilters class
+   * when it is called with an unknown HTTP method.
+   * <p>
+   * The addFilters method is expected to throw an IllegalArgumentException with a message
+   * indicating that the provided HTTP method is unknown.
+   */
   @Test
   void testAddFilters_UnknownMethod() {
     boolean isActive = true;

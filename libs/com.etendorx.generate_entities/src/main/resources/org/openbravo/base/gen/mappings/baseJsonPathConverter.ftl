@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import com.etendorx.entities.entities.mappings.MappingUtils;
+import com.etendorx.entities.mapper.lib.ReturnKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -96,15 +97,7 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   @Override
   public ${mappingPrefix}${entity.externalName}DTOWrite convert(String rawData) {
     var ctx = getReadContext(rawData);
-    List<String> missingFields = new ArrayList<>();
-    List<String> expectedFields = new ArrayList<>();
-    Map<String, Object> json = ctx.json();
-    Set<String> receivedFields = json.keySet();
-
-    Function<String, Void> missing = (String path) -> {
-      missingFields.add(path);
-      return null;
-    };
+    List<ReturnKey<?>> values = new ArrayList<>();
 
     ${mappingPrefix}${entity.externalName}DTOWrite dto = new ${mappingPrefix}${entity.externalName}DTOWrite();
   <#list entity.fields as field>
@@ -116,39 +109,46 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
     </#if>
   </#if>
   <#assign returnClass = ""/>
-  log.debug("-- Parsing {}", "${field.name}");
-  expectedFields.add("${field.jsonPath!"$."+field.name}");
+    log.debug("-- Parsing {}", "${field.name}");
   <#if field.fieldMapping == "CM">
     dto.set<@toCamelCase field.name />(mappingUtils.constantValue("${field.constantValue.id}"));
   <#else>
     <#if hasRetriever>
       <#if field.constantValue??>
-    var _${NamingUtil.getSafeJavaName(field.name)}> = Optional.of(retrieve${field.name?cap_first}(
+    var _${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(
       mappingUtils.constantValue("${field.constantValue.id}")
     );
       <#else>
-    var val${field.name} = getData(ctx, "${field.jsonPath!"$."+field.name}", String.class, missing);
-    var _${NamingUtil.getSafeJavaName(field.name)} = val${field.name}.map(this::retrieve${field.name?cap_first});
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}", String.class);
       </#if>
     <#elseif field.property??>
       <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + field.property) ! "" />
-    var _${NamingUtil.getSafeJavaName(field.name)} = getData(ctx, "${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class</#if>, missing);
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class<#else>, Object.class</#if>);
     <#else>
-    var _${NamingUtil.getSafeJavaName(field.name)} = getData(ctx, "${field.jsonPath!"$."+field.name}", Object.class, missing);
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}", Object.class);
     </#if>
+    values.add(_${NamingUtil.getSafeJavaName(field.name)});
     log.debug("pathConverter ${entity.externalName} \"${field.jsonPath!"$."+field.name}\": {}", _${NamingUtil.getSafeJavaName(field.name)});
-    dto.set<@toCamelCase field.name />(
+    if(!_${NamingUtil.getSafeJavaName(field.name)}.isNullValue()) {
+      <#if hasRetriever>
+      var val_${NamingUtil.getSafeJavaName(field.name)} = this.retrieve${field.name?cap_first}(_${NamingUtil.getSafeJavaName(field.name)}.getValue());
+      dto.set<@toCamelCase field.name />(
+        val_${NamingUtil.getSafeJavaName(field.name)}
+      );
+      <#else>
+      dto.set<@toCamelCase field.name />(
     <#if returnClass=="java.util.Date">
-      mappingUtils.parseDate(_${NamingUtil.getSafeJavaName(field.name)}.orElse(null))
+        mappingUtils.parseDate(_${NamingUtil.getSafeJavaName(field.name)}.getValue())
     <#else>
-      _${NamingUtil.getSafeJavaName(field.name)}.orElse(null)
+        _${NamingUtil.getSafeJavaName(field.name)}.getValue()
     </#if>
-    );
+      );
+      </#if>
+    }
   </#if>
-  log.debug("// End Parsing {}", "${field.name}");
+    log.debug("// End Parsing {}", "${field.name}");
   </#list>
-    // Debug missing fields
-    log.debug("missing fields: {}", debugFields(expectedFields, receivedFields, missingFields));
+    validateValues(values);
     return dto;
   }
 

@@ -21,6 +21,7 @@ import com.etendorx.entities.mapper.lib.JsonPathConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -36,8 +37,8 @@ public class ${mappingPrefix}${entity.externalName}RestController extends Binded
 
   public ${mappingPrefix}${entity.externalName}RestController(
   JsonPathConverter<${mappingPrefix}${entity.externalName}DTOWrite> converter,
-  @Autowired @Qualifier("${mappingPrefix}${entity.externalName}DASRepository") DASRepository<${mappingPrefix}${entity.externalName}DTORead, ${mappingPrefix}${entity.externalName}DTOWrite> repository) {
-    super(converter, repository);
+  @Autowired @Qualifier("${mappingPrefix}${entity.externalName}DASRepository") DASRepository<${mappingPrefix}${entity.externalName}DTORead, ${mappingPrefix}${entity.externalName}DTOWrite> repository, Validator validator) {
+    super(converter, repository, validator);
   }
 
   <#list modelProviderRX.getETRXRepositories(entity) as repo>

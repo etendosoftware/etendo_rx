@@ -1,5 +1,5 @@
 /*
- * Copyright 2022  Futit Services SL
+ * Copyright 2022-2024  Futit Services SL
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.etendorx.entities.entities.mappings.MappingUtils;
 import com.etendorx.entities.jparepo.ETRX_Constant_ValueRepository;
 import com.etendorx.utils.auth.key.context.AppContext;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.stereotype.Component;
@@ -35,7 +34,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * Mapping utils implementation for the DAS module
+ * This class provides utility methods for mapping objects. It is used to handle base objects, parse
+ * date strings, and retrieve constant values.
  */
 @Component
 @Slf4j
@@ -93,11 +93,27 @@ public class MappingUtilsImpl implements MappingUtils {
     return obj;
   }
 
+  /**
+   * Parses a date string into a Date object according to the current user's date format and time zone.
+   * If the date string is blank, it returns null.
+   * If the current user's date format is null, it uses "yyyy-MM-dd" as the default date format.
+   * If the date string is not blank and not equal to "null" (ignoring case), it tries to parse the date string.
+   * If the parsing fails, it logs an error and returns null.
+   *
+   * @param date The date string to be parsed.
+   * @return The parsed Date object, or null if the date string is blank or cannot be parsed.
+   */
   @Override
   public Date parseDate(String date) {
+    if (StringUtils.isBlank(date)) {
+      return null;
+    }
     var dateFormat = AppContext.getCurrentUser().getDateFormat();
+    if (dateFormat == null) {
+      dateFormat = "yyyy-MM-dd";
+    }
     var timeZone = AppContext.getCurrentUser().getTimeZone();
-    if(dateFormat != null && StringUtils.isNotBlank(date) && !StringUtils.equalsIgnoreCase(date,"null")) {
+    if (StringUtils.isNotBlank(date) && !StringUtils.equalsIgnoreCase(date, "null")) {
       SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
       if (timeZone != null) {
         sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
@@ -111,6 +127,13 @@ public class MappingUtilsImpl implements MappingUtils {
     return null;
   }
 
+  /**
+   * Retrieves the default value of a constant from the constant value repository by its identifier.
+   * If the constant is not found, it returns null.
+   *
+   * @param id The identifier of the constant.
+   * @return The default value of the constant, or null if the constant is not found.
+   */
   @Override
   public String constantValue(String id) {
     var constantValue = constantValueRepository.findById(id);

@@ -41,6 +41,7 @@ import com.etendorx.entities.mapper.lib.BaseDTOModel;
 <#if entity.mappingType == "R">
 import com.fasterxml.jackson.annotation.JsonProperty;
 </#if>
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -58,6 +59,9 @@ public class ${mappingPrefix}${entity.externalName}DTO<#if entity.mappingType ==
       </#if>
       <#if !NamingUtil.isJavaReservedWord(field.name)>
   @Getter @Setter
+      </#if>
+      <#if !field.property?? || field.isMandatory>
+  @NotNull
       </#if>
       <#assign columnType = "Object">
       <#if field.property??>
