@@ -17,8 +17,35 @@ package com.etendorx.entities.mapper.lib;
 
 import java.util.TreeSet;
 
+/**
+ * This interface defines methods for retrieving entities based on JSON paths.
+ *
+ * @param <E> the type of entity to be retrieved
+ */
 public interface JsonPathEntityRetriever<E> {
+
+  /**
+   * Retrieves an entity based on a single key.
+   *
+   * @param key the key to use for retrieving the entity
+   * @return the retrieved entity
+   */
   E get(Object key);
 
+  /**
+   * Retrieves an entity based on a field and a key.
+   *
+   * @param field the field to use for retrieving the entity
+   * @param key the key to use for retrieving the entity
+   * @return the retrieved entity
+   */
+  E get(String field, String key);
+
+  /**
+   * Retrieves an entity based on a set of key values.
+   *
+   * @param keyValues the set of key values to use for retrieving the entity
+   * @return the retrieved entity
+   */
   E get(TreeSet<String> keyValues);
 }
