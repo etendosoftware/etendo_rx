@@ -35,17 +35,22 @@ public class OBCONFieldMapping implements DTOReadMapping<InstanceConnectorMappin
       map.put("jsonpath", StringUtils.isBlank(
           etrxEntityField.getJsonpath()) ? "$." + etrxEntityField.getName() : etrxEntityField.getJsonpath());
       map.put("fieldMapping", etrxEntityField.getFieldMapping());
-      map.put("isExternalIdentifier", etrxEntityField.getExternalIdentifier());
-      if (etrxEntityField.getExternalIdentifier()) {
-        if (etrxEntityField.getTable() != null) {
-          map.put("ad_table_id", etrxEntityField.getTable().getId());
-        } else {
+      String property = etrxEntityField.getProperty();
+      // Get property segments
+      boolean isExternalIdentifier = false;
+      if(!StringUtils.isBlank(property)) {
+        String[] propertySegments = property.split("\\.");
+        if(!property.isEmpty()) {
           var field = metadataUtil.getPropertyMetadata(
               entity.getEtrxEntityMapping().getProjectionEntity().getTableEntity().getId(),
-              etrxEntityField.getProperty());
-          map.put("ad_table_id", field != null ? field.getAdTableIdRel() : null);
+              propertySegments[0]);
+          if (field != null && field.getAdTableIdRel() != null) {
+            map.put("ad_table_id", field.getAdTableIdRel());
+            isExternalIdentifier = true;
+          }
         }
       }
+      map.put("isExternalIdentifier", isExternalIdentifier);
       fieldMapping.add(map);
     }
     return fieldMapping;
