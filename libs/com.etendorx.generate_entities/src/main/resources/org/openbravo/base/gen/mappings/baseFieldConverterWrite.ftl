@@ -11,6 +11,11 @@
       </#list>${result?cap_first}</#if>
   </#compress>
 </#macro>
+<#function firstProperty property>
+  <#list property?split(".") as part>
+    <#return part>
+  </#list>
+</#function>
 <#macro convertToGetMethod path>
   <#compress>
   <#assign result="entity">
@@ -81,7 +86,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
   <#if (field.fieldMapping == "DM" || field.fieldMapping == "EM" || field.fieldMapping == "CM")>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     <#if field.property??>
-    entity.set${NamingUtil.getSafeJavaName(field.property)?cap_first}(dto.get<@toCamelCase field.name/>());
+    entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(dto.get<@toCamelCase field.name/>());
     <#else>
     entity.set${field.name?cap_first}(dto.get<@toCamelCase field.name/>());
     </#if>

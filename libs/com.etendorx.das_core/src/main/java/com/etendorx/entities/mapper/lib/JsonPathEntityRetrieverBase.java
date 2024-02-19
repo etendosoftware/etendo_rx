@@ -73,19 +73,36 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
    */
   @Override
   public E get(TreeSet<String> keyValues) throws NonUniqueResultException {
-    Iterator<String> valueIterator = keyValues.iterator();
-    if (keyValues.size() != getKeys().length) {
-      throw new IllegalArgumentException("Mapping has misconfigured identifiers");
-    }
-    List<Specification<E>> specs = new ArrayList<>();
-
-    for (String key : getKeys()) {
-      String value = valueIterator.next();
-      specs.add((root, query, builder) -> builder.equal(root.get(key), value));
-    }
-    Specification<E> combinedSpec = specs.stream().reduce(Specification::and).orElse(null);
-    return getRepository().findOne(combinedSpec).orElse(null);
+    return get(getKeys(), keyValues);
   }
+
+/**
+ * Retrieves an entity from the repository using a set of key values and their corresponding keys.
+ * The keys and values are provided as arrays and must have the same length.
+ * Each key-value pair is used to create a specification that checks if an entity's attribute (the key) equals the provided value.
+ * All specifications are combined using logical AND, meaning an entity must satisfy all specifications to be retrieved.
+ * If no entity satisfies all specifications, null is returned.
+ *
+ * @param keys An array of keys. Each key is the name of an attribute of the entity.
+ * @param keyValues An array of values. Each value corresponds to a key and is the value the entity's attribute should have.
+ * @return The retrieved entity, or null if no entity was found.
+ * @throws NonUniqueResultException If more than one entity was found.
+ * @throws IllegalArgumentException If the number of keys does not match the number of values.
+ */
+public E get(String[] keys, TreeSet<String> keyValues) throws NonUniqueResultException {
+  Iterator<String> valueIterator = keyValues.iterator();
+  if (keyValues.size() != keys.length) {
+    throw new IllegalArgumentException("Mapping has misconfigured identifiers");
+  }
+  List<Specification<E>> specs = new ArrayList<>();
+
+  for (String key : keys) {
+    String value = valueIterator.next();
+    specs.add((root, query, builder) -> builder.equal(root.get(key), value));
+  }
+  Specification<E> combinedSpec = specs.stream().reduce(Specification::and).orElse(null);
+  return getRepository().findOne(combinedSpec).orElse(null);
+}
 
   /**
    * Converts an object to a string.
@@ -109,5 +126,10 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
           "Invalid value for identifier: " + id + " of type " + id.getClass().getName());
     }
     return strId;
+  }
+
+  @Override
+  public E get(String field, String key) {
+    return get(new String[]{field}, new TreeSet<>(List.of(objectToString(key))));
   }
 }

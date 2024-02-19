@@ -47,9 +47,13 @@ public class ${mappingPrefix}${entity.externalName}JsonPathRetriever extends Jso
   @Override
   public String[] getKeys() {
     var keys = new String[]{
-    <#list indentifierFields as field>
+    <#if indentifierFields?size == 0>
+      "id"
+    <#else>
+      <#list indentifierFields as field>
       "${field.property}"<#if field_has_next>,</#if>
-    </#list>
+      </#list>
+    </#if>
     };
     log.debug("retrieve ${entity.externalName} with keys: {}", (Object) keys);
     return keys;
