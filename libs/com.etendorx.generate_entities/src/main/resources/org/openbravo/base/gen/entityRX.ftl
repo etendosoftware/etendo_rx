@@ -48,10 +48,10 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     )
             </#if>
     @jakarta.persistence.Column(name = "${p.columnName?lower_case}"<#if entity.isView()>, insertable = false, updatable = false</#if>)
-    @JsonProperty("${p.javaName}")
-    <#if p.isMandatory()>
+            <#if p.isMandatory()>
     @NotNull
-    </#if>
+           </#if>
+    @JsonProperty("${p.javaName}")
     java.lang.String ${p.javaName};
 
         </#if>
@@ -59,6 +59,9 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
             <#if p.isPrimitive() && !p.isId()>
                 <#if !p.getPrimitiveType().isArray()>
     @jakarta.persistence.Column(name = "${p.columnName?lower_case}")
+                  <#if p.isMandatory()>
+    @NotNull
+                  </#if>
                     <#if p.isBoolean()>
     @Convert(converter = YesNoConverter.class)
                     </#if>
@@ -75,10 +78,10 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
                     </#if>
                 <#else>
     @jakarta.persistence.Column(name = "${p.columnName?lower_case}")
-    @JsonProperty("${p.javaName}")
-    <#if p.isMandatory()>
+                  <#if p.isMandatory()>
     @NotNull
-    </#if>
+                  </#if>
+    @JsonProperty("${p.javaName}")
     ${p.shorterTypeName} ${p.javaName};
 
                 </#if>
@@ -94,9 +97,6 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     @jakarta.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.referencedProperty.columnName?lower_case}"<#if repeated>, updatable = false, insertable = false</#if>)
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
     @JsonProperty("${p.javaName}")
-    <#if p.isMandatory()>
-    @NotNull
-    </#if>
     ${p.targetEntity.className} ${p.javaName};
 
                     <#else>
@@ -115,9 +115,6 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
         <#if computedColumns && p.computedColumn && !p.targetEntity??><#assign query>${p.sqlLogic}</#assign>
     @Formula("(${query?replace("^\\s+|\\s+$|\\n|\\r", " ", "rm")?replace("\"", "\\\"")})")
     @JsonProperty("${p.javaName}")
-    <#if p.isMandatory()>
-    @NotNull
-    </#if>
     @JsonIgnore
     ${p.getObjectTypeName()} ${p.javaName};
 

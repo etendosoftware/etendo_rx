@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.etendorx.das.unit;
+package com.etendorx.entities.mapper.lib;
 
-import com.etendorx.entities.mapper.lib.JsonPathEntityRetrieverBase;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,16 +57,6 @@ public class JsonPathEntityRetrieverBaseTests {
     String name;
   }
 
-  static class CarDTORead {
-    String id;
-    String name;
-  }
-
-  static class CarDTOWrite {
-    String id;
-    String name;
-  }
-
   /**
    * Set up the test environment before each test.
    */
@@ -96,13 +85,11 @@ public class JsonPathEntityRetrieverBaseTests {
     // Given
     Car expectedEntity = new Car("1", "Car 1");
     String key = "1";
-    var keySet = new TreeSet<String>();
-    keySet.add(key);
     when(repository.findOne(any(Specification.class))).thenReturn(
         java.util.Optional.of(expectedEntity));
 
     // When
-    Car result = retriever.get(keySet);
+    Car result = retriever.get(key);
 
     // Then
     assertNotNull(result);
@@ -120,6 +107,23 @@ public class JsonPathEntityRetrieverBaseTests {
 
     // Then
     assertNull(result);
+  }
+
+  @Test
+  void getWithIntegerKeyShouldReturnObject() {
+    // Given
+    Car expectedEntity = new Car("1", "Car 1");
+    Integer key = 1;
+    when(repository.findOne(any(Specification.class))).thenReturn(
+        java.util.Optional.of(expectedEntity));
+
+    // When
+    Car result = retriever.get(key);
+
+    // Then
+    assertNotNull(result);
+    assertEquals(expectedEntity, result);
+
   }
 
   /**

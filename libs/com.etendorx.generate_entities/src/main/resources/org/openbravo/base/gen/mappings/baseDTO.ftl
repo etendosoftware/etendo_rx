@@ -20,6 +20,11 @@
     ${finalResultList?join("")}
   </#compress>
 </#macro>
+<#function firstProperty property>
+  <#list property?split(".") as part>
+    <#return part>
+  </#list>
+</#function>
 /**
 * Copyright 2022-2023 Futit Services SL
 *
@@ -65,10 +70,10 @@ public class ${mappingPrefix}${entity.externalName}DTO<#if entity.mappingType ==
       </#if>
       <#assign columnType = "Object">
       <#if field.property??>
-        <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "Object">
+        <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "Object">
       </#if>
       <#if field.property?? && columnType == "Object">
-        <#assign columnType = modelProvider.getColumnTypeName(entity.table, entity.table.name + "." + field.property) ! "Object">
+        <#assign columnType = modelProvider.getColumnTypeName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "Object">
       </#if>
   <#if entity.mappingType == "R">Object<#else>${columnType}</#if> <@toCamelCase field.name/>;
       <#if NamingUtil.isJavaReservedWord(field.name)>
