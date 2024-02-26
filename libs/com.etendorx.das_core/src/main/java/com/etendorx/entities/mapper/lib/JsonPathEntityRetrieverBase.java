@@ -15,12 +15,14 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.NonUniqueResultException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
@@ -31,6 +33,7 @@ import java.util.TreeSet;
  *
  * @param <E> The type of the entity that will be retrieved.
  */
+@Slf4j
 public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRetriever<E> {
 
   /**
@@ -101,7 +104,17 @@ public E get(String[] keys, TreeSet<String> keyValues) throws NonUniqueResultExc
     specs.add((root, query, builder) -> builder.equal(root.get(key), value));
   }
   Specification<E> combinedSpec = specs.stream().reduce(Specification::and).orElse(null);
-  return getRepository().findOne(combinedSpec).orElse(null);
+  if(combinedSpec == null) {
+    throw new IllegalArgumentException("No specifications were created");
+  }
+  var result = getRepository().findAll(combinedSpec);
+  if(result.size() > 1) {
+    // In case of a bad configuration, the repository will retrieve the first entity that satisfies
+    // the specifications. This is a configuration error and should be fixed.
+    log.error("Detected a non-unique result for the entity retrieval. This is a configuration error."
+        + Arrays.toString(keys));
+  }
+  return result.isEmpty() ? null : result.get(0);
 }
 
   /**

@@ -50,7 +50,7 @@ public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
       E value = ctx.read(path, clazz);
       log.debug("    readedPath '{}' '{}'", path, value);
       // Is an error if the value is not of the expected class
-      if (!(value.getClass().equals(clazz))) {
+      if (!clazz.isAssignableFrom(value.getClass())) {
         error = true;
         nullValue = true;
       }

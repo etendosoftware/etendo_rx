@@ -97,6 +97,9 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     @jakarta.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.referencedProperty.columnName?lower_case}"<#if repeated>, updatable = false, insertable = false</#if>)
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
     @JsonProperty("${p.javaName}")
+                      <#if p.isMandatory()>
+      @NotNull
+                      </#if>
     ${p.targetEntity.className} ${p.javaName};
 
                     <#else>

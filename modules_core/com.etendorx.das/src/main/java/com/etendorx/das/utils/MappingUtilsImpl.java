@@ -69,21 +69,20 @@ public class MappingUtilsImpl implements MappingUtils {
       return list;
     }
     if (Date.class.isAssignableFrom(obj.getClass())) {
-      var dateFormat = AppContext.getCurrentUser().getDateFormat();
+      var dateTimeFormat = AppContext.getCurrentUser().getDateFormat();
       var timeZone = AppContext.getCurrentUser().getTimeZone();
-      if (dateFormat != null) {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+      if (dateTimeFormat != null) {
+        SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
         if (timeZone != null) {
           sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
         }
-        return sdf.format((Date) obj);
       }
     }
     if (Timestamp.class.isAssignableFrom(obj.getClass())) {
-      var dateFormat = AppContext.getCurrentUser().getDateFormat();
+      var dateTimeFormat = AppContext.getCurrentUser().getDateFormat();
       var timeZone = AppContext.getCurrentUser().getTimeZone();
-      if (dateFormat != null) {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+      if (dateTimeFormat != null) {
+        SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
         if (timeZone != null) {
           sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
         }
@@ -105,26 +104,40 @@ public class MappingUtilsImpl implements MappingUtils {
    */
   @Override
   public Date parseDate(String date) {
-    if (StringUtils.isBlank(date)) {
+    if (StringUtils.isBlank(date) || StringUtils.equalsIgnoreCase(date, "null")) {
       return null;
+    }
+    var dateTimeFormat = AppContext.getCurrentUser().getDateTimeFormat();
+    if (dateTimeFormat == null) {
+      dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+    }
+    var timeZone = AppContext.getCurrentUser().getTimeZone();
+    Date returnValue = null;
+    SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
+    if (timeZone != null) {
+      sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+    }
+    try {
+       returnValue = sdf.parse(date);
+    } catch (ParseException ignored) {
+    }
+    if(returnValue != null) {
+      return returnValue;
     }
     var dateFormat = AppContext.getCurrentUser().getDateFormat();
     if (dateFormat == null) {
       dateFormat = "yyyy-MM-dd";
     }
-    var timeZone = AppContext.getCurrentUser().getTimeZone();
-    if (StringUtils.isNotBlank(date) && !StringUtils.equalsIgnoreCase(date, "null")) {
-      SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-      if (timeZone != null) {
-        sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
-      }
-      try {
-        return sdf.parse(date);
-      } catch (ParseException e) {
-        log.error("Error parsing date with value {}", date, e);
-      }
+    sdf = new SimpleDateFormat(dateFormat);
+    if (timeZone != null) {
+      sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
     }
-    return null;
+    try {
+      return sdf.parse(date);
+    } catch (ParseException e) {
+      log.error("Error parsing date with value {}", date, e);
+    }
+    throw new IllegalArgumentException("The date " + date + " cannot be parsed");
   }
 
   /**
