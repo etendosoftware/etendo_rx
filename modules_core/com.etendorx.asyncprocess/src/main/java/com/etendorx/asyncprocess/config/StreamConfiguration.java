@@ -17,15 +17,27 @@
 package com.etendorx.asyncprocess.config;
 
 import com.etendorx.asyncprocess.serdes.AsyncProcessSerializer;
+import com.etendorx.lib.kafka.model.AsyncProcess;
+import com.etendorx.lib.kafka.model.AsyncProcessExecution;
+import com.etendorx.lib.kafka.model.AsyncProcessState;
+import com.etendorx.lib.kafka.model.JsonSerde;
 import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.Materialized;
+import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.state.HostInfo;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -38,12 +50,9 @@ import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.receiver.internals.ConsumerFactory;
 import reactor.kafka.receiver.internals.DefaultKafkaReceiver;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
-import static com.etendorx.lib.kafka.topology.AsyncProcessTopology.ASYNC_PROCESS;
+import static com.etendorx.lib.kafka.topology.AsyncProcessTopology.*;
 
 /**
  * Initial configuration of stream services
@@ -77,7 +86,10 @@ public class StreamConfiguration {
   @Bean
   public KafkaStreams kafkaStreams(
       @Qualifier("kafkaStreamsConfiguration") Properties streamConfiguration) {
-    var topology = AsyncProcessTopology.buildTopology();
+    StreamsBuilder streamsBuilder = new StreamsBuilder();
+    AsyncProcessTopology.buildTopology(streamsBuilder);
+    LatestLogsConfiguration.lastRecords(streamConfiguration, streamsBuilder);
+    var topology = streamsBuilder.build();
     var kafkaStreams = new KafkaStreams(topology, streamConfiguration);
 
     kafkaStreams.cleanUp();
@@ -87,6 +99,7 @@ public class StreamConfiguration {
 
     return kafkaStreams;
   }
+
 
   @Bean
   public HostInfo hostInfo() {

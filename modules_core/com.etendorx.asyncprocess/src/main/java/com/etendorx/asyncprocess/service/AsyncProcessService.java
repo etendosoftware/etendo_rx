@@ -26,6 +26,13 @@ import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.PriorityQueue;
+
+import static com.etendorx.asyncprocess.config.LatestLogsConfiguration.ASYNC_PROCESS_STORE_QUEUE;
+
 /**
  * Service that returns information from a process stored in Kafka.
  */
@@ -49,6 +56,15 @@ public class AsyncProcessService {
     return kafkaStreams.store(
         StoreQueryParameters.fromNameAndType(AsyncProcessTopology.ASYNC_PROCESS_STORE,
             QueryableStoreTypes.keyValueStore()));
+  }
+
+  public List<AsyncProcess> getLatestAsyncProcesses() {
+    ReadOnlyKeyValueStore<String, PriorityQueue<AsyncProcess>> store =
+        kafkaStreams.store(StoreQueryParameters.fromNameAndType(
+            ASYNC_PROCESS_STORE_QUEUE,
+            QueryableStoreTypes.keyValueStore()));
+    PriorityQueue<AsyncProcess> records = store.get("1");
+    return records == null ? Collections.emptyList() : new ArrayList<>(records);
   }
 
 }
