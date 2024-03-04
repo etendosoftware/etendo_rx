@@ -17,27 +17,16 @@
 package com.etendorx.asyncprocess.config;
 
 import com.etendorx.asyncprocess.serdes.AsyncProcessSerializer;
-import com.etendorx.lib.kafka.model.AsyncProcess;
-import com.etendorx.lib.kafka.model.AsyncProcessExecution;
-import com.etendorx.lib.kafka.model.AsyncProcessState;
-import com.etendorx.lib.kafka.model.JsonSerde;
 import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.state.HostInfo;
-import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -50,24 +39,41 @@ import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.receiver.internals.ConsumerFactory;
 import reactor.kafka.receiver.internals.DefaultKafkaReceiver;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
-import static com.etendorx.lib.kafka.topology.AsyncProcessTopology.*;
+import static com.etendorx.lib.kafka.topology.AsyncProcessTopology.ASYNC_PROCESS;
 
 /**
- * Initial configuration of stream services
+ * This class is responsible for configuring the Kafka Streams for the application.
+ * It sets up the Kafka Streams configuration, creates the Kafka Streams instance, and starts it.
+ * It also provides beans for the Kafka Receiver and Kafka Template for sending retries.
  */
 @Configuration
 public class StreamConfiguration {
 
+  // The name of the Kafka Streams application.
   public static final String ASYNC_PROCESS_QUERIES = "async-process-queries";
+
+  // The host information for the Kafka Streams application.
   @Value("${kafka.streams.host.info:localhost:8080}")
   private String kafkaStreamsHostInfo;
+
+  // The directory for the Kafka Streams state store.
   @Value("${kafka.streams.state.dir:/tmp/kafka-streams/async-process-queries}")
   private String kafkaStreamsStateDir;
+
+  // The bootstrap servers for Kafka.
   @Value("${bootstrap_server:kafka:9092}")
   private String bootstrapServer;
 
+  /**
+   * This method is used to set up the Kafka Streams configuration.
+   *
+   * @return Properties The Kafka Streams configuration.
+   */
   @Bean
   public Properties kafkaStreamsConfiguration() {
     Properties properties = new Properties();
@@ -83,12 +89,18 @@ public class StreamConfiguration {
     return properties;
   }
 
+  /**
+   * This method is used to create and start the Kafka Streams instance.
+   *
+   * @param streamConfiguration The Kafka Streams configuration.
+   * @return KafkaStreams The Kafka Streams instance.
+   */
   @Bean
   public KafkaStreams kafkaStreams(
       @Qualifier("kafkaStreamsConfiguration") Properties streamConfiguration) {
     StreamsBuilder streamsBuilder = new StreamsBuilder();
     AsyncProcessTopology.buildTopology(streamsBuilder);
-    LatestLogsConfiguration.lastRecords(streamConfiguration, streamsBuilder);
+    LatestLogsConfiguration.lastRecords(streamsBuilder);
     var topology = streamsBuilder.build();
     var kafkaStreams = new KafkaStreams(topology, streamConfiguration);
 
@@ -100,13 +112,22 @@ public class StreamConfiguration {
     return kafkaStreams;
   }
 
-
+  /**
+   * This method is used to create the HostInfo object for the Kafka Streams application.
+   *
+   * @return HostInfo The HostInfo object.
+   */
   @Bean
   public HostInfo hostInfo() {
     var split = kafkaStreamsHostInfo.split(":");
     return new HostInfo(split[0], Integer.parseInt(split[1]));
   }
 
+  /**
+   * This method is used to create the Kafka Receiver for consuming messages from Kafka.
+   *
+   * @return KafkaReceiver The Kafka Receiver.
+   */
   @Bean
   public KafkaReceiver kafkaReceiver() {
 
@@ -123,6 +144,11 @@ public class StreamConfiguration {
         ReceiverOptions.create(props).subscription(Collections.singleton(ASYNC_PROCESS)));
   }
 
+  /**
+   * This method is used to create the ProducerFactory for the Kafka Template for sending retries.
+   *
+   * @return ProducerFactory The ProducerFactory.
+   */
   @Bean
   public ProducerFactory<String, String> sendRetryFactory() {
     Map<String, Object> configProps = new HashMap<>();
@@ -132,6 +158,11 @@ public class StreamConfiguration {
     return new DefaultKafkaProducerFactory<>(configProps);
   }
 
+  /**
+   * This method is used to create the Kafka Template for sending retries.
+   *
+   * @return KafkaTemplate The Kafka Template.
+   */
   @Bean
   public KafkaTemplate<String, String> sendRetryTemplate() {
     return new KafkaTemplate<>(sendRetryFactory());
