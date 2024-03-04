@@ -15,6 +15,8 @@
  */
 package com.etendorx.asyncprocess.serdes;
 
+import com.etendorx.asyncprocess.exceptions.SerdesException;
+import lombok.SneakyThrows;
 import org.apache.kafka.common.serialization.Serializer;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -60,6 +62,7 @@ public class DequeSerializer<T> implements Serializer<Deque<T>> {
    * @param queue The Deque object to be serialized.
    * @return byte[] The serialized byte array.
    */
+  @SneakyThrows
   @Override
   public byte[] serialize(final String topic, final Deque<T> queue) {
     final int size = queue.size();
@@ -75,7 +78,7 @@ public class DequeSerializer<T> implements Serializer<Deque<T>> {
       }
       out.close();
     } catch (final IOException e) {
-      throw new RuntimeException("unable to serialize PriorityQueue", e);
+      throw new SerdesException("unable to serialize PriorityQueue", e);
     }
     return baos.toByteArray();
   }
@@ -86,6 +89,6 @@ public class DequeSerializer<T> implements Serializer<Deque<T>> {
    */
   @Override
   public void close() {
-
+    // do nothing
   }
 }

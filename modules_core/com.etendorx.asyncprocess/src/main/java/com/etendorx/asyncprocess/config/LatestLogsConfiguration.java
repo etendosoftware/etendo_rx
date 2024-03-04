@@ -40,6 +40,10 @@ import static com.etendorx.lib.kafka.topology.AsyncProcessTopology.ASYNC_PROCESS
 @Configuration
 public class LatestLogsConfiguration {
 
+  private LatestLogsConfiguration() {
+    // Private constructor to hide the implicit public one.
+  }
+
   // The name of the Kafka store for the asynchronous process queue.
   public static final String ASYNC_PROCESS_STORE_QUEUE = "async-process-queue-store5";
 

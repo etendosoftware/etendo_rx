@@ -15,6 +15,8 @@
  */
 package com.etendorx.asyncprocess.serdes;
 
+import com.etendorx.asyncprocess.exceptions.SerdesException;
+import lombok.SneakyThrows;
 import org.apache.kafka.common.serialization.Deserializer;
 
 import java.io.ByteArrayInputStream;
@@ -62,6 +64,7 @@ public class DequeDeserializer<T> implements Deserializer<Deque<T>> {
    * @param bytes The byte array to be deserialized.
    * @return Deque<T> The deserialized Deque object.
    */
+  @SneakyThrows
   @Override
   public Deque<T> deserialize(final String s, final byte[] bytes) {
     if (bytes == null || bytes.length == 0) {
@@ -79,7 +82,7 @@ public class DequeDeserializer<T> implements Deserializer<Deque<T>> {
         priorityQueue.add(valueDeserializer.deserialize(s, valueBytes));
       }
     } catch (final IOException e) {
-      throw new RuntimeException("Unable to deserialize PriorityQueue", e);
+      throw new SerdesException("Unable to deserialize PriorityQueue", e);
     }
     return priorityQueue;
   }
@@ -90,6 +93,6 @@ public class DequeDeserializer<T> implements Deserializer<Deque<T>> {
    */
   @Override
   public void close() {
-
+    // do nothing
   }
 }
