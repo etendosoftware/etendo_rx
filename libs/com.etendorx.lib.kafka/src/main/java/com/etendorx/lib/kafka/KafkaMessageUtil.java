@@ -50,7 +50,7 @@ public class KafkaMessageUtil {
   @SneakyThrows
   private static void send(KafkaProducer<String, String> asyncProcessExecutionProducer,
       ProducerRecord<String, String> record) {
-    log.info("send {} {}", record.key(), record.value());
+    log.debug("send {} {}", record.key(), record.value());
     asyncProcessExecutionProducer.send(record).get();
   }
 

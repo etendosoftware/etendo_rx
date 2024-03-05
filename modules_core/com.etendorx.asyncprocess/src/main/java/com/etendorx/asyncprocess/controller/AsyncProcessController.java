@@ -43,6 +43,7 @@ import reactor.kafka.receiver.KafkaReceiver;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -79,6 +80,13 @@ public class AsyncProcessController {
       @PathVariable("asyncProcessId") String asyncProcessId) {
     var asyncProcess = asyncProcessService.getAsyncProcess(asyncProcessId);
     return ResponseEntity.ok(asyncProcess);
+  }
+
+  @Operation(summary = "Get current status of execution")
+  @GetMapping(value = "/latest", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<AsyncProcess>> getLatestAsyncProcess(
+      ) {
+    return ResponseEntity.ok(asyncProcessService.getLatestAsyncProcesses());
   }
 
   @SendTo("/topic/message")

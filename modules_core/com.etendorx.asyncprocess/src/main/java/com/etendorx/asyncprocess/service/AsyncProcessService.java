@@ -26,29 +26,70 @@ import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+
+import static com.etendorx.asyncprocess.config.LatestLogsConfiguration.ASYNC_PROCESS_STORE_QUEUE;
+
 /**
- * Service that returns information from a process stored in Kafka.
+ * This service class is responsible for retrieving information from a process stored in Kafka.
+ * It uses the KafkaStreams and HostInfo objects to interact with the Kafka store.
  */
 @Service
 public class AsyncProcessService {
 
+  // The KafkaStreams object used to interact with the Kafka store.
   private final KafkaStreams kafkaStreams;
+
+  // The HostInfo object used to interact with the Kafka store.
   private final HostInfo hostInfo;
 
+  /**
+   * Constructor for the AsyncProcessService class.
+   *
+   * @param kafkaStreams The KafkaStreams object to be used.
+   * @param hostInfo     The HostInfo object to be used.
+   */
   @Autowired
   public AsyncProcessService(KafkaStreams kafkaStreams, HostInfo hostInfo) {
     this.kafkaStreams = kafkaStreams;
     this.hostInfo = hostInfo;
   }
 
+  /**
+   * Retrieves an AsyncProcess object from the Kafka store using its ID.
+   *
+   * @param asyncProcessId The ID of the AsyncProcess object to be retrieved.
+   * @return AsyncProcess The retrieved AsyncProcess object.
+   */
   public AsyncProcess getAsyncProcess(String asyncProcessId) {
     return getStore().get(asyncProcessId);
   }
 
+  /**
+   * Retrieves a ReadOnlyKeyValueStore object from the Kafka store.
+   *
+   * @return ReadOnlyKeyValueStore The retrieved ReadOnlyKeyValueStore object.
+   */
   public ReadOnlyKeyValueStore<String, AsyncProcess> getStore() {
     return kafkaStreams.store(
         StoreQueryParameters.fromNameAndType(AsyncProcessTopology.ASYNC_PROCESS_STORE,
             QueryableStoreTypes.keyValueStore()));
+  }
+
+  /**
+   * Retrieves a list of the latest AsyncProcess objects from the Kafka store.
+   *
+   * @return List<AsyncProcess> The list of retrieved AsyncProcess objects.
+   */
+  public List<AsyncProcess> getLatestAsyncProcesses() {
+    ReadOnlyKeyValueStore<String, Deque<AsyncProcess>> store = kafkaStreams.store(
+        StoreQueryParameters.fromNameAndType(ASYNC_PROCESS_STORE_QUEUE,
+            QueryableStoreTypes.keyValueStore()));
+    Deque<AsyncProcess> records = store.get("1");
+    return records == null ? Collections.emptyList() : new ArrayList<>(records);
   }
 
 }
