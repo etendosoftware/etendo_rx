@@ -45,16 +45,11 @@ public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
    */
   public ReturnKey<E> read(DocumentContext ctx, String path, Class<E> clazz) {
     try {
-      boolean error = false;
-      boolean nullValue = false;
       E value = ctx.read(path, clazz);
       log.debug("    readedPath '{}' '{}'", path, value);
       // Is an error if the value is not of the expected class
-      if (!clazz.isAssignableFrom(value.getClass())) {
-        error = true;
-        nullValue = true;
-      }
-      return new ReturnKey<>(path, value, false, nullValue, error);
+      boolean nullValue = !clazz.isAssignableFrom(value.getClass());
+      return new ReturnKey<>(path, value, false, nullValue, nullValue);
     } catch (Exception e) {
       log.debug("    Cannot read path '{}'", path);
       // Is not considered an error if the path is not found
