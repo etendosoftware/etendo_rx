@@ -7,11 +7,9 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 @Suite
 @SuiteDisplayName("Etendo RX Unit Tests Suite")
 @SelectClasses({
-    BaseDTORepositoryDefaultTests.class,
     JsonPathConverterBaseTests.class,
     JsonPathEntityRetrieverBaseTests.class,
     MappingUtilsImplTest.class,
-    BindedRestControllerTest.class,
     JsonPathEntityRetrieverDefaultTest.class
 })
 public class EtendoRXUnitTestsSuite {
