@@ -19,6 +19,7 @@ import com.etendorx.asyncprocess.serdes.PriorityQueueSerde;
 import com.etendorx.lib.kafka.model.AsyncProcess;
 import com.etendorx.lib.kafka.model.AsyncProcessState;
 import com.etendorx.lib.kafka.model.JsonSerde;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -77,7 +78,7 @@ public class LatestLogsConfiguration {
    * @return Deque<AsyncProcess> The updated list of logs for the asynchronous process.
    */
   private static Deque<AsyncProcess> updateList(AsyncProcess value, Deque<AsyncProcess> list) {
-    if (value.getId() == null || value.getState().equals(AsyncProcessState.ACCEPTED)) {
+    if (StringUtils.isEmpty(value.getId()) || value.getState().equals(AsyncProcessState.ACCEPTED)) {
       return list;
     }
     list.removeIf(existingValue -> existingValue.getId().equals(value.getId()));

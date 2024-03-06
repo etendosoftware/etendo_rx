@@ -43,9 +43,9 @@ public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
    * @param clazz The class of the value to be read.
    * @return A ReturnKey containing the read value and error information.
    */
-  public ReturnKey<E> read(DocumentContext ctx, String path, Class<E> clazz) {
+  public <F> ReturnKey<F> read(DocumentContext ctx, String path, Class<F> clazz) {
     try {
-      E value = ctx.read(path, clazz);
+      F value = ctx.read(path, clazz);
       log.debug("    readedPath '{}' '{}'", path, value);
       // Is an error if the value is not of the expected class
       boolean nullValue = !clazz.isAssignableFrom(value.getClass());
