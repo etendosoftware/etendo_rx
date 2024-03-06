@@ -78,15 +78,32 @@ public class MappingUtilsImpl implements MappingUtils {
 
   @Nullable
   private static String handleDateObject(Date obj) {
-    var dateTimeFormat = AppContext.getCurrentUser().getDateFormat();
+    var dateFormat = AppContext.getCurrentUser().getDateFormat();
     var timeZone = AppContext.getCurrentUser().getTimeZone();
+    if (dateFormat != null) {
+      SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+      if (timeZone != null) {
+        sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+      }
+      try {
+        return sdf.format(obj);
+      } catch (Exception e) {
+        // If the date cannot be formatted, try to format it with the user's date format
+      }
+    }
+    var dateTimeFormat = AppContext.getCurrentUser().getDateTimeFormat();
     if (dateTimeFormat != null) {
       SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
       if (timeZone != null) {
         sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
       }
-      return sdf.format(obj);
+      try {
+        return sdf.format(obj);
+      } catch (Exception e) {
+        // If the date cannot be formatted, log an error and return null
+      }
     }
+    log.error("Error formatting date with value {}", obj);
     return null;
   }
 
