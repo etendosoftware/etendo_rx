@@ -22,8 +22,11 @@ import com.etendorx.entities.mapper.lib.DTOConverter;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import lombok.Getter;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends BaseDTOModel,F extends BaseDTOModel> implements DASRepository<E,F> {
 
@@ -41,15 +45,18 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   private final DTOConverter<T, E, F> converter;
   private final AuditServiceInterceptor auditService;
   private final JsonPathEntityRetriever<T> retriever;
+  private final Validator validator;
 
   public BaseDTORepositoryDefault(RestCallTransactionHandler transactionHandler,
       BaseDASRepository<T> repository, DTOConverter<T, E, F> converter,
-      JsonPathEntityRetriever<T> retriever, AuditServiceInterceptor auditService) {
+      JsonPathEntityRetriever<T> retriever, AuditServiceInterceptor auditService,
+      Validator validator) {
     this.transactionHandler = transactionHandler;
     this.repository = repository;
     this.converter = converter;
     this.auditService = auditService;
     this.retriever = retriever;
+    this.validator = validator;
   }
 
   /**
@@ -113,20 +120,38 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
         throw new IllegalStateException("Entity conversion failed");
       }
       setAuditValuesIfApplicable(entity, isNew);
-      repository.save(entity);
-      repository.save(converter.convertOneToMany(dtoEntity, entity));
+      Set<ConstraintViolation<T>> violations = validator.validate(entity);
+      if (!violations.isEmpty()) {
+        List<String> messages = new ArrayList<>();
+        boolean hasViolations = false;
+        for (ConstraintViolation<T> violation : violations) {
+          if (!StringUtils.equals(violation.getPropertyPath().toString(), "id")) {
+            messages.add(violation.getPropertyPath() + ": " + violation.getMessage());
+            hasViolations = true;
+          }
+        }
+        if (hasViolations) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+              "Validation failed: " + messages);
+        }
+      }
+      entity = repository.save(entity);
+      entity = repository.save(converter.convertOneToMany(dtoEntity, entity));
       newId = converter.convert(entity).getId();
-    } finally {
       transactionHandler.commit();
+      return converter.convert(retriever.get(newId));
+    } catch (ResponseStatusException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-    return converter.convert(retriever.get(newId));
   }
 
   /**
    * Check for duplicate
    * @param dtoEntity
    */
-  private void checkForDuplicate(F dtoEntity) {
+  public void checkForDuplicate(F dtoEntity) {
     if (dtoEntity.getId() != null && retriever.get(dtoEntity.getId()) != null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Record already exists");
     }

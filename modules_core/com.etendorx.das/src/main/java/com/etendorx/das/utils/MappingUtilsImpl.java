@@ -1,5 +1,5 @@
 /*
- * Copyright 2022  Futit Services SL
+ * Copyright 2022-2024  Futit Services SL
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,12 @@ import com.etendorx.entities.entities.BaseSerializableObject;
 import com.etendorx.entities.entities.mappings.MappingUtils;
 import com.etendorx.entities.jparepo.ETRX_Constant_ValueRepository;
 import com.etendorx.utils.auth.key.context.AppContext;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,7 +34,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * Mapping utils implementation for the DAS module
+ * This class provides utility methods for mapping objects. It is used to handle base objects, parse
+ * date strings, and retrieve constant values.
  */
 @Component
 @Slf4j
@@ -59,58 +59,119 @@ public class MappingUtilsImpl implements MappingUtils {
   @Override
   public Object handleBaseObject(Object obj) {
     if (BaseSerializableObject.class.isAssignableFrom(obj.getClass())) {
-      return ((BaseSerializableObject) obj).get_identifier();
+      return handleBaseSerializableObject((BaseSerializableObject) obj);
     }
     if (PersistentBag.class.isAssignableFrom(obj.getClass())) {
-      List<Object> list = new ArrayList<>();
-      for (Object o : (PersistentBag) obj) {
-        list.add(handleBaseObject(o));
-      }
-      return list;
+      return handlePersistentBag((PersistentBag<?>) obj);
     }
     if (Date.class.isAssignableFrom(obj.getClass())) {
-      var dateFormat = AppContext.getCurrentUser().getDateFormat();
-      var timeZone = AppContext.getCurrentUser().getTimeZone();
-      if (dateFormat != null) {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-        if (timeZone != null) {
-          sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
-        }
-        return sdf.format((Date) obj);
-      }
-    }
-    if (Timestamp.class.isAssignableFrom(obj.getClass())) {
-      var dateFormat = AppContext.getCurrentUser().getDateFormat();
-      var timeZone = AppContext.getCurrentUser().getTimeZone();
-      if (dateFormat != null) {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-        if (timeZone != null) {
-          sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
-        }
-        return sdf.format((Timestamp) obj);
-      }
+      String sdf = handleDateObject((Date) obj);
+      if (sdf != null)
+        return sdf;
     }
     return obj;
   }
 
-  @Override
-  public Date parseDate(String date) {
+  private static String handleBaseSerializableObject(BaseSerializableObject obj) {
+    return obj.get_identifier();
+  }
+
+  @Nullable
+  private static String handleDateObject(Date obj) {
     var dateFormat = AppContext.getCurrentUser().getDateFormat();
     var timeZone = AppContext.getCurrentUser().getTimeZone();
-    if(dateFormat != null && StringUtils.isNotBlank(date) && !StringUtils.equalsIgnoreCase(date,"null")) {
+    if (dateFormat != null) {
       SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
       if (timeZone != null) {
         sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
       }
       try {
-        return sdf.parse(date);
-      } catch (ParseException e) {
-        log.error("Error parsing date with value {}", date, e);
+        return sdf.format(obj);
+      } catch (Exception e) {
+        // If the date cannot be formatted, try to format it with the user's date format
       }
     }
+    var dateTimeFormat = AppContext.getCurrentUser().getDateTimeFormat();
+    if (dateTimeFormat != null) {
+      SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
+      if (timeZone != null) {
+        sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+      }
+      try {
+        return sdf.format(obj);
+      } catch (Exception e) {
+        // If the date cannot be formatted, log an error and return null
+      }
+    }
+    log.error("Error formatting date with value {}", obj);
     return null;
   }
 
+  private List<Object> handlePersistentBag(PersistentBag<?> obj) {
+    List<Object> list = new ArrayList<>();
+    for (Object o : (PersistentBag<?>) obj) {
+      list.add(handleBaseObject(o));
+    }
+    return list;
+  }
+
+  /**
+   * Parses a date string into a Date object according to the current user's date format and time zone.
+   * If the date string is blank, it returns null.
+   * If the current user's date format is null, it uses "yyyy-MM-dd" as the default date format.
+   * If the date string is not blank and not equal to "null" (ignoring case), it tries to parse the date string.
+   * If the parsing fails, it logs an error and returns null.
+   *
+   * @param date The date string to be parsed.
+   * @return The parsed Date object, or null if the date string is blank or cannot be parsed.
+   */
+  @Override
+  public Date parseDate(String date) {
+    if (StringUtils.isBlank(date) || StringUtils.equalsIgnoreCase(date, "null")) {
+      return null;
+    }
+    var dateTimeFormat = AppContext.getCurrentUser().getDateTimeFormat();
+    if (dateTimeFormat == null) {
+      dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+    }
+    var timeZone = AppContext.getCurrentUser().getTimeZone();
+    Date returnValue = null;
+    SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
+    if (timeZone != null) {
+      sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+    }
+    try {
+      returnValue = sdf.parse(date);
+    } catch (ParseException ignored) {
+      // This error is ignored because the date may be in a different format
+      // than the user's date format, and it will be parsed again below
+    }
+    if (returnValue != null) {
+      return returnValue;
+    }
+    var dateFormat = AppContext.getCurrentUser().getDateFormat();
+    if (dateFormat == null) {
+      dateFormat = "yyyy-MM-dd";
+    }
+    sdf = new SimpleDateFormat(dateFormat);
+    if (timeZone != null) {
+      sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+    }
+    try {
+      return sdf.parse(date);
+    } catch (ParseException e) {
+      log.error("Error parsing date with value {}", date, e);
+    }
+    throw new IllegalArgumentException("The date " + date + " cannot be parsed");
+  }
+
+  /**
+   * Retrieves the default value of a constant from the constant value repository by its identifier.
+   * If the constant is not found, it returns null.
+   *
+   * @param id The identifier of the constant.
+   * @return The default value of the constant, or null if the constant is not found.
+   */
   @Override
   public String constantValue(String id) {
     var constantValue = constantValueRepository.findById(id);

@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Convert;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.type.YesNoConverter;
@@ -37,28 +38,35 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 public abstract class BaseRXObject implements BaseSerializableObject {
     @jakarta.persistence.JoinColumn(name = "ad_client_id", referencedColumnName = "AD_Client_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @NotNull
     Client client;
 
     @jakarta.persistence.JoinColumn(name = "ad_org_id", referencedColumnName = "AD_Org_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @NotNull
     Organization organization;
 
     @jakarta.persistence.Column(name = "isactive")
     @Convert(converter = YesNoConverter.class)
+    @NotNull
     java.lang.Boolean active;
 
     @jakarta.persistence.Column(name = "created")
+    @NotNull
     java.util.Date creationDate;
 
     @jakarta.persistence.JoinColumn(name = "createdby", referencedColumnName = "AD_User_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @NotNull
     User createdBy;
 
     @jakarta.persistence.Column(name = "updated")
+    @NotNull
     java.util.Date updated;
 
     @jakarta.persistence.JoinColumn(name = "updatedby", referencedColumnName = "AD_User_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @NotNull
     User updatedBy;
 
     @JsonProperty("_identifier")

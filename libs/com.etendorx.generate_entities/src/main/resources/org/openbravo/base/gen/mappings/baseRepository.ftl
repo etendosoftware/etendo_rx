@@ -4,6 +4,7 @@ import com.etendorx.entities.entities.AuditServiceInterceptor;
 import com.etendorx.entities.entities.BaseDTORepositoryDefault;
 import com.etendorx.entities.jparepo.${entity.table.name}Repository;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
+import jakarta.validation.Validator;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import org.springframework.data.domain.Page;
@@ -18,9 +19,10 @@ public class ${mappingPrefix}${entity.externalName}DTORepositoryDefault extends 
       ${entity.table.name}Repository repository,
       ${mappingPrefix}${entity.externalName}DTOConverter converter,
       ${mappingPrefix}${entity.externalName}JsonPathRetriever retriever,
-      AuditServiceInterceptor auditService
+      AuditServiceInterceptor auditService,
+      Validator validator
     ) {
-    super(restCallTransactionHandler, repository, converter, retriever, auditService);
+    super(restCallTransactionHandler, repository, converter, retriever, auditService, validator);
   }
 
   <#list modelProviderRX.getETRXRepositories(entity) as repo>

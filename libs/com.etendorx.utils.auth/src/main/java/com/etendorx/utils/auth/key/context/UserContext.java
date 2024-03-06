@@ -49,5 +49,7 @@ public class UserContext {
 
   private String dateFormat;
 
+  private String dateTimeFormat;
+
   private String timeZone;
 }

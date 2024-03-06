@@ -18,7 +18,7 @@
 </#macro>
 <#macro convertToGetMethod name path mappingType>
   <#assign result="entity">
-  <#assign nullCheck="  if (">
+  <#assign nullCheck="  if (entity != null && ">
   <#list path?split(".") as part>
     <#if part?index != 0>
       <#assign nullCheck = nullCheck + " && ">

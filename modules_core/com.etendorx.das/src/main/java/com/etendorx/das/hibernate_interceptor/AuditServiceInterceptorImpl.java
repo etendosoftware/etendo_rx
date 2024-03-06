@@ -52,15 +52,21 @@ public class AuditServiceInterceptorImpl implements AuditServiceInterceptor {
     log.debug("UserContext: {}", userContext);
     log.debug("UserContext.userId {}", userContext.getUserId());
     log.debug("UserContext.clientId {}", userContext.getClientId());
-    if (newRecord) {
+    if (baseObject.getClient() == null) {
       baseObject.setClient(adClientRepository.findById(userContext.getClientId()).orElse(null));
+    }
+    if (baseObject.getActive() == null) {
       baseObject.setActive(true);
+    }
+    if (baseObject.getCreatedBy() == null) {
       baseObject.setCreatedBy(adUserRepository.findById(userContext.getUserId()).orElse(null));
+    }
+    if (baseObject.getCreationDate() == null) {
       baseObject.setCreationDate(new Date());
-      if(baseObject.getOrganization() == null) {
-        baseObject.setOrganization(
-            organizationRepository.findById(userContext.getOrganizationId()).orElse(null));
-      }
+    }
+    if (baseObject.getOrganization() == null) {
+      baseObject.setOrganization(
+          organizationRepository.findById(userContext.getOrganizationId()).orElse(null));
     }
     baseObject.setUpdatedBy(adUserRepository.findById(userContext.getUserId()).orElse(null));
     baseObject.setUpdated(new Date());

@@ -57,6 +57,9 @@ public class ${mappingPrefix}${readEntity.externalName}DTOConverter extends
   // READ
   @Override
   public ${mappingPrefix}${readEntity.externalName}DTORead convert(${readEntity.table.className} entity) {
+    if (entity == null) {
+      return null;
+    }
     ${mappingPrefix}${readEntity.externalName}DTORead dto = new ${mappingPrefix}${readEntity.externalName}DTORead();
 <#list readEntity.fields as field>
     dto.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(readConverter.get<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity));

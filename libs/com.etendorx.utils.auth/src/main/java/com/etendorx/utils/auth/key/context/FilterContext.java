@@ -42,6 +42,7 @@ public class FilterContext extends OncePerRequestFilter {
   public static final String FALSE = "false";
   public static final String NO_ACTIVE_FILTER_PARAMETER = "_noActiveFilter";
   public static final String TRIGGER_ENABLED_PARAMETER = "_triggerEnabled";
+  private static final String DATE_TIME_FORMAT_PARAMETER = "_dateTimeFormat";
   private static final String DATE_FORMAT_PARAMETER = "_dateFormat";
   private static final String TIME_ZONE_PARAMETER = "_timeZone";
   @Autowired
@@ -91,6 +92,7 @@ public class FilterContext extends OncePerRequestFilter {
     String noActiveFilterParameter = req.getParameter(NO_ACTIVE_FILTER_PARAMETER);
     String triggerEnabledParam = req.getParameter(TRIGGER_ENABLED_PARAMETER);
     String dateFormatParam = req.getParameter(DATE_FORMAT_PARAMETER);
+    String dateTimeFormatParam = req.getParameter(DATE_TIME_FORMAT_PARAMETER);
     String timeZoneParam = req.getParameter(TIME_ZONE_PARAMETER);
     String restMethod = req.getMethod();
     boolean noActiveFilter = !parseBooleanParameter(noActiveFilterParameter,
@@ -101,6 +103,9 @@ public class FilterContext extends OncePerRequestFilter {
     boolean isTriggerEnabled = parseBooleanParameter(triggerEnabledParam, TRIGGER_ENABLED_PARAMETER,
         true);
     userContext.setTriggerEnabled(isTriggerEnabled);
+    if (StringUtils.isNotBlank(dateTimeFormatParam)) {
+      userContext.setDateTimeFormat(dateTimeFormatParam);
+    }
     if (StringUtils.isNotBlank(dateFormatParam)) {
       userContext.setDateFormat(dateFormatParam);
     }

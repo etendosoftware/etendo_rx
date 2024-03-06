@@ -16,10 +16,23 @@
     ${finalResultList?join("")}
   </#compress>
 </#macro>
+<#function firstProperty property>
+  <#list property?split(".") as part>
+    <#return part>
+  </#list>
+</#function>
+<#function secondProperty property>
+    <#list property?split(".") as part>
+        <#if part_index == 1>
+        <#return part>
+        </#if>
+    </#list>
+    <#return "id">
+</#function>
 <#assign objectFields = []>
 <#list entity.fields as field>
   <#if field.property??>
-    <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "" />
+    <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     <#if columnType?? && columnType != "">
       <#assign objectFields = objectFields + [field]>
     </#if>
@@ -43,8 +56,21 @@
 package com.etendorx.entities.mappings;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 import com.etendorx.entities.entities.mappings.MappingUtils;
+<#list objectFields as field>
+<#if field.fieldMapping == "DM">
+<#assign columnType = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
+import com.etendorx.entities.jparepo.${columnType}Repository;
+</#if>
+</#list>
+import com.etendorx.entities.mapper.lib.JsonPathEntityRetrieverDefault;
+import com.etendorx.entities.mapper.lib.ReturnKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -58,7 +84,7 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   private final MappingUtils mappingUtils;
   <#list objectFields as field>
   <#if field.property??>
-    <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "" />
+    <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     <#if columnType?? && columnType != "">
   private final JsonPathEntityRetriever<${columnType}> ${field.name}Retriever;
     </#if>
@@ -69,14 +95,19 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
     MappingUtils mappingUtils<#if objectFields?size gt 0>,</#if>
 <#list objectFields as field>
   <#if field.property??>
-    <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "" />
+    <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     <#if field.etrxProjectionEntityRelated??>
       <#assign targetEntityName = field.etrxProjectionEntityRelated.externalName />
     <#else>
-      <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + field.property) ! "" />
+      <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     </#if>
     <#if columnType?? && columnType != "">
+      <#if field.fieldMapping == "DM">
+        <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
+    ${targetEntityName}Repository ${field.name}Repository<#if field_has_next>,</#if>
+      <#else>
     ${mappingPrefix}${targetEntityName}JsonPathRetriever ${field.name}Retriever<#if field_has_next>,</#if>
+      </#if>
     </#if>
   </#if>
 </#list>
@@ -84,65 +115,82 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
     super();
     this.mappingUtils = mappingUtils;
   <#list objectFields as field>
+    <#if field.fieldMapping == "DM">
+      <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
+    this.${field.name}Retriever = new JsonPathEntityRetrieverDefault<>(${field.name}Repository);
+    <#else>
     this.${field.name}Retriever = ${field.name}Retriever;
+    </#if>
   </#list>
   }
 
   @Override
   public ${mappingPrefix}${entity.externalName}DTOWrite convert(String rawData) {
     var ctx = getReadContext(rawData);
+    List<ReturnKey<?>> values = new ArrayList<>();
 
     ${mappingPrefix}${entity.externalName}DTOWrite dto = new ${mappingPrefix}${entity.externalName}DTOWrite();
   <#list entity.fields as field>
   <#assign hasRetriever = false />
   <#if field.property??>
-    <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "" />
+    <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     <#if columnType?? && columnType != "">
       <#assign hasRetriever = true />
     </#if>
   </#if>
   <#assign returnClass = ""/>
-  // ${field.name}
+    log.debug("-- Parsing {}", "${field.name}");
   <#if field.fieldMapping == "CM">
     dto.set<@toCamelCase field.name />(mappingUtils.constantValue("${field.constantValue.id}"));
   <#else>
     <#if hasRetriever>
-    var ${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(
       <#if field.constantValue??>
-        mappingUtils.constantValue("${field.constantValue.id}")
+    var _${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(
+      mappingUtils.constantValue("${field.constantValue.id}")
+    );
       <#else>
-        ctx.read("${field.jsonPath!"$."+field.name}")
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}", String.class);
       </#if>
-    );
     <#elseif field.property??>
-      <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + field.property) ! "" />
-    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class</#if>);
+      <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class<#else>, Object.class</#if>);
     <#else>
-    var ${NamingUtil.getSafeJavaName(field.name)} = ctx.read("${field.jsonPath!"$."+field.name}");
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}", Object.class);
     </#if>
-    log.debug("pathConverter ${entity.externalName} \"${field.jsonPath!"$."+field.name}\": {}", ${NamingUtil.getSafeJavaName(field.name)});
-    dto.set<@toCamelCase field.name />(
+    values.add(_${NamingUtil.getSafeJavaName(field.name)});
+    log.debug("pathConverter ${entity.externalName} \"${field.jsonPath!"$."+field.name}\": {}", _${NamingUtil.getSafeJavaName(field.name)});
+    if(!_${NamingUtil.getSafeJavaName(field.name)}.isNullValue()) {
+      <#if hasRetriever>
+      var val_${NamingUtil.getSafeJavaName(field.name)} = this.retrieve${field.name?cap_first}(_${NamingUtil.getSafeJavaName(field.name)}.getValue());
+      dto.set<@toCamelCase field.name />(
+        val_${NamingUtil.getSafeJavaName(field.name)}
+      );
+      <#else>
+      dto.set<@toCamelCase field.name />(
     <#if returnClass=="java.util.Date">
-      mappingUtils.parseDate(${NamingUtil.getSafeJavaName(field.name)})
+        mappingUtils.parseDate(_${NamingUtil.getSafeJavaName(field.name)}.getValue())
     <#else>
-      ${NamingUtil.getSafeJavaName(field.name)}
+        _${NamingUtil.getSafeJavaName(field.name)}.getValue()
     </#if>
-    );
+      );
+      </#if>
+    }
   </#if>
+    log.debug("// End Parsing {}", "${field.name}");
   </#list>
+    validateValues(values);
     return dto;
   }
 
-<#list entity.fields as field>
-  <#if field.property??>
-    <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + field.property) ! "" />
-    <#if columnType?? && columnType != "">
+<#list objectFields as field>
+  <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
   private ${columnType} retrieve${field.name?cap_first}(Object id) {
+  <#if field.fieldMapping == "DM">
+    return ${field.name}Retriever.get("${secondProperty(field.property)}", (String) id);
+  <#else>
     return ${field.name}Retriever.get(id);
-  }
-
-    </#if>
   </#if>
+  }
 </#list>
 
 }
