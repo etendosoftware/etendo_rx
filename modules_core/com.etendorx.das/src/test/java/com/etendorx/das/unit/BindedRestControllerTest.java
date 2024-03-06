@@ -39,7 +39,9 @@ import static org.mockito.Mockito.*;
 /**
  * This class contains unit tests for the BindedRestController class.
  */
-public class BindedRestControllerTest {
+class BindedRestControllerTest {
+
+  public static final String RAW_ENTITY = "rawEntity";
 
   /**
    * Mock classes for testing.
@@ -62,7 +64,7 @@ public class BindedRestControllerTest {
 
     @Override
     public void setId(String id) {
-
+      // do nothing
     }
   }
 
@@ -73,7 +75,7 @@ public class BindedRestControllerTest {
 
     @Override
     public void setId(String id) {
-
+      // do nothing
     }
   }
 
@@ -158,7 +160,7 @@ public class BindedRestControllerTest {
     given(repository.save(any())).willReturn(savedEntity);
 
     // Execute
-    ResponseEntity<CarDTORead> response = controller.post("rawEntity");
+    ResponseEntity<CarDTORead> response = controller.post(RAW_ENTITY);
 
     // Assert
     assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -178,7 +180,7 @@ public class BindedRestControllerTest {
     given(repository.update(any())).willReturn(updatedEntity);
 
     // Execute
-    ResponseEntity<CarDTORead> response = controller.put(id, "rawEntity");
+    ResponseEntity<CarDTORead> response = controller.put(id, RAW_ENTITY);
 
     // Assert
     assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -191,6 +193,6 @@ public class BindedRestControllerTest {
   @Test
   void putShouldFailWithBadRequestOnInvalidId() {
     // Assert
-    assertThrows(ResponseStatusException.class, () -> controller.put(null, "rawEntity"));
+    assertThrows(ResponseStatusException.class, () -> controller.put(null, RAW_ENTITY));
   }
 }

@@ -20,12 +20,12 @@ import com.etendorx.entities.entities.BaseSerializableObject;
 import com.etendorx.entities.entities.mappings.MappingUtils;
 import com.etendorx.entities.jparepo.ETRX_Constant_ValueRepository;
 import com.etendorx.utils.auth.key.context.AppContext;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,37 +59,43 @@ public class MappingUtilsImpl implements MappingUtils {
   @Override
   public Object handleBaseObject(Object obj) {
     if (BaseSerializableObject.class.isAssignableFrom(obj.getClass())) {
-      return ((BaseSerializableObject) obj).get_identifier();
+      return handleBaseSerializableObject((BaseSerializableObject) obj);
     }
     if (PersistentBag.class.isAssignableFrom(obj.getClass())) {
-      List<Object> list = new ArrayList<>();
-      for (Object o : (PersistentBag) obj) {
-        list.add(handleBaseObject(o));
-      }
-      return list;
+      return handlePersistentBag((PersistentBag<?>) obj);
     }
     if (Date.class.isAssignableFrom(obj.getClass())) {
-      var dateTimeFormat = AppContext.getCurrentUser().getDateFormat();
-      var timeZone = AppContext.getCurrentUser().getTimeZone();
-      if (dateTimeFormat != null) {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
-        if (timeZone != null) {
-          sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
-        }
-      }
-    }
-    if (Timestamp.class.isAssignableFrom(obj.getClass())) {
-      var dateTimeFormat = AppContext.getCurrentUser().getDateFormat();
-      var timeZone = AppContext.getCurrentUser().getTimeZone();
-      if (dateTimeFormat != null) {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
-        if (timeZone != null) {
-          sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
-        }
-        return sdf.format((Timestamp) obj);
-      }
+      String sdf = handleDateObject((Date) obj);
+      if (sdf != null)
+        return sdf;
     }
     return obj;
+  }
+
+  private static String handleBaseSerializableObject(BaseSerializableObject obj) {
+    return obj.get_identifier();
+  }
+
+  @Nullable
+  private static String handleDateObject(Date obj) {
+    var dateTimeFormat = AppContext.getCurrentUser().getDateFormat();
+    var timeZone = AppContext.getCurrentUser().getTimeZone();
+    if (dateTimeFormat != null) {
+      SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
+      if (timeZone != null) {
+        sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+      }
+      return sdf.format(obj);
+    }
+    return null;
+  }
+
+  private List<Object> handlePersistentBag(PersistentBag<?> obj) {
+    List<Object> list = new ArrayList<>();
+    for (Object o : (PersistentBag<?>) obj) {
+      list.add(handleBaseObject(o));
+    }
+    return list;
   }
 
   /**
@@ -118,10 +124,12 @@ public class MappingUtilsImpl implements MappingUtils {
       sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
     }
     try {
-       returnValue = sdf.parse(date);
+      returnValue = sdf.parse(date);
     } catch (ParseException ignored) {
+      // This error is ignored because the date may be in a different format
+      // than the user's date format, and it will be parsed again below
     }
-    if(returnValue != null) {
+    if (returnValue != null) {
       return returnValue;
     }
     var dateFormat = AppContext.getCurrentUser().getDateFormat();

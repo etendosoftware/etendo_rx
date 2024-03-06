@@ -38,12 +38,12 @@ public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
    * Reads a value from the provided DocumentContext at the specified path and returns it as an instance of the provided class.
    * If the value cannot be read or is not of the expected class, it returns a ReturnKey with error information.
    *
-   * @param ctx The DocumentContext from which to read the value.
-   * @param path The JsonPath at which to read the value.
+   * @param ctx   The DocumentContext from which to read the value.
+   * @param path  The JsonPath at which to read the value.
    * @param clazz The class of the value to be read.
    * @return A ReturnKey containing the read value and error information.
    */
-  public <E> ReturnKey<E> read(DocumentContext ctx, String path, Class<E> clazz) {
+  public ReturnKey<E> read(DocumentContext ctx, String path, Class<E> clazz) {
     try {
       boolean error = false;
       boolean nullValue = false;

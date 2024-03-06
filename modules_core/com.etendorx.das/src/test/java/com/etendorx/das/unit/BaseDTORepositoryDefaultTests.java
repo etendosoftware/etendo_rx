@@ -39,7 +39,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for the BaseDTORepositoryDefault class.
  */
-public class BaseDTORepositoryDefaultTests {
+class BaseDTORepositoryDefaultTests {
 
   // Mock objects for testing
   @Mock
@@ -99,7 +99,7 @@ public class BaseDTORepositoryDefaultTests {
 
     @Override
     public void setId(String id) {
-
+      // do nothing
     }
   }
 
@@ -107,9 +107,9 @@ public class BaseDTORepositoryDefaultTests {
    * Test the save method when valid data is provided.
    */
   @Test
-  public void shouldSaveWhenValidDataProvided() {
+  void shouldSaveWhenValidDataProvided() {
     // Arrange
-    String NEW_ID = "ABDC";
+    final String NEW_ID = "ABDC";
     Car carBeforeSave = mock(Car.class);
     Car carAfterSave = mock(Car.class);
     CarDTO carDTOBeforeSave = mock(CarDTO.class);
