@@ -75,24 +75,11 @@ public class ${mappingPrefix}${readEntity.externalName}DTOConverter extends
       entity = new ${writeEntity.table.className}();
     }
 <#list writeEntity.fields as field>
-  <#assign isOneToMany = field.property?? && modelProvider.isColumnIsOneToMany(writeEntity.table, writeEntity.table.name + "." + field.property)>
-  <#if !isOneToMany>
     writeConverter.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity, dto);
-  </#if>
 </#list>
     return entity;
   }
 
-  @Override
-  public ${writeEntity.table.className} convertOneToMany(${mappingPrefix}${writeEntity.externalName}DTOWrite dto, ${writeEntity.table.className}  entity) {
-<#list writeEntity.fields as field>
-  <#assign isOneToMany = field.property?? && modelProvider.isColumnIsOneToMany(writeEntity.table, writeEntity.table.name + "." + field.property)>
-  <#if isOneToMany>
-    writeConverter.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity, dto);
-  </#if>
-</#list>
-    return entity;
-  }
 <#else>
   @Override
   public ${readEntity.table.className} convert((String) ${mappingPrefix}${readEntity.externalName}DTO dto, ${readEntity.table.className} entity) {

@@ -50,6 +50,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 public class ${mappingPrefix}${entity.externalName}DTO<#if entity.mappingType == "R">Read<#else>Write</#if> implements BaseDTOModel {
   <#if entity.mappingType == "R">
   @JsonProperty("id")
@@ -74,6 +76,9 @@ public class ${mappingPrefix}${entity.externalName}DTO<#if entity.mappingType ==
       </#if>
       <#if field.property?? && columnType == "Object">
         <#assign columnType = modelProvider.getColumnTypeName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "Object">
+        <#if columnType == "Object" && field.fieldMapping == "EM" && genUtils.isOneToMany(field)>
+          <#assign columnType = "List<" + genUtils.getDto(field, entity.mappingType) + ">"/>
+        </#if>
       </#if>
   <#if entity.mappingType == "R">Object<#else>${columnType}</#if> <@toCamelCase field.name/>;
       <#if NamingUtil.isJavaReservedWord(field.name)>

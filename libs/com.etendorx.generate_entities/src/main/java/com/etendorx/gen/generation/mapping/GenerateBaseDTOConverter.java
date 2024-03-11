@@ -84,7 +84,7 @@ public class GenerateBaseDTOConverter {
         if (readEntity != null) {
           TemplateUtil.processTemplate(templateJPARepoRX,
               getData(mappingPrefix, projection, readEntity, writeEntity),
-              CodeGenerationUtils.getWriter(mappingPrefix, externalName + "DTOConverter.java",
+              CodeGenerationUtils.getInstance().getWriter(mappingPrefix, externalName + "DTOConverter.java",
                   path));
         }
       }

@@ -25,10 +25,15 @@
   ${result}
   </#compress>
 </#macro>
-<#assign javaMappings = []>
+<#function firstProperty property>
+  <#list property?split(".") as part>
+    <#return part>
+  </#list>
+</#function>
+<#assign extMappings = []>
 <#list entity.fields as field>
-  <#if field.fieldMapping == "JM">
-    <#assign javaMappings = javaMappings + [field]>
+  <#if field.fieldMapping == "JM" || (field.fieldMapping == "EM" && genUtils.isOneToMany(field))>
+    <#assign extMappings = extMappings + [field]>
   </#if>
 </#list>
 /**
@@ -53,37 +58,67 @@ import ${entity.table.thePackage.javaPackage}.${entity.table.className};
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.etendorx.entities.entities.AuditServiceInterceptor;
+
+import java.util.ArrayList;
 
 @Component
 public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
 
-<#list javaMappings as field>
+  private final AuditServiceInterceptor auditServiceInterceptor;
+<#list extMappings as field>
+  <#if field.fieldMapping == "JM">
   private final DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name};
+  <#else>
+  private final ${genUtils.getDTOConverter(field)} ${field.name}Converter;
+  </#if>
 </#list>
 
   public ${mappingPrefix}${entity.externalName}FieldConverterWrite(
-<#list javaMappings as field>
-    @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name}<#if field_has_next>,</#if>
+<#list extMappings as field>
+  <#if field.fieldMapping == "JM">
+    @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name},
+  <#else>
+    ${genUtils.getDTOConverter(field)} ${field.name}Converter,
+  </#if>
 </#list>
+    AuditServiceInterceptor auditServiceInterceptor
   ) {
     super();
-<#list javaMappings as field>
+<#list extMappings as field>
+  <#if field.fieldMapping == "JM">
     this.${field.name} = ${field.name};
+  <#else>
+    this.${field.name}Converter = ${field.name}Converter;
+  </#if>
 </#list>
+    this.auditServiceInterceptor = auditServiceInterceptor;
   }
 
   public String getId(${mappingPrefix}${entity.externalName}DTOWrite entity) {
     return entity.getId();
   }
 
-<#list javaMappings as field>
+<#list extMappings as field>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
+    <#if field.fieldMapping == "JM">
     ${field.name}.map(entity, dto);
+    <#else>
+      if(entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}() == null) {
+        entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(new ArrayList<>());
+      }
+      for (${genUtils.getDto(field, "")} el : dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}()) {
+        var ol = ${field.name}Converter.convert(el, new ${genUtils.getReturnType(field)}());
+        ol.set${genUtils.getParentField(field)?cap_first}(entity);
+        auditServiceInterceptor.setAuditValues(ol, true);
+        entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}().add(ol);
+      }
+    </#if>
   }
 
 </#list>
 <#list entity.fields as field>
-  <#if (field.fieldMapping == "DM" || field.fieldMapping == "EM" || field.fieldMapping == "CM")>
+  <#if (field.fieldMapping == "DM" || (field.fieldMapping == "EM" && !genUtils.isOneToMany(field)) || field.fieldMapping == "CM")>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     <#if field.property??>
     entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(dto.get<@toCamelCase field.name/>());

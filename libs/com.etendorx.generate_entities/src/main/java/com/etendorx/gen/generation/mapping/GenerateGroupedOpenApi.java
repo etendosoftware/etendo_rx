@@ -34,7 +34,7 @@ public class GenerateGroupedOpenApi {
       throws FileNotFoundException {
     freemarker.template.Template templateJPARepoRX = TemplateUtil.createTemplateImplementation(
         FTL_FILE);
-    final Writer outWriterRepo = CodeGenerationUtils.getWriter("", OUT_FILE_NAME, path);
+    final Writer outWriterRepo = CodeGenerationUtils.getInstance().getWriter("", OUT_FILE_NAME, path);
     Map<String, Object> data = new HashMap<>();
     data.put("projections", projections);
     TemplateUtil.processTemplate(templateJPARepoRX, data, outWriterRepo);
