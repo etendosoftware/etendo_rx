@@ -136,7 +136,6 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
         }
       }
       entity = repository.save(entity);
-      entity = repository.save(converter.convertOneToMany(dtoEntity, entity));
       newId = converter.convert(entity).getId();
       transactionHandler.commit();
       return converter.convert(retriever.get(newId));

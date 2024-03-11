@@ -56,7 +56,7 @@ public abstract class MappingGenerationBase implements MappingGenerator {
     }
     final String outFileName = getOutFileName(etrxProjectionEntity);
     final String mappingPrefix = etrxProjectionEntity.getProjection().getName().toUpperCase();
-    final Writer outWriterRepo = CodeGenerationUtils.getWriter(mappingPrefix, outFileName, path);
+    final Writer outWriterRepo = CodeGenerationUtils.getInstance().getWriter(mappingPrefix, outFileName, path);
 
     freemarker.template.Template templateJPARepoRX = TemplateUtil.createTemplateImplementation(
         ftlFileNameRX);
@@ -78,11 +78,13 @@ public abstract class MappingGenerationBase implements MappingGenerator {
     data.put("entity", etrxProjectionEntity);
     data.put("modelProvider", ModelProvider.getInstance());
     data.put("modelProviderRX", ETRXModelProvider.getInstance());
+    data.put("genUtils", CodeGenerationUtils.getInstance());
     try {
       TemplateHashModel fileStatics = null;
       fileStatics = (TemplateHashModel) staticModels.get("org.openbravo.base.model.NamingUtil");
       data.put("NamingUtil", fileStatics);
     } catch (TemplateModelException ignored) {
+      log.error("Error getting static model", ignored);
     }
     return data;
   }
