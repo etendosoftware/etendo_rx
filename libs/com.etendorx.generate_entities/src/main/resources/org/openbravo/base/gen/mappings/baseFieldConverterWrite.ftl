@@ -107,6 +107,9 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
       if(entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}() == null) {
         entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(new ArrayList<>());
       }
+      if(dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}() == null) {
+        return;
+      }
       for (${genUtils.getDto(field, "")} el : dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}()) {
         var ol = ${field.name}Converter.convert(el, new ${genUtils.getReturnType(field)}());
         ol.set${genUtils.getParentField(field)?cap_first}(entity);
