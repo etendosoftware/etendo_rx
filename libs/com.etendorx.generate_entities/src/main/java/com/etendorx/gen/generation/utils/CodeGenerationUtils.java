@@ -188,4 +188,11 @@ public class CodeGenerationUtils {
     }
     return null;
   }
+
+  public String getPropertyTableId(ETRXEntityField field) {
+    if (field.getEtrxProjectionEntityRelated() != null && field.getEtrxProjectionEntityRelated().getTable() != null) {
+      return field.getEtrxProjectionEntityRelated().getTable().getId();
+    }
+    return null;
+  }
 }

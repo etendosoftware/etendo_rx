@@ -16,10 +16,7 @@
 
 package com.etendorx.entities.entities;
 
-import com.etendorx.entities.mapper.lib.BaseDTOModel;
-import com.etendorx.entities.mapper.lib.DASRepository;
-import com.etendorx.entities.mapper.lib.DTOConverter;
-import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
+import com.etendorx.entities.mapper.lib.*;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
@@ -46,17 +43,19 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
   private final AuditServiceInterceptor auditService;
   private final JsonPathEntityRetriever<T> retriever;
   private final Validator validator;
+  ExternalIdService externalIdService;
 
   public BaseDTORepositoryDefault(RestCallTransactionHandler transactionHandler,
       BaseDASRepository<T> repository, DTOConverter<T, E, F> converter,
       JsonPathEntityRetriever<T> retriever, AuditServiceInterceptor auditService,
-      Validator validator) {
+      Validator validator, ExternalIdService externalIdService) {
     this.transactionHandler = transactionHandler;
     this.repository = repository;
     this.converter = converter;
     this.auditService = auditService;
     this.retriever = retriever;
     this.validator = validator;
+    this.externalIdService = externalIdService;
   }
 
   /**
@@ -136,12 +135,15 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
         }
       }
       entity = repository.save(entity);
+      externalIdService.flush();
+
       newId = converter.convert(entity).getId();
       transactionHandler.commit();
       return converter.convert(retriever.get(newId));
     } catch (ResponseStatusException e) {
       throw e;
     } catch (Exception e) {
+      e.printStackTrace();
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }

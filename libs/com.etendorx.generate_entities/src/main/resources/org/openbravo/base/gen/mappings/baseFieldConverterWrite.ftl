@@ -54,6 +54,7 @@
 package com.etendorx.entities.mappings;
 
 import com.etendorx.entities.mapper.lib.DTOWriteMapping;
+import com.etendorx.entities.mapper.lib.ExternalIdService;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
   private final ${genUtils.getDTOConverter(field)} ${field.name}Converter;
   </#if>
 </#list>
+  private final ExternalIdService externalIdService;
 
   public ${mappingPrefix}${entity.externalName}FieldConverterWrite(
 <#list extMappings as field>
@@ -82,7 +84,8 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
     ${genUtils.getDTOConverter(field)} ${field.name}Converter,
   </#if>
 </#list>
-    AuditServiceInterceptor auditServiceInterceptor
+    AuditServiceInterceptor auditServiceInterceptor,
+    ExternalIdService externalIdService
   ) {
     super();
 <#list extMappings as field>
@@ -93,6 +96,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
   </#if>
 </#list>
     this.auditServiceInterceptor = auditServiceInterceptor;
+    this.externalIdService = externalIdService;
   }
 
   public String getId(${mappingPrefix}${entity.externalName}DTOWrite entity) {
@@ -115,6 +119,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
         ol.set${genUtils.getParentField(field)?cap_first}(entity);
         auditServiceInterceptor.setAuditValues(ol, true);
         entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}().add(ol);
+        externalIdService.add("${genUtils.getPropertyTableId(field)}", el.getId(), ol);
       }
     </#if>
   }
@@ -124,7 +129,11 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
   <#if (field.fieldMapping == "DM" || (field.fieldMapping == "EM" && !genUtils.isOneToMany(field)) || field.fieldMapping == "CM")>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     <#if field.property??>
+      <#if field.property != "id">
     entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(dto.get<@toCamelCase field.name/>());
+      <#else>
+      // Id property is not directly assignable in writer
+      </#if>
     <#else>
     entity.set${field.name?cap_first}(dto.get<@toCamelCase field.name/>());
     </#if>
