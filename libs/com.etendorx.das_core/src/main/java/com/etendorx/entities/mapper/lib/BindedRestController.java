@@ -118,9 +118,14 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   @Transactional
   @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   public ResponseEntity<E> post(@RequestBody String rawEntity) {
-    F dtoEntity = converter.convert(rawEntity);
-    validate(dtoEntity);
-    return new ResponseEntity<>(repository.save(dtoEntity), HttpStatus.CREATED);
+    try {
+      F dtoEntity = converter.convert(rawEntity);
+      validate(dtoEntity);
+      return new ResponseEntity<>(repository.save(dtoEntity), HttpStatus.CREATED);
+    } catch (Exception e) {
+      log.error("Error while updating new entity", e);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
   }
 
   /**
