@@ -71,6 +71,9 @@ import com.etendorx.entities.entities.mappings.MappingUtils;
 import com.etendorx.entities.jparepo.${columnType}Repository;
 </#if>
 </#list>
+import com.etendorx.entities.mapper.lib.ExternalIdService;
+import com.etendorx.entities.mapper.lib.JsonPathConverterBase;
+import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetrieverDefault;
 import com.etendorx.entities.mapper.lib.ReturnKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -87,6 +90,8 @@ import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends JsonPathConverterBase<${mappingPrefix}${entity.externalName}DTOWrite> {
 
   private final MappingUtils mappingUtils;
+  private final ExternalIdService externalIdService;
+
   <#list objectFields as field>
   <#if field.property??>
     <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
@@ -101,7 +106,8 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   </#list>
 
   public ${mappingPrefix}${entity.externalName}JsonPathConverter(
-    MappingUtils mappingUtils<#if objectFields?size gt 0>,</#if>
+    MappingUtils mappingUtils,
+    ExternalIdService externalIdService<#if objectFields?size gt 0>,</#if>
 <#list objectFields as field>
   // field ${field.name}
   <#if field.property??>
@@ -129,10 +135,11 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   ) {
     super();
     this.mappingUtils = mappingUtils;
+    this.externalIdService = externalIdService;
   <#list objectFields as field>
     <#if field.fieldMapping == "DM">
       <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
-    this.${field.name}Retriever = new JsonPathEntityRetrieverDefault<>(${field.name}Repository);
+    this.${field.name}Retriever = new JsonPathEntityRetrieverDefault<>(${field.name}Repository, externalIdService, "${genUtils.getPropertyTableId(field)}");
     <#else>
       <#if field.fieldMapping == "EM" && genUtils.isOneToMany(field)>
     this.${field.name}JsonPathConverter = ${field.name}JsonPathConverter;

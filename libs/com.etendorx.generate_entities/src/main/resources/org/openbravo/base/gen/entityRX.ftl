@@ -36,6 +36,9 @@ import java.util.Date;
 @jakarta.persistence.Cacheable
 @EntityScan
 public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.tableName?lower_case)>implements BaseSerializableObject<#else>extends BaseRXObject</#if> {
+
+  public static final String TABLE_ID = "${entity.tableId}";
+
 <#list entity.properties as p>
     <#if !p.computedColumn>
         <#if p.isId()>

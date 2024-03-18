@@ -36,12 +36,16 @@ import java.util.TreeSet;
 @Slf4j
 public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRetriever<E> {
 
+  protected abstract String getTableId();
+
+  protected abstract ExternalIdService getExternalIdService();
+
   /**
    * Returns the JPA repository that will be used to retrieve entities.
    *
    * @return The JPA repository.
    */
-  public abstract JpaSpecificationExecutor<E> getRepository();
+  protected abstract JpaSpecificationExecutor<E> getRepository();
 
   /**
    * Returns the keys that will be used to retrieve entities.
@@ -100,7 +104,8 @@ public E get(String[] keys, TreeSet<String> keyValues) throws NonUniqueResultExc
   List<Specification<E>> specs = new ArrayList<>();
 
   for (String key : keys) {
-    String value = valueIterator.next();
+    String idReceived = valueIterator.next();
+    final String value = getExternalIdService().convertExternalToInternalId(getTableId(), key, idReceived);
     specs.add((root, query, builder) -> builder.equal(root.get(key), value));
   }
   Specification<E> combinedSpec = specs.stream().reduce(Specification::and).orElse(null);

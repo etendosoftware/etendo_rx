@@ -192,6 +192,18 @@ public class CodeGenerationUtils {
   public String getPropertyTableId(ETRXEntityField field) {
     if (field.getEtrxProjectionEntityRelated() != null && field.getEtrxProjectionEntityRelated().getTable() != null) {
       return field.getEtrxProjectionEntityRelated().getTable().getId();
+    } else {
+      // Get first segment of property
+      String[] segments = field.getProperty().split("\\.");
+      String strProperty = segments[0];
+      String tableName = field.getEntity().getTable().getName();
+      for (Property p : ModelProvider.getInstance()
+          .getEntity(tableName)
+          .getProperties()) {
+        if (StringUtils.equals(p.getName(), strProperty)) {
+          return p.getTargetEntity().getTableId();
+        }
+      }
     }
     return null;
   }

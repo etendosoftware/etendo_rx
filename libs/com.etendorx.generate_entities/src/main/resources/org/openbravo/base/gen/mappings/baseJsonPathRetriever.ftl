@@ -21,6 +21,7 @@
 */
 package com.etendorx.entities.mappings;
 
+import com.etendorx.entities.mapper.lib.ExternalIdService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
@@ -34,9 +35,21 @@ import com.etendorx.entities.mapper.lib.JsonPathEntityRetrieverBase;
 public class ${mappingPrefix}${entity.externalName}JsonPathRetriever extends JsonPathEntityRetrieverBase<${entity.table.className}> {
 
   private final JpaSpecificationExecutor<${entity.table.className}> repository;
+  private final ExternalIdService externalIdService;
 
-  public ${mappingPrefix}${entity.externalName}JsonPathRetriever(${entity.table.name}Repository repository) {
+  public ${mappingPrefix}${entity.externalName}JsonPathRetriever(ExternalIdService externalIdService, ${entity.table.name}Repository repository) {
+    this.externalIdService = externalIdService;
     this.repository = repository;
+  }
+
+  @Override
+  protected String getTableId() {
+    return ${entity.table.className}.TABLE_ID;
+  }
+
+  @Override
+  protected ExternalIdService getExternalIdService() {
+    return this.externalIdService;
   }
 
   @Override

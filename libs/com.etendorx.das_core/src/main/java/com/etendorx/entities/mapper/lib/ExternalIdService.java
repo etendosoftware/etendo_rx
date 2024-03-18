@@ -6,4 +6,6 @@ public interface ExternalIdService {
   void add(String adTableId, String externalId, Object entity);
 
   void flush();
+
+  String convertExternalToInternalId(String tableId, String key, String value);
 }
