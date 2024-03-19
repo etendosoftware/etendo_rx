@@ -135,9 +135,9 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject,E extends
         }
       }
       entity = repository.save(entity);
-      externalIdService.flush();
-
       newId = converter.convert(entity).getId();
+      externalIdService.add(entity.getTableId(), dtoEntity.getId(), entity);
+      externalIdService.flush();
       transactionHandler.commit();
       return converter.convert(retriever.get(newId));
     } catch (ResponseStatusException e) {

@@ -68,7 +68,7 @@ public class ${mappingPrefix}${entity.externalName}DTO<#if entity.mappingType ==
   @Getter @Setter
       </#if>
       <#if !field.property?? || field.isMandatory>
-  // @NotNull
+  @NotNull
       </#if>
       <#assign columnType = "Object">
       <#if field.property??>

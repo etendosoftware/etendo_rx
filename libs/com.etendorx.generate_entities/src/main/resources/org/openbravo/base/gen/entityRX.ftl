@@ -132,4 +132,9 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     public String get_identifier() {
         return id;
     }
+
+    @Override
+    public String getTableId() {
+      return TABLE_ID;
+    }
 }
