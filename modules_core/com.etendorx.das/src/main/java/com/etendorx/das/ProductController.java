@@ -13,10 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static io.github.perplexhub.rsql.RSQLJPASupport.toSpecification;
 
-
-import org.springframework.web.bind.annotation.CrossOrigin;
-
-
 @RestController
 public class ProductController {
   @Autowired

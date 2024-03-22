@@ -39,12 +39,14 @@ public abstract class BaseRXObject implements BaseSerializableObject {
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
+    @NotNull
     Client client;
 
     @jakarta.persistence.JoinColumn(name = "ad_org_id", referencedColumnName = "AD_Org_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
+    @NotNull
     Organization organization;
 
     @jakarta.persistence.Column(name = "isactive")
@@ -56,6 +58,7 @@ public abstract class BaseRXObject implements BaseSerializableObject {
 
     @jakarta.persistence.JoinColumn(name = "createdby", referencedColumnName = "AD_User_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @NotNull
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     User createdBy;
@@ -65,6 +68,7 @@ public abstract class BaseRXObject implements BaseSerializableObject {
 
     @jakarta.persistence.JoinColumn(name = "updatedby", referencedColumnName = "AD_User_id")
     @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
+    @NotNull
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     User updatedBy;
