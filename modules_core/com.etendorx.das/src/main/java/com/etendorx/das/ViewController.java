@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 public class ViewController {
   @GetMapping(value = "/sws/view", produces="application/json")
   public String view() {
-    return getFileContent("productMetadata.json");
+    return getFileContent("orderMetadata.json");
   }
 
   @GetMapping(value = "/sws/session", produces="application/json")
