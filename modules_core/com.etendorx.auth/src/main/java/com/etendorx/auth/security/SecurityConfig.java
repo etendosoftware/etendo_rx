@@ -24,7 +24,7 @@ public class SecurityConfig {
   ) throws Exception {
 
     http
-        .authorizeRequests(a -> a
+        .authorizeHttpRequests(a -> a
             .requestMatchers("/tokenTest").authenticated()
             .requestMatchers("/api/authenticate", "/error").permitAll()
             .anyRequest().authenticated()
