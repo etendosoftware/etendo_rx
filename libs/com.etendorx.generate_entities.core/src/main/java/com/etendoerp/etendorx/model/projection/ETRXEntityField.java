@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openbravo.base.model.ModelObject;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @JsonIncludeProperties({ "name", "value" })
 public class ETRXEntityField extends ModelObject {
@@ -38,6 +39,10 @@ public class ETRXEntityField extends ModelObject {
   private String jsonPath;
 
   private ETRXConstantValue constantValue;
+
+  private Set<ETRXEntityFieldMap> entityFieldMap;
+
+  private Boolean createRelated;
 
   public ETRXProjectionEntity getEntity() {
     return entity;
@@ -126,5 +131,21 @@ public class ETRXEntityField extends ModelObject {
 
   public void setConstantValue(ETRXConstantValue constantValue) {
     this.constantValue = constantValue;
+  }
+
+  public Set<ETRXEntityFieldMap> getEntityFieldMap() {
+    return entityFieldMap;
+  }
+
+  public void setEntityFieldMap(Set<ETRXEntityFieldMap> entityFieldMapList) {
+    this.entityFieldMap= entityFieldMapList;
+  }
+
+  public Boolean getCreateRelated() {
+    return createRelated;
+  }
+
+  public void setCreateRelated(Boolean createRelated) {
+    this.createRelated = createRelated;
   }
 }

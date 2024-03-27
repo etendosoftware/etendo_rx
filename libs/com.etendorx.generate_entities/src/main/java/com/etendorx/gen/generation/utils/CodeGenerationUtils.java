@@ -16,6 +16,7 @@
 package com.etendorx.gen.generation.utils;
 
 import com.etendoerp.etendorx.model.projection.ETRXEntityField;
+import com.etendoerp.etendorx.model.projection.ETRXEntityFieldMap;
 import com.etendorx.gen.generation.GeneratePaths;
 import org.apache.commons.lang3.StringUtils;
 import org.openbravo.base.model.ModelProvider;
@@ -207,4 +208,5 @@ public class CodeGenerationUtils {
     }
     return null;
   }
+
 }
