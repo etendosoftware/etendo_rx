@@ -161,6 +161,9 @@ public class CodeGenerationUtils {
     return getBaseName(field) + "DTOConverter";
   }
 
+  public String getRetriever(ETRXEntityField field) {
+    return getBaseName(field) + "JsonPathRetriever";
+  }
   /**
    * Returns the JsonPath converter for the given ETRXEntityField.
    *

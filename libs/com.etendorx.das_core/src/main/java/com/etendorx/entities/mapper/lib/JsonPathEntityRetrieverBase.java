@@ -105,7 +105,7 @@ public E get(String[] keys, TreeSet<String> keyValues) throws NonUniqueResultExc
 
   for (String key : keys) {
     String idReceived = valueIterator.next();
-    final String value = getExternalIdService().convertExternalToInternalId(getTableId(), key, idReceived);
+    final String value = getExternalIdService().convertExternalToInternalId(getTableId(), idReceived);
     specs.add((root, query, builder) -> builder.equal(root.get(key), value));
   }
   Specification<E> combinedSpec = specs.stream().reduce(Specification::and).orElse(null);

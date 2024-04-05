@@ -72,6 +72,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
   private final DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name};
   <#else>
   private final ${genUtils.getDTOConverter(field)} ${field.name}Converter;
+  private final ${genUtils.getRetriever(field)} ${field.name}Retriever;
   </#if>
 </#list>
   private final ExternalIdService externalIdService;
@@ -82,6 +83,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
     @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name},
   <#else>
     ${genUtils.getDTOConverter(field)} ${field.name}Converter,
+    ${genUtils.getRetriever(field)} ${field.name}Retriever,
   </#if>
 </#list>
     AuditServiceInterceptor auditServiceInterceptor,
@@ -93,6 +95,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
     this.${field.name} = ${field.name};
   <#else>
     this.${field.name}Converter = ${field.name}Converter;
+    this.${field.name}Retriever = ${field.name}Retriever;
   </#if>
 </#list>
     this.auditServiceInterceptor = auditServiceInterceptor;
@@ -118,7 +121,10 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
         return;
       }
       for (${genUtils.getDto(field, "")} el : dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}()) {
-        var line = new ${genUtils.getReturnType(field)}();
+        ${genUtils.getReturnType(field)} line = this.${field.name}Retriever.get(el.getId());
+        if(line == null) {
+          line = new ${genUtils.getReturnType(field)}();
+        }
         <#if field.entityFieldMap??>
           <#list field.entityFieldMap as relField>
             <#if relField.property == "_identifier">
