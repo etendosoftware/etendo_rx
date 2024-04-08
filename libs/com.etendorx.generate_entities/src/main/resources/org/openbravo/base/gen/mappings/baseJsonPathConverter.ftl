@@ -80,6 +80,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 import com.etendorx.entities.mapper.lib.JsonPathConverterBase;
@@ -167,7 +168,12 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   <#assign returnClass = ""/>
     log.debug("-- Parsing {}", "${field.name}");
   <#if field.fieldMapping == "CM">
+    <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
+    <#if returnClass == "java.math.BigDecimal">
+    dto.set<@toCamelCase field.name />(NumberUtils.createBigDecimal( mappingUtils.constantValue("${field.constantValue.id}")));
+    <#else>
     dto.set<@toCamelCase field.name />(mappingUtils.constantValue("${field.constantValue.id}"));
+    </#if>
   <#else>
     <#if hasRetriever>
       <#if field.constantValue??>
