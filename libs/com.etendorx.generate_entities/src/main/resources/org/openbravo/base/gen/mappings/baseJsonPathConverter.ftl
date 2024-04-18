@@ -81,6 +81,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.etendorx.entities.mapper.lib.JsonPathConverterBase;
@@ -171,6 +172,8 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
     <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     <#if returnClass == "java.math.BigDecimal">
     dto.set<@toCamelCase field.name />(NumberUtils.createBigDecimal( mappingUtils.constantValue("${field.constantValue.id}")));
+    <#elseif returnClass == "java.lang.Boolean">
+    dto.set<@toCamelCase field.name />(StringUtils.equals(mappingUtils.constantValue("${field.constantValue.id}"), "Y"));
     <#else>
     dto.set<@toCamelCase field.name />(mappingUtils.constantValue("${field.constantValue.id}"));
     </#if>
