@@ -29,15 +29,29 @@ public class JsonPathEntityRetrieverDefault<E> extends JsonPathEntityRetrieverBa
    * The repository used to execute specifications for retrieving entities.
    */
   private final JpaSpecificationExecutor<E> repository;
+  private final ExternalIdService externalIdService;
+  private final String adTableId;
 
   /**
    * Constructs a new JsonPathEntityRetrieverDefault object.
    *
    * @param repository the repository to be used for retrieving entities
    */
-  public JsonPathEntityRetrieverDefault(JpaSpecificationExecutor<E> repository) {
+  public JsonPathEntityRetrieverDefault(JpaSpecificationExecutor<E> repository, ExternalIdService externalIdService, String adTableId) {
     super();
     this.repository = repository;
+    this.externalIdService = externalIdService;
+    this.adTableId = adTableId;
+  }
+
+  @Override
+  protected String getTableId() {
+    return adTableId;
+  }
+
+  @Override
+  protected ExternalIdService getExternalIdService() {
+    return externalIdService;
   }
 
   /**

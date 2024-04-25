@@ -122,7 +122,6 @@ class BaseDTORepositoryDefaultTests {
     when(converter.convert(any(Car.class))).thenReturn(carDTOAfterSave);
     when(converter.convert(any(), any())).thenReturn(carBeforeSave);
     when(converter.convert(carAfterSave)).thenReturn(carDTOAfterSave);
-    when(converter.convertOneToMany(any(), any())).thenReturn(carAfterSave);
     //
     when(retriever.get(anyString())).thenReturn(carAfterSave);
     //
@@ -143,10 +142,8 @@ class BaseDTORepositoryDefaultTests {
     // Verify that the converter's convert method was called as expected
     verify(converter, times(1)).convert(carDTORead, null);
     verify(converter, times(2)).convert(carAfterSave);
-    verify(converter, times(1)).convertOneToMany(carDTORead, carAfterSave);
     verify(validator, times(1)).validate(carBeforeSave);
     verify(repository, times(1)).save(carBeforeSave);
-    verify(repository, times(1)).save(carAfterSave);
 
     // Optionally, assert the result of the save operation
     assertNotNull(result, "The result should not be null.");

@@ -35,6 +35,8 @@
     <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     <#if columnType?? && columnType != "">
       <#assign objectFields = objectFields + [field]>
+    <#elseif field.fieldMapping == "EM" && genUtils.isOneToMany(field)>
+      <#assign objectFields = objectFields + [field]>
     </#if>
   </#if>
 </#list>
@@ -69,9 +71,17 @@ import com.etendorx.entities.entities.mappings.MappingUtils;
 import com.etendorx.entities.jparepo.${columnType}Repository;
 </#if>
 </#list>
+import com.etendorx.entities.mapper.lib.ExternalIdService;
+import com.etendorx.entities.mapper.lib.JsonPathConverterBase;
+import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetrieverDefault;
 import com.etendorx.entities.mapper.lib.ReturnKey;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.etendorx.entities.mapper.lib.JsonPathConverterBase;
@@ -82,18 +92,26 @@ import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends JsonPathConverterBase<${mappingPrefix}${entity.externalName}DTOWrite> {
 
   private final MappingUtils mappingUtils;
+  private final ExternalIdService externalIdService;
+
   <#list objectFields as field>
   <#if field.property??>
     <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     <#if columnType?? && columnType != "">
   private final JsonPathEntityRetriever<${columnType}> ${field.name}Retriever;
+    <#else>
+      <#if field.fieldMapping == "EM" && genUtils.isOneToMany(field)>
+    private final ${genUtils.getJsonPathConverter(field)} ${field.name}JsonPathConverter;
+      </#if>
     </#if>
   </#if>
   </#list>
 
   public ${mappingPrefix}${entity.externalName}JsonPathConverter(
-    MappingUtils mappingUtils<#if objectFields?size gt 0>,</#if>
+    MappingUtils mappingUtils,
+    ExternalIdService externalIdService<#if objectFields?size gt 0>,</#if>
 <#list objectFields as field>
+  // field ${field.name}
   <#if field.property??>
     <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     <#if field.etrxProjectionEntityRelated??>
@@ -101,6 +119,7 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
     <#else>
       <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     </#if>
+    // columnType ${columnType}
     <#if columnType?? && columnType != "">
       <#if field.fieldMapping == "DM">
         <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
@@ -108,18 +127,27 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
       <#else>
     ${mappingPrefix}${targetEntityName}JsonPathRetriever ${field.name}Retriever<#if field_has_next>,</#if>
       </#if>
+    <#else>
+        <#if field.fieldMapping == "EM" && genUtils.isOneToMany(field)>
+    ${genUtils.getJsonPathConverter(field)} ${field.name}JsonPathConverter<#if field_has_next>,</#if>
+        </#if>
     </#if>
   </#if>
 </#list>
   ) {
     super();
     this.mappingUtils = mappingUtils;
+    this.externalIdService = externalIdService;
   <#list objectFields as field>
     <#if field.fieldMapping == "DM">
       <#assign targetEntityName = modelProvider.getColumnEntityName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
-    this.${field.name}Retriever = new JsonPathEntityRetrieverDefault<>(${field.name}Repository);
+    this.${field.name}Retriever = new JsonPathEntityRetrieverDefault<>(${field.name}Repository, externalIdService, "${genUtils.getPropertyTableId(field)}");
     <#else>
+      <#if field.fieldMapping == "EM" && genUtils.isOneToMany(field)>
+    this.${field.name}JsonPathConverter = ${field.name}JsonPathConverter;
+      <#else>
     this.${field.name}Retriever = ${field.name}Retriever;
+      </#if>
     </#if>
   </#list>
   }
@@ -141,7 +169,14 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   <#assign returnClass = ""/>
     log.debug("-- Parsing {}", "${field.name}");
   <#if field.fieldMapping == "CM">
+    <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
+    <#if returnClass == "java.math.BigDecimal">
+    dto.set<@toCamelCase field.name />(NumberUtils.createBigDecimal( mappingUtils.constantValue("${field.constantValue.id}")));
+    <#elseif returnClass == "java.lang.Boolean">
+    dto.set<@toCamelCase field.name />(StringUtils.equals(mappingUtils.constantValue("${field.constantValue.id}"), "Y"));
+    <#else>
     dto.set<@toCamelCase field.name />(mappingUtils.constantValue("${field.constantValue.id}"));
+    </#if>
   <#else>
     <#if hasRetriever>
       <#if field.constantValue??>
@@ -155,7 +190,7 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
       <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
     var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class<#else>, Object.class</#if>);
     <#else>
-    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}", Object.class);
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}", <#if genUtils.isOneToMany(field)>List<#else>Object</#if>.class);
     </#if>
     values.add(_${NamingUtil.getSafeJavaName(field.name)});
     log.debug("pathConverter ${entity.externalName} \"${field.jsonPath!"$."+field.name}\": {}", _${NamingUtil.getSafeJavaName(field.name)});
@@ -166,11 +201,26 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
         val_${NamingUtil.getSafeJavaName(field.name)}
       );
       <#else>
+        <#if field.fieldMapping == "EM" && genUtils.isOneToMany(field) >
+      ObjectMapper objectMapper = new ObjectMapper();
+      List<${genUtils.getDto(field, "W")}> list = new ArrayList<>();
+      for (Object o : (JSONArray) _${NamingUtil.getSafeJavaName(field.name)}.getValue()) {
+        try {
+          list.add(${field.name}JsonPathConverter.convert(objectMapper.writeValueAsString(o)) );
+        } catch (JsonProcessingException e) {
+          throw new IllegalArgumentException(e);
+        }
+      }
+        </#if>
       dto.set<@toCamelCase field.name />(
     <#if returnClass=="java.util.Date">
         mappingUtils.parseDate(_${NamingUtil.getSafeJavaName(field.name)}.getValue())
     <#else>
+      <#if field.fieldMapping == "EM" && genUtils.isOneToMany(field) >
+        list
+      <#else>
         _${NamingUtil.getSafeJavaName(field.name)}.getValue()
+      </#if>
     </#if>
       );
       </#if>
@@ -183,6 +233,8 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   }
 
 <#list objectFields as field>
+  <#if field.fieldMapping == "EM" && genUtils.isOneToMany(field)>
+  <#else>
   <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
   private ${columnType} retrieve${field.name?cap_first}(Object id) {
   <#if field.fieldMapping == "DM">
@@ -191,6 +243,7 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
     return ${field.name}Retriever.get(id);
   </#if>
   }
+  </#if>
 </#list>
 
 }

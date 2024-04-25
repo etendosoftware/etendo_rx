@@ -57,8 +57,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.jetbrains:annotations:23.0.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    runtimeOnly group: 'com.oracle.database.jdbc', name: 'ojdbc8', version: '21.6.0.0.1'
-    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.3.8'
+    implementation group: 'com.oracle.database.jdbc', name: 'ojdbc8', version: '21.6.0.0.1'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.8'
 
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'

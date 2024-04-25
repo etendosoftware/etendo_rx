@@ -38,6 +38,8 @@
         <property name="fieldMapping" column="field_mapping"/>
         <property name="line" column="line"/>
         <property name="jsonPath" column="jsonpath"/>
+        <property name="createRelated" type="org.etendorx.base.session.OBYesNoType"
+                  column="create_related"/>
 
         <many-to-one name="entity" not-null="true"
                      class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
@@ -55,5 +57,14 @@
         <many-to-one name="constantValue" not-null="true"
                      class="com.etendoerp.etendorx.model.mapping.ETRXConstantValue"
                      column="etrx_constant_value_id" foreign-key="etrx_constant_value_id"/>
+
+        <set name="entityFieldMap" table="etrx_entity_field_map" inverse="true"
+             cascade="save-update" lazy="true" fetch="select">
+            <key>
+                <column name="etrx_entity_field_id" not-null="true"/>
+            </key>
+            <one-to-many class="com.etendoerp.etendorx.model.projection.ETRXEntityFieldMap"/>
+        </set>
+
     </class>
 </hibernate-mapping>
