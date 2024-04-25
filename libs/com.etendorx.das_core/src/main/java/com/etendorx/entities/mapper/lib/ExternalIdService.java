@@ -7,5 +7,5 @@ public interface ExternalIdService {
 
   void flush();
 
-  String convertExternalToInternalId(String tableId, String key, String value);
+  String convertExternalToInternalId(String tableId, String value);
 }

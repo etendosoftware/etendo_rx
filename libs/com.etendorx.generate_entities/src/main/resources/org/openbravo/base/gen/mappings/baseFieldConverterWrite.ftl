@@ -72,6 +72,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
   private final DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name};
   <#else>
   private final ${genUtils.getDTOConverter(field)} ${field.name}Converter;
+  private final ${genUtils.getRetriever(field)} ${field.name}Retriever;
   </#if>
 </#list>
   private final ExternalIdService externalIdService;
@@ -82,6 +83,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
     @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name},
   <#else>
     ${genUtils.getDTOConverter(field)} ${field.name}Converter,
+    ${genUtils.getRetriever(field)} ${field.name}Retriever,
   </#if>
 </#list>
     AuditServiceInterceptor auditServiceInterceptor,
@@ -93,6 +95,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
     this.${field.name} = ${field.name};
   <#else>
     this.${field.name}Converter = ${field.name}Converter;
+    this.${field.name}Retriever = ${field.name}Retriever;
   </#if>
 </#list>
     this.auditServiceInterceptor = auditServiceInterceptor;
@@ -104,6 +107,9 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
   }
 
 <#list extMappings as field>
+      <#if field.createRelated?? && field.createRelated>
+      // createRelated ${field.createRelated?c}
+      </#if>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     <#if field.fieldMapping == "JM">
     ${field.name}.map(entity, dto);
@@ -115,11 +121,32 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
         return;
       }
       for (${genUtils.getDto(field, "")} el : dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}()) {
-        var ol = ${field.name}Converter.convert(el, new ${genUtils.getReturnType(field)}());
-        ol.set${genUtils.getParentField(field)?cap_first}(entity);
-        auditServiceInterceptor.setAuditValues(ol, true);
-        entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}().add(ol);
-        externalIdService.add("${genUtils.getPropertyTableId(field)}", el.getId(), ol);
+        ${genUtils.getReturnType(field)} line = this.${field.name}Retriever.get(el.getId());
+        if(line == null) {
+          line = new ${genUtils.getReturnType(field)}();
+        }
+        <#if field.entityFieldMap??>
+          <#list field.entityFieldMap as relField>
+            <#if relField.property == "_identifier">
+        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+            <#else>
+        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+            </#if>
+          </#list>
+        </#if>
+        line = ${field.name}Converter.convert(el, line);
+        <#if field.entityFieldMap??>
+          <#list field.entityFieldMap as relField>
+            <#if relField.property == "_identifier">
+        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+            <#else>
+        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+            </#if>
+          </#list>
+        </#if>
+        auditServiceInterceptor.setAuditValues(line, true);
+        entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}().add(line);
+        externalIdService.add("${genUtils.getPropertyTableId(field)}", el.getId(), line);
       }
     </#if>
   }
@@ -132,7 +159,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
       <#if field.property != "id">
     entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(dto.get<@toCamelCase field.name/>());
       <#else>
-      // Id property is not directly assignable in writer
+    // Id property is not directly assignable in writer
       </#if>
     <#else>
     entity.set${field.name?cap_first}(dto.get<@toCamelCase field.name/>());
