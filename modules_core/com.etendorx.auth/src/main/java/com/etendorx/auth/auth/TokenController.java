@@ -35,7 +35,6 @@ public class TokenController {
     RestTemplate restTemp = new RestTemplate();
     HttpHeaders tokenHeaders = new HttpHeaders();
     tokenHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    token = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNzA5NTY4ODIxLCJhZF91c2VyX2lkIjoiMTY3NDUwQTVCQjI4NEFCMjlDNEZFRjAzOUU5OEM5NjMiLCJhZF9jbGllbnRfaWQiOiIyM0M1OTU3NUI5Q0Y0NjdDOTYyMDc2MEVCMjU1QjM4OSIsImFkX29yZ19pZCI6IkU0NDNBMzE5OTJDQjQ2MzVBRkNBRUFCRTcxODNDRTg1IiwiYWRfcm9sZV9pZCI6IkUwM0VENEEwMDU2MzQwNjc4QzNENkEzQkExODNGOTQxIiwic2VhcmNoX2tleSI6ImF1dGgiLCJzZXJ2aWNlX2lkIjoiRkI2NkY5OTQ5QjMzNDgxMEEyRTE1OUMxRDhGMEQ1NDIifQ.mtEcV-jsdjQ70v8iv_CSJ2tvZtP111TofBrUszXhEUwcCYPH43UwLqP67AAYQWY6bvw0C0c16UtTc8cJmsxaDL9TEcpSKAjQ3V8dUls3NUJa1VpSUqv-3zOHa53QSPqi4xjQZeDrPaxab4bSi4UCT49Qblg7rZZNiLT47tsiEfS86uOCxKqJJzty98pVnhHoJdvOOvgoG6BNPq10T7-QWqRatX8aOjWdUty8Ltz-RUwkyXdLGFi4nVpUI55oZapabZcyeNjoiCqp7HX2n0_kzUeh1XGjiVLP2rhHxExi7Tv9BCXPr3pfpxL-VW2dGgAzK616flrvo9zzt1ESb0WOeA";
     tokenHeaders.set("Authorization", "Bearer " + token);
     TokenInfo tokenInfo = new TokenInfo(
         null,

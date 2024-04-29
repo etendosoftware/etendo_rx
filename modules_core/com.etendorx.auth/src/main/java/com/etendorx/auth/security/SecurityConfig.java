@@ -25,36 +25,12 @@ public class SecurityConfig {
 
     http
         .authorizeHttpRequests(a -> a
-            .requestMatchers("/tokenTest").authenticated()
-            .requestMatchers("/api/authenticate", "/error").permitAll()
+            .requestMatchers("/api/genToken").authenticated()
+            .requestMatchers("/api/authenticate", "/error", "/actuator/**").permitAll()
             .anyRequest().authenticated()
         )
         .oauth2Login(Customizer.withDefaults());
     http.csrf(AbstractHttpConfigurer::disable);
     return http.build();
-  }
-
-  public class CustomOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
-    private final OAuth2AuthorizationRequestResolver defaultResolver;
-
-    public CustomOAuth2AuthorizationRequestResolver(ClientRegistrationRepository repo) {
-      this.defaultResolver = new DefaultOAuth2AuthorizationRequestResolver(repo, "/oauth2/authorization");
-    }
-
-    @Override
-    public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
-      // Extract your parameter (e.g., 'provider') from the request
-      String provider = request.getParameter("provider");
-      if (provider != null) {
-        // Modify the request to use the desired provider
-        return this.defaultResolver.resolve(request, provider);
-      }
-      return this.defaultResolver.resolve(request);
-    }
-
-    @Override
-    public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
-      return this.defaultResolver.resolve(request, clientRegistrationId);
-    }
   }
 }
