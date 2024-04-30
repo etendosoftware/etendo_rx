@@ -1,13 +1,11 @@
 package com.etendorx.auth.auth;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -32,10 +30,6 @@ public class TokenController {
         .getAuthentication();
     DefaultOAuth2User user = (DefaultOAuth2User) authentication.getPrincipal();
 
-    RestTemplate restTemp = new RestTemplate();
-    HttpHeaders tokenHeaders = new HttpHeaders();
-    tokenHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    tokenHeaders.set("Authorization", "Bearer " + token);
     TokenInfo tokenInfo = new TokenInfo(
         null,
         user.getAttribute("expiresAt").toString(),
@@ -43,12 +37,14 @@ public class TokenController {
         userId,
         etrxOauthProviderId
     );
-    // Entity to send
-    HttpEntity<TokenInfo> httpEntity = new HttpEntity<>(tokenInfo, tokenHeaders);
+
+    HttpHeaders tokenHeaders = new HttpHeaders();
+    tokenHeaders.set("Authorization", "Bearer " + token);
     // check if exists
-    restTemp.exchange(dasUrl + "/auth/ETRX_Token_Info?_dateFormat=yyyy-MM-dd'T'HH:mm:ss.SSSX",
+    new RestTemplate().exchange(dasUrl + "/auth/ETRX_Token_Info?_dateFormat=yyyy-MM-dd'T'HH:mm:ss.SSSX",
         HttpMethod.POST,
-        httpEntity, TokenInfo.class);
+        new HttpEntity<>(tokenInfo, tokenHeaders),
+        TokenInfo.class);
     return "Token Created! You can close this window";
   }
 }
