@@ -6,43 +6,64 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import lombok.Getter;
 
 @Component
 public class AuthConfig {
+  @Getter
   @Value("${token}")
   private String token;
 
+  @Getter
   @Value("${private-key}")
   private String privateKey;
 
-  public String getToken() {
-    return token;
-  }
-
-  public String getPrivateKey() {
-    return privateKey;
-  }
+  Logger logger = LoggerFactory.getLogger(getClass());
 
   @Bean
   public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
     return userRequest -> {
       Set<GrantedAuthority> authorities = new LinkedHashSet<>();
       Map<String, Object> userAttributes = new HashMap<>();
-      userAttributes.put("name", "test");
-      userAttributes.put("token", userRequest.getAccessToken().getTokenValue());
-      userAttributes.put("scopes", userRequest.getAccessToken().getScopes().stream().map(s -> s.toString()).toArray());
-      userAttributes.put("expiresAt", userRequest.getAccessToken().getExpiresAt());
-      userAttributes.put("issuedAt", userRequest.getAccessToken().getIssuedAt());
+
+      final OAuth2AccessToken accessToken = userRequest.getAccessToken();
       String userNameAttributeName = "name";
+      try {
+        fillUserAttributes(userAttributes,
+            "TokenCreatedSuccessfully",
+            accessToken.getTokenValue(),
+            accessToken.getExpiresAt(),
+            accessToken.getIssuedAt(),
+            accessToken.getScopes().stream().map(Object::toString).toArray());
+      } catch (NullPointerException e) {
+        logger.error("Null pointer exception during token attribute generation", e);
+        throw new AuthenticationServiceException("Failed to generate user attributes due to null token details");
+      } catch (Exception e) {
+        logger.error("Unexpected error during token attribute generation", e);
+        throw new AuthenticationServiceException("An unexpected error occurred during token attribute generation");
+      }
       return new DefaultOAuth2User(authorities, userAttributes, userNameAttributeName);
     };
+  }
+
+  private void fillUserAttributes(Map<String, Object> userAttributes, String name, String token, Object expiresAt, Object issuedAt, Object scopes) {
+    userAttributes.put("name", name);
+    userAttributes.put("token", token);
+    userAttributes.put("expiresAt", expiresAt);
+    userAttributes.put("issuedAt", issuedAt);
+    userAttributes.put("scopes", scopes);
   }
 }
 

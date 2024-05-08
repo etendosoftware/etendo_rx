@@ -2,6 +2,7 @@ package com.etendorx.auth.auth;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,8 @@ import com.etendorx.auth.auth.utils.TokenInfo;
 
 @RestController("/")
 public class TokenController {
+  private static final String CENTERED_DIV = "<div style=\"display: flex;align-items: center; justify-content: center; text-align: center;\">";
+  private static final String CLOSED_DIV = "</div>";
   @Value("${auth.token:}")
   String token;
   @Value("${das.url:}")
@@ -29,7 +32,10 @@ public class TokenController {
     Authentication authentication = SecurityContextHolder.getContext()
         .getAuthentication();
     DefaultOAuth2User user = (DefaultOAuth2User) authentication.getPrincipal();
-
+    if (StringUtils.equals("FailedTokenCreation", user.getAttribute("name"))) {
+      return CENTERED_DIV + "Token creation failed!" + CLOSED_DIV +
+          CENTERED_DIV + " Try again later. If the problem persist, please, contact your system administrator." + CLOSED_DIV;
+    }
     TokenInfo tokenInfo = new TokenInfo(
         null,
         user.getAttribute("expiresAt").toString(),
@@ -37,7 +43,6 @@ public class TokenController {
         userId,
         etrxOauthProviderId
     );
-
     HttpHeaders tokenHeaders = new HttpHeaders();
     tokenHeaders.set("Authorization", "Bearer " + token);
     // check if exists
@@ -45,6 +50,7 @@ public class TokenController {
         HttpMethod.POST,
         new HttpEntity<>(tokenInfo, tokenHeaders),
         TokenInfo.class);
-    return "Token Created! You can close this window";
+    return CENTERED_DIV + "Token Created!" + CLOSED_DIV +
+        CENTERED_DIV + "You can close this window." + CLOSED_DIV;
   }
 }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TokenInfo {
   private String id;
-  private String validuntil;
+  private String validUntil;
   private String token;
   private String user;
   private String etrxOauthProvider;
@@ -20,8 +20,8 @@ public class TokenInfo {
     return id;
   }
 
-  public String getValiduntil() {
-    return validuntil;
+  public String getValidUntil() {
+    return validUntil;
   }
 
   public String getToken() {
