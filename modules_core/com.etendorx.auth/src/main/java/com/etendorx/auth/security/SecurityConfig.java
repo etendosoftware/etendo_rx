@@ -32,10 +32,6 @@ public class SecurityConfig {
             .anyRequest().authenticated()
         )
         .oauth2Login(Customizer.withDefaults());
-//        .exceptionHandling(exceptionHandling -> exceptionHandling
-//            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))  // Handles cases where there is no authentication
-//            .accessDeniedHandler(accessDeniedHandler())  // Handles cases where access is denied
-//        );
     http.csrf(AbstractHttpConfigurer::disable);
     return http.build();
   }
