@@ -23,7 +23,7 @@ public class TokenController {
   private static final String CLOSED_DIV = "</div>";
   @Value("${auth.token:}")
   String token;
-  @Value("${das.url:}")
+  @Value("${das.url:http://das:8092}")
   String dasUrl;
 
   @GetMapping("/api/genToken")
