@@ -35,14 +35,4 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable);
     return http.build();
   }
-
-  @Bean
-  public AccessDeniedHandler accessDeniedHandler() {
-    return (request, response, accessDeniedException) -> {
-      // Custom response if access is denied
-      response.setStatus(HttpStatus.FORBIDDEN.value());
-      response.setContentType("application/json");
-      response.getWriter().write("{\"error\": \"Access Denied\", \"message\": \"" + accessDeniedException.getMessage() + "\"}");
-    };
-  }
 }
