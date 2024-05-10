@@ -21,7 +21,7 @@ import com.etendorx.auth.auth.utils.TokenInfo;
 public class TokenController {
   private static final String CENTERED_DIV = "<div style=\"display: flex;align-items: center; justify-content: center; text-align: center;\">";
   private static final String CLOSED_DIV = "</div>";
-  @Value("${auth.token:}")
+  @Value("${token:}")
   String token;
   @Value("${das.url:http://das:8092}")
   String dasUrl;
