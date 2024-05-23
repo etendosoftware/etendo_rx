@@ -1,12 +1,15 @@
 name: Build
 on:
+  workflow_run:
+    workflows: [Git Police]
+    types:
+      - completed
   push:
     branches:
-      - master # or the name of your main branch
-  pull_request:
-    types: [ opened, synchronize, reopened ]
+      - main
 jobs:
   build:
+    if: github.event.workflow_run.conclusion == 'success'
     name: Build
     runs-on: ubuntu-latest
     steps:
