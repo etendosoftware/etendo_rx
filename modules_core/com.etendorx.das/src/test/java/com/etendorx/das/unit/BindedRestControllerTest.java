@@ -58,7 +58,7 @@ class BindedRestControllerTest {
 
     @Override
     public String getTableId() {
-      return "";
+      throw new UnsupportedOperationException("Table ID is not set");
     }
   }
 

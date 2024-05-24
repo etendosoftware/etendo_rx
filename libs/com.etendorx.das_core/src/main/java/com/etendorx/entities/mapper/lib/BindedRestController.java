@@ -141,10 +141,16 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   public ResponseEntity<Object> post(@RequestBody String rawEntity,
       @RequestParam(required = false, name = "json_path") String jsonPath) {
+    if (rawEntity == null || rawEntity.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Raw entity cannot be null or empty");
+    }
     try {
       jsonPath = (StringUtils.hasText(jsonPath)) ? jsonPath : "$";
       Object rawData = parseJson(rawEntity, jsonPath);
       return new ResponseEntity<>(handleRawData(rawData, rawEntity), HttpStatus.CREATED);
+    } catch (JsonProcessingException e) {
+      log.error("JSON processing error while updating new entity", e);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid JSON format");
     } catch (Exception e) {
       log.error("Error while updating new entity", e);
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -184,6 +190,7 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
           String jsonObject = objectMapper.writeValueAsString(rawDatum);
           jsonObjects.add(handleEntity(jsonObject));
         } else {
+          log.error("Invalid JSON object: {}", rawDatum);
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid JSON object");
         }
       }
