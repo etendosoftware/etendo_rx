@@ -15,6 +15,10 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -22,16 +26,21 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import net.minidev.json.JSONArray;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -108,6 +117,19 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   }
 
   /**
+   * This method handles the conversion of a raw JSON string to a DTO object, validates the DTO object,
+   * and saves it to the repository.
+   *
+   * @param rawEntity The raw JSON string to be converted to a DTO object.
+   * @return The saved DTO object.
+   */
+  private E handleEntity(String rawEntity) {
+    F dtoEntity = converter.convert(rawEntity);
+    validate(dtoEntity);
+    return repository.save(dtoEntity);
+  }
+
+  /**
    * Endpoint for creating a new entity.
    *
    * @param rawEntity The raw JSON string of the entity to be created.
@@ -117,14 +139,60 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
   @ResponseStatus(HttpStatus.OK)
   @Transactional
   @Operation(security = { @SecurityRequirement(name = "basicScheme") })
-  public ResponseEntity<E> post(@RequestBody String rawEntity) {
+  public ResponseEntity<Object> post(@RequestBody String rawEntity,
+      @RequestParam(required = false, name = "json_path") String jsonPath) {
     try {
-      F dtoEntity = converter.convert(rawEntity);
-      validate(dtoEntity);
-      return new ResponseEntity<>(repository.save(dtoEntity), HttpStatus.CREATED);
+      jsonPath = (StringUtils.hasText(jsonPath)) ? jsonPath : "$";
+      Object rawData = parseJson(rawEntity, jsonPath);
+      return new ResponseEntity<>(handleRawData(rawData, rawEntity), HttpStatus.CREATED);
     } catch (Exception e) {
       log.error("Error while updating new entity", e);
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+  }
+
+  /**
+   * This method parses a raw JSON string using JsonPath.
+   *
+   * @param rawEntity The raw JSON string to be parsed.
+   * @param jsonPath  The JsonPath expression to be used for parsing.
+   * @return The parsed JSON data as an Object.
+   */
+  private Object parseJson(String rawEntity, String jsonPath) {
+    Configuration conf = Configuration.defaultConfiguration().addOptions();
+    DocumentContext documentContext = JsonPath.using(conf).parse(rawEntity);
+    return documentContext.read(jsonPath, Object.class);
+  }
+
+  /**
+   * This method handles the parsed JSON data.
+   * If the data is a JSONArray, it converts each JSON object in the array to a DTO and adds it to a list.
+   * If the data is a JSON object, it converts it to a DTO.
+   * If the data is neither a JSONArray nor a JSON object, it treats the raw JSON string as a DTO.
+   *
+   * @param rawData   The parsed JSON data.
+   * @param rawEntity The raw JSON string.
+   * @return The DTO or list of DTOs.
+   * @throws JsonProcessingException If an error occurs while converting a JSON object to a DTO.
+   */
+  private Object handleRawData(Object rawData, String rawEntity) throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    if (rawData instanceof JSONArray) {
+      List<E> jsonObjects = new ArrayList<>();
+      for (Object rawDatum : ((JSONArray) rawData)) {
+        if (rawDatum instanceof Map) {
+          String jsonObject = objectMapper.writeValueAsString(rawDatum);
+          jsonObjects.add(handleEntity(jsonObject));
+        } else {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid JSON object");
+        }
+      }
+      return jsonObjects;
+    } else if (rawData instanceof Map) {
+      String jsonObject = objectMapper.writeValueAsString(rawData);
+      return handleEntity(jsonObject);
+    } else {
+      return handleEntity(rawEntity);
     }
   }
 
