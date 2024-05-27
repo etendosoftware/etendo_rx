@@ -178,22 +178,25 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
     dto.set<@toCamelCase field.name />(mappingUtils.constantValue("${field.constantValue.id}"));
     </#if>
   <#else>
+    <#if field.jsonPath??>
+      <#assign jsonPath = field.jsonPath?replace("\"", "\\\"") />
+    </#if>
     <#if hasRetriever>
       <#if field.constantValue??>
     var _${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(
       mappingUtils.constantValue("${field.constantValue.id}")
     );
       <#else>
-    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}", String.class);
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${jsonPath!"$."+field.name}", String.class);
       </#if>
     <#elseif field.property??>
       <#assign returnClass = modelProvider.getColumnPrimitiveType(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "" />
-    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class<#else>, Object.class</#if>);
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class<#else>, Object.class</#if>);
     <#else>
-    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${field.jsonPath!"$."+field.name}", <#if genUtils.isOneToMany(field)>List<#else>Object</#if>.class);
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${jsonPath!"$."+field.name}", <#if genUtils.isOneToMany(field)>List<#else>Object</#if>.class);
     </#if>
     values.add(_${NamingUtil.getSafeJavaName(field.name)});
-    log.debug("pathConverter ${entity.externalName} \"${field.jsonPath!"$."+field.name}\": {}", _${NamingUtil.getSafeJavaName(field.name)});
+    log.debug("pathConverter ${entity.externalName} \"${jsonPath!"$."+field.name}\": {}", _${NamingUtil.getSafeJavaName(field.name)});
     if(!_${NamingUtil.getSafeJavaName(field.name)}.isNullValue()) {
       <#if hasRetriever>
       var val_${NamingUtil.getSafeJavaName(field.name)} = this.retrieve${field.name?cap_first}(_${NamingUtil.getSafeJavaName(field.name)}.getValue());
