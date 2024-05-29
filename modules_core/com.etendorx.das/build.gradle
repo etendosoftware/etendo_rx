@@ -64,7 +64,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    implementation project(':com.etendorx.entities')
     codegen project(':com.etendorx.entities')
     implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
     implementation 'com.google.protobuf:protobuf-java-util:3.19.4'
