@@ -87,6 +87,11 @@ class BaseDTORepositoryDefaultTests {
     public String get_identifier() {
       return "_id";
     }
+
+    @Override
+    public String getTableId() {
+      return "";
+    }
   }
 
   /**

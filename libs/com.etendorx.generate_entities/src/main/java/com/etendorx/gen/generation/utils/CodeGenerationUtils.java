@@ -231,10 +231,8 @@ public class CodeGenerationUtils {
     if (property == null) {
       return null;
     }
-    for (String part : property.split("\\.")) {
-      return part;
-    }
-    return null;
+    String[] parts = property.split("\\.");
+    return parts.length > 0 ? parts[0] : null;
   }
 
   public String getPrimitiveType(ETRXProjectionEntity entity, ETRXEntityField field) {

@@ -65,6 +65,16 @@ public class JsonPathEntityRetrieverBaseTests {
     MockitoAnnotations.openMocks(this);
     retriever = new JsonPathEntityRetrieverBase<>() {
       @Override
+      protected String getTableId() {
+        return "";
+      }
+
+      @Override
+      protected ExternalIdService getExternalIdService() {
+        return null;
+      }
+
+      @Override
       public JpaSpecificationExecutor<Car> getRepository() {
         return repository;
       }
