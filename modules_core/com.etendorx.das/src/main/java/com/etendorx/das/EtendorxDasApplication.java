@@ -24,7 +24,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableJpaRepositories("com.etendorx.entities.jparepo")
 @ComponentScan(basePackages = { "com.etendorx.utils.auth.key", "com.etendorx.das",
-    "com.etendorx.entities.mappings", "com.etendorx.entities.metadata", "com.etendorx.mapping.tutorial", "com.etendorx.openapi" })
+    "com.etendorx.entities.mappings", "com.etendorx.entities.metadata", "com.etendorx.mapping.tutorial", "com.etendorx.openapi",
+    "com.etendorx.das.externalid"
+})
 @ComponentScan(basePackages = "${scan.basePackage:}")
 public class EtendorxDasApplication {
 

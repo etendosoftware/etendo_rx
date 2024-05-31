@@ -55,8 +55,8 @@ public class ExternalIdServiceImpl implements ExternalIdService {
   }
 
   @Override
-  public void getExternalId(String entityName, String entityId, String externalId) {
-    throw new UnsupportedOperationException("Not implemented yet");
+  public String getExternalId(String entityName, String entityId, String externalId) {
+    return null;
   }
 
   /**
