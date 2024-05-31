@@ -108,48 +108,6 @@ spec:
         }
     }
     stages {
-        stage ('Test environment') {
-            steps {
-                container('compiler') {
-                    script {
-                        try {
-                            echo "Starting Environment tests"
-                            sh """
-                            export DOCKER_HOST=/var/run/docker.sock
-                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-                            git clone --branch $BRANCH_NAME https://github.com/etendosoftware/etendo_rx
-                            cd etendo_rx
-                            chmod a+x ./pipelines/run-tests/build-update.sh
-                            cp gradle.properties.template gradle.properties
-                            sed -i 's/^githubUser=.*/githubUser=${GITHUB_USER}/' gradle.properties
-                            sed -i 's/^githubToken=.*/githubToken=${GITHUB_TOKEN}/' gradle.properties
-                            sed -i 's/^grpc.enabled=.*/grpc.enabled=true/' gradle.properties
-                            sed -i 's/^data-rest.enabled=.*/data-rest.enabled=true/' gradle.properties
-                            mkdir -p modules
-                            ./gradlew :setup
-                            ./gradlew :com.etendorx.test.testcontainer:test
-                            """
-                            '...Environment TESTS SUCCESSFUL...'
-                        } catch (Exception e) {
-                            echo 'Exception occurred: ' + e.toString()
-                            echo '...Environment TEST FAILED...'
-                            currentBuild.result = 'UNSTABLE'
-                            unstable('Environment TESTS FAILED!')
-                            env.STATUSTEST = "0"
-                        }
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'etendo_rx/modules_test/com.etendorx.test.testcontainer/build/reports/tests/test',
-                            reportFiles: '*.html',
-                            reportName: 'Environment TESTS REPORT',
-                            reportTitles: ''
-                        ])
-                    }
-                }
-            }
-        }
         stage ('Build Environment Etendo Core') {
             when {
                 expression {

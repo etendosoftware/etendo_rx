@@ -20,6 +20,7 @@ import com.etendorx.entities.entities.BaseDTORepositoryDefault;
 import com.etendorx.entities.entities.BaseSerializableObject;
 import com.etendorx.entities.mapper.lib.BaseDTOModel;
 import com.etendorx.entities.mapper.lib.DTOConverter;
+import com.etendorx.entities.mapper.lib.ExternalIdService;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.validation.ConstraintViolation;
@@ -63,6 +64,8 @@ class BaseDTORepositoryDefaultTests {
   Validator validator;
   @Mock
   BaseDASRepository<Car> repository;
+  @Mock
+  ExternalIdService externalIdService;
 
   @InjectMocks
   BaseDTORepositoryDefault<Car, CarDTO, CarDTO> baseDTORepositoryDefault;
