@@ -1,15 +1,16 @@
 name: Auto Reviewer
 
 on:
-  pull_request:
-    types: [opened, reopened, synchronize]
+  workflow_run:
+    workflows: [Git Police]
+    types:
+      - completed
 
 jobs:
   make-review:
-    if:  github.head_ref != 'develop'
+    if: github.head_ref != 'develop' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     env:
-      PULL_REQUEST: ${{ github.event.pull_request.number }}
       PROJECT: ${{ github.event.repository.owner.login }}
       REPO_SLUG: ${{ github.event.repository.name }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -19,6 +20,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Fetch pull request number
+        id: fetch-pr
+        run: |
+          PR_NUMBER=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                      "https://api.github.com/repos/${{ env.PROJECT }}/${{ env.REPO_SLUG }}/pulls?head=${{ env.PROJECT }}:${{ github.head_ref }}" \
+                      | jq '.[0].number')
+          echo "PULL_REQUEST=$PR_NUMBER" >> $GITHUB_ENV
 
       - name: Run Docker container
         id: run-docker
@@ -34,7 +43,6 @@ jobs:
           response=$(curl -s -o response.txt -w "%{http_code}" -X GET http://localhost:5000/review/github)
           if [ $response -ne 200 ]; then
             echo "API call failed with status code $response. This is likely an error related to the PR data, or an internal API error"
-
             echo "Response text:"
             cat response.txt
             exit 1
