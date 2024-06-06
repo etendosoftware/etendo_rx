@@ -17,18 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import com.etendorx.auth.auth.utils.TokenInfo;
 
-@RestController("/")
+@RestController()
 public class TokenController {
   private static final String CENTERED_DIV = "<div style=\"display: flex;align-items: center; justify-content: center; text-align: center;\">";
   private static final String CLOSED_DIV = "</div>";
-  @Value("${token:}")
+  private static final String AUTH_TOKEN_INFO_URI_WITH_DATE_FORMAT = "/auth/ETRX_Token_Info?_dateFormat=yyyy-MM-dd'T'HH:mm:ss.SSSX";
+  @Value("${token}")
   String token;
-  @Value("${das.url:http://das:8092}")
+  @Value("${das.url}")
   String dasUrl;
 
   @GetMapping("/api/genToken")
-  public String index(@RequestHeader Map<String, String> headers, @RequestParam String userId,
-      @RequestParam String etrxOauthProviderId) {
+  public String index(@RequestHeader Map<String, String> headers, @RequestParam(required = false) String userId,
+      @RequestParam(required = false) String etrxOauthProviderId) {
     Authentication authentication = SecurityContextHolder.getContext()
         .getAuthentication();
     DefaultOAuth2User user = (DefaultOAuth2User) authentication.getPrincipal();
@@ -46,10 +47,11 @@ public class TokenController {
     HttpHeaders tokenHeaders = new HttpHeaders();
     tokenHeaders.set("Authorization", "Bearer " + token);
     // check if exists
-    new RestTemplate().exchange(dasUrl + "/auth/ETRX_Token_Info?_dateFormat=yyyy-MM-dd'T'HH:mm:ss.SSSX",
+    new RestTemplate().exchange(dasUrl + AUTH_TOKEN_INFO_URI_WITH_DATE_FORMAT,
         HttpMethod.POST,
         new HttpEntity<>(tokenInfo, tokenHeaders),
         TokenInfo.class);
+    authentication.setAuthenticated(false);
     return CENTERED_DIV + "Token Created!" + CLOSED_DIV +
         CENTERED_DIV + "You can close this window." + CLOSED_DIV;
   }
