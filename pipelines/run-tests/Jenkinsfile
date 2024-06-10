@@ -156,7 +156,7 @@ spec:
                         """
 
                         // Clone Etendo Core
-                        sh 'GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@github.com:etendosoftware/etendo_core.git etendo_core'
+                        sh 'GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch release/2.0 git@github.com:etendosoftware/etendo_core.git etendo_core'
 
                         // Setup environment
                         sh 'printenv'
