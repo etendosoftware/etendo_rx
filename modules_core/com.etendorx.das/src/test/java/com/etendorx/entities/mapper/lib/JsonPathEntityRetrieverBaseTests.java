@@ -15,16 +15,26 @@
  */
 package com.etendorx.entities.mapper.lib;
 
+import com.etendorx.das.EtendorxDasApplication;
+import com.etendorx.das.externalid.ExternalIdServiceImpl;
+import com.etendorx.das.test.RepositoryTest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,6 +44,13 @@ import static org.mockito.Mockito.when;
 /**
  * This class contains unit tests for the JsonPathEntityRetrieverBase class.
  */
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
+    "grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey },
+    classes = EtendorxDasApplication.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration()
+@AutoConfigureMockMvc
+@ComponentScan({"com.etendorx.das.test.projections","com.etendorx.das.externalid"})
 public class JsonPathEntityRetrieverBaseTests {
 
   /**
@@ -42,6 +59,8 @@ public class JsonPathEntityRetrieverBaseTests {
   @Mock
   private JpaSpecificationExecutor<Car> repository;
 
+  @Mock
+  private ExternalIdServiceImpl externalIdService;
   /**
    * Object under test.
    */
@@ -63,7 +82,18 @@ public class JsonPathEntityRetrieverBaseTests {
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
+    when(externalIdService.getExternalId(any(), any(), any())).thenReturn("1");
     retriever = new JsonPathEntityRetrieverBase<>() {
+      @Override
+      protected String getTableId() {
+        return "";
+      }
+
+      @Override
+      protected ExternalIdService getExternalIdService() {
+        return externalIdService;
+      }
+
       @Override
       public JpaSpecificationExecutor<Car> getRepository() {
         return repository;
@@ -84,9 +114,10 @@ public class JsonPathEntityRetrieverBaseTests {
   void getWithValidKeyShouldReturnEntity() {
     // Given
     Car expectedEntity = new Car("1", "Car 1");
+    List<Car> list = Collections.singletonList(expectedEntity);
     String key = "1";
-    when(repository.findOne(any(Specification.class))).thenReturn(
-        java.util.Optional.of(expectedEntity));
+    when(repository.findAll(any(Specification.class))).thenReturn(
+        list);
 
     // When
     Car result = retriever.get(key);
@@ -113,9 +144,9 @@ public class JsonPathEntityRetrieverBaseTests {
   void getWithIntegerKeyShouldReturnObject() {
     // Given
     Car expectedEntity = new Car("1", "Car 1");
+    List<Car> list = Collections.singletonList(expectedEntity);
     Integer key = 1;
-    when(repository.findOne(any(Specification.class))).thenReturn(
-        java.util.Optional.of(expectedEntity));
+    when(repository.findAll(any(Specification.class))).thenReturn(list);
 
     // When
     Car result = retriever.get(key);

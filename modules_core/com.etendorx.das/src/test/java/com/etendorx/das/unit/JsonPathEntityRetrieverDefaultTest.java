@@ -39,7 +39,7 @@ public class JsonPathEntityRetrieverDefaultTest {
         // Mock the JpaSpecificationExecutor repository
         repository = mock(JpaSpecificationExecutor.class);
         // Initialize the JsonPathEntityRetrieverDefault with the mocked repository
-        retriever = new JsonPathEntityRetrieverDefault<>(repository);
+        retriever = new JsonPathEntityRetrieverDefault<>(repository, null, null);
     }
 
     /**

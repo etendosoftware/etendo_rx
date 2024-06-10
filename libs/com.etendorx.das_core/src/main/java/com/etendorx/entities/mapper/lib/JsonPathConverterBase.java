@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -92,5 +93,23 @@ public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
           .map(Object::toString)
           .collect(Collectors.joining(", ")));
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected String toString(Object o) {
+    if(o instanceof String) {
+      return (String) o;
+    } else if(o instanceof Map) {
+      Map<String, Object> m = (Map<String, Object>) o;
+      if(m.containsKey("id")) {
+        Object val = m.get("id");
+        if(val instanceof String) {
+          log.warn("Extracted id from map: {}", o.toString());
+          return (String) val;
+        }
+      }
+    }
+    log.warn("Expected String but got a {}, value: {}. A null value is returned", o.getClass().getName(), o.toString());
+    return null;
   }
 }

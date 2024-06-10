@@ -16,16 +16,14 @@
 
 package com.etendorx.asyncprocess.topology;
 
+import com.etendorx.asyncprocess.config.LatestLogsConfiguration;
 import com.etendorx.lib.kafka.model.AsyncProcess;
 import com.etendorx.lib.kafka.model.AsyncProcessExecution;
 import com.etendorx.lib.kafka.model.AsyncProcessState;
 import com.etendorx.lib.kafka.model.JsonSerde;
 import com.etendorx.lib.kafka.topology.AsyncProcessTopology;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.TestInputTopic;
-import org.apache.kafka.streams.TestOutputTopic;
-import org.apache.kafka.streams.TopologyTestDriver;
+import org.apache.kafka.streams.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +48,11 @@ class AsyncProcessTopologyTest {
     Properties props = new Properties();
     props.put(StreamsConfig.APPLICATION_ID_CONFIG, "test");
     props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "dummy:1234");
-    testDriver = new TopologyTestDriver(AsyncProcessTopology.buildTopology(), props);
+    StreamsBuilder streamsBuilder = new StreamsBuilder();
+    AsyncProcessTopology.buildTopology(streamsBuilder);
+    LatestLogsConfiguration.lastRecords(streamsBuilder);
+    var topology = streamsBuilder.build();
+    testDriver = new TopologyTestDriver(topology, props);
 
     var asyncProcessJsonSerde = new JsonSerde<>(AsyncProcess.class);
     var asyncProcessExecutionJsonSerde = new JsonSerde<>(AsyncProcessExecution.class);

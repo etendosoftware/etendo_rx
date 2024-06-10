@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Suite
 @SuiteDisplayName("Etendo RX Spring Boot Tests Suite")
@@ -21,7 +20,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
     RepositoryTest.class, RestCallTest.class,
     AnnotationTests.class
 })
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19090")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration

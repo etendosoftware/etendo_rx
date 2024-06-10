@@ -55,6 +55,11 @@ class BindedRestControllerTest {
     public String get_identifier() {
       return "_id";
     }
+
+    @Override
+    public String getTableId() {
+      return "";
+    }
   }
 
   static class CarDTORead implements BaseDTOModel {
