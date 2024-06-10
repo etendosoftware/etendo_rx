@@ -16,7 +16,7 @@
 package com.etendorx.gen.generation.utils;
 
 import com.etendoerp.etendorx.model.projection.ETRXEntityField;
-import com.etendoerp.etendorx.model.projection.ETRXEntityFieldMap;
+import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.generation.GeneratePaths;
 import org.apache.commons.lang3.StringUtils;
 import org.openbravo.base.model.ModelProvider;
@@ -40,6 +40,10 @@ public class CodeGenerationUtils {
    * Singleton instance of CodeGenerationUtils.
    */
   private static CodeGenerationUtils instance = null;
+
+  public static String getNull() {
+    return null;
+  }
 
   /**
    * Returns the singleton instance of CodeGenerationUtils.
@@ -164,6 +168,17 @@ public class CodeGenerationUtils {
   public String getRetriever(ETRXEntityField field) {
     return getBaseName(field) + "JsonPathRetriever";
   }
+
+  public String getRepository(ETRXEntityField field) {
+    var property = getProperty(field);
+    if(property != null) {
+      var targetEntity = property.getTargetEntity();
+      return targetEntity.getName() + "Repository";
+    } else {
+      throw new IllegalArgumentException("Property not found for field: " + field);
+    }
+  }
+
   /**
    * Returns the JsonPath converter for the given ETRXEntityField.
    *
@@ -212,4 +227,25 @@ public class CodeGenerationUtils {
     return null;
   }
 
+  public String firstProperty(String property) {
+    if (property == null) {
+      return null;
+    }
+    String[] parts = property.split("\\.");
+    return parts.length > 0 ? parts[0] : null;
+  }
+
+  public String getPrimitiveType(ETRXProjectionEntity entity, ETRXEntityField field) {
+    if(getFullQualifiedType(entity, field) == null) {
+      return ModelProvider.getInstance()
+          .getColumnPrimitiveType(entity.getTable(),
+              entity.getTable().getName() + "." + firstProperty(field.getProperty()));
+    } else {
+      return null;
+    }
+  }
+
+  public String getFullQualifiedType(ETRXProjectionEntity entity, ETRXEntityField field) {
+    return ModelProvider.getInstance().getColumnTypeFullQualified(entity.getTable(), entity.getTable().getName() +"." + firstProperty(field.getProperty()));
+  }
 }

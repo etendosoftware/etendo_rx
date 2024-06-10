@@ -16,18 +16,12 @@
 package com.etendorx.das.test;
 
 import com.etendorx.das.utils.DefaultFilters;
-import com.etendorx.das.utils.TestcontainersUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * This class contains unit tests for the DefaultFilters class.
  * It tests the addFilters method with different HTTP methods and SQL queries.
  */
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19090")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration
@@ -59,20 +52,6 @@ public class DefaultFiltersTest {
   public static final String ROLE_ID_101112 = "101112";
   public static final String REST_METHOD_GET = "GET";
   public static final String ROLE_ID_789 = "789";
-
-  /**
-   * Sets up the PostgreSQL properties for the test environment.
-   */
-  @DynamicPropertySource
-  static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    TestcontainersUtils.setProperties(registry, postgreSQLContainer);
-  }
-
-  /**
-   * Sets up the PostgreSQL container for the test environment.
-   */
-  @Container
-  public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
   /**
    * Tests the addFilters method with a null client ID and a GET request.
