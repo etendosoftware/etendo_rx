@@ -63,9 +63,6 @@ spec:
           mountPath: /root/.ssh/
         - name: docker-sock
           mountPath: /var/run/docker.sock
-      env:
-        - name: TESTCONTAINERS_IP
-          value: GATEWAY
       lifecycle:
         postStart:
           exec:
@@ -119,8 +116,6 @@ spec:
                             echo "Starting Environment tests"
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             git clone --branch $BRANCH_NAME https://github.com/etendosoftware/etendo_rx
                             cd etendo_rx
@@ -132,7 +127,6 @@ spec:
                             sed -i 's/^data-rest.enabled=.*/data-rest.enabled=true/' gradle.properties
                             mkdir -p modules
                             ./gradlew :setup
-                            ./gradlew :com.etendorx.test.testcontainer:test
                             """
                             '...Environment TESTS SUCCESSFUL...'
                         } catch (Exception e) {
@@ -234,8 +228,6 @@ spec:
                             sh 'printenv'
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             chmod a+x ./pipelines/run-tests/build-update.sh
@@ -303,8 +295,6 @@ spec:
                             echo "Starting Auth tests"
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.auth:test --info
@@ -345,14 +335,21 @@ spec:
                             echo "Starting Das tests"
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RepositoryTest
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RestCallTest
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.DefaultFiltersTest
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.eventhandlertest.test.AnnotationTests
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.BindedRestControllerTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.JsonPathEntityRetrieverDefaultTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.MappingUtilsImplTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.DisableEnableTriggersTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.FieldMappingRestCallTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.integration.PropertyMetadataTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.BaseDTORepositoryDefaultTests
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.JsonPathConverterBaseTests
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.entities.mapper.lib.JsonPathEntityRetrieverBaseTests
                             """
                             '...DAS TESTS SUCCESSFUL...'
                         } catch (Exception e) {
@@ -390,8 +387,6 @@ spec:
                             echo "Starting Edge tests"
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
                             export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.edge:test --info
@@ -432,7 +427,6 @@ spec:
                                     echo "Starting Event Handler tests"
                                     sh """
                                     export DOCKER_HOST=/var/run/docker.sock
-                                    export TESTCONTAINERS_RYUK_DISABLED=true
                                     export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                                     cd etendo_rx
                                     ./gradlew :com.etendorx.test.eventhandler:test --info
