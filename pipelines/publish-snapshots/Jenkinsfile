@@ -18,7 +18,7 @@ pipeline {
     REPOSITORY_URL      = "https://repo.futit.cloud/repository/etendo-snapshot-jars"
     EMAIL_ADDRESS       = credentials('email_builds')
     ETENDO_RX_URL       = "https://github.com/etendosoftware/etendo_rx"
-    ETENDO_BASE_URL     = "https://github.com/etendosoftware/etendo_base"
+    ETENDO_BASE_URL     = "https://github.com/etendosoftware/etendo"
     MODULE_RX_URL       = "git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git"
     COMMIT_AUTHOR_NAME  = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
     COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
@@ -40,15 +40,6 @@ metadata:
   labels:
     app.kubernetes.io/name: jenkins-node-rx-snap
 spec:
-  volumes:
-    - name: rsa-keys
-      configMap:
-        name: rsa-keys
-        defaultMode: 384
-    - name: docker-sock
-      hostPath:
-        path: /var/run/docker.sock
-        type: ''
   containers:
     - name: compiler
       image: etendo/compiler_jenkins:1.0.7
@@ -94,14 +85,24 @@ spec:
       terminationMessagePath: /dev/termination-log
       terminationMessagePolicy: File
       imagePullPolicy: IfNotPresent
+  volumes:
+    - name: rsa-keys
+      configMap:
+        name: rsa-keys
+        defaultMode: 384
+    - name: docker-sock
+      hostPath:
+        path: /var/run/docker.sock
   restartPolicy: Always
   terminationGracePeriodSeconds: 30
   dnsPolicy: ClusterFirst
   serviceAccountName: default
   serviceAccount: default
-  securityContext: {}
-        """
-      }
+  securityContext:
+    privileged: true
+
+"""
+        }
     }
 
   stages {
@@ -116,13 +117,14 @@ spec:
           script {
             try {
               echo "--------------- Building Classic environment --------------"
+              // Clone Etendo Core
               sh """
-              git clone --branch develop $ETENDO_BASE_URL
+              git clone --branch develop $ETENDO_BASE_URL etendo_core
               """
 
               echo "---------------- Prepare gradle.properties ----------------"
               sh """
-              cd etendo_base
+              cd etendo_core
               echo -e \"\n
               context.name=${CONTEXT_NAME}\n
               bbdd.sid=${BBDD_SID}\n
@@ -136,16 +138,15 @@ spec:
               githubUser=${GITHUB_USER}\n
               githubToken=${GITHUB_TOKEN}\n
               allow.root=true\n
-              org.gradle.parallel=false\n
-              org.gradle.daemon=false\n
-              org.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8\" > gradle.properties
+              org.gradle.jvmargs=-Dfile.encoding=UTF-8\" > gradle.properties
+              export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
               """
 
               echo "---------------- Clone modules of Classic ---------------"
               withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
                 sh """
-                cd etendo_base
-                mkdir modules
+                cd etendo_core
+                mkdir -p modules
                 cd modules
                 # Clone module etendo_rx
                 GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch ${env.BRANCH_NAME} $MODULE_RX_URL
@@ -154,8 +155,7 @@ spec:
 
               echo "--------------------- Compile Classic ---------------------"
               sh """
-              cd etendo_base
-              yes | ./gradlew expand --info
+              cd etendo_core
               ./gradlew prepareConfig --info
               ./gradlew setup --info
               ./gradlew install --info
@@ -222,6 +222,7 @@ spec:
               rx.generateCode=true\n
               rx.computedColumns=true\n
               rx.views=true\" > gradle.properties
+              export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
               """
 
               echo "---------------- Change version to snapshot ---------------"
@@ -263,6 +264,7 @@ spec:
             try {
               echo "----------------- Publishing Snapshot JARs ----------------"
               sh """
+              export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
               cd etendo_rx
               ./gradlew publish --info
               """
