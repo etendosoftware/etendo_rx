@@ -52,7 +52,65 @@ public class TokenController {
         new HttpEntity<>(tokenInfo, tokenHeaders),
         TokenInfo.class);
     authentication.setAuthenticated(false);
-    return CENTERED_DIV + "Token Created!" + CLOSED_DIV +
-        CENTERED_DIV + "You can close this window." + CLOSED_DIV;
+    return generateSuccessHtml();
+//    return CENTERED_DIV + "Token Created!" + CLOSED_DIV +
+//        CENTERED_DIV + "You can close this window." + CLOSED_DIV;
+  }
+
+  /**
+   * Genera un HTML que indica una ejecución exitosa.
+   *
+   * @return Un string que contiene el HTML.
+   */
+  public static String generateSuccessHtml() {
+    // Plantilla HTML para una ejecución exitosa
+    return "<!DOCTYPE html>\n"
+        + "<html>\n"
+        + "<head>\n"
+        + "    <title>Execution Successful</title>\n"
+        + "    <style>\n"
+        + "        body { \n"
+        + "            font-family: Arial, sans-serif; \n"
+        + "            background-color: #f4f4f9; \n"
+        + "            margin: 0; \n"
+        + "            padding: 0; \n"
+        + "            display: flex; \n"
+        + "            justify-content: center; \n"
+        + "            align-items: center; \n"
+        + "            height: 100vh; \n"
+        + "        }\n"
+        + "        .container { \n"
+        + "            background-color: #fff; \n"
+        + "            padding: 40px; \n"
+        + "            border-radius: 10px; \n"
+        + "            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); \n"
+        + "            text-align: center; \n"
+        + "            max-width: 500px; \n"
+        + "            width: 100%; \n"
+        + "        }\n"
+        + "        h1 { \n"
+        + "            color: #4caf50; \n"
+        + "            margin-bottom: 20px; \n"
+        + "        }\n"
+        + "        p { \n"
+        + "            color: #333; \n"
+        + "            font-size: 18px; \n"
+        + "            margin-bottom: 0; \n"
+        + "        }\n"
+        + "        .success-icon { \n"
+        + "            font-size: 50px; \n"
+        + "            color: #4caf50; \n"
+        + "            margin-bottom: 20px; \n"
+        + "        }\n"
+        + "    </style>\n"
+        + "</head>\n"
+        + "<body>\n"
+        + "    <div class=\"container\">\n"
+        + "        <div class=\"success-icon\">&#10004;</div>\n"
+        + "        <h1>Execution Successful</h1>\n"
+        + "        <p>Your request has been processed successfully.</p>\n"
+        + "    </div>\n"
+        + "</body>\n"
+        + "</html>";
   }
 }

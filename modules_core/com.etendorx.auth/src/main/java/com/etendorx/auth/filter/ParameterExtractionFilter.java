@@ -1,7 +1,6 @@
 package com.etendorx.auth.filter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -14,22 +13,47 @@ import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
+/**
+ * This class is a filter that extracts parameters from the query string of the request.
+ * It is a Spring component that extends OncePerRequestFilter to ensure it is executed once per request.
+ */
 @Component
 public class ParameterExtractionFilter extends OncePerRequestFilter {
 
-  static Logger log = LoggerFactory.getLogger(ParameterExtractionFilter.class);
+  // Constants for the parameter names to be extracted
+  private static final String USER_ID = "userId";
+  private static final String ETRX_OAUTH_PROVIDER_ID = "etrxOauthProviderId";
 
+  /**
+   * This method is overridden from OncePerRequestFilter.
+   * It extracts parameters from the query string and sets them as attributes in the session.
+   * It then allows the request to proceed in the filter chain.
+   *
+   * @param request the HTTP request
+   * @param response the HTTP response
+   * @param filterChain the filter chain
+   * @throws IOException if an input or output exception occurred
+   * @throws ServletException if a servlet exception occurred
+   */
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+  protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
       throws IOException, ServletException {
     Map<String, String> params = parseQueryString(request.getQueryString());
-    if (params.containsKey("userId") && params.containsKey("etrxOauthProviderId")) {
-      request.getSession().setAttribute("userId", params.get("userId"));
-      request.getSession().setAttribute("etrxOauthProviderId", params.get("etrxOauthProviderId"));
+    if (params.containsKey(USER_ID) && params.containsKey(ETRX_OAUTH_PROVIDER_ID)) {
+      request.getSession().setAttribute(USER_ID, params.get(USER_ID));
+      request.getSession().setAttribute(ETRX_OAUTH_PROVIDER_ID, params.get(ETRX_OAUTH_PROVIDER_ID));
     }
     filterChain.doFilter(request, response);
   }
 
+  /**
+   * This method parses the query string into a map of parameter names and values.
+   * It splits the query string at '&' to get the parameter pairs, then splits each pair at '=' to get the name and value.
+   * If the query string is null, it returns an empty map.
+   *
+   * @param queryString the query string to parse
+   * @return a map of parameter names and values
+   */
   private static Map<String, String> parseQueryString(String queryString) {
     if (queryString == null) return Map.of();
     return Stream.of(queryString.split("&"))
