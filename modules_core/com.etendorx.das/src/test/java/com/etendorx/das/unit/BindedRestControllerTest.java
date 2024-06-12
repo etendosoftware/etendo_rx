@@ -58,7 +58,7 @@ class BindedRestControllerTest {
 
     @Override
     public String getTableId() {
-      return "";
+      throw new UnsupportedOperationException("Table ID is not set");
     }
   }
 
@@ -165,7 +165,7 @@ class BindedRestControllerTest {
     given(repository.save(any())).willReturn(savedEntity);
 
     // Execute
-    ResponseEntity<CarDTORead> response = controller.post(RAW_ENTITY);
+    ResponseEntity<Object> response = controller.post(RAW_ENTITY, null);
 
     // Assert
     assertEquals(HttpStatus.CREATED, response.getStatusCode());

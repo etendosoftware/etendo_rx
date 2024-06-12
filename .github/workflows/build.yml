@@ -1,10 +1,10 @@
 name: Build
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
   push:
     branches:
-      - master # or the name of your main branch
-  pull_request:
-    types: [ opened, synchronize, reopened ]
+      - main
 jobs:
   build:
     name: Build
