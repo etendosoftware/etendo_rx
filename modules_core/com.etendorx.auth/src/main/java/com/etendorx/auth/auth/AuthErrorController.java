@@ -25,7 +25,8 @@ public class AuthErrorController implements ErrorController {
   @RequestMapping("/error")
   public String handleError(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String errorMessage) throws IOException {
     HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-    String message = (String) request.getAttribute("errorMessage");
+    String message = request.getAttribute("errorMessage") != null ?
+        (String) request.getAttribute("errorMessage") : "internal_error";
 
     String title = "";
     message = switch (message) {
