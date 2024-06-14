@@ -1,6 +1,13 @@
 package com.etendorx.auth.auth;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,8 +19,11 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 public class AuthErrorController implements ErrorController {
 
+  @Autowired
+  private ResourceLoader resourceLoader;
+
   @RequestMapping("/error")
-  public String handleError(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String errorMessage) {
+  public String handleError(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String errorMessage) throws IOException {
     HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     String message = (String) request.getAttribute("errorMessage");
 
@@ -46,7 +56,18 @@ public class AuthErrorController implements ErrorController {
       }
     };
 
-    return generateHtml(title, "#e74c3c", "&#10006;", "#e74c3c", message);
+    // Load the HTML template
+    Resource resource = resourceLoader.getResource("classpath:templates/oAuthResponse.html");
+    String htmlContent = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+
+    // Replace placeholders with actual values
+    htmlContent = htmlContent.replace("{{title}}", title)
+        .replace("{{titleColor}}", "#e74c3c")
+        .replace("{{icon}}", "&#10006;")
+        .replace("{{iconColor}}", "#e74c3c")
+        .replace("{{message}}", message);
+
+    return htmlContent;
   }
 
   public static String generateHtml(String title, String titleColor, String icon, String iconColor, String message) {

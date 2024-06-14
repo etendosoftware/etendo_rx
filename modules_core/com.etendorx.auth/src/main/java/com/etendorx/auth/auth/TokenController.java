@@ -1,9 +1,15 @@
 package com.etendorx.auth.auth;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,6 +29,10 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 public class TokenController {
+
+  @Autowired
+  private ResourceLoader resourceLoader;
+
   private static final String AUTH_TOKEN_INFO_URI_WITH_DATE_FORMAT = "/auth/ETRX_Token_Info?_dateFormat=yyyy-MM-dd'T'HH:mm:ss.SSSX";
   @Value("${token}")
   String token;
@@ -56,88 +66,27 @@ public class TokenController {
           TokenInfo.class);
       authentication.setAuthenticated(false);
 
-      return generateSuccessHtml();
+
+      // Load the HTML template
+      Resource resource = resourceLoader.getResource("classpath:templates/oAuthResponse.html");
+      String htmlContent = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+
+      // Replace placeholders with actual values
+      htmlContent = htmlContent.replace("{{title}}", "Execution Successful")
+          .replace("{{titleColor}}", "#4caf50")
+          .replace("{{icon}}", "&#10004;")
+          .replace("{{iconColor}}", "#4caf50")
+          .replace("{{message}}", "Your request has been processed successfully.");
+
+      return htmlContent;
+
+
     } catch (ResourceAccessException e1) {
       request.setAttribute("errorMessage", "conn_refuse_das");
       throw new ResourceAccessException("Connection refused with DAS service. Check if the service is Up and Running");
+    } catch (IOException e) {
+      request.setAttribute("errorMessage", "internal_error");
+      throw new RuntimeException(e);
     }
-  }
-
-  public static String generateSuccessHtml() {
-    return generateHtml("Execution Successful", "#4caf50", "&#10004;", "#4caf50", "Your request has been processed successfully.");
-  }
-
-  public static String generateHtml(String title, String titleColor, String icon, String iconColor, String message) {
-    return """
-           <!DOCTYPE html>
-           <html>
-           <head>
-               <title>"""
-        + title +
-        """
-        </title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f9;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-            }
-            .container {
-                background-color: #fff;
-                padding: 40px;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                text-align: center;
-                max-width: 500px;
-                width: 100%;
-            }
-            h1 {
-                color: 
-        """
-        + titleColor + ";" +
-        """
-                margin-bottom: 20px;
-            }
-            p {
-                color: #333;
-                font-size: 18px;
-                margin-bottom: 0;
-            }
-            .icon {
-                font-size: 50px;
-                color: 
-        """
-        + iconColor + ";" +
-        """
-                margin-bottom: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="icon">
-    """
-        + icon +
-        """
-                </div>
-                <h1>
-        """
-        + title +
-        """
-                </h1>
-                <p>
-        """
-        + message +
-        """
-            </p>
-            </div>
-        </body>
-        </html>
-        """;
   }
 }
