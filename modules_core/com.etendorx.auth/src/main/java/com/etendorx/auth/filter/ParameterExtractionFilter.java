@@ -1,5 +1,6 @@
 package com.etendorx.auth.filter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -9,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
   // Constants for the parameter names to be extracted
   private static final String USER_ID = "userId";
   private static final String ETRX_OAUTH_PROVIDER_ID = "etrxOauthProviderId";
+  private static final String ERROR = "error";
 
   /**
    * This method is overridden from OncePerRequestFilter.
@@ -39,11 +42,19 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
       throws IOException, ServletException {
     Map<String, String> params = parseQueryString(request.getQueryString());
+    if (params.containsKey(ERROR)) {
+      request.setAttribute("errorMessage" , params.get(ERROR));
+      if (StringUtils.equals("access_denied", params.get(ERROR))) {
+        throw new AccessDeniedException(params.get(ERROR));
+      }
+      request.setAttribute("errorMessage" , "internal_error");
+      throw new RuntimeException("Internal error occurred.");
+    }
     if (params.containsKey(USER_ID) && params.containsKey(ETRX_OAUTH_PROVIDER_ID)) {
       request.getSession().setAttribute(USER_ID, params.get(USER_ID));
       request.getSession().setAttribute(ETRX_OAUTH_PROVIDER_ID, params.get(ETRX_OAUTH_PROVIDER_ID));
     }
-    filterChain.doFilter(request, response);
+      filterChain.doFilter(request, response);
   }
 
   /**

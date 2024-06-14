@@ -57,9 +57,11 @@ public class AuthConfig {
         );
       } catch (NullPointerException e) {
         logger.error("Null pointer exception during token attribute generation", e);
+        request.setAttribute("errorMessage", "null_attributes");
         throw new AuthenticationServiceException("Failed to generate user attributes due to null token details");
       } catch (Exception e) {
         logger.error("Unexpected error during token attribute generation", e);
+        request.setAttribute("errorMessage", "internal_error");
         throw new AuthenticationServiceException("An unexpected error occurred during token attribute generation");
       }
       return new DefaultOAuth2User(authorities, userAttributes, userNameAttributeName);
