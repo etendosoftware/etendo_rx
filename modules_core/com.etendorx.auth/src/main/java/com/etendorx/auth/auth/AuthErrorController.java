@@ -57,18 +57,7 @@ public class AuthErrorController implements ErrorController {
       }
     };
 
-    // Load the HTML template
-    Resource resource = resourceLoader.getResource("classpath:templates/oAuthResponse.html");
-    String htmlContent = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-
-    // Replace placeholders with actual values
-    htmlContent = htmlContent.replace("{{title}}", title)
-        .replace("{{titleColor}}", "#e74c3c")
-        .replace("{{icon}}", "&#10006;")
-        .replace("{{iconColor}}", "#e74c3c")
-        .replace("{{message}}", message);
-
-    return htmlContent;
+    return generateHtml(title, "#e74c3c", "&#10006;", "#e74c3c", message);
   }
 
   public static String generateHtml(String title, String titleColor, String icon, String iconColor, String message) {
