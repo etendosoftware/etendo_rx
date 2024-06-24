@@ -1,16 +1,12 @@
 package com.etendorx.auth.auth;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,41 +19,50 @@ public class AuthErrorController implements ErrorController {
   private ResourceLoader resourceLoader;
 
   @RequestMapping("/error")
-  public String handleError(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String errorMessage) throws IOException {
+  public String handleError(HttpServletRequest request, HttpServletResponse response) throws IOException {
     HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-    String message = request.getAttribute("errorMessage") != null ?
-        (String) request.getAttribute("errorMessage") : "internal_error";
+    String message = (String) request.getAttribute("errorMessage");
+    if (message == null) {
+      message = "internal_error";
+    }
 
-    String title = "";
-    message = switch (message) {
-      case "access_denied" -> {
+    String title;
+    String errorMessage;
+
+    switch (message) {
+      case "access_denied":
         title = "Access Denied";
-        yield "The login attempt failed due to incorrect credentials or denied access.";
-      }
-      case "token_failed" -> {
+        errorMessage = "The login attempt failed due to incorrect credentials or denied access.";
+        httpStatus = HttpStatus.FORBIDDEN;
+        break;
+      case "token_failed":
         title = "Token Creation Failed";
-        yield "Token creation failed! Try again later. If the problem persists, please contact your system administrator.";
-      }
-      case "conn_refuse_das" -> {
+        errorMessage = "Token creation failed! Try again later. If the problem persists, please contact your system administrator.";
+        httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        break;
+      case "conn_refuse_das":
         title = "Connection Refused";
-        yield "Connection refused with DAS service. Check if the service is Up and Running";
-      }
-      case "null_attributes" -> {
+        errorMessage = "Connection refused with DAS service. Check if the service is Up and Running";
+        httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
+        break;
+      case "null_attributes":
         title = "Null Attributes";
-        yield "Failed to generate user attributes due to null token details";
-      }
-      case "internal_error" -> {
+        errorMessage = "Failed to generate user attributes due to null token details";
+        httpStatus = HttpStatus.BAD_REQUEST;
+        break;
+      case "internal_error":
         title = "Internal Error";
-        yield "An internal error occurred.";
-      }
-      default -> {
-        // Default case for unexpected status codes
+        errorMessage = "An internal error occurred.";
+        httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        break;
+      default:
         title = "Error";
-        yield "An unexpected error occurred: " + httpStatus.getReasonPhrase();
-      }
-    };
+        errorMessage = "An unexpected error occurred: " + httpStatus.getReasonPhrase();
+        break;
+    }
 
-    return generateHtml(title, "#e74c3c", "&#10006;", "#e74c3c", message);
+    response.setStatus(httpStatus.value());
+    return generateHtml(title, "#e74c3c", "&#10006;", "#e74c3c", errorMessage);
   }
 
   public static String generateHtml(String title, String titleColor, String icon, String iconColor, String message) {
