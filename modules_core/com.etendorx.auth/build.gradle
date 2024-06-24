@@ -34,9 +34,11 @@ publishing {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation(project(':com.etendorx.utils.auth')) {
         exclude group: 'org.slf4j', module: '*'
     }
