@@ -10,7 +10,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.AccessDeniedException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
@@ -51,8 +54,16 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
       throw new RuntimeException("Internal error occurred.");
     }
     if (params.containsKey(USER_ID) && params.containsKey(ETRX_OAUTH_PROVIDER_ID)) {
-      request.getSession().setAttribute(USER_ID, params.get(USER_ID));
-      request.getSession().setAttribute(ETRX_OAUTH_PROVIDER_ID, params.get(ETRX_OAUTH_PROVIDER_ID));
+      try {
+        String fullURL = request.getRequestURL() + "?" + request.getQueryString();
+        URI uri = new URI(fullURL);
+        request.getSession().setAttribute("loginURL", uri.getPath());
+        request.getSession().setAttribute(USER_ID, params.get(USER_ID));
+        request.getSession().setAttribute(ETRX_OAUTH_PROVIDER_ID, params.get(ETRX_OAUTH_PROVIDER_ID));
+      } catch (URISyntaxException e) {
+        request.setAttribute("errorMessage" , "internal_error");
+        throw new RuntimeException("Error parsing URI", e);
+      }
     }
       filterChain.doFilter(request, response);
   }
@@ -66,12 +77,12 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
    * @return a map of parameter names and values
    */
   private static Map<String, String> parseQueryString(String queryString) {
-    if (queryString == null) return Map.of();
-    return Stream.of(queryString.split("&"))
-        .map(pair -> pair.split("="))
+    if (StringUtils.isBlank(queryString)) return Map.of();
+    return Arrays.stream(queryString.split("&"))
+        .map(pair -> pair.split("=", 2))
         .collect(Collectors.toMap(
             pair -> pair[0],
-            pair -> pair.length > 1 ? pair[1] : null
+            pair -> pair.length > 1 ? pair[1] : ""
         ));
   }
 }

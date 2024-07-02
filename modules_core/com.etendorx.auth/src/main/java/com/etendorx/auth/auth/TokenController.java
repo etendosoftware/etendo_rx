@@ -74,77 +74,18 @@ public class TokenController {
     }
   }
 
-  public static String generateHtml(String title, String titleColor, String icon, String iconColor, String message) {
-    return """
-           <!DOCTYPE html>
-           <html>
-           <head>
-               <title>"""
-        + title +
-        """
-        </title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f9;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-            }
-            .container {
-                background-color: #fff;
-                padding: 40px;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                text-align: center;
-                max-width: 500px;
-                width: 100%;
-            }
-            h1 {
-                color: 
-        """
-        + titleColor + ";" +
-        """
-                margin-bottom: 20px;
-            }
-            p {
-                color: #333;
-                font-size: 18px;
-                margin-bottom: 0;
-            }
-            .icon {
-                font-size: 50px;
-                color: 
-        """
-        + iconColor + ";" +
-        """
-                margin-bottom: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="icon">
-    """
-        + icon +
-        """
-                </div>
-                <h1>
-        """
-        + title +
-        """
-                </h1>
-                <p>
-        """
-        + message +
-        """
-            </p>
-            </div>
-        </body>
-        </html>
-        """;
+  public String generateHtml(String title, String titleColor, String icon, String iconColor, String message) {
+    try {
+      Resource resource = resourceLoader.getResource("classpath:templates/oAuthResponse.html");
+      String html = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+      html = html.replace("{{title}}", title)
+          .replace("{{titleColor}}", titleColor)
+          .replace("{{icon}}", icon)
+          .replace("{{iconColor}}", iconColor)
+          .replace("{{message}}", message);
+      return html;
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading HTML template", e);
+    }
   }
 }
