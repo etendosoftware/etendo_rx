@@ -1,6 +1,8 @@
 package com.etendorx.auth.auth;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -42,7 +44,6 @@ public class AuthErrorController implements ErrorController {
       case "token_failed":
         title = "Token Creation Failed";
         errorMessage = "Token creation failed! Try again later. If the problem persists, please contact your system administrator.";
-        httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         break;
       case "conn_refuse_das":
         title = "Connection Refused";
@@ -57,7 +58,6 @@ public class AuthErrorController implements ErrorController {
       case "internal_error":
         title = "Internal Error";
         errorMessage = "An internal error occurred.";
-        httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         break;
       default:
         title = "Error";
@@ -73,7 +73,8 @@ public class AuthErrorController implements ErrorController {
   public String generateHtml(String title, String titleColor, String icon, String iconColor, String message, String loginURL) {
     try {
       Resource resource = resourceLoader.getResource("classpath:templates/oAuthResponse.html");
-      String html = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+      InputStream inputStream = resource.getInputStream();
+      String html = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
       html = html.replace("{{title}}", title)
           .replace("{{titleColor}}", titleColor)
           .replace("{{icon}}", icon)

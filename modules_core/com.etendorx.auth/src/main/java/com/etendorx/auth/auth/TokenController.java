@@ -1,6 +1,8 @@
 package com.etendorx.auth.auth;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -40,7 +42,7 @@ public class TokenController {
   String dasUrl;
 
   @GetMapping("/api/genToken")
-  public Object index(HttpServletRequest request, @RequestHeader Map<String, String> headers, @RequestParam(required = false) String userId,
+  public Object index(HttpServletRequest request, @RequestParam(required = false) String userId,
       @RequestParam(required = false) String etrxOauthProviderId) {
     try {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -77,7 +79,8 @@ public class TokenController {
   public String generateHtml(String title, String titleColor, String icon, String iconColor, String message) {
     try {
       Resource resource = resourceLoader.getResource("classpath:templates/oAuthResponse.html");
-      String html = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+      InputStream inputStream = resource.getInputStream();
+      String html = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
       html = html.replace("{{title}}", title)
           .replace("{{titleColor}}", titleColor)
           .replace("{{icon}}", icon)
