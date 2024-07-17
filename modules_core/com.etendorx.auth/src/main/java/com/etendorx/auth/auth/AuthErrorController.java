@@ -71,9 +71,10 @@ public class AuthErrorController implements ErrorController {
   }
 
   public String generateHtml(String title, String titleColor, String icon, String iconColor, String message, String loginURL) {
-    try {
-      Resource resource = resourceLoader.getResource("classpath:templates/oAuthResponse.html");
-      InputStream inputStream = resource.getInputStream();
+    try (InputStream inputStream = getClass().getResourceAsStream("/templates/oAuthResponse.html")) {
+      if (inputStream == null) {
+        throw new RuntimeException("Resource not found: templates/oAuthResponse.html");
+      }
       String html = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
       html = html.replace("{{title}}", title)
           .replace("{{titleColor}}", titleColor)
