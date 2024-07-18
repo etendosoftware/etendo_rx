@@ -57,7 +57,9 @@ dependencyManagement {
 
 configurations {
     codegen
-    implementation.exclude module: 'com.etendorx.entities'
+    if(project.hasProperty('exclude.entities.jar') && project.property('exclude.entities.jar') == "true") {
+        implementation.exclude module: 'com.etendorx.entities'
+    }
 }
 
 dependencies {
