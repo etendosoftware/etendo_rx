@@ -16,7 +16,6 @@
 
 package com.etendorx.das.test;
 
-import com.etendorx.das.utils.TestcontainersUtils;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,19 +28,13 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
     "grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey })
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -64,14 +57,6 @@ public class RestCallTest {
   }
 
   private static final String TOKEN = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjk3MTM1NjE4LCJhZF91c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAiLCJhZF9yb2xlX2lkIjoiMCIsInNlYXJjaF9rZXkiOiIiLCJzZXJ2aWNlX2lkIjoiIn0.JXgTYhxyK23BZXJEOObs2n4ms4Fls3jXSsKNScT90j-22c8Ypo4ZYkjt0ucKLEjccuPSsxiyGfwH6fwtdoeAxSr9dQCQaV94jjJHXm75IgncgF1YHTUTCgZQ073prX6lyHdQZ0okhBrDMHiEo1_JWbLbEluiERzJFk0t9NYcXJcNAVvTK50zPJk4Ar0cwOEtIEP1nIPOeA8vQY2NBff5t3x_CCVNgdl3BC19nx-iWBf_6xyF0mRAs2uNQ5KI9aY63vjv_z1e_j4Wupff67oQHRwMLnJShemWnjbs71s6S5SbMrUfM2Z8TkLYC964rGlUYnmwHuCTkDoBDNKebYEINw";
-
-  @DynamicPropertySource
-  static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    TestcontainersUtils.setProperties(registry, postgreSQLContainer);
-  }
-
-  @Container
-  public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
   public static Stream<Arguments> validRequestParams() {
     return Stream.of(

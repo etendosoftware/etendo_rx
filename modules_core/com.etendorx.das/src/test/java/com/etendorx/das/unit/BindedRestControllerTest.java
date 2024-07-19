@@ -55,6 +55,11 @@ class BindedRestControllerTest {
     public String get_identifier() {
       return "_id";
     }
+
+    @Override
+    public String getTableId() {
+      throw new UnsupportedOperationException("Table ID is not set");
+    }
   }
 
   static class CarDTORead implements BaseDTOModel {
@@ -160,7 +165,7 @@ class BindedRestControllerTest {
     given(repository.save(any())).willReturn(savedEntity);
 
     // Execute
-    ResponseEntity<CarDTORead> response = controller.post(RAW_ENTITY);
+    ResponseEntity<Object> response = controller.post(RAW_ENTITY, null);
 
     // Assert
     assertEquals(HttpStatus.CREATED, response.getStatusCode());

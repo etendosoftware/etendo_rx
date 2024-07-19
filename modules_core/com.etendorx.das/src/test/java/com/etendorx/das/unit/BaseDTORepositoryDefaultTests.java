@@ -20,6 +20,7 @@ import com.etendorx.entities.entities.BaseDTORepositoryDefault;
 import com.etendorx.entities.entities.BaseSerializableObject;
 import com.etendorx.entities.mapper.lib.BaseDTOModel;
 import com.etendorx.entities.mapper.lib.DTOConverter;
+import com.etendorx.entities.mapper.lib.ExternalIdService;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.validation.ConstraintViolation;
@@ -63,6 +64,8 @@ class BaseDTORepositoryDefaultTests {
   Validator validator;
   @Mock
   BaseDASRepository<Car> repository;
+  @Mock
+  ExternalIdService externalIdService;
 
   @InjectMocks
   BaseDTORepositoryDefault<Car, CarDTO, CarDTO> baseDTORepositoryDefault;
@@ -86,6 +89,11 @@ class BaseDTORepositoryDefaultTests {
     @Override
     public String get_identifier() {
       return "_id";
+    }
+
+    @Override
+    public String getTableId() {
+      return "";
     }
   }
 
@@ -122,7 +130,6 @@ class BaseDTORepositoryDefaultTests {
     when(converter.convert(any(Car.class))).thenReturn(carDTOAfterSave);
     when(converter.convert(any(), any())).thenReturn(carBeforeSave);
     when(converter.convert(carAfterSave)).thenReturn(carDTOAfterSave);
-    when(converter.convertOneToMany(any(), any())).thenReturn(carAfterSave);
     //
     when(retriever.get(anyString())).thenReturn(carAfterSave);
     //
@@ -143,10 +150,8 @@ class BaseDTORepositoryDefaultTests {
     // Verify that the converter's convert method was called as expected
     verify(converter, times(1)).convert(carDTORead, null);
     verify(converter, times(2)).convert(carAfterSave);
-    verify(converter, times(1)).convertOneToMany(carDTORead, carAfterSave);
     verify(validator, times(1)).validate(carBeforeSave);
     verify(repository, times(1)).save(carBeforeSave);
-    verify(repository, times(1)).save(carAfterSave);
 
     // Optionally, assert the result of the save operation
     assertNotNull(result, "The result should not be null.");

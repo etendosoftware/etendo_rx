@@ -16,6 +16,7 @@
 package com.etendorx.entities.mapper.lib;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.hibernate.NonUniqueResultException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -36,12 +37,16 @@ import java.util.TreeSet;
 @Slf4j
 public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRetriever<E> {
 
+  protected abstract String getTableId();
+
+  protected abstract ExternalIdService getExternalIdService();
+
   /**
    * Returns the JPA repository that will be used to retrieve entities.
    *
    * @return The JPA repository.
    */
-  public abstract JpaSpecificationExecutor<E> getRepository();
+  protected abstract JpaSpecificationExecutor<E> getRepository();
 
   /**
    * Returns the keys that will be used to retrieve entities.
@@ -92,6 +97,7 @@ public abstract class JsonPathEntityRetrieverBase<E> implements JsonPathEntityRe
  * @throws NonUniqueResultException If more than one entity was found.
  * @throws IllegalArgumentException If the number of keys does not match the number of values.
  */
+@SuppressWarnings("unchecked")
 public E get(String[] keys, TreeSet<String> keyValues) throws NonUniqueResultException {
   Iterator<String> valueIterator = keyValues.iterator();
   if (keyValues.size() != keys.length) {
@@ -100,7 +106,8 @@ public E get(String[] keys, TreeSet<String> keyValues) throws NonUniqueResultExc
   List<Specification<E>> specs = new ArrayList<>();
 
   for (String key : keys) {
-    String value = valueIterator.next();
+    String idReceived = valueIterator.next();
+    final String value = getExternalIdService().convertExternalToInternalId(getTableId(), idReceived);
     specs.add((root, query, builder) -> builder.equal(root.get(key), value));
   }
   Specification<E> combinedSpec = specs.stream().reduce(Specification::and).orElse(null);
@@ -114,7 +121,8 @@ public E get(String[] keys, TreeSet<String> keyValues) throws NonUniqueResultExc
     log.error("Detected a non-unique result for the entity retrieval. This is a configuration error."
         + Arrays.toString(keys));
   }
-  return result.isEmpty() ? null : result.get(0);
+  // Unproxy the entity to avoid lazy loading issues
+  return result.isEmpty() ? null : (E) Hibernate.unproxy(result.get(0));
 }
 
   /**

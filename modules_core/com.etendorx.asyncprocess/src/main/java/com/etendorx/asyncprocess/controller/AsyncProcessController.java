@@ -19,6 +19,7 @@ package com.etendorx.asyncprocess.controller;
 import com.etendorx.asyncprocess.service.AsyncProcessService;
 import com.etendorx.lib.kafka.KafkaMessageUtil;
 import com.etendorx.lib.kafka.model.AsyncProcess;
+import com.etendorx.lib.kafka.model.AsyncProcessExecution;
 import com.etendorx.lib.kafka.model.AsyncProcessState;
 import com.etendorx.utils.auth.key.context.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,11 +42,7 @@ import reactor.core.publisher.Flux;
 import reactor.kafka.receiver.KafkaReceiver;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Controller for rest api access to async process
@@ -76,10 +73,12 @@ public class AsyncProcessController {
 
   @Operation(summary = "Get current status of execution")
   @GetMapping(value = "/{asyncProcessId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<AsyncProcess> getAsyncProcess(
+  public ResponseEntity<List<AsyncProcessExecution>> getAsyncProcess(
       @PathVariable("asyncProcessId") String asyncProcessId) {
     var asyncProcess = asyncProcessService.getAsyncProcess(asyncProcessId);
-    return ResponseEntity.ok(asyncProcess);
+    var exec = asyncProcess.getExecutions();
+    List<AsyncProcessExecution> ret = new ArrayList<>(exec);
+    return ResponseEntity.ok(ret);
   }
 
   @Operation(summary = "Get current status of execution")

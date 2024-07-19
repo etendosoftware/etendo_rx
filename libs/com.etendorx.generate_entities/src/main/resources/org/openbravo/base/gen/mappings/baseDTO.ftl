@@ -50,6 +50,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 public class ${mappingPrefix}${entity.externalName}DTO<#if entity.mappingType == "R">Read<#else>Write</#if> implements BaseDTOModel {
   <#if entity.mappingType == "R">
   @JsonProperty("id")
@@ -70,10 +72,16 @@ public class ${mappingPrefix}${entity.externalName}DTO<#if entity.mappingType ==
       </#if>
       <#assign columnType = "Object">
       <#if field.property??>
-        <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "Object">
-      </#if>
-      <#if field.property?? && columnType == "Object">
-        <#assign columnType = modelProvider.getColumnTypeName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "Object">
+        <#if field.fieldMapping == "EM" && genUtils.isOneToMany(field)>
+          <#assign columnType = "List<" + genUtils.getDto(field, entity.mappingType) + ">"/>
+        <#elseif field.fieldMapping == "EM" && field.createRelated?? && field.createRelated>
+          <#assign columnType = genUtils.getDto(field, entity.mappingType) />
+        <#else>
+          <#assign columnType = modelProvider.getColumnTypeFullQualified(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "Object">
+        </#if>
+        <#if columnType == "Object">
+          <#assign columnType = modelProvider.getColumnTypeName(entity.table, entity.table.name + "." + firstProperty(field.property)) ! "Object">
+        </#if>
       </#if>
   <#if entity.mappingType == "R">Object<#else>${columnType}</#if> <@toCamelCase field.name/>;
       <#if NamingUtil.isJavaReservedWord(field.name)>

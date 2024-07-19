@@ -16,7 +16,6 @@
 
 package com.etendorx.das.test;
 
-import com.etendorx.das.utils.TestcontainersUtils;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import com.etendorx.utils.auth.key.context.AppContext;
 import com.etendorx.utils.auth.key.context.FilterContext;
@@ -40,14 +39,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -66,7 +60,6 @@ import java.util.stream.Collectors;
 
 import static com.etendorx.utils.auth.key.context.FilterContext.setUserContextFromToken;
 
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
     "grpc.server.port=19091", "public-key=" + RepositoryTest.publicKey , "scan.basePackage=com.etendorx.subapp.product.javamap", "data-rest.enabled=true"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -98,14 +91,6 @@ public class RepositoryTest {
 
   @Autowired
   private UserContext userContext;
-
-  @DynamicPropertySource
-  static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    TestcontainersUtils.setProperties(registry, postgreSQLContainer);
-  }
-
-  @Container
-  public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
   @Test
   public void whenReadUser() {

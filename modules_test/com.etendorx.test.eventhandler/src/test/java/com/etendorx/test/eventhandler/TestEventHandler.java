@@ -19,7 +19,6 @@ package com.etendorx.test.eventhandler;
 import com.etendorx.das.EtendorxDasApplication;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import com.etendorx.test.eventhandler.component.EventHandlerUser;
-import com.etendorx.test.eventhandler.utils.TestcontainersUtils;
 import com.etendorx.utils.auth.key.context.AppContext;
 import com.etendorx.utils.auth.key.context.UserContext;
 import org.hibernate.event.spi.PreUpdateEvent;
@@ -32,18 +31,12 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "grpc.server.port=19091")
 @ContextConfiguration
 @Import(EtendorxDasApplication.class)
@@ -65,14 +58,6 @@ public class TestEventHandler {
 
   @Autowired
   private UserContext userContext;
-
-  @DynamicPropertySource
-  static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    TestcontainersUtils.setProperties(registry, postgreSQLContainer);
-  }
-
-  @Container
-  public static final PostgreSQLContainer<?> postgreSQLContainer = TestcontainersUtils.createDBContainer();
 
   @Test
   void testUpdateUserAndExecuteEventHandler() {

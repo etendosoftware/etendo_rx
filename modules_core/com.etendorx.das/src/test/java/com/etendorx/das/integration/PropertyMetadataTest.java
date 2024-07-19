@@ -19,8 +19,11 @@ import com.etendorx.entities.metadata.MetadataUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * This class contains integration tests for the MetadataUtil class.
@@ -28,7 +31,9 @@ import org.springframework.context.annotation.ComponentScan;
  * The tests verify the behavior of the getPropertyMetadata method when it is called with valid arguments.
  */
 @SpringBootTest(properties = {"spring.datasource.url="})
-@ComponentScan(basePackages = {"com.etendorx.das", "com.etendorx.entities"})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration
+@AutoConfigureMockMvc
 public class PropertyMetadataTest {
 
   /**

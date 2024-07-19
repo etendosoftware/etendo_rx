@@ -117,6 +117,11 @@ public class FilterContext extends OncePerRequestFilter {
     if (StringUtils.isNotBlank(dateFormatParam)) {
       userContext.setTimeZone(timeZoneParam);
     }
+    String externalSystemId = req.getParameter("externalSystemId");
+    if(StringUtils.isNotBlank(externalSystemId)) {
+      userContext.setExternalSystemId(externalSystemId);
+    }
+
   }
 
   private static boolean parseBooleanParameter(String paramValueStr, String nameParam,

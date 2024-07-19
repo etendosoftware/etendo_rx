@@ -25,10 +25,15 @@
   ${result}
   </#compress>
 </#macro>
-<#assign javaMappings = []>
+<#function firstProperty property>
+  <#list property?split(".") as part>
+    <#return part>
+  </#list>
+</#function>
+<#assign extMappings = []>
 <#list entity.fields as field>
-  <#if field.fieldMapping == "JM">
-    <#assign javaMappings = javaMappings + [field]>
+  <#if field.fieldMapping == "JM" || field.fieldMapping == "EM">
+    <#assign extMappings = extMappings + [field]>
   </#if>
 </#list>
 /**
@@ -48,45 +53,171 @@
 */
 package com.etendorx.entities.mappings;
 
+<#list extMappings as field>
+  <#if field.fieldMapping == "EM" && field.createRelated?? && field.createRelated>
+import com.etendorx.entities.jparepo.${genUtils.getRepository(field)};
+  </#if>
+</#list>
 import com.etendorx.entities.mapper.lib.DTOWriteMapping;
+import com.etendorx.entities.mapper.lib.ExternalIdService;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.etendorx.entities.entities.AuditServiceInterceptor;
+
+import java.util.ArrayList;
 
 @Component
 public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
 
-<#list javaMappings as field>
+  private final AuditServiceInterceptor auditServiceInterceptor;
+<#list extMappings as field>
+  <#if field.fieldMapping == "JM">
   private final DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name};
+  <#else>
+  private final ${genUtils.getRetriever(field)} ${field.name}Retriever;
+    <#if genUtils.isOneToMany(field) || (field.createRelated?? && field.createRelated)>
+  private final ${genUtils.getDTOConverter(field)} ${field.name}Converter;
+    </#if>
+    <#if !genUtils.isOneToMany(field) && (field.createRelated?? && field.createRelated)>
+  private final ${genUtils.getRepository(field)} ${field.name}Repository;
+    </#if>
+  </#if>
 </#list>
+  private final ExternalIdService externalIdService;
 
   public ${mappingPrefix}${entity.externalName}FieldConverterWrite(
-<#list javaMappings as field>
-    @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name}<#if field_has_next>,</#if>
+<#list extMappings as field>
+  <#if field.fieldMapping == "JM">
+    @Qualifier("${field.javaMapping.qualifier}") @Autowired DTOWriteMapping<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTOWrite> ${field.name},
+  <#else>
+    ${genUtils.getRetriever(field)} ${field.name}Retriever,
+    <#if genUtils.isOneToMany(field) || (field.createRelated?? && field.createRelated)>
+    ${genUtils.getDTOConverter(field)} ${field.name}Converter,
+    </#if>
+    <#if !genUtils.isOneToMany(field) && (field.createRelated?? && field.createRelated)>
+    ${genUtils.getRepository(field)} ${field.name}Repository,
+    </#if>
+  </#if>
 </#list>
+    AuditServiceInterceptor auditServiceInterceptor,
+    ExternalIdService externalIdService
   ) {
     super();
-<#list javaMappings as field>
+<#list extMappings as field>
+  <#if field.fieldMapping == "JM">
     this.${field.name} = ${field.name};
+  <#else>
+    this.${field.name}Retriever = ${field.name}Retriever;
+    <#if genUtils.isOneToMany(field) || (field.createRelated?? && field.createRelated)>
+    this.${field.name}Converter = ${field.name}Converter;
+    </#if>
+    <#if !genUtils.isOneToMany(field) && (field.createRelated?? && field.createRelated)>
+    this.${field.name}Repository = ${field.name}Repository;
+    </#if>
+  </#if>
 </#list>
+    this.auditServiceInterceptor = auditServiceInterceptor;
+    this.externalIdService = externalIdService;
   }
 
   public String getId(${mappingPrefix}${entity.externalName}DTOWrite entity) {
     return entity.getId();
   }
 
-<#list javaMappings as field>
+<#list extMappings as field>
+      <#if field.createRelated?? && field.createRelated>
+      // createRelated ${field.createRelated?c}
+      </#if>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
+    <#if field.fieldMapping == "JM">
     ${field.name}.map(entity, dto);
+    <#else>
+     <#if genUtils.isOneToMany(field)>
+      if(entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}() == null) {
+        entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(new ArrayList<>());
+      }
+      if(dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}() == null) {
+        return;
+      }
+      for (${genUtils.getDto(field, "")} el : dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}()) {
+        ${genUtils.getReturnType(field)} line = this.${field.name}Retriever.get(el.getId());
+        if(line == null) {
+          line = new ${genUtils.getReturnType(field)}();
+        }
+        <#if field.entityFieldMap??>
+          <#list field.entityFieldMap as relField>
+            <#if relField.property == "_identifier">
+        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+            <#else>
+        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+            </#if>
+          </#list>
+        </#if>
+        line = ${field.name}Converter.convert(el, line);
+        <#if field.entityFieldMap??>
+          <#list field.entityFieldMap as relField>
+            <#if relField.property == "_identifier">
+        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+            <#else>
+        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+            </#if>
+          </#list>
+        </#if>
+        auditServiceInterceptor.setAuditValues(line, true);
+        entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}().add(line);
+        externalIdService.add("${genUtils.getPropertyTableId(field)}", el.getId(), line);
+      }
+      <#else>
+      var dtoRel = dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}();
+      <#assign typeVar=genUtils.getReturnType(field)>
+      <#if typeVar == "Object">
+        <#assign typeVar="var">
+      </#if>
+      ${typeVar} el = dtoRel == null ? null : this.${field.name}Retriever.get(dtoRel.getId());
+        <#if field.createRelated?? && field.createRelated>
+      if(el == null) {
+        el = new ${genUtils.getReturnType(field)}();
+      }
+      <#if field.entityFieldMap??>
+        <#list field.entityFieldMap as relField>
+          <#if relField.property == "_identifier">
+      el.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+          <#else>
+      el.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+          </#if>
+        </#list>
+      </#if>
+      el = ${field.name}Converter.convert(dtoRel, el);
+      <#if field.entityFieldMap??>
+        <#list field.entityFieldMap as relField>
+          <#if relField.property == "_identifier">
+      el.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+          <#else>
+      el.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+          </#if>
+        </#list>
+      </#if>
+      auditServiceInterceptor.setAuditValues(el, true);
+      ${field.name}Repository.save(el);
+      externalIdService.add("${genUtils.getPropertyTableId(field)}", el.getId(), el);
+        </#if>
+      entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(el);
+      </#if>
+    </#if>
   }
 
 </#list>
 <#list entity.fields as field>
-  <#if (field.fieldMapping == "DM" || field.fieldMapping == "EM" || field.fieldMapping == "CM")>
+  <#if (field.fieldMapping == "DM" || field.fieldMapping == "CM")>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     <#if field.property??>
+      <#if field.property != "id">
     entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(dto.get<@toCamelCase field.name/>());
+      <#else>
+    // Id property is not directly assignable in writer
+      </#if>
     <#else>
     entity.set${field.name?cap_first}(dto.get<@toCamelCase field.name/>());
     </#if>

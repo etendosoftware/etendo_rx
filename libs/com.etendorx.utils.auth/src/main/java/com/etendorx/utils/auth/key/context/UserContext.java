@@ -52,4 +52,6 @@ public class UserContext {
   private String dateTimeFormat;
 
   private String timeZone;
+
+  private String externalSystemId;
 }

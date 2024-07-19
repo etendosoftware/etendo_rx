@@ -17,6 +17,7 @@ package com.etendorx.das.hibernate_interceptor;
 
 import com.etendorx.entities.entities.AuditServiceInterceptor;
 import com.etendorx.entities.entities.BaseRXObject;
+import com.etendorx.entities.entities.BaseSerializableObject;
 import com.etendorx.entities.jparepo.ADClientRepository;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import com.etendorx.entities.jparepo.OrganizationRepository;
@@ -70,5 +71,12 @@ public class AuditServiceInterceptorImpl implements AuditServiceInterceptor {
     }
     baseObject.setUpdatedBy(adUserRepository.findById(userContext.getUserId()).orElse(null));
     baseObject.setUpdated(new Date());
+  }
+
+  @Override
+  public void setAuditValues(BaseSerializableObject baseObject, boolean newRecord) {
+    if(baseObject instanceof BaseRXObject) {
+      setAuditValues((BaseRXObject) baseObject, newRecord);
+    }
   }
 }

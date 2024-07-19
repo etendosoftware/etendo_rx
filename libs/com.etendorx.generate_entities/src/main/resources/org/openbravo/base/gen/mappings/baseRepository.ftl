@@ -3,6 +3,7 @@ package com.etendorx.entities.mappings;
 import com.etendorx.entities.entities.AuditServiceInterceptor;
 import com.etendorx.entities.entities.BaseDTORepositoryDefault;
 import com.etendorx.entities.jparepo.${entity.table.name}Repository;
+import com.etendorx.entities.mapper.lib.ExternalIdService;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.validation.Validator;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
@@ -20,9 +21,10 @@ public class ${mappingPrefix}${entity.externalName}DTORepositoryDefault extends 
       ${mappingPrefix}${entity.externalName}DTOConverter converter,
       ${mappingPrefix}${entity.externalName}JsonPathRetriever retriever,
       AuditServiceInterceptor auditService,
-      Validator validator
+      Validator validator,
+      ExternalIdService externalIdService
     ) {
-    super(restCallTransactionHandler, repository, converter, retriever, auditService, validator);
+    super(restCallTransactionHandler, repository, converter, retriever, auditService, validator, externalIdService);
   }
 
   <#list modelProviderRX.getETRXRepositories(entity) as repo>
