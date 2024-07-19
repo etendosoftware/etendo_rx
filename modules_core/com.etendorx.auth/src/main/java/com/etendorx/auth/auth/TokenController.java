@@ -2,10 +2,13 @@ package com.etendorx.auth.auth;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
+
+import javax.swing.text.html.HTMLDocument;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.ResourceAccessException;
@@ -28,10 +30,13 @@ import org.springframework.web.client.RestTemplate;
 import com.etendorx.auth.auth.utils.TokenInfo;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RestController
 public class TokenController {
 
+  private static final String ERROR_MESSAGE = "errorMessage";
   @Autowired
   private ResourceLoader resourceLoader;
 
@@ -48,7 +53,7 @@ public class TokenController {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       DefaultOAuth2User user = (DefaultOAuth2User) authentication.getPrincipal();
       if (StringUtils.equals("FailedTokenCreation", user.getAttribute("name"))) {
-        request.setAttribute("errorMessage", "token_failed");
+        request.setAttribute(ERROR_MESSAGE, "token_failed");
         throw new IllegalArgumentException("Token creation failed! Try again later. " +
             "If the problem persists, please contact your system administrator.");
       }
@@ -66,18 +71,20 @@ public class TokenController {
           HttpMethod.POST,
           new HttpEntity<>(tokenInfo, tokenHeaders),
           TokenInfo.class);
-      authentication.setAuthenticated(false);
-
       return generateHtml("Execution Successful", "#4caf50", "&#10004;", "#4caf50", "Your request has been processed successfully.");
-
     } catch (ResourceAccessException e1) {
-      request.setAttribute("errorMessage", "conn_refuse_das");
+      log.error(e1.getMessage(), e1);
+      request.setAttribute(ERROR_MESSAGE, "conn_refuse_das");
       throw new ResourceAccessException("Connection refused with DAS service. Check if the service is Up and Running");
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      request.setAttribute(ERROR_MESSAGE, "internal_error");
+      throw new RuntimeException("An unexpected error occurred: " + e.getMessage(), e);
     }
   }
 
   public String generateHtml(String title, String titleColor, String icon, String iconColor, String message) {
-    try (InputStream inputStream = getClass().getResourceAsStream("/templates/oAuthResponse.html")) {
+    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("templates/oAuthResponse.html")) {
       if (inputStream == null) {
         throw new RuntimeException("Resource not found: templates/oAuthResponse.html");
       }
@@ -89,6 +96,7 @@ public class TokenController {
           .replace("{{message}}", message);
       return html;
     } catch (IOException e) {
+      log.error(e.getMessage(), e);
       throw new RuntimeException("Error reading HTML template", e);
     }
   }
