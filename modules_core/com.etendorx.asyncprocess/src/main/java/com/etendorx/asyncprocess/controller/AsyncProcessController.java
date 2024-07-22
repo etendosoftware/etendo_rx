@@ -16,16 +16,16 @@
 
 package com.etendorx.asyncprocess.controller;
 
-
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
+import com.etendorx.asyncprocess.service.AsyncProcessService;
+import com.etendorx.lib.kafka.KafkaMessageUtil;
+import com.etendorx.lib.kafka.model.AsyncProcess;
+import com.etendorx.lib.kafka.model.AsyncProcessExecution;
+import com.etendorx.lib.kafka.model.AsyncProcessState;
+import com.etendorx.utils.auth.key.context.UserContext;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,26 +36,13 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.etendorx.asyncprocess.service.AsyncProcessService;
-import com.etendorx.lib.kafka.KafkaMessageUtil;
-import com.etendorx.lib.kafka.model.AsyncProcess;
-import com.etendorx.lib.kafka.model.AsyncProcessState;
-import com.etendorx.utils.auth.key.context.UserContext;
-
-import io.swagger.v3.oas.annotations.Operation;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.kafka.receiver.KafkaReceiver;
+
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * Controller for rest api access to async process
@@ -74,8 +61,9 @@ public class AsyncProcessController {
   @Resource(name = "userContextBean")
   private UserContext currentUser;
 
-  public AsyncProcessController(AsyncProcessService asyncProcessService, KafkaMessageUtil kafkaMessageUtil,
-      StreamBridge streamBridge, KafkaReceiver<String, AsyncProcess> kafkaReceiver) {
+  public AsyncProcessController(AsyncProcessService asyncProcessService,
+      KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge,
+      KafkaReceiver<String, AsyncProcess> kafkaReceiver) {
     this.asyncProcessService = asyncProcessService;
     this.kafkaMessageUtil = kafkaMessageUtil;
     this.streamBridge = streamBridge;
@@ -84,10 +72,20 @@ public class AsyncProcessController {
   }
 
   @Operation(summary = "Get current status of execution")
-  @GetMapping(value = "/{asyncProcessId}", produces = "application/json")
-  public ResponseEntity<AsyncProcess> getAsyncProcess(@PathVariable("asyncProcessId") String asyncProcessId) {
+  @GetMapping(value = "/{asyncProcessId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<AsyncProcessExecution>> getAsyncProcess(
+      @PathVariable("asyncProcessId") String asyncProcessId) {
     var asyncProcess = asyncProcessService.getAsyncProcess(asyncProcessId);
-    return ResponseEntity.ok(asyncProcess);
+    var exec = asyncProcess.getExecutions();
+    List<AsyncProcessExecution> ret = new ArrayList<>(exec);
+    return ResponseEntity.ok(ret);
+  }
+
+  @Operation(summary = "Get current status of execution")
+  @GetMapping(value = "/latest", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<AsyncProcess>> getLatestAsyncProcess(
+      ) {
+    return ResponseEntity.ok(asyncProcessService.getLatestAsyncProcesses());
   }
 
   @SendTo("/topic/message")
@@ -98,10 +96,9 @@ public class AsyncProcessController {
   @Operation(summary = "Create the async process")
   @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public Map<String, String> index(
-      @RequestBody Map<String, Map<String, ?>> bodyChanges,
-      @RequestParam(required = false, name = "process") String processName
-  ) throws Exception {
+  public Map<String, String> index(@RequestBody Map<String, Map<String, ?>> bodyChanges,
+      @RequestParam(required = false, name = "process") String processName,
+      @RequestParam(required = false, name = "run_id") String runId) throws Exception {
     Map<String, String> ret = new HashMap<>();
     Map<String, Object> session = new HashMap<>();
 
@@ -109,7 +106,7 @@ public class AsyncProcessController {
     bodyChanges.put("session", session);
 
     try {
-      var uuid = message(kafkaMessageUtil, streamBridge, null, processName, bodyChanges);
+      String uuid = message(kafkaMessageUtil, streamBridge, runId, processName, bodyChanges);
       if (uuid != null) {
         ret.put("status", "OK");
         ret.put("id", uuid);
@@ -124,14 +121,14 @@ public class AsyncProcessController {
     return ret;
   }
 
-  public static String message(KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge, String reqUid,
-      String processName, Object bodyChanges) throws Exception {
+  public static String message(KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge,
+      String reqUid, String processName, Object bodyChanges) throws Exception {
     return message(kafkaMessageUtil, streamBridge, reqUid, processName, bodyChanges, null);
   }
 
-  public static String message(
-      KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge, String requestUuid, String processName,
-      Object bodyChanges, String messageDescription) throws Exception {
+  public static String message(KafkaMessageUtil kafkaMessageUtil, StreamBridge streamBridge,
+      String requestUuid, String processName, Object bodyChanges, String messageDescription)
+      throws Exception {
 
     String uuid;
     if (requestUuid == null) {
@@ -141,8 +138,7 @@ public class AsyncProcessController {
     }
 
     if (bodyChanges.getClass().isAssignableFrom(LinkedHashMap.class)) {
-      @SuppressWarnings("unchecked")
-      var localBody = (Map<String, Map<String, String>>) bodyChanges;
+      @SuppressWarnings("unchecked") var localBody = (Map<String, Map<String, String>>) bodyChanges;
       Map<String, String> session;
       if (localBody.containsKey("session")) {
         session = localBody.get("session");
@@ -150,16 +146,15 @@ public class AsyncProcessController {
         session = new LinkedHashMap<>();
         localBody.put("session", session);
       }
-      session.put("id", uuid);
+      session.put("run_id", uuid);
     }
 
-    kafkaMessageUtil.saveProcessExecution(
-        bodyChanges, uuid, messageDescription == null ? "Sync message received" : messageDescription,
-        AsyncProcessState.ACCEPTED
-    );
+    kafkaMessageUtil.saveProcessExecution(bodyChanges, uuid,
+        messageDescription == null ? "Sync message received" : messageDescription,
+        AsyncProcessState.ACCEPTED);
 
     Message<Object> message = MessageBuilder.withPayload(bodyChanges)
-        .setHeader(KafkaHeaders.MESSAGE_KEY, uuid.getBytes(StandardCharsets.UTF_8))
+        .setHeader(KafkaHeaders.KEY, uuid.getBytes(StandardCharsets.UTF_8))
         .build();
     if (!streamBridge.send(processName, message)) {
       throw new Exception("Error sending message");
@@ -178,8 +173,8 @@ public class AsyncProcessController {
 
   @GetMapping(value = "/sse/{processId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   Flux<ServerSentEvent<AsyncProcess>> getEventsFlux(@PathVariable String processId) {
-    return eventPublisher
-        .filter(asyncProcessServerSentEvent -> asyncProcessServerSentEvent.data().getId().equals(processId))
+    return eventPublisher.filter(
+            asyncProcessServerSentEvent -> asyncProcessServerSentEvent.data().getId().equals(processId))
         .map(ServerSentEvent::data)
         .map(this::clientEventToServerSentEvent)
         .doOnSubscribe(subscription -> log.info("[ON_SUBSCRIBE]"))
@@ -189,8 +184,6 @@ public class AsyncProcessController {
   }
 
   private ServerSentEvent<AsyncProcess> clientEventToServerSentEvent(AsyncProcess event) {
-    return ServerSentEvent.<AsyncProcess>builder()
-        .data(event)
-        .build();
+    return ServerSentEvent.<AsyncProcess>builder().data(event).build();
   }
 }

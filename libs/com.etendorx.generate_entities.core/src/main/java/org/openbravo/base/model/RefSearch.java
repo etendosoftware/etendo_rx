@@ -45,7 +45,7 @@ public class RefSearch extends ModelObject {
     final DomainType domainType = referenceObj.getDomainType();
     if (!(domainType instanceof SearchDomainType)) {
       log.error(
-        "Domain type of reference " + referenceObj.getId() + " is not a TableDomainType but a " + domainType);
+          "Domain type of reference " + referenceObj.getId() + " is not a TableDomainType but a " + domainType);
     } else {
       ((SearchDomainType) domainType).setRefSearch(this);
     }

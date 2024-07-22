@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.etendorx.utils.auth.key.context;
 
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * User context information for the current request
+ */
 @Setter
 @Getter
 public class UserContext {
@@ -43,4 +45,13 @@ public class UserContext {
 
   private String restMethod;
 
+  private boolean isTriggerEnabled;
+
+  private String dateFormat;
+
+  private String dateTimeFormat;
+
+  private String timeZone;
+
+  private String externalSystemId;
 }

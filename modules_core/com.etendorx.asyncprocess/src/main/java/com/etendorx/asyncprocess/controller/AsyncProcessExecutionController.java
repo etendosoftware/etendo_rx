@@ -36,12 +36,14 @@ public class AsyncProcessExecutionController {
   private final AsyncProcessExecutionService asyncProcessExecutionService;
 
   @Autowired
-  public AsyncProcessExecutionController(AsyncProcessExecutionService asyncProcessExecutionService) {
+  public AsyncProcessExecutionController(
+      AsyncProcessExecutionService asyncProcessExecutionService) {
     this.asyncProcessExecutionService = asyncProcessExecutionService;
   }
 
   @PostMapping(value = "/", produces = "application/json")
-  public ResponseEntity<AsyncProcessExecution> postAsyncProcess(@RequestBody AsyncProcessExecution asyncProcessExecution) {
+  public ResponseEntity<AsyncProcessExecution> postAsyncProcess(
+      @RequestBody AsyncProcessExecution asyncProcessExecution) {
     log.info("exec {}", asyncProcessExecution);
     asyncProcessExecutionService.save(asyncProcessExecution);
     return ResponseEntity.ok(asyncProcessExecution);

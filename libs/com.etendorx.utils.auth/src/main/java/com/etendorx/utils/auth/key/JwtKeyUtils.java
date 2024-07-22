@@ -1,10 +1,15 @@
 package com.etendorx.utils.auth.key;
 
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.DefaultClaims;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -17,17 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.DefaultClaims;
 
 public class JwtKeyUtils {
 
@@ -43,35 +37,23 @@ public class JwtKeyUtils {
   /**
    * Generates a {@link PrivateKey} from a key String
    *
-   * @param privateKeyStr
-   *   The raw key String
-   *
+   * @param privateKeyStr The raw key String
    * @return {@link PrivateKey}
    */
   public static PrivateKey readPrivateKey(String privateKeyStr) {
-    return readKey(
-      privateKeyStr,
-      "PRIVATE",
-      JwtKeyUtils::privateKeySpec,
-      JwtKeyUtils::privateKeyGenerator
-    );
+    return readKey(privateKeyStr, "PRIVATE", JwtKeyUtils::privateKeySpec,
+        JwtKeyUtils::privateKeyGenerator);
   }
 
   /**
    * Generates a {@link PublicKey} from a key String
    *
-   * @param publicKeyStr
-   *   The raw key String
-   *
+   * @param publicKeyStr The raw key String
    * @return {@link PublicKey}
    */
   public static PublicKey readPublicKey(String publicKeyStr) {
-    return readKey(
-      publicKeyStr,
-      "PUBLIC",
-      JwtKeyUtils::publicKeySpec,
-      JwtKeyUtils::publicKeyGenerator
-    );
+    return readKey(publicKeyStr, "PUBLIC", JwtKeyUtils::publicKeySpec,
+        JwtKeyUtils::publicKeyGenerator);
   }
 
   public static boolean isValidToken(PublicKey publicKey, String jwt) {
@@ -87,10 +69,12 @@ public class JwtKeyUtils {
   }
 
   public static Claims getJwtClaims(PublicKey publicKey, String jwt) {
-    return Jwts.parser().setSigningKey(publicKey).parseClaimsJws(jwt).getBody();
+    return Jwts.parser().setSigningKey(publicKey).build().parseClaimsJws(jwt).getBody();
   }
 
-  public static <T extends Key> T readKey(String originalKey, String spec, Function<String, EncodedKeySpec> keySpec, BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator) {
+  public static <T extends Key> T readKey(String originalKey, String spec,
+      Function<String, EncodedKeySpec> keySpec,
+      BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator) {
     try {
       String cleanKey = cleanKeyHeaders(originalKey, spec);
       return keyGenerator.apply(KeyFactory.getInstance("RSA"), keySpec.apply(cleanKey));
@@ -129,40 +113,43 @@ public class JwtKeyUtils {
     return key.replaceAll("\\s+", "");
   }
 
-  public static Claims parseUnsignedToken(String token) {
-    String[] splitToken = token.split("\\.");
-    return (Claims) Jwts.parser().parse(splitToken[0] + "." + splitToken[1] + ".").getBody();
+  public static Claims parseUnsignedToken(String publicKey, String token) {
+    PublicKey pk = JwtKeyUtils.readPublicKey(publicKey);
+    return JwtKeyUtils.getJwtClaims(pk, token);
   }
 
   public static String generateJwtToken(PrivateKey privateKey, Claims claims, String iss) {
     return Jwts.builder()
-      .setIssuer(iss)
-      .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-      .addClaims(claims)
-      .signWith(SignatureAlgorithm.RS256, privateKey)
-      .compact();
+        .setIssuer(iss)
+        .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
+        .addClaims(claims)
+        .signWith(SignatureAlgorithm.RS256, privateKey)
+        .compact();
   }
 
-  public static Map<String, Object> getTokenValues(String token) {
+  public static Map<String, Object> getTokenValues(String publicKey, String token) {
     try {
-      return new HashMap<>(parseUnsignedToken(token));
+      return new HashMap<>(parseUnsignedToken(publicKey, token));
     } catch (Exception e) {
       logger.error("Error parsing the token '{}' - {}", token, e.getMessage());
       throw new IllegalArgumentException(e);
     }
   }
 
-  public static void validateTokenValues(Map<String, Object> tokenValuesMap, List<String> keyValues) {
+  public static void validateTokenValues(Map<String, Object> tokenValuesMap,
+      List<String> keyValues) {
     for (String keyValue : keyValues) {
       if (!tokenValuesMap.containsKey(keyValue)) {
-        throw new IllegalArgumentException("The token is missing the required key value '" + keyValue + "'");
+        throw new IllegalArgumentException(
+            "The token is missing the required key value '" + keyValue + "'");
       }
     }
   }
 
   public static Claims generateUserClaims(String userId, String clientId, String orgId,
-                                          String roleId, String searchKey, String serviceId) {
-    Claims claims = new DefaultClaims();
+      String roleId, String searchKey, String serviceId) {
+    Map<String, Object> map = new HashMap<>();
+    Claims claims = new DefaultClaims(map);
     claims.put(USER_ID_CLAIM, userId);
     claims.put(CLIENT_ID_CLAIM, clientId);
     claims.put(ORG_ID, orgId);

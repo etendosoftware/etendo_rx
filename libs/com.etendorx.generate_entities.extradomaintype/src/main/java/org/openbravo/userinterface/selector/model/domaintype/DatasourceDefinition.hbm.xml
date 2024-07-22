@@ -17,7 +17,8 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="org.openbravo.userinterface.selector.model.domaintype.DatasourceDefinition" lazy="false"
+    <class name="org.openbravo.userinterface.selector.model.domaintype.DatasourceDefinition"
+           lazy="false"
            table="obserds_datasource">
         <cache usage="read-write"/>
 
@@ -25,6 +26,7 @@
             <generator class="org.etendorx.base.session.DalUUIDGenerator"/>
         </id>
 
-        <many-to-one name="table" not-null="false" class="org.openbravo.base.model.Table" column="ad_table_id"/>
+        <many-to-one name="table" not-null="false" class="org.openbravo.base.model.Table"
+                     column="ad_table_id"/>
     </class>
 </hibernate-mapping>

@@ -61,7 +61,7 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
         " where s.referenceId = :referenceId";
     //@formatter:on
     Query<SelectorDefinition> query = session.createQuery(hql, SelectorDefinition.class)
-      .setParameter("referenceId", getReference().getId());
+        .setParameter("referenceId", getReference().getId());
     final List<SelectorDefinition> list = query.list();
     if (list.isEmpty()) {
       // a base reference
@@ -72,7 +72,7 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
       return;
     } else if (list.size() > 1) {
       log.warn(
-        "Reference " + getReference() + " has more than one selector definition, only one is really used");
+          "Reference " + getReference() + " has more than one selector definition, only one is really used");
     }
     final SelectorDefinition selectorDefinition = list.get(0);
     Table table = selectorDefinition.getTable();
@@ -81,7 +81,7 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
     }
     if (table == null) {
       throw new IllegalStateException(
-        "The selector " + selectorDefinition.getIdentifier() + " is used in a foreign key reference but no table has been set");
+          "The selector " + selectorDefinition.getIdentifier() + " is used in a foreign key reference but no table has been set");
     }
     tableName = table.getTableName();
     if (selectorDefinition.getColumn() == null) {
@@ -119,7 +119,7 @@ public class SelectorDomainType extends BaseForeignKeyDomainType {
   public Column getForeignKeyColumn(String columnName) {
     while (!column.isKey() && column.getDomainType() instanceof ForeignKeyDomainType) {
       column = ((ForeignKeyDomainType) column.getDomainType()).getForeignKeyColumn(
-        column.getColumnName());
+          column.getColumnName());
       tableName = column.getTable().getName();
     }
     return column;

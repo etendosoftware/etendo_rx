@@ -1,9 +1,8 @@
 package com.etendorx.auth.auth;
 
+import com.etendorx.utils.auth.key.context.AllowedURIS;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import com.etendorx.utils.auth.key.context.AllowedURIS;
 
 @Component
 public class AuthAllowedURIs implements AllowedURIS {

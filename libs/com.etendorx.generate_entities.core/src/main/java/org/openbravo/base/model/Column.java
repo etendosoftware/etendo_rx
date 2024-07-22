@@ -91,7 +91,7 @@ public class Column extends ModelObject {
 
   public boolean isBoolean() {
     return isPrimitiveType() && (getPrimitiveType().getName()
-      .compareTo("boolean") == 0 || Boolean.class == getPrimitiveType());
+        .compareTo("boolean") == 0 || Boolean.class == getPrimitiveType());
   }
 
   public String getColumnName() {
@@ -244,9 +244,9 @@ public class Column extends ModelObject {
       // for infinite looping, see issue:
       // https://issues.etendorx.com/view.php?id=8632
       if (thatColumn != null && (!thatColumn.isSuperActive() || !thatColumn.getTable()
-        .isActive())) {
+          .isActive())) {
         log.error(
-          "Column " + this + " refers to a non active table or column or to a view" + thatColumn);
+            "Column " + this + " refers to a non active table or column or to a view" + thatColumn);
       }
     }
     return super.isActive();
@@ -274,12 +274,12 @@ public class Column extends ModelObject {
 
     try {
       setReferenceType(
-        ((ForeignKeyDomainType) getDomainType()).getForeignKeyColumn(getColumnName()));
+          ((ForeignKeyDomainType) getDomainType()).getForeignKeyColumn(getColumnName()));
     } catch (final Exception e) {
       if (!OBPropertiesProvider.isFriendlyWarnings()) {
         log.error(
-          "No referenced column found: error >> tableName: " + table.getTableName() + " - columnName: " + getColumnName(),
-          e);
+            "No referenced column found: error >> tableName: " + table.getTableName() + " - columnName: " + getColumnName(),
+            e);
       }
     }
   }

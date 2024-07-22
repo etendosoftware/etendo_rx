@@ -1,6 +1,7 @@
 package com.etendorx.edge.filters.auth;
 
 import com.etendorx.utils.auth.key.JwtKeyUtils;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -14,13 +15,12 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.security.PublicKey;
 
-
 @Component
-public class JwtAuthenticationFilter implements GatewayFilterFactory<JwtAuthenticationFilter.Config> {
+public class JwtAuthenticationFilter
+    implements GatewayFilterFactory<JwtAuthenticationFilter.Config> {
 
   public static final String TOKEN_HEADER = "X-TOKEN";
   public static final String PUBLIC_KEY_LOCATION = "public.key.location";

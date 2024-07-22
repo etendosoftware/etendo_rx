@@ -5,19 +5,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AuthConfig {
-    @Value("${token}")
-    private String token;
+  @Value("${token}")
+  private String token;
 
-    @Value("${private-key}")
-    private String privateKey;
+  @Value("${private-key}")
+  private String privateKey;
 
+  public String getToken() {
+    return token;
+  }
 
-    public String getToken() {
-        return token;
-    }
-
-    public String getPrivateKey() {
-        return privateKey;
-    }
+  public String getPrivateKey() {
+    return privateKey;
+  }
 }
 

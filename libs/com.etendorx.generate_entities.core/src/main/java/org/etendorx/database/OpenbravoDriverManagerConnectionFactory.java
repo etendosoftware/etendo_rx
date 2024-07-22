@@ -42,7 +42,7 @@ class OpenbravoDriverManagerConnectionFactory implements ConnectionFactory {
   }
 
   public OpenbravoDriverManagerConnectionFactory(String connectUri, String uname, String passwd,
-                                                 String dbSessionConfig, String rdbsm) {
+      String dbSessionConfig, String rdbsm) {
     this._props = null;
     this._dbSessionConfig = null;
     this._connectUri = connectUri;

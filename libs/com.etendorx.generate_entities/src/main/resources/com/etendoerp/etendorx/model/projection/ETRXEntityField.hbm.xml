@@ -17,7 +17,8 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="com.etendoerp.etendorx.model.projection.ETRXEntityField" lazy="false" table="etrx_entity_field">
+    <class name="com.etendoerp.etendorx.model.projection.ETRXEntityField" lazy="false"
+           table="etrx_entity_field">
         <cache usage="read-write"/>
 
         <id name="id" type="string" column="etrx_entity_field_id">
@@ -32,9 +33,38 @@
         <property name="property"/>
 
         <property name="name"/>
+        <property name="isMandatory" column="ismandatory"/>
+        <property name="identifiesUnivocally" column="identifies_univocally"/>
+        <property name="fieldMapping" column="field_mapping"/>
+        <property name="line" column="line"/>
+        <property name="jsonPath" column="jsonpath"/>
+        <property name="createRelated" type="org.etendorx.base.session.OBYesNoType"
+                  column="create_related"/>
 
-        <many-to-one name="entity" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
+        <many-to-one name="entity" not-null="true"
+                     class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
                      column="etrx_projection_entity_id"/>
+
+        <many-to-one name="javaMapping" not-null="true"
+                     class="com.etendoerp.etendorx.model.mapping.ETRXJavaMapping"
+                     column="etrx_java_mapping_id"/>
+
+        <many-to-one name="etrxProjectionEntityRelated" not-null="true"
+                     class="com.etendoerp.etendorx.model.projection.ETRXProjectionEntity"
+                     column="etrx_projection_entity_rel_id"
+                     foreign-key="etrx_projection_entity_id"/>
+
+        <many-to-one name="constantValue" not-null="true"
+                     class="com.etendoerp.etendorx.model.mapping.ETRXConstantValue"
+                     column="etrx_constant_value_id" foreign-key="etrx_constant_value_id"/>
+
+        <set name="entityFieldMap" table="etrx_entity_field_map" inverse="true"
+             cascade="save-update" lazy="true" fetch="select">
+            <key>
+                <column name="etrx_entity_field_id" not-null="true"/>
+            </key>
+            <one-to-many class="com.etendoerp.etendorx.model.projection.ETRXEntityFieldMap"/>
+        </set>
 
     </class>
 </hibernate-mapping>
