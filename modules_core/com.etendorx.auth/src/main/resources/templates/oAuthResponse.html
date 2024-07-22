@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title}}</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid #e0e0e0;
+        }
+        h1 {
+            color: #333333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        p {
+            color: #666666;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .icon {
+            font-size: 50px;
+            color: {{iconColor}};
+            margin-bottom: 20px;
+        }
+        .retry-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #1e1e30;
+            background-color: #ffda4a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .retry-button:hover {
+            background-color: #e6c842;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="icon">{{icon}}</div>
+    <h1>{{title}}</h1>
+    <p>{{message}}</p>
+    <div id="retry-container"></div>
+</div>
+<script>
+    var loginURL = "{{loginURL}}";
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var title = document.querySelector('h1').textContent.trim();
+        if (title === 'Access Denied') {
+            var retryButton = document.createElement('a');
+            retryButton.href = loginURL;
+            retryButton.className = 'retry-button';
+            retryButton.textContent = 'Retry';
+            document.getElementById('retry-container').appendChild(retryButton);
+        }
+    });
+</script>
+</body>
+</html>
