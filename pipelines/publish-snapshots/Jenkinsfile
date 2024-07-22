@@ -221,7 +221,9 @@ spec:
               bbdd.sessionConfig=select update_dateFormat('DD-MM-YYYY')\n
               rx.generateCode=true\n
               rx.computedColumns=true\n
-              rx.views=true\" > gradle.properties
+              rx.views=true\n
+              exclude.entities.jar=true\n
+              \"\n> gradle.properties
               export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
               """
 
