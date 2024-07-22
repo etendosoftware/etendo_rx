@@ -17,6 +17,7 @@
 package com.etendorx.das.test;
 
 import com.etendorx.utils.auth.key.context.AppContext;
+import com.etendorx.utils.auth.key.context.FilterContext;
 import com.etendorx.utils.auth.key.context.UserContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
