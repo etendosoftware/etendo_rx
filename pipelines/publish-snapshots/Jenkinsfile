@@ -223,7 +223,7 @@ spec:
               rx.computedColumns=true\n
               rx.views=true\n
               exclude.entities.jar=true\n
-              \"\n> gradle.properties
+              \" > gradle.properties
               export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
               """
 
