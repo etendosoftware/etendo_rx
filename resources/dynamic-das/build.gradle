@@ -1,0 +1,88 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = "${System.env.REPO_URL ?: 'https://repo.maven.apache.org/maven2/'}"
+        credentials {
+            username = System.getenv("REPO_USER")
+            password = System.getenv("REPO_PASSWORD")
+        }
+    }
+}
+
+def dynamicDependencies = System.getenv("DEPENDENCIES")?.split(",") ?: []
+
+dependencies {
+    // Add the dependencies to the project
+    dynamicDependencies.each { dep ->
+        // Add the dependency to the project with the flag transitive = false
+        implementation(dep.trim()) {
+            transitive = false
+        }
+    }
+}
+
+// Task to print environment variables (optional, for debugging)
+task printEnvVariables {
+    doLast {
+        println "Repository URL: ${System.env.REPO_URL}"
+        println "Main Class: ${System.env.MAIN_CLASS}"
+        println "Dependencies: ${System.env.DEPENDENCIES}"
+    }
+}
+
+task downloadJar(type: Copy) {
+    from configurations.runtimeClasspath
+    into 'libs'
+    include '**/*.jar'
+    rename { fileName ->
+        'app.jar'
+    }
+
+    doLast {
+        configurations.runtimeClasspath.each { println it }
+    }
+}
+
+task runJar(dependsOn: 'downloadJar', type: Exec) {
+    workingDir 'libs'
+    commandLine 'java', '-jar', 'app.jar'
+}
+
+task waitForConfigServer {
+    doLast {
+        // get environment variable CONFIG_SERVER_URL
+        def configServerUrl = System.getenv("CONFIG_SERVER_URL")
+        println("CONFIG_SERVER_URL: $configServerUrl")
+        // check if the environment variable CONFIG_SERVER_URL is set
+        if (configServerUrl == null || configServerUrl.isEmpty()) {
+            println("Skipping the wait for the config server")
+            return
+        }
+        // wait for the config server to be ready
+        def ready = false
+        println "Waiting for the config server to be ready..."
+        while (!ready) {
+            print(".")
+            try {
+                URL url = new URL(configServerUrl + "/application/default")
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection()
+                connection.setRequestMethod('GET')
+                connection.connect()
+                int responseCode = connection.getResponseCode()
+                if (responseCode >= 200 && responseCode < 300) {
+                } else {
+                    throw new GradleException("URL responded with non-20x status code: $responseCode")
+                }
+                connection.disconnect()
+                ready = true
+            } catch (Exception e) {
+                Thread.sleep(1000)
+            }
+        }
+    }
+}
+
