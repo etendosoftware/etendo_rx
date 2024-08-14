@@ -35,6 +35,10 @@ import java.util.stream.Collectors;
 @Log4j2
 public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
 
+  public <F> ReturnKey<F> read(DocumentContext ctx, String path, Class<F> clazz) {
+    return read(ctx, path, clazz, null);
+  }
+
   /**
    * Reads a value from the provided DocumentContext at the specified path and returns it as an instance of the provided class.
    * If the value cannot be read or is not of the expected class, it returns a ReturnKey with error information.
@@ -44,9 +48,12 @@ public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
    * @param clazz The class of the value to be read.
    * @return A ReturnKey containing the read value and error information.
    */
-  public <F> ReturnKey<F> read(DocumentContext ctx, String path, Class<F> clazz) {
+  public <F> ReturnKey<F> read(DocumentContext ctx, String path, Class<F> clazz, Object defaultValue) {
     try {
       F value = ctx.read(path, clazz);
+      if(value == null && defaultValue != null && clazz.isAssignableFrom(defaultValue.getClass())) {
+        value = (F) defaultValue;
+      }
       log.debug("    readedPath '{}' '{}'", path, value);
       // Is an error if the value is not of the expected class
       boolean nullValue = !clazz.isAssignableFrom(value.getClass());
