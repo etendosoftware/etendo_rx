@@ -27,6 +27,7 @@ public class Module extends ModelObject {
   private String name;
   private Integer seqno;
   private String javaPackage;
+  private String version;
 
   @Override
   public String getName() {
@@ -52,5 +53,13 @@ public class Module extends ModelObject {
 
   public void setJavaPackage(String javaPackage) {
     this.javaPackage = javaPackage;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 }

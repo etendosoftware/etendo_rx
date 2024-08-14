@@ -76,8 +76,7 @@ public class DalConnectionProvider implements ConnectionProvider {
   }
 
   /**
-   * @param flush
-   *   if set to true, the getConnection method will flush the OBDal instance.
+   * @param flush if set to true, the getConnection method will flush the OBDal instance.
    */
   public DalConnectionProvider(boolean flush) {
     pool = ExternalConnectionPool.DEFAULT_POOL;
@@ -128,8 +127,7 @@ public class DalConnectionProvider implements ConnectionProvider {
   }
 
   @Override
-  public Connection getTransactionConnection()
-    throws NoConnectionAvailableException, SQLException {
+  public Connection getTransactionConnection() throws NoConnectionAvailableException, SQLException {
     Connection conn = SessionHandler.getInstance().getNewConnection(pool);
 
     if (conn == null) {
@@ -158,41 +156,39 @@ public class DalConnectionProvider implements ConnectionProvider {
   }
 
   @Override
-  public PreparedStatement getPreparedStatement(String SQLPreparedStatement)
-    throws Exception {
+  public PreparedStatement getPreparedStatement(String SQLPreparedStatement) throws Exception {
     return getPreparedStatement(getConnection(), SQLPreparedStatement);
   }
 
   @Override
-  public PreparedStatement getPreparedStatement(String poolName,
-                                                String SQLPreparedStatement) throws Exception {
+  public PreparedStatement getPreparedStatement(String poolName, String SQLPreparedStatement)
+      throws Exception {
     return getPreparedStatement(getConnection(), SQLPreparedStatement);
   }
 
   @Override
-  public PreparedStatement getPreparedStatement(Connection conn,
-                                                String SQLPreparedStatement) throws SQLException {
+  public PreparedStatement getPreparedStatement(Connection conn, String SQLPreparedStatement)
+      throws SQLException {
     PreparedStatement ps = conn.prepareStatement(SQLPreparedStatement,
-      ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
     return ps;
   }
 
   @Override
-  public CallableStatement getCallableStatement(String SQLCallableStatement)
-    throws Exception {
+  public CallableStatement getCallableStatement(String SQLCallableStatement) throws Exception {
     return getCallableStatement("", SQLCallableStatement);
   }
 
   @Override
-  public CallableStatement getCallableStatement(String poolName,
-                                                String SQLCallableStatement) throws Exception {
+  public CallableStatement getCallableStatement(String poolName, String SQLCallableStatement)
+      throws Exception {
     Connection conn = getConnection();
     return getCallableStatement(conn, SQLCallableStatement);
   }
 
   @Override
-  public CallableStatement getCallableStatement(Connection conn,
-                                                String SQLCallableStatement) throws SQLException {
+  public CallableStatement getCallableStatement(Connection conn, String SQLCallableStatement)
+      throws SQLException {
     if (conn == null || SQLCallableStatement == null || SQLCallableStatement.equals("")) {
       return null;
     }
@@ -229,8 +225,7 @@ public class DalConnectionProvider implements ConnectionProvider {
   }
 
   @Override
-  public void releasePreparedStatement(PreparedStatement preparedStatement)
-    throws SQLException {
+  public void releasePreparedStatement(PreparedStatement preparedStatement) throws SQLException {
     if (preparedStatement == null) {
       return;
     }
@@ -238,8 +233,7 @@ public class DalConnectionProvider implements ConnectionProvider {
   }
 
   @Override
-  public void releaseCallableStatement(CallableStatement callableStatement)
-    throws SQLException {
+  public void releaseCallableStatement(CallableStatement callableStatement) throws SQLException {
     if (callableStatement == null) {
       return;
     }
@@ -264,7 +258,7 @@ public class DalConnectionProvider implements ConnectionProvider {
 
   @Override
   public void releaseTransactionalPreparedStatement(PreparedStatement preparedStatement)
-    throws SQLException {
+      throws SQLException {
     if (preparedStatement == null) {
       return;
     }

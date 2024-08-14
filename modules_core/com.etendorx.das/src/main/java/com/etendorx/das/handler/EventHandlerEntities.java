@@ -1,24 +1,17 @@
 package com.etendorx.das.handler;
 
-import java.util.Date;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
-import org.springframework.data.rest.core.annotation.HandleBeforeSave;
-import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
-import org.springframework.stereotype.Component;
-
 import com.etendorx.entities.entities.BaseRXObject;
 import com.etendorx.entities.jparepo.ADClientRepository;
 import com.etendorx.entities.jparepo.ADUserRepository;
 import com.etendorx.entities.jparepo.OrganizationRepository;
 import com.etendorx.utils.auth.key.context.UserContext;
-
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
-@RepositoryEventHandler
+import java.util.Date;
+
 @Slf4j
 @Component
 public class EventHandlerEntities {
@@ -38,7 +31,6 @@ public class EventHandlerEntities {
     return userContext;
   }
 
-  @HandleBeforeCreate
   public void handleBeforeCreate(BaseRXObject entity) {
     log.info("handleBeforeCreate {}", entity);
     UserContext userContext = getUserContext();
@@ -64,7 +56,6 @@ public class EventHandlerEntities {
     entity.setActive(true);
   }
 
-  @HandleBeforeSave
   public void handleBeforeSave(BaseRXObject entity) {
     log.info("handleBeforeSave {}", entity);
     UserContext userContext = getUserContext();

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface ServiceClient {
 
   @GetMapping("/search/searchByServiceId?serviceId={serviceId}&active={active}")
-  public ResponseEntity<String> searchServiceByServiceId(@PathVariable(name = "serviceId") String serviceId, @PathVariable(name = "active") boolean active, @RequestHeader HttpHeaders headers);
+  public ResponseEntity<String> searchServiceByServiceId(
+      @PathVariable(name = "serviceId") String serviceId,
+      @PathVariable(name = "active") boolean active, @RequestHeader HttpHeaders headers);
 }
 

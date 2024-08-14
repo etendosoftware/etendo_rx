@@ -44,8 +44,7 @@ public class OBClassLoader implements OBSingleton {
    * Load a class using the classloader. This method will throw an OBException if the class is not
    * found. This exception is logged.
    *
-   * @param className
-   *   the name of the class to load
+   * @param className the name of the class to load
    */
   public Class<?> loadClass(String className) throws ClassNotFoundException {
     return Thread.currentThread().getContextClassLoader().loadClass(className);

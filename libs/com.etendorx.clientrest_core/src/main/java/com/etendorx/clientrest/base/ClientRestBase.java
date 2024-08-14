@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.*;
 public interface ClientRestBase<T extends RepresentationWithId<T>> {
 
   @PatchMapping("/{id}")
-  ResponseEntity<T> update(@RequestBody T entity, @PathVariable String id, @RequestHeader("If-Match") String version);
+  ResponseEntity<T> update(@RequestBody T entity, @PathVariable String id,
+      @RequestHeader("If-Match") String version);
 
   @PatchMapping("/{id}")
-  ResponseEntity<T> update(@RequestBody T entity, @PathVariable String id, @RequestHeader HttpHeaders headers);
+  ResponseEntity<T> update(@RequestBody T entity, @PathVariable String id,
+      @RequestHeader HttpHeaders headers);
 
   @PostMapping("/{id}")
   ResponseEntity<T> post(@RequestBody T entity, @RequestHeader HttpHeaders headers);
@@ -35,18 +37,22 @@ public interface ClientRestBase<T extends RepresentationWithId<T>> {
   public ResponseEntity<T> save(@RequestBody T entity, @RequestHeader HttpHeaders headers);
 
   @PostMapping("/")
-  public ResponseEntity<T> saveRequest(@RequestBody RequestModel entity, @RequestHeader HttpHeaders headers);
+  public ResponseEntity<T> saveRequest(@RequestBody RequestModel entity,
+      @RequestHeader HttpHeaders headers);
 
   @DeleteMapping("/{id}")
   public void delete(@PathVariable String id);
 
   @GetMapping("/search/findAllCreated?startDate={startDate}&endDate={endDate}&page={page}&size={size}")
-  PagedModel<T> findAllCreated(@PathVariable String startDate, @PathVariable String endDate, @PathVariable int size, @PathVariable int page);
+  PagedModel<T> findAllCreated(@PathVariable String startDate, @PathVariable String endDate,
+      @PathVariable int size, @PathVariable int page);
 
   @GetMapping("/search/findAllUpdated?startDate={startDate}&endDate={endDate}&page={page}&size={size}")
-  PagedModel<T> findAllUpdated(@PathVariable String startDate, @PathVariable String endDate, @PathVariable int size, @PathVariable int page);
+  PagedModel<T> findAllUpdated(@PathVariable String startDate, @PathVariable String endDate,
+      @PathVariable int size, @PathVariable int page);
 
   @PatchMapping("/{id}/remoteid")
-  ResponseEntity<T> updateRemoteId(@RequestBody T entity, @PathVariable String id, @RequestHeader HttpHeaders headers);
+  ResponseEntity<T> updateRemoteId(@RequestBody T entity, @PathVariable String id,
+      @RequestHeader HttpHeaders headers);
 
 }

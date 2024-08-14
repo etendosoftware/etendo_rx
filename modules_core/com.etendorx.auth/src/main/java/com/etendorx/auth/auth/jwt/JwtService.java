@@ -23,11 +23,11 @@ public class JwtService {
   public JwtResponse generateJwtToken(Claims claims) {
     PrivateKey privateKey = jwtKeyProvider.getPrivateKey();
     String token = Jwts.builder()
-      .setIssuer(ISS)
-      .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-      .addClaims(claims)
-      .signWith(SignatureAlgorithm.RS256, privateKey)
-      .compact();
+        .setIssuer(ISS)
+        .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
+        .addClaims(claims)
+        .signWith(SignatureAlgorithm.RS256, privateKey)
+        .compact();
     return new JwtResponse(token);
   }
 

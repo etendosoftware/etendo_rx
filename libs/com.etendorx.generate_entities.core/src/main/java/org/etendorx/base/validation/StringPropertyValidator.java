@@ -58,7 +58,7 @@ public class StringPropertyValidator extends BasePropertyValidator {
   public void initialize() {
     if (getProperty().getFieldLength() <= 0) {
       log.error(
-        "Fieldlength of property " + getProperty().getName() + " should be larger than 0 for validation");
+          "Fieldlength of property " + getProperty().getName() + " should be larger than 0 for validation");
     } else {
       setFieldLength(getProperty().getFieldLength());
     }

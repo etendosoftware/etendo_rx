@@ -41,10 +41,11 @@ public abstract class EtendoTopologyBase<O, D extends ProcessModel<O, D>> {
     return () -> newInstanceSupplier.get();
   }
 
-  Materialized<String, D, KeyValueStore<Bytes, byte[]>> materialized(Serde<D> destinationSerde, String processTopic) {
+  Materialized<String, D, KeyValueStore<Bytes, byte[]>> materialized(Serde<D> destinationSerde,
+      String processTopic) {
     return Materialized.<String, D, KeyValueStore<Bytes, byte[]>>as(processTopic)
-      .withKeySerde(Serdes.String())
-      .withValueSerde(destinationSerde);
+        .withKeySerde(Serdes.String())
+        .withValueSerde(destinationSerde);
   }
 
 }

@@ -16,29 +16,23 @@
 
 package com.etendorx.asyncprocess;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * Main class to launch async process service
  */
 @SpringBootApplication
-@ComponentScan(basePackages = {
-  "com.etendorx.lib.asyncprocess.utils",
-  "com.etendorx.lib.kafka",
-  "com.etendorx.lib.kafka.configuration",
-  "com.etendorx.lib.kafka.topology",
-  "com.etendorx.asyncprocess",
-  "com.etendorx.asyncprocess.controller",
-  "com.etendorx.utils.auth.key.context"
-})
+@ComponentScan(basePackages = { "com.etendorx.lib.asyncprocess.utils", "com.etendorx.lib.kafka",
+    "com.etendorx.lib.kafka.configuration", "com.etendorx.lib.kafka.topology",
+    "com.etendorx.asyncprocess", "com.etendorx.asyncprocess.controller",
+    "com.etendorx.utils.auth.key.context" })
 @OpenAPIDefinition(info = @Info(title = "Async Process API", version = "1.0"))
 @SecurityScheme(name = "javainuseapi", scheme = "basic", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
 public class AsyncProcessDbApp {

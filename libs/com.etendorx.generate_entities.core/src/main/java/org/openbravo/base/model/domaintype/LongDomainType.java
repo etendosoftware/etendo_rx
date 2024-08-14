@@ -38,8 +38,7 @@ public class LongDomainType extends BasePrimitiveDomainType {
   }
 
   @Override
-  public void checkIsValidValue(Property property, Object value)
-    throws ValidationException {
+  public void checkIsValidValue(Property property, Object value) throws ValidationException {
     if (value == null) {
       return;
     }

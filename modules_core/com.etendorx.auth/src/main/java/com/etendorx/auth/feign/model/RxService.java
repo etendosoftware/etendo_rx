@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 public class RxService {
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private String secret;
-    private String searchkey;
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  private String secret;
+  private String searchkey;
 }
 
 

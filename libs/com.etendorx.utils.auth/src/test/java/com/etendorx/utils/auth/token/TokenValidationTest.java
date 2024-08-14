@@ -40,12 +40,8 @@ public class TokenValidationTest {
   }
 
   public static Stream<Arguments> invalidTokens() {
-    return Stream.of(
-      Arguments.of(""),
-      Arguments.of("invalidtoken"),
-      Arguments.of(TokenUtils.INVALID_TOKEN_0),
-      Arguments.of(TokenUtils.INVALID_TOKEN_1)
-    );
+    return Stream.of(Arguments.of(""), Arguments.of("invalidtoken"),
+        Arguments.of(TokenUtils.INVALID_TOKEN_0), Arguments.of(TokenUtils.INVALID_TOKEN_1));
   }
 
   @ParameterizedTest
@@ -57,10 +53,8 @@ public class TokenValidationTest {
   }
 
   public static Stream<Arguments> validTokens() {
-    return Stream.of(
-      Arguments.of(TokenUtils.VALID_TOKEN_0),
-      Arguments.of(TokenUtils.VALID_TOKEN_1)
-    );
+    return Stream.of(Arguments.of(TokenUtils.VALID_TOKEN_0),
+        Arguments.of(TokenUtils.VALID_TOKEN_1));
   }
 
   @ParameterizedTest

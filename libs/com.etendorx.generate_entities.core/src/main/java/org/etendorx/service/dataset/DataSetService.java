@@ -224,13 +224,9 @@ public class DataSetService implements OBSingleton {
   /**
    * Determines which objects are exportable using the DataSetTable whereClause.
    *
-   * @param dataSetTable
-   *   the dataSetTable defines the Entity and the whereClause to use
-   * @param moduleId
-   *   the moduleId is a parameter in the whereClause
-   * @param parameters
-   *   a collection of named parameters which are used in the whereClause of the dataSetTable
-   *
+   * @param dataSetTable the dataSetTable defines the Entity and the whereClause to use
+   * @param moduleId     the moduleId is a parameter in the whereClause
+   * @param parameters   a collection of named parameters which are used in the whereClause of the dataSetTable
    * @return the list of exportable business objects
    */
   @SuppressWarnings("unchecked")
@@ -290,18 +286,17 @@ public class DataSetService implements OBSingleton {
    * @return whereClause ready for execution and existingParams set
    */
   @Deprecated
-  private String getWhereClauseWithAliasesReplaced(String moduleId,
-                                                       Map<String, Object> parameters, String whereClauseWithAliases,
-                                                       Map<String, Object> paramsInWhereClause) {
+  private String getWhereClauseWithAliasesReplaced(String moduleId, Map<String, Object> parameters,
+      String whereClauseWithAliases, Map<String, Object> paramsInWhereClause) {
     String whereClause = whereClauseWithAliases;
     if (whereClauseWithAliases != null) {
       if (parameters != null) {
         String finalWhereClause = whereClause;
         parameters.keySet()
-          .stream()
-          .filter(name -> finalWhereClause.contains(":" + name))
-          .forEach(name -> paramsInWhereClause.put(name,
-            "null".equals(parameters.get(name)) ? null : parameters.get(name)));
+            .stream()
+            .filter(name -> finalWhereClause.contains(":" + name))
+            .forEach(name -> paramsInWhereClause.put(name,
+                "null".equals(parameters.get(name)) ? null : parameters.get(name)));
       }
       if (moduleId != null) {
         // Minimal checking that the moduleId has no spaces and seems to be an alphanumeric string
@@ -424,15 +419,10 @@ public class DataSetService implements OBSingleton {
    * definition. It will include transient properties depending on the parameter. Audit-info
    * properties are never exported
    *
-   * @param bob
-   *   the business object to export
-   * @param dataSetTable
-   *   the dataSetTable to export
-   * @param dataSetColumns
-   *   the list of potential columns to export
-   * @param exportTransients
-   *   if true then transient properties are also exportable
-   *
+   * @param bob              the business object to export
+   * @param dataSetTable     the dataSetTable to export
+   * @param dataSetColumns   the list of potential columns to export
+   * @param exportTransients if true then transient properties are also exportable
    * @return the list of properties which are exportable
    */
   /*

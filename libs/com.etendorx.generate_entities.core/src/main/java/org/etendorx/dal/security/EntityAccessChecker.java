@@ -229,8 +229,8 @@ public class EntityAccessChecker implements OBNotSingleton {
         + " where wa.role.id= :roleId";
       // @formatter:on
       final Query<Object[]> qry = SessionHandler.getInstance()
-        .createQuery(qryStr, Object[].class)
-        .setParameter("roleId", getRoleId());
+          .createQuery(qryStr, Object[].class)
+          .setParameter("roleId", getRoleId());
       final List<Object[]> tabData = qry.list();
 
       for (final Object[] os : tabData) {
@@ -292,7 +292,7 @@ public class EntityAccessChecker implements OBNotSingleton {
         for (String tableId : getTargetTablesIds(processTables)) {
           Entity targetSelectorEntity = ModelProvider.getInstance().getEntityByTableId(tableId);
           if (!writableEntities.contains(targetSelectorEntity) && !readableEntities.contains(
-            targetSelectorEntity)) {
+              targetSelectorEntity)) {
             derivedReadableEntities.add(targetSelectorEntity);
           }
         }
@@ -305,8 +305,8 @@ public class EntityAccessChecker implements OBNotSingleton {
         + " where p.role.id= :roleId";
       // @formatter:on
       Query<String> processAccessQry = SessionHandler.getInstance()
-        .createQuery(processAccessQryStr, String.class)
-        .setParameter("roleId", getRoleId());
+          .createQuery(processAccessQryStr, String.class)
+          .setParameter("roleId", getRoleId());
 
       final List<String> processAccessQuery = processAccessQry.list();
       for (final String processAccess : processAccessQuery) {
@@ -333,7 +333,7 @@ public class EntityAccessChecker implements OBNotSingleton {
   }
 
   private Set<String> getProcessAccess(Set<String> processTables,
-                                       List<Object[]> targetProcessAccess) {
+      List<Object[]> targetProcessAccess) {
     Set<String> targetProcesses = new HashSet<>();
     for (Object[] pa : targetProcessAccess) {
       if (processTables.contains(pa[TABLE_ID])) {
@@ -347,11 +347,8 @@ public class EntityAccessChecker implements OBNotSingleton {
    * Checks if a certain user access level and a certain data access level match. Meaning that with
    * a certain user access level it is allowed to view something with a certain data access level.
    *
-   * @param userLevel
-   *   the user level as defined in the role of the user
-   * @param accessLevel
-   *   the data access level defined in the table
-   *
+   * @param userLevel   the user level as defined in the role of the user
+   * @param accessLevel the data access level defined in the table
    * @return true if access is allowed, false otherwise
    */
   public static boolean hasCorrectAccessLevel(String userLevel, int accessLevel) {
@@ -365,10 +362,10 @@ public class EntityAccessChecker implements OBNotSingleton {
     } else if (accessLevel == 1 && userLevel.indexOf("O") == -1) {
       return false;
     } else if (accessLevel == 3 && (!(userLevel.indexOf("C") != -1 || userLevel.indexOf(
-      "O") != -1))) {
+        "O") != -1))) {
       return false;
     } else if (accessLevel == 6 && (!(userLevel.indexOf("S") != -1 || userLevel.indexOf(
-      "C") != -1))) {
+        "C") != -1))) {
       return false;
     }
     return true;
@@ -417,7 +414,7 @@ public class EntityAccessChecker implements OBNotSingleton {
     log.info("");
     log.info("");
     log.info(
-      ">>> Entities granted: " + (processes.size() + readableNotWritable.size() + writableEntities.size() + derivedEntitiesFromProcess.size() + derivedReadableEntities.size() + readableEntities.size()));
+        ">>> Entities granted: " + (processes.size() + readableNotWritable.size() + writableEntities.size() + derivedEntitiesFromProcess.size() + derivedReadableEntities.size() + readableEntities.size()));
 
   }
 
@@ -455,7 +452,7 @@ public class EntityAccessChecker implements OBNotSingleton {
   private void addDerivedReadableIdentifierProperties(Entity entity) {
     for (final Property p : entity.getProperties()) {
       if (p.isIdentifier() && p.getTargetEntity() != null && !readableEntities.contains(
-        p.getTargetEntity()) && !derivedReadableEntities.contains(p.getTargetEntity())) {
+          p.getTargetEntity()) && !derivedReadableEntities.contains(p.getTargetEntity())) {
         derivedReadableEntities.add(p.getTargetEntity());
         addDerivedReadableIdentifierProperties(p.getTargetEntity());
       }
@@ -463,9 +460,7 @@ public class EntityAccessChecker implements OBNotSingleton {
   }
 
   /**
-   * @param entity
-   *   the entity to check
-   *
+   * @param entity the entity to check
    * @return true if the entity is derived readable for this user, otherwise false is returned.
    */
   public boolean isDerivedReadable(Entity entity) {
@@ -482,9 +477,7 @@ public class EntityAccessChecker implements OBNotSingleton {
   }
 
   /**
-   * @param entity
-   *   the entity to check
-   *
+   * @param entity the entity to check
    * @return true if the entity is writable for this user, otherwise false is returned.
    */
   public boolean isWritable(Entity entity) {
@@ -502,8 +495,7 @@ public class EntityAccessChecker implements OBNotSingleton {
   /**
    * Checks if an entity is writable for this user. If not then a OBSecurityException is thrown.
    *
-   * @param entity
-   *   the entity to check
+   * @param entity the entity to check
    */
   public void checkWritable(Entity entity) {
     if (!isWritable(entity)) {
@@ -514,8 +506,7 @@ public class EntityAccessChecker implements OBNotSingleton {
   /**
    * Checks if an entity is readable for this user. If not then a OBSecurityException is thrown.
    *
-   * @param entity
-   *   the entity to check
+   * @param entity the entity to check
    */
   public void checkReadable(Entity entity) {
     // prevent infinite looping
@@ -532,16 +523,14 @@ public class EntityAccessChecker implements OBNotSingleton {
     }
 
     if (!readableEntities.contains(entity)) {
-      throw new OBSecurityException(
-        "Entity " + entity + " is not readable by the user ");
+      throw new OBSecurityException("Entity " + entity + " is not readable by the user ");
     }
   }
 
   /**
    * Checks if an entity is readable for current user. It is not take into account admin mode.
    *
-   * @param entity
-   *   the entity to check
+   * @param entity the entity to check
    */
   public void checkReadableAccess(Entity entity) {
     if (!isReadableWithoutAdminMode(entity)) {
@@ -552,8 +541,7 @@ public class EntityAccessChecker implements OBNotSingleton {
   /**
    * Checks if an entity is derived for current user. It is not take into account admin mode.
    *
-   * @param entity
-   *   the entity to check
+   * @param entity the entity to check
    */
   public void checkDerivedAccess(Entity entity) {
     if (!isDerivedWithoutAdminMode(entity)) {
@@ -564,8 +552,7 @@ public class EntityAccessChecker implements OBNotSingleton {
   /**
    * Checks if an entity is writable for current user. It is not take into account admin mode.
    *
-   * @param entity
-   *   the entity to check
+   * @param entity the entity to check
    */
   public void checkWritableAccess(Entity entity) {
     if (!isWritableWithoutAdminMode(entity)) {
@@ -721,8 +708,7 @@ public class EntityAccessChecker implements OBNotSingleton {
   private void addEntitiesOfSelectorReference(ModelProvider mp, Object[] ref) {
     final Entity derivedEntity = mp.getEntityByTableId((String) ref[SELECTED_TABLE_ID]);
     if (!writableEntities.contains(derivedEntity) && !readableEntities.contains(
-      derivedEntity) && !derivedReadableEntities.contains(
-      derivedEntity)) {
+        derivedEntity) && !derivedReadableEntities.contains(derivedEntity)) {
       derivedEntitiesFromProcess.add(derivedEntity);
     }
   }
@@ -734,8 +720,7 @@ public class EntityAccessChecker implements OBNotSingleton {
     tabsWithSelectors.add((String) ref[TAB_ID]);
 
     final Entity derivedEntity = mp.getEntityByTableId((String) ref[SELECTED_TABLE_ID]);
-    if (!writableEntities.contains(derivedEntity) && !readableEntities.contains(
-      derivedEntity)) {
+    if (!writableEntities.contains(derivedEntity) && !readableEntities.contains(derivedEntity)) {
       readableEntities.add(derivedEntity);
       writableEntities.add(derivedEntity);
       // Removed from derived entities

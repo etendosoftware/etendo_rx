@@ -23,7 +23,7 @@ pipeline {
         COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
         CATALINA_HOME       = "${WORKSPACE}/apache-tomcat-8.5.75"
         STATUSCORE          = "1"
-        BUILD_CLASSIC       = false
+        BUILD_CLASSIC       = true
         DOCKER_HOST         = '/home/jenkins/docker.sock'
         DOCKER_TLS_VERIFY   = 0
     }
@@ -43,7 +43,7 @@ metadata:
 spec:
   containers:
     - name: compiler
-      image: etendo/compiler_jenkins:1.0.4
+      image: etendo/compiler_jenkins:1.0.7
       ports:
         - name: ssh
           containerPort: 22
@@ -63,9 +63,6 @@ spec:
           mountPath: /root/.ssh/
         - name: docker-sock
           mountPath: /var/run/docker.sock
-      env:
-        - name: TESTCONTAINERS_IP
-          value: GATEWAY
       lifecycle:
         postStart:
           exec:
@@ -80,17 +77,15 @@ spec:
       terminationMessagePolicy: File
       imagePullPolicy: IfNotPresent
     - name: postgres
-      image: etendo/etendodata:rx-${BRANCH_NAME.replaceAll('/', '-')}
+      image: postgres:14
       workingDir: /home/jenkins
       env:
         - name: POSTGRES_PASSWORD
           value: syspass
-        - name: PGDATA
-          value: /postgres
       resources: {}
       terminationMessagePath: /dev/termination-log
       terminationMessagePolicy: File
-      imagePullPolicy: Always
+      imagePullPolicy: IfNotPresent
   volumes:
     - name: rsa-keys
       configMap:
@@ -119,17 +114,17 @@ spec:
                             echo "Starting Environment tests"
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             git clone --branch $BRANCH_NAME https://github.com/etendosoftware/etendo_rx
                             cd etendo_rx
                             chmod a+x ./pipelines/run-tests/build-update.sh
                             cp gradle.properties.template gradle.properties
                             sed -i 's/^githubUser=.*/githubUser=${GITHUB_USER}/' gradle.properties
                             sed -i 's/^githubToken=.*/githubToken=${GITHUB_TOKEN}/' gradle.properties
+                            sed -i 's/^grpc.enabled=.*/grpc.enabled=true/' gradle.properties
+                            sed -i 's/^data-rest.enabled=.*/data-rest.enabled=true/' gradle.properties
+                            mkdir -p modules
                             ./gradlew :setup
-                            ./gradlew :com.etendorx.test.testcontainer:test
                             """
                             '...Environment TESTS SUCCESSFUL...'
                         } catch (Exception e) {
@@ -139,15 +134,6 @@ spec:
                             unstable('Environment TESTS FAILED!')
                             env.STATUSTEST = "0"
                         }
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'etendo_rx/modules_test/com.etendorx.test.testcontainer/build/reports/tests/test',
-                            reportFiles: '*.html',
-                            reportName: 'Environment TESTS REPORT',
-                            reportTitles: ''
-                        ])
                     }
                 }
             }
@@ -191,14 +177,14 @@ spec:
                                     githubUser=${GITHUB_USER}\n
                                     githubToken=${GITHUB_TOKEN}\n
                                     allow.root=true\n
-                                    org.gradle.jvmargs=-Xmx2g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" > gradle.properties
+                                    org.gradle.jvmargs=-Dfile.encoding=UTF-8" > gradle.properties
                                     """
                                     sh './gradlew prepareConfig --info --stacktrace'
                                     sh './gradlew setup --info --stacktrace'
                                     sh './gradlew expandModules --info --stacktrace'
                                     sh """
                                     cd modules
-                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile}\" git clone --branch epic/EPL-329 git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git
                                     """
                                     sh './gradlew install --info --stacktrace'
                                     sh './gradlew smartbuild --info --stacktrace'
@@ -231,13 +217,12 @@ spec:
                             sh 'printenv'
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             chmod a+x ./pipelines/run-tests/build-update.sh
                             ./pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo RX" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL
-                            ./gradlew generate.entities.test --info
+                            mkdir -p modules
+                            ./gradlew generate.entities --info
                             """
                             echo 'Build of Etendo RX Finished'
                             env.STATUSRX = "1"
@@ -299,9 +284,7 @@ spec:
                             echo "Starting Auth tests"
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.auth:test --info
                             """
@@ -341,13 +324,21 @@ spec:
                             echo "Starting Das tests"
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RepositoryTest
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.RestCallTest
                             ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.DefaultFiltersTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.eventhandlertest.test.AnnotationTests
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.BindedRestControllerTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.JsonPathEntityRetrieverDefaultTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.MappingUtilsImplTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.DisableEnableTriggersTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.test.FieldMappingRestCallTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.integration.PropertyMetadataTest
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.BaseDTORepositoryDefaultTests
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.das.unit.JsonPathConverterBaseTests
+                            ./gradlew :com.etendorx.das:test --info --tests com.etendorx.entities.mapper.lib.JsonPathEntityRetrieverBaseTests
                             """
                             '...DAS TESTS SUCCESSFUL...'
                         } catch (Exception e) {
@@ -385,9 +376,7 @@ spec:
                             echo "Starting Edge tests"
                             sh """
                             export DOCKER_HOST=/var/run/docker.sock
-                            export TESTCONTAINERS_RYUK_DISABLED=true
-                            export TESTCONTAINERS_IP=GATEWAY
-                            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
                             ./gradlew :com.etendorx.edge:test --info
                             """
@@ -414,6 +403,46 @@ spec:
                 }
             }
         }
+        stage ("Run Event Handler Tests") {
+                    when {
+                        expression {
+                            env.STATUSRX == "1"
+                        }
+                    }
+                    steps {
+                        container("compiler") {
+                            script {
+                                try {
+                                    echo "Starting Event Handler tests"
+                                    sh """
+                                    export DOCKER_HOST=/var/run/docker.sock
+                                    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+                                    cd etendo_rx
+                                    ./gradlew :com.etendorx.test.eventhandler:test --info
+                                    """
+                                    '...EVENT HANDLER TESTS SUCCESSFUL...'
+                                } catch (Exception e) {
+                                    echo 'Exception occurred: ' + e.toString()
+                                    echo '...EVENT HANDLER TEST FAILED...'
+                                    currentBuild.result = 'UNSTABLE'
+                                    unstable('EVENT HANDLER TESTS FAILED!')
+                                    env.STATUSTEST = "0"
+                                }
+                                if(fileExists('etendo_rx/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test')) {
+                                    publishHTML([
+                                        allowMissing: false,
+                                        alwaysLinkToLastBuild: false,
+                                        keepAll: true,
+                                        reportDir: 'etendo_rx/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test',
+                                        reportFiles: '*.html',
+                                        reportName: 'EVENT HANDLER TESTS REPORT',
+                                        reportTitles: ''
+                                    ])
+                                }
+                            }
+                        }
+                    }
+                }
     }
     post {
             always {
