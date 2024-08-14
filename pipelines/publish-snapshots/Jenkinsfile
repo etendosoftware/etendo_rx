@@ -109,7 +109,7 @@ spec:
     stage ('Build Environment Etendo Classic') {
       when {
         expression {
-          return (env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'release/2.0')
+          return env.BRANCH_NAME == 'develop'
         }
       }
       steps {
@@ -178,7 +178,7 @@ spec:
       when {
         allOf {
           expression {
-            return currentBuild.result == SUCCESS && (env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'release/2.0')
+            return currentBuild.result == SUCCESS && env.BRANCH_NAME == 'develop'
           }
         }
       }
@@ -256,7 +256,7 @@ spec:
       when {
         allOf {
            expression {
-            return currentBuild.result == SUCCESS && (env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'release/2.0')
+            return currentBuild.result == SUCCESS && env.BRANCH_NAME == 'develop'
           }
         }
       }
