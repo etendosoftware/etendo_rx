@@ -30,7 +30,7 @@ pipeline {
 
     agent {
         kubernetes {
-            label 'jenkins-node-rx'
+            inheritFrom 'jenkins-node-rx'
             defaultContainer 'jnlp'
             yaml """
 apiVersion: v1
