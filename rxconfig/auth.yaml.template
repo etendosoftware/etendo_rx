@@ -3,6 +3,20 @@ server:
 
 token: eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFdGVuZG9SWCBBdXRoIiwiaWF0IjoxNjk1MTUzMDI0LCJhZF91c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsImFkX29yZ19pZCI6IjAiLCJhZF9yb2xlX2lkIjoiMCIsInNlYXJjaF9rZXkiOiJzZWFyY2hLZXkiLCJzZXJ2aWNlX2lkIjoic2VydmljZUlkIn0.Fc1ME312-KpQNV2a01f12chO7nZ93nDP2aKkeEorX5i7fYP8KASuDrqrI_AXG-j-U_WpO-Dh1fGOJEnbhWqYhTISCD9FQ3FW2wc81jnZDbnxmk75CtgyWu3KUWHxxuwuUExgWz7uEAgdiIytPQJkvpG_uGP5G51RpFMvaQSI6WAEXviJ78r-EP1cigiOpLsBHShx_BXZRIkAXuAFqZMrKUz51LVMSb7XZkeO5gyiIv2QQf5QZ_5-QydDtwe-LVr7dA7JFCIgZT2ax5bKRpFy8I08tqHaJNDpr6ea0-cQqVJ4isssDl5f6CtvU366a_hYBJhm3syuHWqgqFCKqKTs_w
 
+management:
+  endpoint:
+    restart:
+      enabled: true
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: placeholder
+            client-secret: placeholder
+
 private-key: >
   -----BEGIN PRIVATE KEY-----
   MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQChyzrvnYFfwT2x
@@ -32,3 +46,4 @@ private-key: >
   xfdbnvKi3Tu8AqIqoEa4BStXvB61m0KcPcZNEZZPpy1ql7iUuu+1VKnyRsE7gl1b
   KnEM6YMz+TW2igQqp2UKjBrwJQ==
   -----END PRIVATE KEY-----
+

@@ -51,6 +51,8 @@ public class FilterContext extends OncePerRequestFilter {
   private Set<AllowedURIS> allowedURIS;
   @Value("${public-key:}")
   String publicKey;
+  @Value("${auth.token:}")
+  String tokenYaml;
   @Autowired(required = false)
   private JwtClassicConfig jwtClassicConfig;
 
@@ -61,6 +63,9 @@ public class FilterContext extends OncePerRequestFilter {
     if (StringUtils.isEmpty(token)) {
       String authHeader = request.getHeader(HEADER_AUTHORIZATION);
       token = StringUtils.substringAfter(authHeader, "Bearer ");
+      if (StringUtils.isEmpty(token)) {
+        token = tokenYaml;
+      }
     }
     if (!StringUtils.isEmpty(token)) {
       // The token can be signed by RX Auth key or Etendo Classic SWS key
