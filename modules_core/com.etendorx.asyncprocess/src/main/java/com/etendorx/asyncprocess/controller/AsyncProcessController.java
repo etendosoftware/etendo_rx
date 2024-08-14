@@ -22,6 +22,8 @@ import com.etendorx.lib.kafka.model.AsyncProcess;
 import com.etendorx.lib.kafka.model.AsyncProcessExecution;
 import com.etendorx.lib.kafka.model.AsyncProcessState;
 import com.etendorx.utils.auth.key.context.UserContext;
+import io.micrometer.common.util.StringUtils;
+import io.netty.util.internal.StringUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -107,7 +109,7 @@ public class AsyncProcessController {
 
     try {
       String uuid = message(kafkaMessageUtil, streamBridge, runId, processName, bodyChanges);
-      if (uuid != null) {
+      if (StringUtils.isNotEmpty(uuid)) {
         ret.put("status", "OK");
         ret.put("id", uuid);
       } else {

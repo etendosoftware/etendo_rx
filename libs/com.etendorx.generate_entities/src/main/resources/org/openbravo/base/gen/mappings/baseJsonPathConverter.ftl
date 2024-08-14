@@ -179,19 +179,19 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
       <#assign jsonPath = "$." + field.name />
     </#if>
     <#if hasRetriever>
-      <#if field.constantValue??>
+      <#if field.fieldMapping == "CM" && field.constantValue??>
     var _${NamingUtil.getSafeJavaName(field.name)} = retrieve${field.name?cap_first}(
       mappingUtils.constantValue("${field.constantValue.id}")
     );
       <#else>
         <#assign returnClass = genUtils.getPrimitiveType(entity, field) ! "" />
-    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class<#else>, Object.class</#if>);
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class<#else>, Object.class</#if>, <#if field.constantValue??> mappingUtils.constantValue("${field.constantValue.id}")<#else>null</#if>);
       </#if>
     <#elseif field.property??>
       <#assign returnClass = genUtils.getPrimitiveType(entity, field) ! "" />
-    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class<#else>, Object.class</#if>);
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${jsonPath!"$."+field.name}"<#if returnClass != "">, <#if returnClass == "java.util.Date">String<#else>${returnClass}</#if>.class<#else>, Object.class</#if>, <#if field.constantValue??> mappingUtils.constantValue("${field.constantValue.id}")<#else>null</#if>);
     <#else>
-    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${jsonPath!"$."+field.name}", <#if genUtils.isOneToMany(field)>List<#else>Object</#if>.class);
+    var _${NamingUtil.getSafeJavaName(field.name)} = read(ctx, "${jsonPath!"$."+field.name}", <#if genUtils.isOneToMany(field)>List<#else>Object</#if>.class, <#if field.constantValue??> mappingUtils.constantValue("${field.constantValue.id}")<#else>null</#if>);
     </#if>
     values.add(_${NamingUtil.getSafeJavaName(field.name)});
     log.debug("pathConverter ${entity.externalName} \"${jsonPath!"$."+field.name}\": {}", _${NamingUtil.getSafeJavaName(field.name)});
@@ -248,6 +248,8 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
   <#assign columnType = genUtils.getFullQualifiedType(entity, field) ! "" />
   private ${columnType} retrieve${field.name?cap_first}(Object id) {
   <#if field.fieldMapping == "DM">
+    return ${field.name}Retriever.get("${secondProperty(field.property)}", toString(id));
+  <#elseif field.fieldMapping == "CM">
     return ${field.name}Retriever.get("${secondProperty(field.property)}", toString(id));
   <#else>
     return ${field.name}Retriever.get(id);
