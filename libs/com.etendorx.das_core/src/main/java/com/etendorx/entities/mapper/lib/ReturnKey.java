@@ -37,7 +37,7 @@ public class ReturnKey<F> {
   /**
    * The value that was read.
    */
-  final F value;
+  F value;
 
   /**
    * A flag indicating whether the value was missing.
