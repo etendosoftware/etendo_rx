@@ -140,10 +140,9 @@ public class OBPropertiesProvider {
   }
 
   // tries to read the properties from the openbravo development project
-
   private void readPropertiesFromDevelopmentProject() {
     final File propertiesFile = getFileFromDevelopmentPath("gradle.properties");
-    if (propertiesFile == null) {
+    if (!propertiesFile.exists()) {
       return;
     }
     setProperties(propertiesFile.getAbsolutePath());
