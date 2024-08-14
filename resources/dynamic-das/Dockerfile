@@ -38,7 +38,9 @@ CMD cp -r /app-template/* /app/ && \
     gradle ${TASK} --no-daemon --info && gradle --stop && \
     echo "bbdd.rdbms=POSTGRE\nbbdd.driver=org.postgresql.Driver\nbbdd.url=jdbc:postgresql://${DB_HOST}:${DB_PORT}\nbbdd.sid=${DB_SID}\nbbdd.systemUser=postgres\nbbdd.systemPassword=syspass\nbbdd.user=tad\nbbdd.password=tad\nbbdd.sessionConfig=select\nupdate_dateFormat('DD-MM-YYYY')\nrx.generateCode=true" > /app/gradle.properties && \
     java -jar libs/app.jar && \
-    cd /app/modules_gen/com.etendorx.entities && make compile && \
+    cd /app/modules_gen/com.etendorx.entities && \
+    echo "ETENDORX_VERSION=${ETENDORX_VERSION}" > gradle.properties && \
+    make compile && \
     cd /app && \
     export DEPENDENCIES="com.etendorx:das:${ETENDORX_VERSION}" && \
     gradle ${TASK} --no-daemon --info --refresh-dependencies && \
