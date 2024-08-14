@@ -56,7 +56,7 @@ public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
       }
       log.debug("    readedPath '{}' '{}'", path, value);
       // Is an error if the value is not of the expected class
-      boolean nullValue = !clazz.isAssignableFrom(value.getClass());
+      boolean nullValue = value == null || !clazz.isAssignableFrom(value.getClass());
       return new ReturnKey<>(path, value, false, nullValue, nullValue);
     } catch (Exception e) {
       log.debug("    Cannot read path '{}'", path);
