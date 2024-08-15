@@ -4,11 +4,29 @@ plugins {
     id 'java'
     id 'org.springframework.boot' apply false
     id 'io.spring.dependency-management'
+    id 'maven-publish'
 }
 
 group = 'com.etendorx.utils.auth'
 version = "$gradle.ext.version"
 sourceCompatibility = JavaVersion.VERSION_17
+
+publishing {
+    publications {
+        bootJava(MavenPublication) {
+            version = version
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
+}
 
 repositories {
     mavenCentral()

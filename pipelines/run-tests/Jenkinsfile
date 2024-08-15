@@ -117,7 +117,6 @@ spec:
                             export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             git clone --branch $BRANCH_NAME https://github.com/etendosoftware/etendo_rx
                             cd etendo_rx
-                            chmod a+x ./pipelines/run-tests/build-update.sh
                             cp gradle.properties.template gradle.properties
                             sed -i 's/^githubUser=.*/githubUser=${GITHUB_USER}/' gradle.properties
                             sed -i 's/^githubToken=.*/githubToken=${GITHUB_TOKEN}/' gradle.properties
@@ -145,7 +144,6 @@ spec:
                 }
             }
             steps {
-                sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
                 sh './pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo Core" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
                 withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
                     withCredentials([usernamePassword(credentialsId: "koodu_credentials", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
@@ -219,7 +217,6 @@ spec:
                             export DOCKER_HOST=/var/run/docker.sock
                             export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                             cd etendo_rx
-                            chmod a+x ./pipelines/run-tests/build-update.sh
                             ./pipelines/run-tests/build-update.sh etendo_rx pending "Build Environment Etendo RX" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL
                             mkdir -p modules
                             ./gradlew generate.entities --info
@@ -404,53 +401,53 @@ spec:
             }
         }
         stage ("Run Event Handler Tests") {
-                    when {
-                        expression {
-                            env.STATUSRX == "1"
-                        }
-                    }
-                    steps {
-                        container("compiler") {
-                            script {
-                                try {
-                                    echo "Starting Event Handler tests"
-                                    sh """
-                                    export DOCKER_HOST=/var/run/docker.sock
-                                    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-                                    cd etendo_rx
-                                    ./gradlew :com.etendorx.test.eventhandler:test --info
-                                    """
-                                    '...EVENT HANDLER TESTS SUCCESSFUL...'
-                                } catch (Exception e) {
-                                    echo 'Exception occurred: ' + e.toString()
-                                    echo '...EVENT HANDLER TEST FAILED...'
-                                    currentBuild.result = 'UNSTABLE'
-                                    unstable('EVENT HANDLER TESTS FAILED!')
-                                    env.STATUSTEST = "0"
-                                }
-                                if(fileExists('etendo_rx/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test')) {
-                                    publishHTML([
-                                        allowMissing: false,
-                                        alwaysLinkToLastBuild: false,
-                                        keepAll: true,
-                                        reportDir: 'etendo_rx/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test',
-                                        reportFiles: '*.html',
-                                        reportName: 'EVENT HANDLER TESTS REPORT',
-                                        reportTitles: ''
-                                    ])
-                                }
-                            }
-                        }
-                    }
-                }
-    }
-    post {
-            always {
-                script {
-                    echo"proccess is done"
+            when {
+                expression {
+                    env.STATUSRX == "1"
                 }
             }
-            fixed {
+            steps {
+                container("compiler") {
+                    script {
+                        try {
+                            echo "Starting Event Handler tests"
+                            sh """
+                            export DOCKER_HOST=/var/run/docker.sock
+                            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+                            cd etendo_rx
+                            ./gradlew :com.etendorx.test.eventhandler:test --info
+                            """
+                            '...EVENT HANDLER TESTS SUCCESSFUL...'
+                        } catch (Exception e) {
+                            echo 'Exception occurred: ' + e.toString()
+                            echo '...EVENT HANDLER TEST FAILED...'
+                            currentBuild.result = 'UNSTABLE'
+                            unstable('EVENT HANDLER TESTS FAILED!')
+                            env.STATUSTEST = "0"
+                        }
+                        if(fileExists('etendo_rx/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test')) {
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'etendo_rx/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test',
+                                reportFiles: '*.html',
+                                reportName: 'EVENT HANDLER TESTS REPORT',
+                                reportTitles: ''
+                            ])
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                echo"proccess is done"
+            }
+        }
+        fixed {
                 mail to: EMAIL_ADDRESS,
                 subject: "✅ FIXED - ${currentBuild.fullDisplayName}",
                 body: """
@@ -466,18 +463,17 @@ spec:
     Check out the output in the following link:
     ${env.BUILD_URL}
     __________________________________________________________
-                """
+            """
+        }
+        failure {
+            script {
+                sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Build Environments" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
+                echo "Failed Build Environments"
             }
-            failure {
-                script {
-                    sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
-                    sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Build Environments" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
-                    echo "Failed Build Environments"
-                }
-                cleanWs deleteDirs: true
-                mail to: EMAIL_ADDRESS,
-                subject: "⛔ ERROR - ${currentBuild.fullDisplayName}",
-                body:  """
+            cleanWs deleteDirs: true
+            mail to: EMAIL_ADDRESS,
+            subject: "⛔ ERROR - ${currentBuild.fullDisplayName}",
+            body:  """
     ${new Date()}
     __________________________________________________________
 
@@ -487,22 +483,21 @@ spec:
     Author: ${COMMIT_AUTHOR_NAME} <${COMMIT_AUTHOR_EMAIL}>
 
     The build has failed unexpectedly.
-    💡 This build was on an Etendo Core environment.
+    💡 This build was on an Etendo RX environment.
     To more information on the failing run visit:
     ${env.BUILD_URL}
     __________________________________________________________
-                """
+            """
+        }
+        unstable {
+            script {
+                sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Tests" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
+                echo "Failed Test"
             }
-            unstable {
-                script {
-                    sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
-                    sh './pipelines/run-tests/build-update.sh etendo_rx failure "Failed Tests" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
-                    echo "Failed Test"
-                }
-                cleanWs deleteDirs: true
-                mail to: EMAIL_ADDRESS,
-                subject: "⚠️ TESTS FAILED - ${currentBuild.fullDisplayName}",
-                body: """
+            cleanWs deleteDirs: true
+            mail to: EMAIL_ADDRESS,
+            subject: "⚠️ TESTS FAILED - ${currentBuild.fullDisplayName}",
+            body: """
     ${new Date()}
     __________________________________________________________
 
@@ -516,15 +511,14 @@ spec:
     To more information on the failing run visit:
     ${env.BUILD_URL}
     __________________________________________________________
-                """
-            }
-            success {
-                script {
-                    sh 'chmod a+x ./pipelines/run-tests/build-update.sh'
-                    sh './pipelines/run-tests/build-update.sh etendo_rx success "Successful Test Suites" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
-                    echo "Successful Test"
-                }
-                cleanWs deleteDirs: true
-            }
+            """
         }
+        success {
+            script {
+                sh './pipelines/run-tests/build-update.sh etendo_rx success "Successful Test Suites" $ACCESS_TOKEN $GIT_COMMIT $BUILD_URL'
+                echo "Successful Test"
+            }
+            cleanWs deleteDirs: true
+        }
+    }
 }
