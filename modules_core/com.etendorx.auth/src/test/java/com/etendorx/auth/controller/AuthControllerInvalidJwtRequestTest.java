@@ -31,38 +31,39 @@ public class AuthControllerInvalidJwtRequestTest {
 
   public static Stream<Arguments> invalidJwtRequestParams() {
     return Stream.of(
-      // Undefined username
-      Arguments.of(null, null, AuthService.UNDEFINED_USERNAME_MESSAGE),
-      Arguments.of("", "", AuthService.UNDEFINED_USERNAME_MESSAGE),
-      Arguments.of("", null, AuthService.UNDEFINED_USERNAME_MESSAGE),
-      Arguments.of("", "pass123", AuthService.UNDEFINED_USERNAME_MESSAGE),
-      // Undefined password
-      Arguments.of("user123", null, AuthService.UNDEFINED_PASSWORD_MESSAGE),
-      Arguments.of("user123", "", AuthService.UNDEFINED_PASSWORD_MESSAGE)
-    );
+        // Undefined username
+        Arguments.of(null, null, AuthService.UNDEFINED_USERNAME_MESSAGE),
+        Arguments.of("", "", AuthService.UNDEFINED_USERNAME_MESSAGE),
+        Arguments.of("", null, AuthService.UNDEFINED_USERNAME_MESSAGE),
+        Arguments.of("", "pass123", AuthService.UNDEFINED_USERNAME_MESSAGE),
+        // Undefined password
+        Arguments.of("user123", null, AuthService.UNDEFINED_PASSWORD_MESSAGE),
+        Arguments.of("user123", "", AuthService.UNDEFINED_PASSWORD_MESSAGE));
   }
 
   @ParameterizedTest
   @MethodSource("invalidJwtRequestParams")
-  public void invalidJwtRequest(String username, String password, String errorMessage) throws Exception {
+  public void invalidJwtRequest(String username, String password, String errorMessage)
+      throws Exception {
     JwtRequest request = new JwtRequest();
     request.setUsername(username);
     request.setPassword(password);
 
-    ResultActions resultActions = this.mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/authenticate")
-      .content(AuthControllerUtils.asJsonString(request))
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON));
+    ResultActions resultActions = this.mockMvc.perform(
+        MockMvcRequestBuilders.post("/api/authenticate")
+            .content(AuthControllerUtils.asJsonString(request))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON));
 
     resultActions.andDo(print())
-      .andExpect(status().isBadRequest())
-      .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
-      .andExpect(result -> {
-        assertEquals(
-          Objects.requireNonNull((ResponseStatusException) result.getResolvedException()).getReason(),
-          errorMessage);
-      });
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
+        .andExpect(result -> {
+          assertEquals(
+              Objects.requireNonNull((ResponseStatusException) result.getResolvedException())
+                  .getReason(), errorMessage);
+        });
   }
 
 }

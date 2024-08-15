@@ -7,13 +7,13 @@
   <#case "String"><#return "string"><#break>
   <#case "java.math.BigDecimal"><#return "number"><#break>
   <#case "java.lang.Long"><#return "number"><#break>
-  <#case "java.util.Date"><#return "string"><#break>
+  <#case "java.util.Date"><#return "Date"><#break>
   <#case "java.sql.Timestamp"><#return "number"><#break>
   <#case "java.lang.Boolean"><#return "boolean"><#break>
   <#default><#return "string">
  </#switch>
 </#function>
-import {EntityType, KV} from '../base/baseservice.types';
+import {DASResponse, EntityType, KV} from '../base/baseservice.types';
 
 export type GetAll${entity.name}Params = KV & {};
 <#if searches??>
@@ -29,7 +29,7 @@ export type ${s.method?cap_first}Params = KV & {
 </#list>
 </#if>
 
-export type ${entity.name}List = Array<${entity.name}>;
+export type ${entity.name}List = DASResponse<${entity.name}>;
 
 export interface ${entity.name} extends EntityType {
 <#list projectionFields as field>

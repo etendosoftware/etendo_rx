@@ -33,19 +33,25 @@
         <property name="identity" type="org.etendorx.base.session.OBYesNoType"
                   column="isidentity"/>
 
-        <many-to-one name="projection" not-null="true" class="com.etendoerp.etendorx.model.projection.ETRXProjection"
+        <property name="mappingType" column="mapping_type"/>
+
+        <many-to-one name="projection" not-null="true"
+                     class="com.etendoerp.etendorx.model.projection.ETRXProjection"
                      column="etrx_projection_id"/>
 
         <many-to-one name="table" not-null="true" class="org.openbravo.base.model.Table"
                      column="ad_table_id"/>
 
         <set name="fields" table="etrx_entity_field" inverse="true"
-             cascade="save-update" lazy="true" fetch="select">
+             cascade="save-update" lazy="true" fetch="select" order-by="line desc">
             <key>
                 <column name="etrx_projection_entity_id" not-null="true"/>
             </key>
             <one-to-many class="com.etendoerp.etendorx.model.projection.ETRXEntityField"/>
         </set>
-
+        <property name="name"/>
+        <property name="restEndPoint" type="org.etendorx.base.session.OBYesNoType" not-null="true"
+                  column="is_rest_end_point"/>
+        <property name="externalName" column="external_name"/>
     </class>
 </hibernate-mapping>

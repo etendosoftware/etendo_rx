@@ -5,7 +5,8 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Date;
 
-public abstract class RepresentationWithId<T extends RepresentationModel<T>> extends RepresentationModel<T> {
+public abstract class RepresentationWithId<T extends RepresentationModel<T>>
+    extends RepresentationModel<T> {
   public abstract String getId();
 
   @JsonProperty("updated")

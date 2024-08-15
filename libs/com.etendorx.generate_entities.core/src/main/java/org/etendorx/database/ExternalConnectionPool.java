@@ -41,10 +41,10 @@ public abstract class ExternalConnectionPool {
   }
 
   public static final synchronized org.etendorx.database.ExternalConnectionPool getInstance(
-    String externalConnectionPoolClassName) throws ReflectiveOperationException {
+      String externalConnectionPoolClassName) throws ReflectiveOperationException {
     if (instance == null) {
       instance = (org.etendorx.database.ExternalConnectionPool) Class.forName(
-        externalConnectionPoolClassName).getDeclaredConstructor().newInstance();
+          externalConnectionPoolClassName).getDeclaredConstructor().newInstance();
     }
 
     return instance;

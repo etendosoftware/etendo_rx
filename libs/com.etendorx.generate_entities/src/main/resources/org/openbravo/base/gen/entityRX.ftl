@@ -5,17 +5,23 @@
 
 package ${entity.packageName};
 
+import com.etendorx.entities.entities.BaseSerializableObject;
 import com.etendorx.entities.entities.BaseRXObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Convert;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
+import org.hibernate.type.YesNoConverter;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
 *
@@ -25,23 +31,29 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-@javax.persistence.Entity(name = "${entity.name}")
-@javax.persistence.Table(name = "${entity.tableName?lower_case}")
-@javax.persistence.Cacheable
+@jakarta.persistence.Entity(name = "${entity.name}")
+@jakarta.persistence.Table(name = "${entity.tableName?lower_case}")
+@jakarta.persistence.Cacheable
 @EntityScan
-public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.tableName?lower_case)>implements Serializable<#else>extends BaseRXObject</#if> {
+public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.tableName?lower_case)>implements BaseSerializableObject<#else>extends BaseRXObject</#if> {
+
+  public static final String TABLE_ID = "${entity.tableId}";
+
 <#list entity.properties as p>
     <#if !p.computedColumn>
         <#if p.isId()>
-    @javax.persistence.Id
+    @jakarta.persistence.Id
             <#if entity.help?? == false || entity.help != "{@literal identity=NONE}">
-    @javax.persistence.GeneratedValue(generator = "custom-generator")
+    @jakarta.persistence.GeneratedValue(generator = "custom-generator")
     @org.hibernate.annotations.GenericGenerator(
     name = "custom-generator",
         strategy = "com.etendorx.entities.utilities.UUIDGenerator"
     )
             </#if>
-    @javax.persistence.Column(name = "${p.columnName?lower_case}"<#if entity.isView()>, insertable = false, updatable = false</#if>)
+    @jakarta.persistence.Column(name = "${p.columnName?lower_case}"<#if entity.isView()>, insertable = false, updatable = false</#if>)
+            <#if p.isMandatory()>
+    @NotNull
+           </#if>
     @JsonProperty("${p.javaName}")
     java.lang.String ${p.javaName};
 
@@ -49,19 +61,29 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
         <#if p.columnName?? && (noAuditTables?seq_contains(entity.tableName?lower_case) || !auditFields?seq_contains(p.columnName?lower_case))>
             <#if p.isPrimitive() && !p.isId()>
                 <#if !p.getPrimitiveType().isArray()>
-    @javax.persistence.Column(name = "${p.columnName?lower_case}")
+    @jakarta.persistence.Column(name = "${p.columnName?lower_case}")
+                  <#if p.isMandatory()>
+    @NotNull
+                  </#if>
                     <#if p.isBoolean()>
-    @javax.persistence.Convert(converter= com.etendorx.entities.utilities.BooleanToStringConverter.class)
+    @Convert(converter = YesNoConverter.class)
                     </#if>
                     <#if p.javaName == "version">
     @JsonProperty("${p.javaName}_Etendo")
     ${p.getObjectTypeName()} ${p.javaName}_Etendo;
                     <#else>
     @JsonProperty("${p.javaName}")
+                      <#if p.getFormattedDefaultValue()??>
+    ${p.getObjectTypeName()} ${p.javaName} = ${p.getFormattedDefaultValue()};
+                        <#else>
     ${p.getObjectTypeName()} ${p.javaName};
+                        </#if>
                     </#if>
                 <#else>
-    @javax.persistence.Column(name = "${p.columnName?lower_case}")
+    @jakarta.persistence.Column(name = "${p.columnName?lower_case}")
+                  <#if p.isMandatory()>
+    @NotNull
+                  </#if>
     @JsonProperty("${p.javaName}")
     ${p.shorterTypeName} ${p.javaName};
 
@@ -75,9 +97,12 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
                                 <#assign repeated=true/>
                             </#if>
                         </#list>
-    @javax.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.referencedProperty.columnName?lower_case}"<#if repeated>, updatable = false, insertable = false</#if>)
-    @javax.persistence.ManyToOne(fetch=javax.persistence.FetchType.LAZY)
+    @jakarta.persistence.JoinColumn(name = "${p.columnName?lower_case}", referencedColumnName = "${p.referencedProperty.columnName?lower_case}"<#if repeated>, updatable = false, insertable = false</#if>)
+    @jakarta.persistence.ManyToOne(fetch=jakarta.persistence.FetchType.LAZY)
     @JsonProperty("${p.javaName}")
+                      <#if p.isMandatory()>
+      @NotNull
+                      </#if>
     ${p.targetEntity.className} ${p.javaName};
 
                     <#else>
@@ -86,7 +111,7 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
             </#if>
         <#else>
             <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.targetEntity.className?ends_with("_ComputedColumns")>
-    @javax.persistence.OneToMany(mappedBy = "${p.referencedProperty.name}")
+    @jakarta.persistence.OneToMany(mappedBy = "${p.referencedProperty.name}", cascade = jakarta.persistence.CascadeType.ALL)
     @JsonIgnoreProperties("${p.referencedProperty.name}")
     java.util.List<${p.targetEntity.className}> ${p.name};
 
@@ -103,4 +128,13 @@ public class ${entity.simpleClassName} <#if noAuditTables?seq_contains(entity.ta
     </#if>
 </#list>
 
+    @Override
+    public String get_identifier() {
+        return id;
+    }
+
+    @Override
+    public String getTableId() {
+      return TABLE_ID;
+    }
 }

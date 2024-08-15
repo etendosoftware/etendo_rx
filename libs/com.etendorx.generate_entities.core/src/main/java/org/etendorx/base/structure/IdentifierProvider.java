@@ -63,9 +63,7 @@ public class IdentifierProvider implements OBSingleton {
    * properties of the Entity of the object. It is translated (if applicable) to the current
    * language
    *
-   * @param o
-   *   the object for which the identifier is generated
-   *
+   * @param o the object for which the identifier is generated
    * @return the identifier
    */
   public String getIdentifier(Object o) {
@@ -80,35 +78,35 @@ public class IdentifierProvider implements OBSingleton {
     final org.etendorx.base.structure.DynamicEnabled dob = (DynamicEnabled) o;
     final String entityName = ((org.etendorx.base.structure.Identifiable) dob).getEntityName();
     final List<Property> identifiers = ModelProvider.getInstance()
-      .getEntity(entityName)
-      .getIdentifierProperties();
+        .getEntity(entityName)
+        .getIdentifierProperties();
 
     for (final Property identifier : identifiers) {
       if (sb.length() > 0) {
         sb.append(SEPARATOR);
       }
       Property property = ((org.etendorx.base.structure.BaseOBObject) dob).getEntity()
-        .getProperty(identifier.getName());
+          .getProperty(identifier.getName());
       Object value;
 
       if (property.hasDisplayColumn()) {
         Property displayColumnProperty = DalUtil.getPropertyFromPath(
-          property.getReferencedProperty().getEntity(), property.getDisplayPropertyName());
+            property.getReferencedProperty().getEntity(), property.getDisplayPropertyName());
         org.etendorx.base.structure.BaseOBObject referencedObject = (org.etendorx.base.structure.BaseOBObject) dob.get(
-          property.getName());
+            property.getName());
         if (referencedObject == null) {
           continue;
         }
         if (displayColumnProperty.hasDisplayColumn()) {
           // Allowing one level deep of displayed column pointing to references with display column
           value = ((org.etendorx.base.structure.BaseOBObject) dob.get(
-            property.getDisplayPropertyName())).get(
-            displayColumnProperty.getDisplayPropertyName());
+              property.getDisplayPropertyName())).get(
+              displayColumnProperty.getDisplayPropertyName());
         } else if (!displayColumnProperty.isPrimitive()) {
           // Displaying identifier for non primitive properties
 
           value = ((org.etendorx.base.structure.BaseOBObject) referencedObject.get(
-            property.getDisplayPropertyName())).getIdentifier();
+              property.getDisplayPropertyName())).getIdentifier();
         } else {
           value = referencedObject.get(property.getDisplayPropertyName() /*, language*/);
         }
@@ -173,11 +171,11 @@ public class IdentifierProvider implements OBSingleton {
     }
     if (dateFormat == null) {
       final String dateFormatString = OBPropertiesProvider.getInstance()
-        .getOpenbravoProperties()
-        .getProperty("dateFormat.java");
+          .getOpenbravoProperties()
+          .getProperty("dateFormat.java");
       final String dateTimeFormatString = OBPropertiesProvider.getInstance()
-        .getOpenbravoProperties()
-        .getProperty("dateTimeFormat.java");
+          .getOpenbravoProperties()
+          .getProperty("dateTimeFormat.java");
       dateFormat = new SimpleDateFormat(dateFormatString);
       dateTimeFormat = new SimpleDateFormat(dateTimeFormatString);
     }
@@ -194,8 +192,8 @@ public class IdentifierProvider implements OBSingleton {
     }
     if (timeFormat == null) {
       final String dateTimeFormatString = OBPropertiesProvider.getInstance()
-        .getOpenbravoProperties()
-        .getProperty("dateTimeFormat.java");
+          .getOpenbravoProperties()
+          .getProperty("dateTimeFormat.java");
       if (dateTimeFormatString.toUpperCase().endsWith("A")) {
         timeFormat = new SimpleDateFormat("hh:mm:ss a");
       } else {

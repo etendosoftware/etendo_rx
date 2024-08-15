@@ -1,0 +1,12 @@
+token:
+connector:
+  instance:
+  user:
+
+async-api-url: http://localhost:8099
+spring:
+  kafka:
+    consumer:
+openbravo:
+  token:
+  url:

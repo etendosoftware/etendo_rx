@@ -36,11 +36,10 @@ dependencies {
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     implementation group: 'org.codehaus.jettison', name: 'jettison', version: '1.5.4'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.2'
-    implementation 'org.hibernate:hibernate-core:5.4.24.Final'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
-    // String Utils
     implementation 'org.apache.commons:commons-lang3:3.13.0'
-    // Jupiter Test
+    implementation 'org.hibernate:hibernate-core:5.4.2.Final'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation 'com.jayway.jsonpath:json-path:2.8.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
@@ -48,3 +47,4 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+

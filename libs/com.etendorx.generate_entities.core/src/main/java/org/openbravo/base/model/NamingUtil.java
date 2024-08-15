@@ -34,7 +34,7 @@ import java.util.HashMap;
 public class NamingUtil {
   private static final Logger log = LogManager.getLogger();
 
-  public static final char[] ILLEGAL_ENTITY_NAME_CHARS = new char[]{'.', ',', ' ', '/', '\\'};
+  public static final char[] ILLEGAL_ENTITY_NAME_CHARS = new char[] { '.', ',', ' ', '/', '\\' };
 
   public static final String ENTITY_NAME_CONSTANT = "ENTITY_NAME";
   public static final String PROPERTY_CONSTANT_PREFIX = "PROPERTY_";
@@ -97,9 +97,7 @@ public class NamingUtil {
   /**
    * Checks if a name of a table contains illegal chars.
    *
-   * @param name
-   *   the name to check
-   *
+   * @param name the name to check
    * @return true if the name contains a char from the {@link #ILLEGAL_ENTITY_NAME_CHARS}).
    */
   public static boolean doesNameHaveIllegalChars(String name) {
@@ -118,9 +116,7 @@ public class NamingUtil {
    * Checks a name for non-normal characters. Non-normal is everything from a to z, A to Z, 0 to 9
    * and _.
    *
-   * @param name
-   *   the name to check
-   *
+   * @param name the name to check
    * @return true if the name contains illegal chars, false otherwise
    */
   public static boolean doesNameContainNonNormalCharacters(String name) {
@@ -137,9 +133,7 @@ public class NamingUtil {
   /**
    * Returns the value of the ENTITY_NAME constant in the passed class.
    *
-   * @param clz
-   *   the entity class
-   *
+   * @param clz the entity class
    * @return the ENTITY_NAME constant
    */
   public static String getEntityName(Class<?> clz) {
@@ -151,7 +145,7 @@ public class NamingUtil {
       return (String) fld.get(null);
     } catch (final Exception e) {
       throw new OBException("Exception when getting ENTITY_NAME constant from  " + clz.getName(),
-        e);
+          e);
     }
   }
 
@@ -162,11 +156,8 @@ public class NamingUtil {
    * constant from the passed class. The clz parameter maybe null (happens for dynamic entities). In
    * this case the passed propertyName is returned.
    *
-   * @param clz
-   *   the entity class, maybe null, in which case propertyName is returned
-   * @param propertyName
-   *   the propertyName to search for in the class
-   *
+   * @param clz          the entity class, maybe null, in which case propertyName is returned
+   * @param propertyName the propertyName to search for in the class
    * @return the String constant or the passed propertyName
    */
   public static String getStaticPropertyName(Class<?> clz, String propertyName) {
@@ -195,7 +186,11 @@ public class NamingUtil {
     }
   }
 
-  static String getSafeJavaName(String name) {
+  public static boolean isJavaReservedWord(String name) {
+    return reservedNames.get(name) != null;
+  }
+
+  public static String getSafeJavaName(String name) {
     if (reservedNames.get(name) != null) {
       return reservedNames.get(name);
     }
@@ -233,7 +228,7 @@ public class NamingUtil {
           // for a one-to-many the referenced property is the
           // property which models the real foreign key column
           mappingName = property.getTargetEntity().getName() + "_" + getPropName(
-            property.getReferencedProperty()) + "List";
+              property.getReferencedProperty()) + "List";
         }
       } else if (columnNameSameAsKeyColumn(property)) {
         mappingName = getPropName(property); // property.getTargetEntity().getSimpleClassName();
@@ -243,8 +238,8 @@ public class NamingUtil {
     }
     // only strip for core module
     final boolean coreModuleProp = property.getModule() != null && !property.getModule()
-      .getId()
-      .equals("0");
+        .getId()
+        .equals("0");
     final boolean coreModuleEntity = property.getEntity().getModule().getId().equals("0");
 
     if (coreModuleProp || coreModuleEntity) {
@@ -259,8 +254,8 @@ public class NamingUtil {
     for (Property p : property.getEntity().getProperties()) {
       if (p.getName() != null && p.getName().equalsIgnoreCase(mappingName)) {
         log.error(
-          "ERROR: Property name computation fails for property " + property + " using new name " + mappingName + " there is more then one property with the same name, being robust and " + "renaming property automatically. If this error appears during update.database then " + "this is possibly solved automatically. Otherwise this should be repaired manually by " + "changing the AD_Column.name of the column " + property.getEntity()
-            .getTableName() + "." + property.getColumnName());
+            "ERROR: Property name computation fails for property " + property + " using new name " + mappingName + " there is more then one property with the same name, being robust and " + "renaming property automatically. If this error appears during update.database then " + "this is possibly solved automatically. Otherwise this should be repaired manually by " + "changing the AD_Column.name of the column " + property.getEntity()
+                .getTableName() + "." + property.getColumnName());
 
         mappingName += property.getIndexInEntity();
         return mappingName;
@@ -311,8 +306,8 @@ public class NamingUtil {
       return false;
     }
     return p.getColumnName()
-      .toLowerCase()
-      .equals(p.getReferencedProperty().getColumnName().toLowerCase());
+        .toLowerCase()
+        .equals(p.getReferencedProperty().getColumnName().toLowerCase());
   }
 
   private static String stripPrefix(String mappingName) {

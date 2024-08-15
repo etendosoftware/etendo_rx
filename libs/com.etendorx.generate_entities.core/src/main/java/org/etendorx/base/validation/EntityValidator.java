@@ -36,8 +36,7 @@ public class EntityValidator {
    * Validates the values of the properties of the entityObject. The validation messages are
    * collected into one ValidationException.
    *
-   * @param entityObject
-   *   the entity instance
+   * @param entityObject the entity instance
    */
   public void validate(Object entityObject) {
     if (!validateRequired) {

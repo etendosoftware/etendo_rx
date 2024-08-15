@@ -40,9 +40,7 @@ public class DbUtility implements OBSingleton {
    * does not return the underlying exception using the {@link Throwable#getCause()} but using the
    * {@link SQLException#getNextException()}.
    *
-   * @param throwable
-   *   the throwable to analyze
-   *
+   * @param throwable the throwable to analyze
    * @return the underlying sql exception or the original throwable if none found
    */
   public static Throwable getUnderlyingSQLException(Throwable throwable) {
@@ -55,12 +53,12 @@ public class DbUtility implements OBSingleton {
       return bue.getNextException();
     }
     if (throwable.getCause() instanceof org.hibernate.exception.GenericJDBCException && ((org.hibernate.exception.GenericJDBCException) throwable.getCause()).getSQLException()
-      .getNextException() != null) {
+        .getNextException() != null) {
       final org.hibernate.exception.GenericJDBCException gjdbce = (org.hibernate.exception.GenericJDBCException) throwable.getCause();
       return gjdbce.getSQLException().getNextException();
     }
     if (throwable.getCause() instanceof org.hibernate.exception.ConstraintViolationException && ((org.hibernate.exception.ConstraintViolationException) throwable.getCause()).getSQLException()
-      .getNextException() != null) {
+        .getNextException() != null) {
       final org.hibernate.exception.ConstraintViolationException cve = (org.hibernate.exception.ConstraintViolationException) throwable.getCause();
       return cve.getSQLException().getNextException();
     }
@@ -76,9 +74,7 @@ public class DbUtility implements OBSingleton {
    * Reads a file and returns the content as a String. The file must exist otherwise an
    * {@link OBException} is thrown.
    *
-   * @param file
-   *   the file to read
-   *
+   * @param file the file to read
    * @return the content of the file
    */
   public static String readFile(File file) {

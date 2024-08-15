@@ -5,10 +5,10 @@
  <#switch string>
   <#case "java.lang.String"><#return "string"><#break>
   <#case "String"><#return "string"><#break>
-  <#case "java.math.BigDecimal"><#return "double"><#break>
-  <#case "java.lang.Long"><#return "int64"><#break>
-  <#case "java.util.Date"><#return "google.protobuf.Timestamp"><#break>
-  <#case "java.sql.Timestamp"><#return "google.protobuf.Timestamp"><#break>
+  <#case "java.math.BigDecimal"><#return "number"><#break>
+  <#case "java.lang.Long"><#return "number"><#break>
+  <#case "java.util.Date"><#return "Date"><#break>
+  <#case "java.sql.Timestamp"><#return "Date"><#break>
   <#case "java.lang.Boolean"><#return "boolean"><#break>
   <#default><#return string>
  </#switch>
@@ -17,11 +17,12 @@ import {BaseService} from '../base/baseservice';
 import {${entity.name}, ${entity.name}List, <#if searches??><#list searches as s>${s.method?cap_first}Params<#if !s?is_last>, </#if></#list></#if>} from './${entity.name?lower_case}.types';
 
 class BackService extends BaseService<${entity.name}> {
-  private static modelName = '${entity.name}';
+  private static projection = '${projectionName?lower_case}';
+  private static modelName = '${externalName}';
   private static fetchName = '${entity.name?uncap_first}';
 
   getModelName(): string {
-    return BackService.modelName;
+    return BackService.projection + "/" + BackService.modelName;
   }
   getFetchName(): string {
     return BackService.fetchName;
@@ -44,10 +45,8 @@ class BackService extends BaseService<${entity.name}> {
   </#list>  page?: number,
     size?: number,
   ): Promise<${entity.name}List> {
-    return this._fetchSearch<${s.method?cap_first}Params>(
-      '${s.method}', {
+    return this._fetchSearch<${s.method?cap_first}Params>('${s.method}', {
       <#list s.params as p>${p.name}, </#list>
-      projection: '${projectionName}',
       page,
       size,
     });
@@ -57,14 +56,14 @@ class BackService extends BaseService<${entity.name}> {
 
 }
 
-class FrontService extends BaseService<Product> {
+class FrontService extends BaseService<${entity.name}> {
   getModelName(): string {
     throw new Error('Method not implemented.');
   }
   getFetchName(): string {
     throw new Error('Method not implemented.');
   }
-  mapManyToOne(entity: Product): void {
+  mapManyToOne(entity: ${entity.name}): void {
     throw new Error('Method not implemented.');
   }
 }

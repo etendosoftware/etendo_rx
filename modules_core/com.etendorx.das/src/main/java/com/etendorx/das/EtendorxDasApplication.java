@@ -1,5 +1,5 @@
 /*
- * Copyright 2022  Futit Services SL
+ * Copyright 2022-2023  Futit Services SL
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableJpaRepositories("com.etendorx.entities.jparepo")
-@ComponentScan({
-    "com.etendorx.das.hibernate_interceptor",
-    "com.etendorx.das.handler",
-    "com.etendorx.das.grpcrepo",
-    "com.etendorx.utils.auth.key.context",
-    "com.etendorx.das.services",
-    "com.etendorx.das.scan"
+@ComponentScan(basePackages = { "com.etendorx.utils.auth.key", "com.etendorx.das",
+    "com.etendorx.entities.mappings", "com.etendorx.entities.metadata", "com.etendorx.mapping.tutorial", "com.etendorx.openapi",
+    "com.etendorx.das.externalid"
 })
+@ComponentScan(basePackages = "${scan.basePackage:}")
 public class EtendorxDasApplication {
 
   public static void main(String[] args) {

@@ -1,0 +1,68 @@
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '3.1.4'
+  id 'io.spring.dependency-management' version '1.1.3'
+}
+
+group = 'com.etendorx.entities'
+version = "1.0.0"
+sourceCompatibility = JavaVersion.VERSION_17
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    // Configuration used to store the dependencies that the FAT JAR will contain
+    bundle
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.1.4'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.1'
+    implementation 'org.springframework:spring-web'
+    implementation 'com.etendorx:das_core:' + project.property('ETENDORX_VERSION')
+    implementation 'com.jayway.jsonpath:json-path:2.8.0'
+    implementation 'net.minidev:json-smart:2.5.0'
+
+    if(project.hasProperty('data-rest.enabled') && project.property('data-rest.enabled') == "true") {
+        implementation 'org.springframework.data:spring-data-rest-core:4.1.5'
+    }
+
+    // openapi
+    implementation 'org.springdoc:springdoc-openapi-starter-common:2.2.0'
+
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = "${System.env.REPO_URL ?: 'https://repo.maven.apache.org/maven2/'}"
+        credentials {
+            username = System.getenv("REPO_USER")
+            password = System.getenv("REPO_PASSWORD")
+        }
+    }
+}
+
+bootJar {
+    enabled = false
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java' // project(':com.etendorx.entities').sourceSets.main.java.srcDirs
+            srcDirs 'src/main/entities' // project(':com.etendorx.entities').sourceSets.main.java.srcDirs
+            srcDirs 'src/main/jparepo' // project(':com.etendorx.entities').sourceSets.main.java.srcDirs
+            srcDirs 'src/main/projections' // project(':com.etendorx.entities').sourceSets.main.java.srcDirs
+            srcDirs 'src/main/mappings'
+        }
+    }
+}

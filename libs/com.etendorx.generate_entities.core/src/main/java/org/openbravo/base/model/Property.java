@@ -126,8 +126,7 @@ public class Property {
   /**
    * Initializes this Property using the information from the Column.
    *
-   * @param fromColumn
-   *   the column used to initialize this Property.
+   * @param fromColumn the column used to initialize this Property.
    */
   public void initializeFromColumn(Column fromColumn) {
     initializeFromColumn(fromColumn, true);
@@ -181,8 +180,8 @@ public class Property {
     setMinValue(fromColumn.getValueMin());
     setMaxValue(fromColumn.getValueMax());
     setUuid(fromColumn.getReference().getName().equals("ID") && fromColumn.getReference()
-      .getId()
-      .equals("13"));
+        .getId()
+        .equals("13"));
     setUpdatable(fromColumn.isUpdatable());
     setFieldLength(fromColumn.getFieldLength());
     setAllowedValues(fromColumn.getAllowedValues());
@@ -255,13 +254,13 @@ public class Property {
     getEntity().addPropertyByName(this);
 
     if (getName().toLowerCase()
-      .equals("creationdate") && isPrimitive() && Date.class.isAssignableFrom(
-      getPrimitiveType())) {
+        .equals("creationdate") && isPrimitive() && Date.class.isAssignableFrom(
+        getPrimitiveType())) {
       setAuditInfo(true);
       // ensure that the casing is correct
       setName("creationDate");
     } else if (getName().toLowerCase()
-      .equals("updated") && isPrimitive() && Date.class.isAssignableFrom(getPrimitiveType())) {
+        .equals("updated") && isPrimitive() && Date.class.isAssignableFrom(getPrimitiveType())) {
       setAuditInfo(true);
     } else if (getName().toLowerCase().equals("updatedby") && !isPrimitive()) {
       setAuditInfo(true);
@@ -288,7 +287,7 @@ public class Property {
       setActiveColumn(true);
     }
     if (getName().equals("inheritedFrom") && !isPrimitive() && "ADRole".equals(
-      getReferencedProperty().getEntity().getName())) {
+        getReferencedProperty().getEntity().getName())) {
       log.debug("Entity inheriting from role: {}", getEntity().getName());
       getEntity().setHasInheritedFrom(true);
     }
@@ -296,7 +295,7 @@ public class Property {
 
   public boolean isBoolean() {
     return isPrimitive() && (getPrimitiveType().getName()
-      .compareTo("boolean") == 0 || Boolean.class == getPrimitiveType());
+        .compareTo("boolean") == 0 || Boolean.class == getPrimitiveType());
   }
 
   public Entity getEntity() {
@@ -334,8 +333,7 @@ public class Property {
    * Sets the referenced property and also the {@link Property#setTargetEntity(Entity) targetEntity}
    * .
    *
-   * @param referencedProperty
-   *   the property referenced by this property
+   * @param referencedProperty the property referenced by this property
    */
   public void setReferencedProperty(Property referencedProperty) {
     this.referencedProperty = referencedProperty;
@@ -356,7 +354,6 @@ public class Property {
 
   /**
    * @return the primitive type defined by the domain type of the property.
-   *
    * @see #getDomainType()
    * @see PrimitiveDomainType#getPrimitiveType()
    */
@@ -366,7 +363,6 @@ public class Property {
 
   /**
    * @return the type used in the hibernate mapping for a primitive typed property.
-   *
    * @see #getDomainType()
    * @see PrimitiveDomainType#getHibernateType()
    */
@@ -396,7 +392,7 @@ public class Property {
    */
   public String getFormattedDefaultValue() {
     Check.isTrue(isPrimitive() || isCompositeId() || isOneToMany(),
-      "Default value is only supported for composite ids, primitive types, and one-to-many properties: property " + this);
+        "Default value is only supported for composite ids, primitive types, and one-to-many properties: property " + this);
     if (isCompositeId()) {
       return "new Id()";
     }
@@ -408,7 +404,8 @@ public class Property {
     if (defaultValue == null && isBoolean()) {
       if (getName().equalsIgnoreCase("active")) {
         log.debug(
-          "Property {} is probably the active column but does not have a default value set, supplying default value Y", this);
+            "Property {} is probably the active column but does not have a default value set, supplying default value Y",
+            this);
         defaultValue = "Y";
       } else {
         defaultValue = "N";
@@ -439,11 +436,11 @@ public class Property {
       }
       if (getPrimitiveType() == String.class) {
         if (defaultValue.length() > 1 && (defaultValue.startsWith("'") || defaultValue.startsWith(
-          "\""))) {
+            "\""))) {
           defaultValue = defaultValue.substring(1);
         }
         if (defaultValue.length() > 1 && (defaultValue.endsWith("'") || defaultValue.endsWith(
-          "\""))) {
+            "\""))) {
           defaultValue = defaultValue.substring(0, defaultValue.length() - 1);
         }
 
@@ -459,7 +456,7 @@ public class Property {
           return "false";
         } else {
           log.error(
-            "Illegal default value for boolean property " + this + ", value should be Y or N and it is: " + defaultValue);
+              "Illegal default value for boolean property " + this + ", value should be Y or N and it is: " + defaultValue);
           return "false";
         }
       }
@@ -470,7 +467,7 @@ public class Property {
 
   /**
    * @return true if the class of the primitive type ({@link #getPrimitiveObjectType()}) is a number
-   *   (extends {@link Number}).
+   * (extends {@link Number}).
    */
   public boolean isNumericType() {
     final Class<?> typeClass = getPrimitiveObjectType();
@@ -482,7 +479,7 @@ public class Property {
 
   /**
    * @return true if the class of the primitive type ({@link #getPrimitiveObjectType()}) is a
-   *   textual type (extends {@link Number}).
+   * textual type (extends {@link Number}).
    */
   public boolean isTextualType() {
     final Class<?> typeClass = getPrimitiveObjectType();
@@ -497,13 +494,14 @@ public class Property {
    * today will return a new Date() object.
    *
    * @return the java object which can be used to initialize the java member corresponding to this
-   *   property.
+   * property.
    */
   public Object getActualDefaultValue() {
     if (defaultValue == null && isBoolean()) {
       if (getName().equalsIgnoreCase("isactive")) {
         log.debug(
-          "Property {} is probably the active column but does not have a default value set, supplying default value Y", this);
+            "Property {} is probably the active column but does not have a default value set, supplying default value Y",
+            this);
         setDefaultValue("Y");
       } else {
         setDefaultValue("N");
@@ -537,7 +535,7 @@ public class Property {
           return false;
         } else {
           log.error(
-            "Illegal default value for boolean property " + this + ", value should be Y or N and it is: " + defaultValue);
+              "Illegal default value for boolean property " + this + ", value should be Y or N and it is: " + defaultValue);
           return false;
         }
       }
@@ -552,7 +550,6 @@ public class Property {
    * properties are not derived readable.
    *
    * @return true if derived readable for the current user, false otherwise.
-   *
    * @see Property#isActiveColumn()
    * @see Property#isAuditInfo()
    * @see Property#isBeingReferenced()
@@ -748,7 +745,7 @@ public class Property {
 
   /**
    * @return true if the property potentially allows null values because it is an object type. Used
-   *   by code generation of entities.
+   * by code generation of entities.
    */
   public boolean allowNullValues() {
     if (!isPrimitive()) {
@@ -788,8 +785,7 @@ public class Property {
    * mandatory. Throws a ValidationException if the value does not fit the definition of the
    * property.
    *
-   * @param value
-   *   the value to check
+   * @param value the value to check
    */
   // null
   public void checkIsValidValue(Object value) {
@@ -815,7 +811,7 @@ public class Property {
 
     // handle special case
     final boolean isSpecialEnumerateCase = value instanceof String && getColumnName().equalsIgnoreCase(
-      "changeprojectstatus");
+        "changeprojectstatus");
     if (!isSpecialEnumerateCase) {
       getDomainType().checkIsValidValue(this, value);
     }
@@ -970,9 +966,7 @@ public class Property {
    * {@link #getTransientCondition() transientCondition} to compute if the property is transient
    * (won't be exported to xml).
    *
-   * @param bob
-   *   the business object used to compute if the property is transient
-   *
+   * @param bob the business object used to compute if the property is transient
    * @return true if the property is transient and does not need to be exported
    */
   public boolean isTransient(BaseOBObjectDef bob) {
@@ -1153,7 +1147,6 @@ public class Property {
    * accessible in derived read mode.
    *
    * @return true if this property is being referenced by another property in the model.
-   *
    * @see Property#getReferencedProperty()
    */
   public boolean isBeingReferenced() {
@@ -1174,8 +1167,8 @@ public class Property {
 
   /**
    * @return true if the property is a table reference which defines an explicit display column.
-   *   This display column is then used as the identifier of objects referenced through this
-   *   property.
+   * This display column is then used as the identifier of objects referenced through this
+   * property.
    */
   public boolean hasDisplayColumn() {
     if (hasDisplayColumn == null) {
@@ -1191,8 +1184,8 @@ public class Property {
 
   /**
    * @return true if the property is a table reference which defines an explicit display column.
-   *   This display column is then used as the identifier of objects referenced through this
-   *   property.
+   * This display column is then used as the identifier of objects referenced through this
+   * property.
    */
   public boolean isDisplayValue() {
     if (isDisplayValue == null) {
@@ -1235,12 +1228,11 @@ public class Property {
    * This property is candidate to be translatable (marked in DB as isTranlated). It checks it is
    * actually translatable and sets the property as translatable or not regarding this.
    *
-   * @param translationProperty
-   *   it is the property in the trl table that holds the translation for this property
+   * @param translationProperty it is the property in the trl table that holds the translation for this property
    */
   void setTranslatable(Property translationProperty) {
-    log.debug(
-      "Setting translatable for {}.{}",this.getEntity().getTableName(), this.getColumnName());
+    log.debug("Setting translatable for {}.{}", this.getEntity().getTableName(),
+        this.getColumnName());
 
     if (translationProperty == null) {
       log.warn("{}.{} is not translatable: null translationProperty",
@@ -1257,7 +1249,7 @@ public class Property {
       // This exception is raised when the property is not found
       translatable = false;
       log.warn(this.getEntity()
-        .getTableName() + "." + this.getColumnName() + " is not translatable: ad_language column not found in its trl table");
+          .getTableName() + "." + this.getColumnName() + " is not translatable: ad_language column not found in its trl table");
       return;
     }
 
@@ -1272,11 +1264,11 @@ public class Property {
     if (trlPropertyListInBase == null) {
       translatable = false;
       log.warn(this.getEntity()
-        .getTableName() + "." + this.getColumnName() + " is not translatable: not found one to many property to trl table");
+          .getTableName() + "." + this.getColumnName() + " is not translatable: not found one to many property to trl table");
       return;
     }
 
-    if(pk == null) {
+    if (pk == null) {
       return;
     }
 
@@ -1289,7 +1281,7 @@ public class Property {
       }
     }
     log.warn(this.getEntity()
-      .getTableName() + "." + this.getColumnName() + " is not translatable: not found correspoding property in its trl table");
+        .getTableName() + "." + this.getColumnName() + " is not translatable: not found correspoding property in its trl table");
   }
 
   public Property getTranslationProperty() {
@@ -1371,7 +1363,7 @@ public class Property {
 
   public void setUsedSequence(boolean usedSequence) {
     this.usedSequence = "documentno".equalsIgnoreCase(
-      columnName) || (usedSequence && "Value".equals(columnName));
+        columnName) || (usedSequence && "Value".equals(columnName));
   }
 
   public String getSqlLogic() {
@@ -1402,7 +1394,7 @@ public class Property {
    * This method is used to determine if this is an image property.
    *
    * @return {@code true} if this property references an AD_Image_ID record. Otherwise, this method
-   *   returns {@code false}.
+   * returns {@code false}.
    */
   public boolean isImage() {
     if (referencedProperty == null) {
@@ -1434,8 +1426,7 @@ public class Property {
    * Adds help to this property from corresponding column Removes comment escape character sequence
    * and wraps comments over 100 characters. Makes sure it doesn't generate warnings by escaping "@"
    *
-   * @param help
-   *   Help comment to add to this property
+   * @param help Help comment to add to this property
    */
   public void setHelp(String help) {
     if (help != null) {
@@ -1474,7 +1465,7 @@ public class Property {
   public String getTableName(String className) {
     final String newClassName = getTargetEntity().getName();
     final String packagePlusNewClass = className.substring(0,
-      className.lastIndexOf('.')) + "." + newClassName;
+        className.lastIndexOf('.')) + "." + newClassName;
     return packagePlusNewClass;
   }
 

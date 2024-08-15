@@ -5,7 +5,7 @@ import org.openbravo.base.model.ModelObject;
 
 import java.util.Set;
 
-@JsonIncludeProperties({"query", "method", "params"})
+@JsonIncludeProperties({ "query", "method", "params" })
 public class ETRXEntitySearch extends ModelObject {
 
   private ETRXRepository repository;

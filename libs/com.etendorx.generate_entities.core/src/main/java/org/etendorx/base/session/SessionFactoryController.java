@@ -26,8 +26,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.dialect.PostgreSQL82Dialect;
-import org.hibernate.dialect.function.SQLFunction;
+import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.service.Service;
@@ -63,7 +63,6 @@ public abstract class SessionFactoryController {
   private boolean isPostgresDatabase = false;
   private String bbddUser;
 
-
   /**
    * Keeps track if the Dal layer runs within Tomcat or within for example an Ant task.
    *
@@ -77,8 +76,7 @@ public abstract class SessionFactoryController {
    * Is set from the {@link org.openbravo.dal.core.DalContextListener DalContextListener}, keeps
    * track if the Dal layer runs within Tomcat or within for example an Ant task.
    *
-   * @param runningInWebContainer
-   *   true if running in a webcontainer such as Tomcat
+   * @param runningInWebContainer true if running in a webcontainer such as Tomcat
    */
   public static void setRunningInWebContainer(boolean runningInWebContainer) {
     SessionFactoryController.runningInWebContainer = runningInWebContainer;
@@ -168,12 +166,12 @@ public abstract class SessionFactoryController {
       registerSqlFunctions();
 
       final DalSessionFactory dalSessionFactory = OBProvider.getInstance()
-        .get(DalSessionFactory.class);
+          .get(DalSessionFactory.class);
 
       configuration.getStandardServiceRegistryBuilder()
-        .applySettings(configuration.getProperties());
+          .applySettings(configuration.getProperties());
       StandardServiceRegistry serviceRegistry = configuration.getStandardServiceRegistryBuilder()
-        .build();
+          .build();
       initializeServices(serviceRegistry);
       SessionFactory delegateSessionFactory = configuration.buildSessionFactory(serviceRegistry);
       dalSessionFactory.setDelegateSessionFactory(delegateSessionFactory);
@@ -210,21 +208,21 @@ public abstract class SessionFactoryController {
   }
 
   private void registerSqlFunctions() {
-    Map<String, SQLFunction> sqlFunctions = getSQLFunctions();
-    for (Entry<String, SQLFunction> entry : sqlFunctions.entrySet()) {
+    Map<String, StandardSQLFunction> sqlFunctions = getSQLFunctions();
+    for (Entry<String, StandardSQLFunction> entry : sqlFunctions.entrySet()) {
       log.debug("Registering SQL function: {}", entry.getKey());
       configuration.addSqlFunction(entry.getKey(), entry.getValue());
     }
   }
 
-  protected Map<String, SQLFunction> getSQLFunctions() {
+  protected Map<String, StandardSQLFunction> getSQLFunctions() {
     return Collections.emptyMap();
   }
 
   public void closeHibernatePool() {
     ConnectionProvider hibernatePool = sessionFactory.getSessionFactoryOptions()
-      .getServiceRegistry()
-      .getService(ConnectionProvider.class);
+        .getServiceRegistry()
+        .getService(ConnectionProvider.class);
     if (hibernatePool != null && hibernatePool instanceof DriverManagerConnectionProviderImpl) {
       ((DriverManagerConnectionProviderImpl) hibernatePool).stop();
     }
@@ -252,8 +250,7 @@ public abstract class SessionFactoryController {
   }
 
   @SuppressWarnings("unchecked")
-  private void addCommonHibernateProperties(Properties properties,
-                                            Properties allProperties) {
+  private void addCommonHibernateProperties(Properties properties, Properties allProperties) {
     Enumeration<String> allPropertyNames = (Enumeration<String>) allProperties.propertyNames();
     while (allPropertyNames.hasMoreElements()) {
       String propertyName = allPropertyNames.nextElement();
@@ -266,13 +263,13 @@ public abstract class SessionFactoryController {
   private Properties getPostgresHbProps(Properties obProps) {
     isPostgresDatabase = true;
     final Properties props = new Properties();
-    props.setProperty(AvailableSettings.DIALECT, PostgreSQL82Dialect.class.getName());
+    props.setProperty(AvailableSettings.DIALECT, PostgreSQLDialect.class.getName());
     if (isJNDIModeOn(obProps)) {
       setJNDI(obProps, props);
     } else {
       props.setProperty(AvailableSettings.DRIVER, "org.postgresql.Driver");
       props.setProperty(AvailableSettings.URL,
-        obProps.getProperty("bbdd.url") + "/" + obProps.getProperty("bbdd.sid"));
+          obProps.getProperty("bbdd.url") + "/" + obProps.getProperty("bbdd.sid"));
 
       props.setProperty(AvailableSettings.USER, obProps.getProperty("bbdd.user"));
       props.setProperty(AvailableSettings.PASS, obProps.getProperty("bbdd.password"));
@@ -298,7 +295,7 @@ public abstract class SessionFactoryController {
   private void setJNDI(Properties obProps, Properties hbProps) {
     log.info("Using JNDI with resource name-> {}", obProps.getProperty("JNDI.resourceName"));
     hbProps.setProperty(AvailableSettings.DATASOURCE,
-      "java:/comp/env/" + obProps.getProperty("JNDI.resourceName"));
+        "java:/comp/env/" + obProps.getProperty("JNDI.resourceName"));
   }
 
   /**
