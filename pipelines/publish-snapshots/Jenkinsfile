@@ -18,7 +18,7 @@ pipeline {
     REPOSITORY_URL      = "https://repo.futit.cloud/repository/etendo-snapshot-jars"
     EMAIL_ADDRESS       = credentials('email_builds')
     ETENDO_RX_URL       = "https://github.com/etendosoftware/etendo_rx"
-    ETENDO_BASE_URL     = "https://github.com/etendosoftware/etendo"
+    ETENDO_BASE_URL     = "https://github.com/etendosoftware/etendo_base"
     MODULE_RX_URL       = "git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git"
     COMMIT_AUTHOR_NAME  = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
     COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
@@ -154,8 +154,17 @@ spec:
               }
 
               echo "--------------------- Compile Classic ---------------------"
+              def buildGradleContent = """
+                dependencies {
+                    implementation(\"com.etendoerp.platform:etendo-core:latest.release\")
+                }
+              """
+
               sh """
               cd etendo_core
+              echo '${buildGradleContent}' >> build.gradle
+              cat build.gradle
+              ./gradlew clean --info
               ./gradlew prepareConfig --info
               ./gradlew setup --info
               ./gradlew install --info
