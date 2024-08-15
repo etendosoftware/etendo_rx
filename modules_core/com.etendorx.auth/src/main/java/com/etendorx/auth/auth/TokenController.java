@@ -7,6 +7,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import javax.swing.text.html.HTMLDocument;
 
@@ -57,8 +58,9 @@ public class TokenController {
         throw new IllegalArgumentException("Token creation failed! Try again later. " +
             "If the problem persists, please contact your system administrator.");
       }
+      String uuid = UUID.randomUUID().toString().toUpperCase().replace("-", "");
       TokenInfo tokenInfo = new TokenInfo(
-          null,
+          uuid,
           user.getAttribute("expiresAt").toString(),
           user.getAttribute("token").toString(),
           userId,
