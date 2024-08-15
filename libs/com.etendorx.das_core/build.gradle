@@ -17,6 +17,23 @@ repositories {
 
 publishing {
     publications {
+        bootJava(MavenPublication) {
+            version = version
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
         mavenJava(MavenPublication) {
             groupId = group
             artifactId = 'das_core'
