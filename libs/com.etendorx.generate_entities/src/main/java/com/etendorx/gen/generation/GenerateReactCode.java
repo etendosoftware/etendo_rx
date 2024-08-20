@@ -32,6 +32,8 @@ public class GenerateReactCode implements ProjectionGenerator {
         data.get("newClassName").toString().toLowerCase() + ".types.ts");
     generateReactFile(data, projection, "/org/openbravo/base/react/modelservice.ts.ftl",
         data.get("newClassName").toString().toLowerCase() + "service.ts");
+    generateReactFile(data, projection, "/org/openbravo/base/react/hookmodel.ts.ftl",
+        "use" + data.get("newClassName").toString() + ".ts");
   }
 
   private void generateReactFile(Map<String, Object> data, Projection projection,
