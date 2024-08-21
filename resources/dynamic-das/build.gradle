@@ -16,9 +16,10 @@ repositories {
 def dynamicDependencies = System.getenv("DEPENDENCIES")?.split(",") ?: []
 
 dependencies {
-    // Add the dependencies to the project
     dynamicDependencies.each { dep ->
-        // Add the dependency to the project with the flag transitive = false
+        if(dep.trim().isEmpty()) {
+            return
+        }
         implementation(dep.trim()) {
             transitive = false
         }
@@ -39,7 +40,13 @@ task downloadJar(type: Copy) {
     into 'libs'
     include '**/*.jar'
     rename { fileName ->
-        'app.jar'
+        println("fileName: $fileName")
+        def destName = fileName.substring(fileName.lastIndexOf('/') + 1)
+        if(fileName.startsWith('das-') || fileName.startsWith('generate-entities-')) {
+             destName = 'app.jar'
+        }
+        println("Download file: $fileName to $destName")
+        return destName
     }
 
     doLast {
