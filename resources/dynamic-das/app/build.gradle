@@ -13,7 +13,6 @@ repositories {
     }
 }
 
-// Definir las dependencias de forma dinámica
 def dynamicDependencies = System.getenv("DEPENDENCIES")?.split(",") ?: []
 
 dependencies {
@@ -40,7 +39,12 @@ task downloadJar(type: Copy) {
     into 'libs'
     include '**/*.jar'
     rename { fileName ->
-        'app.jar'
+        def destName = fileName.substring(fileName.lastIndexOf('/') + 1)
+        if(fileName.startsWith('das-') || fileName.startsWith('generate-entities-')) {
+             destName = 'app.jar'
+        }
+        println("Download file: $fileName to $destName")
+        return destName
     }
 
     doLast {
@@ -52,3 +56,35 @@ task runJar(dependsOn: 'downloadJar', type: Exec) {
     workingDir 'libs'
     commandLine 'java', '-jar', 'app.jar'
 }
+
+task waitForConfigServer {
+    doLast {
+        def configServerUrl = System.getenv("CONFIG_SERVER_URL")
+        println("CONFIG_SERVER_URL: $configServerUrl")
+        if (configServerUrl == null || configServerUrl.isEmpty()) {
+            println("Skipping the wait for the config server")
+            return
+        }
+        def ready = false
+        println "Waiting for the config server to be ready..."
+        while (!ready) {
+            print(".")
+            try {
+                URL url = new URL(configServerUrl + "/application/default")
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection()
+                connection.setRequestMethod('GET')
+                connection.connect()
+                int responseCode = connection.getResponseCode()
+                if (responseCode >= 200 && responseCode < 300) {
+                } else {
+                    throw new GradleException("URL responded with non-20x status code: $responseCode")
+                }
+                connection.disconnect()
+                ready = true
+            } catch (Exception e) {
+                Thread.sleep(1000)
+            }
+        }
+    }
+}
+
