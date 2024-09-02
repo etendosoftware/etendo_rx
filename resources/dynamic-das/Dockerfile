@@ -16,7 +16,6 @@ ENV TASK="downloadJar"
 ENV CONFIG_SERVER_URL=http://localhost:8888
 ENV SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCHLOCATIONS=
 ENV SPRING_PROFILES_ACTIVE=
-ENV ETENDORX_VERSION=${ETENDORX_VERSION}
 ENV DEBUG_PORT=5005
 ENV DB_HOST=db
 ENV DB_PORT=5432
@@ -34,8 +33,11 @@ COPY modules_gen/com.etendorx.entities/Makefile /app-template/modules_gen/com.et
 # Prefer non-interactive gradle commands to reduce logs and potential hangups
 CMD cp -r /app-template/* /app/ && \
     cd /app && \
+    export DOWNLOAD_DEP=${DEPENDENCIES} && \
+    echo " DOWNLOAD_DEP=${DOWNLOAD_DEP}" && \
     export DEPENDENCIES="com.etendorx:generate-entities:${ETENDORX_VERSION}" && \
     gradle ${TASK} --no-daemon --info && gradle --stop && \
+    rm -rf /app/modules_gen/com.etendorx.entities/src && \
     echo "bbdd.rdbms=POSTGRE\nbbdd.driver=org.postgresql.Driver\nbbdd.url=jdbc:postgresql://${DB_HOST}:${DB_PORT}\nbbdd.sid=${DB_SID}\nbbdd.systemUser=postgres\nbbdd.systemPassword=syspass\nbbdd.user=tad\nbbdd.password=tad\nbbdd.sessionConfig=select\nupdate_dateFormat('DD-MM-YYYY')\nrx.generateCode=true" > /app/gradle.properties && \
     java -jar libs/app.jar && \
     cd /app/modules_gen/com.etendorx.entities && \
@@ -43,9 +45,13 @@ CMD cp -r /app-template/* /app/ && \
     make compile && \
     cd /app && \
     export DEPENDENCIES="com.etendorx:das:${ETENDORX_VERSION}" && \
+    echo " DEPENDENCIES=${DEPENDENCIES}" && \
+    gradle ${TASK} --no-daemon --info --refresh-dependencies && \
+    export DEPENDENCIES=$DOWNLOAD_DEP && \
+    echo " DEPENDENCIES=${DEPENDENCIES}" && \
     gradle ${TASK} --no-daemon --info --refresh-dependencies && \
     gradle --stop && \
     echo "------ CHECKING FOR CONFIG SERVER ------" && \
     gradle waitForConfigServer && \
     echo "------- STARTING APP -------\n" && \
-    java -Dloader.path=./modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-1.0.0-plain.jar -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT} -jar libs/app.jar
+    java -Dloader.path=./modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-1.0.0-plain.jar,./libs/ -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT} -jar libs/app.jar

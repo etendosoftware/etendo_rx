@@ -34,8 +34,8 @@ export type ${entity.name}List = DASResponse<${entity.name}>;
 export interface ${entity.name} extends EntityType {
 <#list projectionFields as field>
 <#if is_object(field.type)>
-  ${field.name}Id?: string;
+  ${field.name}Id?: string | null;
 </#if>
-  ${field.name}?: ${react_type(field.type)};
+  ${field.name}?: ${react_type(field.type)} | null;
 </#list>
 }
