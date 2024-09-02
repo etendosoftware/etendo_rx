@@ -80,11 +80,14 @@ public class GenerateEntities {
     if (getBasePath() == null) {
       setBasePath(".");
     }
-    ETRXModelProvider.getInstance().verifyModule();
+    final Properties obProperties = OBPropertiesProvider.getInstance().getOpenbravoProperties();
+    final boolean checkModuleVersion = Boolean.parseBoolean(
+        obProperties.getProperty("rx.checkModuleVersion", "true"));
+    if (checkModuleVersion) {
+      ETRXModelProvider.getInstance().verifyModule();
+    }
     log.debug("initializating dal layer, getting properties from {}", getPropertiesFile());
     OBPropertiesProvider.getInstance().setProperties(getPropertiesFile());
-
-    final Properties obProperties = OBPropertiesProvider.getInstance().getOpenbravoProperties();
 
     String pathEtendoRx = obProperties.getProperty("rx.path");
 
