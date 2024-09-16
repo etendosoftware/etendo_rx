@@ -3,7 +3,9 @@ name: Docker Build and Push
 on:
   push:
     branches:
-      - feature/ERP-774
+      - main
+      - develop 
+      - 'feature/*'
 
 jobs:
   build_and_push_dynamic_das:
