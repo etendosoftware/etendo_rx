@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - main
-      - develop 
+      - develop
       - 'feature/*'
+
+env:
+  VERSION: 1.0.1  # Definí la versión como variable global
 
 jobs:
   build_and_push_dynamic_das:
@@ -25,15 +28,9 @@ jobs:
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build amd64 image for dynamic-das
+      - name: Build and Push multi-arch image for dynamic-das
         run: |
-          export VERSION=1.0.1
-          docker buildx build --platform linux/amd64 -t etendo/dynamic-das:${VERSION}-amd64 -f resources/dynamic-das/Dockerfile --push .
-
-      - name: Build arm64 image for dynamic-das
-        run: |
-          export VERSION=1.0.1
-          docker buildx build --platform linux/arm64 -t etendo/dynamic-das:${VERSION}-arm64 -f resources/dynamic-das/Dockerfile --push .
+          docker buildx build --platform linux/amd64,linux/arm64 -t etendo/dynamic-das:${{ env.VERSION }} --push -f resources/dynamic-das/Dockerfile .
 
   build_and_push_dynamic_gradle:
     runs-on: ubuntu-latest
@@ -52,46 +49,6 @@ jobs:
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build amd64 image for dynamic-gradle
+      - name: Build and Push multi-arch image for dynamic-gradle
         run: |
-          export VERSION=1.0.1
-          docker buildx build --platform linux/amd64 -t etendo/dynamic-gradle:${VERSION}-amd64 -f resources/dynamic-gradle/Dockerfile --push .
-
-      - name: Build arm64 image for dynamic-gradle
-        run: |
-          export VERSION=1.0.1
-          docker buildx build --platform linux/arm64 -t etendo/dynamic-gradle:${VERSION}-arm64 -f resources/dynamic-gradle/Dockerfile --push .
-
-  create_and_push_manifest_dynamic_das:
-    runs-on: ubuntu-latest
-    needs: build_and_push_dynamic_das
-    steps:
-      - name: Login to DockerHub
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Create and Push Docker Manifest for dynamic-das
-        run: |
-          export VERSION=1.0.1
-          docker manifest create etendo/dynamic-das:${VERSION} \
-            etendo/dynamic-das:${VERSION}-amd64 \
-            etendo/dynamic-das:${VERSION}-arm64
-          docker manifest annotate etendo/dynamic-das:${VERSION} etendo/dynamic-das:${VERSION}-amd64 --os linux --arch amd64
-          docker manifest annotate etendo/dynamic-das:${VERSION} etendo/dynamic-das:${VERSION}-arm64 --os linux --arch arm64
-          docker manifest push etendo/dynamic-das:${VERSION}
-
-  create_and_push_manifest_dynamic_gradle:
-    runs-on: ubuntu-latest
-    needs: build_and_push_dynamic_gradle
-    steps:
-      - name: Login to DockerHub
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Create and Push Docker Manifest for dynamic-gradle
-        run: |
-          export VERSION=1.0.1
-          docker manifest create etendo/dynamic-gradle:${VERSION} \
-            etendo/dynamic-gradle:${VERSION}-amd64 \
-            etendo/dynamic-gradle:${VERSION}-arm64
-          docker manifest annotate etendo/dynamic-gradle:${VERSION} etendo/dynamic-gradle:${VERSION}-amd64 --os linux --arch amd64
-          docker manifest annotate etendo/dynamic-gradle:${VERSION} etendo/dynamic-gradle:${VERSION}-arm64 --os linux --arch arm64
-          docker manifest push etendo/dynamic-gradle:${VERSION}
+          docker buildx build --platform linux/amd64,linux/arm64 -t etendo/dynamic-gradle:${{ env.VERSION }} --push -f resources/dynamic-gradle/Dockerfile .
