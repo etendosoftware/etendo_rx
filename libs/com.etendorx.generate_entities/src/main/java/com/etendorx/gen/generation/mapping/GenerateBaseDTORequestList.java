@@ -18,8 +18,14 @@ package com.etendorx.gen.generation.mapping;
 import com.etendoerp.etendorx.model.projection.ETRXProjectionEntity;
 import com.etendorx.gen.generation.constants.MappingConstants;
 
+/**
+ * Generates the base DTO request list for the given entity.
+ */
 public class GenerateBaseDTORequestList extends MappingGenerationBase {
 
+  /**
+   * Constructor.
+   */
   public GenerateBaseDTORequestList() {
     super("/org/openbravo/base/gen/mappings/baseDTORequestList.ftl");
   }
