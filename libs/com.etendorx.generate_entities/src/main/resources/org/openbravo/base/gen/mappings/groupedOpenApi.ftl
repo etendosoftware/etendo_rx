@@ -23,22 +23,32 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
+import jakarta.validation.Valid;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class OpenApiConfig {
 
+  @Value("${"$"}{springdoc.swagger-ui.server-urls[0].url:http://localhost:8092}")
+  String serverUrl;
+  @Value("${"$"}{springdoc.swagger-ui.server-urls[0].description:API Server}")
+  String serverDescription;
   record Group(String group, String[] pathsToMatch) {}
-
 
 
   @Bean
   public OpenAPI customOpenAPI(@Value("${"$"}{springdoc.version:}") String appVersion) {
+    Server localServer = new Server();
+    localServer.setUrl(serverUrl);
+    localServer.setDescription(serverDescription);
+
     return new OpenAPI().components(new Components().addSecuritySchemes("basicScheme",
                 new SecurityScheme()
                     .type(SecurityScheme.Type.APIKEY)
@@ -52,7 +62,9 @@ public class OpenApiConfig {
             .description(
                 "This is an automated API documentation for EtendoRX API. For more information, please visit https://docs.etendo.software")
             .termsOfService("http://swagger.io/terms/")
-            .license(new License().name("Apache 2.0").url("http://springdoc.org")));
+            .license(new License().name("Apache 2.0").url("http://springdoc.org")))
+            .servers(List.of(localServer));
+
   }
 
       <#list projections as projection>

@@ -105,6 +105,7 @@ public class FilterContext extends OncePerRequestFilter {
     userContext.setActive(noActiveFilter);
     userContext.setAuthToken(token);
     userContext.setRestMethod(restMethod);
+    userContext.setRestUri(req.getRequestURI());
     boolean isTriggerEnabled = parseBooleanParameter(triggerEnabledParam, TRIGGER_ENABLED_PARAMETER,
         true);
     userContext.setTriggerEnabled(isTriggerEnabled);
