@@ -3,6 +3,7 @@ package com.etendorx.entities.mappings;
 import com.etendorx.entities.entities.AuditServiceInterceptor;
 import com.etendorx.entities.entities.BaseDTORepositoryDefault;
 import com.etendorx.entities.jparepo.${entity.table.name}Repository;
+import com.etendorx.entities.mapper.lib.DefaultValuesHandler;
 import com.etendorx.entities.mapper.lib.ExternalIdService;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.validation.Validator;
@@ -11,6 +12,8 @@ import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component("${mappingPrefix}${entity.externalName}DASRepository")
 public class ${mappingPrefix}${entity.externalName}DTORepositoryDefault extends BaseDTORepositoryDefault<${entity.table.className}, ${mappingPrefix}${entity.externalName}DTORead, ${mappingPrefix}${entity.externalName}DTOWrite> {
@@ -22,9 +25,10 @@ public class ${mappingPrefix}${entity.externalName}DTORepositoryDefault extends 
       ${mappingPrefix}${entity.externalName}JsonPathRetriever retriever,
       AuditServiceInterceptor auditService,
       Validator validator,
-      ExternalIdService externalIdService
+      ExternalIdService externalIdService,
+      Optional<DefaultValuesHandler> defaultValuesHandler
     ) {
-    super(restCallTransactionHandler, repository, converter, retriever, auditService, validator, externalIdService);
+    super(restCallTransactionHandler, repository, converter, retriever, auditService, validator, externalIdService, defaultValuesHandler);
   }
 
   <#list modelProviderRX.getETRXRepositories(entity) as repo>
