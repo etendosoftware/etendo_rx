@@ -171,14 +171,17 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
   }
 
   private void triggerEventHandlers(T entity, boolean isNew) {
-    defaultValuesHandler.ifPresent(
-        valuesHandler -> valuesHandler.triggerEventHandlers(entity, isNew));
+    if(defaultValuesHandler != null) {
+      defaultValuesHandler.ifPresent(
+          valuesHandler -> valuesHandler.triggerEventHandlers(entity, isNew));
+    }
   }
 
   private void setDefaultValues(T entity, boolean isNew) {
-    defaultValuesHandler.ifPresent(
-        valuesHandler -> valuesHandler.setDefaultValues(entity, isNew)
-    );
+    if(defaultValuesHandler != null) {
+      defaultValuesHandler.ifPresent(
+          valuesHandler -> valuesHandler.setDefaultValues(entity, isNew));
+    }
   }
 
   /**
