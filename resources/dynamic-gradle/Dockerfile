@@ -20,7 +20,7 @@ ENV SPRING_PROFILES_ACTIVE=
 ENV DEBUG_PORT=8000
 
 WORKDIR /app
-COPY build.gradle /app
+COPY resources/dynamic-gradle/build.gradle /app 
 
 CMD gradle ${TASK} --no-daemon --info && \
     gradle --stop && \
