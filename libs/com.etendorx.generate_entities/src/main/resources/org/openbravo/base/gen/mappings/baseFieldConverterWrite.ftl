@@ -138,10 +138,10 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
       if(entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}() == null) {
         entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(new ArrayList<>());
       }
-      if(dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}() == null) {
+      if(dto.get${field.name?cap_first}() == null) {
         return;
       }
-      for (${genUtils.getDto(field, "")} el : dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}()) {
+      for (${genUtils.getDto(field, "")} el : dto.get${field.name?cap_first}()) {
         ${genUtils.getReturnType(field)} line = this.${field.name}Retriever.get(el.getId());
         if(line == null) {
           line = new ${genUtils.getReturnType(field)}();
