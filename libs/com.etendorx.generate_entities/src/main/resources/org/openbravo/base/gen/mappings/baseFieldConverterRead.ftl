@@ -34,7 +34,7 @@
     <#assign result = name + ".convert(" + result + ")">
   </#if>
   <#if name == "id">
-  <#assign nullCheck = nullCheck + ") {\n      return " + result + ";\n    } else {\n      return null;\n    }">
+  <#assign nullCheck = nullCheck + ") {\n      return " + result + ".toString();\n    } else {\n      return null;\n    }">
   <#else>
   <#assign nullCheck = nullCheck + ") {\n      return mappingUtils.handleBaseObject(" + result + ");\n    } else {\n      return null;\n    }">
   </#if>
