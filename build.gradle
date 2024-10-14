@@ -4,6 +4,7 @@ plugins {
     id 'java'
     id 'java-library'
     id 'groovy'
+    id 'jacoco'
     id 'com.etendorx.gradlepluginrx' version '2.0.0'
 }
 
@@ -74,4 +75,46 @@ task upgradeRxVersion() {
 
 test {
     useJUnitPlatform()
+}
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+subprojects {
+    apply plugin: 'jacoco'
+
+    jacoco {
+        toolVersion = "0.8.10" // Asegúrate de usar una versión compatible
+    }
+
+    task printSourceSets {
+        doLast {
+            def mainSourceSet = sourceSets.main
+            println("Main Java Sources: ${mainSourceSet.java.srcDirs}")
+            println("Main Resources: ${mainSourceSet.resources.srcDirs}")
+        }
+    }
+}
+
+task jacocoRootReport(type: JacocoReport) {
+    // Find all subprojects that have the JaCoCo plugin applied and collect the necessary information
+    def jacocoProjects = subprojects.findAll { subproject ->
+        subproject.plugins.hasPlugin('jacoco') // Solo incluye proyectos con JaCoCo
+    }
+
+    // Collects the source directories, classes, and execution data of the subprojects with JaCoCo
+    additionalSourceDirs = files(jacocoProjects.collect { it.sourceSets.main.allSource.srcDirs }.flatten())
+    sourceDirectories = files(jacocoProjects.collect { it.sourceSets.main.java.srcDirs.flatten() })
+    classDirectories = files(jacocoProjects.collect { it.sourceSets.main.output })
+
+    executionData = files(jacocoProjects.collect {
+        def execFiles = fileTree(dir: "${it.layout.buildDirectory.get()}/jacoco", include: "test*.exec")
+        execFiles.isEmpty() ? null : execFiles
+    }).filter { it != null }
+
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }
