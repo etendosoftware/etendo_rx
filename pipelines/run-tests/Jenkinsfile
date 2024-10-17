@@ -445,8 +445,14 @@ spec:
                 container("compiler") {
                     script {
                         dir(RX_DIR) {
-                            echo "---------------------- Run jacocoTestReport ----------------------"
+                            echo "---------------------- Run jacocoRootReport ----------------------"
                             sh "./gradlew jacocoRootReport --info"
+
+                            env.JACOCO_REPORT = "build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+
+                            if (fileExists("${JACOCO_REPORT}")) {
+                                echo "---------------------- Jacoco Report Found ----------------------"
+                            }
                         }
                     }
                 }
@@ -484,7 +490,7 @@ spec:
                                 -Dsonar.branch.name=${GIT_BRANCH} \
                                 -Dsonar.projectVersion=${GIT_COMMIT} \
                                 -Dsonar.java.coveragePlugin=jacoco \
-                                -Dsonar.coverage.jacoco.xmlReportPaths=./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
+                                -Dsonar.coverage.jacoco.xmlReportPaths=${JACOCO_REPORT}
                             """
                         }
                     }
