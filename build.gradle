@@ -83,9 +83,10 @@ jacoco {
 
 subprojects {
     apply plugin: 'jacoco'
+    apply plugin: 'java'
 
     jacoco {
-        toolVersion = "0.8.10" // Asegúrate de usar una versión compatible
+        toolVersion = "0.8.10"
     }
 
     task printSourceSets {
@@ -98,9 +99,12 @@ subprojects {
 }
 
 task jacocoRootReport(type: JacocoReport) {
+    // Configure the task to always run
+    outputs.upToDateWhen { false }
+
     // Find all subprojects that have the JaCoCo plugin applied and collect the necessary information
     def jacocoProjects = subprojects.findAll { subproject ->
-        subproject.plugins.hasPlugin('jacoco') // Solo incluye proyectos con JaCoCo
+        subproject.plugins.hasPlugin('jacoco')
     }
 
     // Collects the source directories, classes, and execution data of the subprojects with JaCoCo
@@ -108,10 +112,10 @@ task jacocoRootReport(type: JacocoReport) {
     sourceDirectories = files(jacocoProjects.collect { it.sourceSets.main.java.srcDirs.flatten() })
     classDirectories = files(jacocoProjects.collect { it.sourceSets.main.output })
 
+    // Collect all .exec files from each subproject's build directory
     executionData = files(jacocoProjects.collect {
-        def execFiles = fileTree(dir: "${it.layout.buildDirectory.get()}/jacoco", include: "test*.exec")
-        execFiles.isEmpty() ? null : execFiles
-    }).filter { it != null }
+        fileTree(dir: "${it.buildDir}/jacoco", include: "*.exec")
+    })
 
     reports {
         xml.required = true
