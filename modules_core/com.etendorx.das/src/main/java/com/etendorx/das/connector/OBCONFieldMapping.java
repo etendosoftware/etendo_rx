@@ -93,6 +93,7 @@ public class OBCONFieldMapping implements DTOReadMapping<InstanceConnectorMappin
         propertySegments[0]);
     if (field != null && field.getAdTableIdRel() != null) {
       map.put("ad_table_id", field.getAdTableIdRel());
+      map.put("entityName", field.getEntityName());
       return true;
     }
     return false;
