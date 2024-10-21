@@ -16,7 +16,11 @@ public class PathManagementUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(PathManagementUtils.class);
 
-  public PathManagementUtils() {
+  /**
+   * Private constructor to prevent instantiation of this utility class.
+   * Throws an IllegalStateException if called.
+   */
+  private PathManagementUtils() {
     throw new IllegalStateException("Utility class");
   }
 
