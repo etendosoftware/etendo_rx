@@ -84,11 +84,11 @@ public class ${mappingPrefix}${entity.externalName}DTO<#if entity.mappingType ==
       <#if NamingUtil.isJavaReservedWord(field.name)>
         <#assign safeFieldName=NamingUtil.getSafeJavaName(field.name) >
 
-  public <#if entity.mappingType == "R">Object<#else>${columnType}</#if> get${field.name?cap_first}() {
+  public <#if entity.mappingType == "R">String<#else>${columnType}</#if> get${field.name?cap_first}() {
     return this.${safeFieldName};
   }
 
-  public void set${field.name?cap_first}(<#if entity.mappingType == "R">Object<#else>${columnType}</#if> ${safeFieldName}) {
+  public void set${field.name?cap_first}(<#if entity.mappingType == "R">String<#else>${columnType}</#if> ${safeFieldName}) {
     this.${safeFieldName} = ${safeFieldName};
   }
 
