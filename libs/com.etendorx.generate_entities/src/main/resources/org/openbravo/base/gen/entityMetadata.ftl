@@ -53,6 +53,8 @@ public class ${entity.name}_Metadata_ extends EntityMetadata {
         <#else>
             <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.targetEntity.className?ends_with("_ComputedColumns")>
         <#assign type = p.targetEntity.className/>
+        <#assign ad_table_id_rel = "\"${p.targetEntity.tableId}\""/>
+        <#assign entityName = "\"${p.targetEntity.name}\""/>
         <#assign isArray = "true"/>
             </#if>
         </#if>
