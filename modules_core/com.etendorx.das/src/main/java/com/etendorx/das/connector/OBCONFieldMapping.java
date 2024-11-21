@@ -90,6 +90,7 @@ public class OBCONFieldMapping implements DTOReadMapping<InstanceConnectorMappin
     String tableId = etrxEntityField.getEtrxProjectionEntity().getTableEntity().getId();
     String entityName = etrxEntityField.getEtrxProjectionEntity().getTableEntity().getName();
     boolean isProcessProperty = false;
+    boolean isArrayProperty = false;
 
     for (int i = 0; i < propertySegments.length; i++) {
       FieldMetadata field = metadataUtil.getPropertyMetadata(
@@ -98,12 +99,14 @@ public class OBCONFieldMapping implements DTOReadMapping<InstanceConnectorMappin
       if (field != null && field.getAdTableIdRel() != null) {
         tableId = field.getAdTableIdRel();
         entityName = field.getEntityName();
+        isArrayProperty = field.isArray();
         isProcessProperty = true;
       }
     }
     if (isProcessProperty) {
       map.put("ad_table_id", tableId);
       map.put("entityName", entityName);
+      map.put("isArray", isArrayProperty);
     }
     return isProcessProperty;
   }
