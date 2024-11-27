@@ -1,11 +1,10 @@
 package com.etendorx.utils.auth.key;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.DefaultClaims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +13,6 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.sql.Date;
-import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -72,18 +69,39 @@ public class JwtKeyUtils {
     return false;
   }
 
-  public static Claims getJwtClaims(PublicKey publicKey, String jwt) {
-    return Jwts.parser().setSigningKey(publicKey).build().parseClaimsJws(jwt).getBody();
+  public static Map<String, Object> getJwtClaims(PublicKey publicKey, String jwt) {
+    Algorithm algorithm = Algorithm.ECDSA256((java.security.interfaces.ECPublicKey) publicKey);
+
+    DecodedJWT decodedJWT = JWT.require(algorithm)
+        .build()
+        .verify(jwt);
+
+    Map<String, Object> claimsMap = new HashMap<>();
+    decodedJWT.getClaims().forEach((key, claim) -> claimsMap.put(key, claim.as(Object.class)));
+
+    return claimsMap;
   }
 
   public static <T extends Key> T readKey(String originalKey, String spec,
       Function<String, EncodedKeySpec> keySpec,
       BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator) {
+    String cleanKey = cleanKeyHeaders(originalKey, spec);
     try {
-      String cleanKey = cleanKeyHeaders(originalKey, spec);
+      return keyGenerator.apply(KeyFactory.getInstance("EC"), keySpec.apply(cleanKey));
+    } catch (JwtKeyException ex) {
+      logger.warn("Deprecated Public Key - Upgrade Core");
+      return handleKeyException(spec, keySpec, keyGenerator, cleanKey);
+    } catch (NoSuchAlgorithmException e) {
+      throw new JwtKeyException("Error reading the '" + spec + "' key.", e);
+    }
+  }
+
+  private static <T extends Key> T handleKeyException(String spec, Function<String, EncodedKeySpec> keySpec,
+      BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator, String cleanKey) {
+    try {
       return keyGenerator.apply(KeyFactory.getInstance("RSA"), keySpec.apply(cleanKey));
     } catch (NoSuchAlgorithmException e) {
-      throw new JwtKeyException("Something went wrong while reading the '" + spec + "' key.", e);
+      throw new JwtKeyException("Unsopported Algorithm - Use a EC or RSA Token", e);
     }
   }
 
@@ -117,18 +135,9 @@ public class JwtKeyUtils {
     return key.replaceAll("\\s+", "");
   }
 
-  public static Claims parseUnsignedToken(String publicKey, String token) {
+  public static Map<String, Object> parseUnsignedToken(String publicKey, String token) {
     PublicKey pk = JwtKeyUtils.readPublicKey(publicKey);
     return JwtKeyUtils.getJwtClaims(pk, token);
-  }
-
-  public static String generateJwtToken(PrivateKey privateKey, Claims claims, String iss) {
-    return Jwts.builder()
-        .setIssuer(iss)
-        .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-        .addClaims(claims)
-        .signWith(SignatureAlgorithm.RS256, privateKey)
-        .compact();
   }
 
   public static Map<String, Object> getTokenValues(String publicKey, String token) {
@@ -166,18 +175,4 @@ public class JwtKeyUtils {
       }
     }
   }
-
-  public static Claims generateUserClaims(String userId, String clientId, String orgId,
-      String roleId, String searchKey, String serviceId) {
-    Map<String, Object> map = new HashMap<>();
-    Claims claims = new DefaultClaims(map);
-    claims.put(USER_ID_CLAIM, userId);
-    claims.put(CLIENT_ID_CLAIM, clientId);
-    claims.put(ORG_ID, orgId);
-    claims.put(ROLE_ID, roleId);
-    claims.put(SERVICE_SEARCH_KEY, searchKey);
-    claims.put(SERVICE_ID, serviceId);
-    return claims;
-  }
-
 }
