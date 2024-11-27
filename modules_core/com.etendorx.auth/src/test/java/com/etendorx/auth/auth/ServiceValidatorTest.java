@@ -36,7 +36,9 @@ public class ServiceValidatorTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     serviceValidator = new AuthService();
+    userModel = new UserModel();
     userModel.setId("100");
+    regularUser = new UserModel();
     regularUser.seteTRXRxServicesAccessList(new ArrayList<>());
     authRequest = new JwtRequest("user", "pass", "service", "secret");
   }
@@ -71,9 +73,6 @@ public class ServiceValidatorTest {
 
   @Test
   public void testValidateService_nullServicesAccessModel_throwsException() {
-    ServiceAccess serviceAccess = new ServiceAccess();
-    serviceAccess.setRxServiceId("123");
-    regularUser.seteTRXRxServicesAccessList(List.of(serviceAccess));
     HttpHeaders headers = new HttpHeaders();
     headers.add(HEADER_TOKEN, "token");
     ResponseEntity<String> responseEntity = new ResponseEntity<>("", HttpStatus.OK);

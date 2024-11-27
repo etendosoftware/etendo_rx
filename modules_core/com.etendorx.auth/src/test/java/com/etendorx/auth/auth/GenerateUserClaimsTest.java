@@ -10,6 +10,7 @@ import org.mockito.Mock;
 
 import java.util.List;
 
+// TODO: DEPRECATED TEST SINCE SWS TOKENIZATION
 public class GenerateUserClaimsTest {
 
   @Mock

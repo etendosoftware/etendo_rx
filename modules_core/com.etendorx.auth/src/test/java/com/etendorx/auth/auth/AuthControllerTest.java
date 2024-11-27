@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+// TODO: DEPRECATED TEST SINCE SWS TOKENIZATION
 public class AuthControllerTest {
 
   @Mock

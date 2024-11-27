@@ -15,6 +15,7 @@ class JwtauthApplicationTests {
 
   @Test
   void contextLoads() {
+    AuthController controller = new AuthController();
     assertThat(controller).isNotNull();
   }
 
