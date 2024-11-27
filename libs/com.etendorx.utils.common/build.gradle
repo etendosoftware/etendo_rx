@@ -1,0 +1,48 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' apply false
+    id 'io.spring.dependency-management'
+    id 'maven-publish'
+}
+
+group = 'com.etendorx'
+version = "$gradle.ext.version"
+sourceCompatibility = JavaVersion.VERSION_17
+
+publishing {
+    publications {
+        bootJava(MavenPublication) {
+            groupId = group
+            artifactId = 'utils.common'
+            version = version
+        }
+    }
+    repositories {
+        maven {
+            url "${repositoryUrl}"
+            credentials {
+                username = "${repositoryUser}"
+                password = "${repositoryPassword}"
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+ext {
+    set('springCloudVersion', "2022.0.4")
+}
+dependencyManagement {
+    imports {
+        mavenBom SpringBootPlugin.BOM_COORDINATES
+    }
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'com.jayway.jsonpath:json-path:2.8.0'
+}

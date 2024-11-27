@@ -61,6 +61,7 @@ import com.etendorx.entities.jparepo.${genUtils.getRepository(field)};
 import com.etendorx.entities.mapper.lib.DTOWriteMapping;
 import com.etendorx.entities.mapper.lib.ExternalIdService;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -138,10 +139,10 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
       if(entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}() == null) {
         entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(new ArrayList<>());
       }
-      if(dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}() == null) {
+      if(dto.get${field.name?cap_first}() == null) {
         return;
       }
-      for (${genUtils.getDto(field, "")} el : dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}()) {
+      for (${genUtils.getDto(field, "")} el : dto.get${field.name?cap_first}()) {
         ${genUtils.getReturnType(field)} line = this.${field.name}Retriever.get(el.getId());
         if(line == null) {
           line = new ${genUtils.getReturnType(field)}();
@@ -170,7 +171,7 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
         externalIdService.add("${genUtils.getPropertyTableId(field)}", el.getId(), line);
       }
       <#else>
-      var dtoRel = dto.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}();
+      var dtoRel = dto.get${field.name?cap_first}();
       <#assign typeVar=genUtils.getReturnType(field)>
       <#if typeVar == "Object">
         <#assign typeVar="var">
@@ -214,7 +215,16 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     <#if field.property??>
       <#if field.property != "id">
-    entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(dto.get<@toCamelCase field.name/>());
+        <#if field.name == "id">
+          <#assign returnClass = genUtils.getPrimitiveType(entity, field) ! "" />
+          <#if genUtils.isNumeric(returnClass)>
+      entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}( ${genUtils.getNumericParser(returnClass)}(dto.get<@toCamelCase field.name/>()));
+          <#else>
+            entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(dto.get<@toCamelCase field.name/>());
+          </#if>
+        <#else>
+      entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(dto.get<@toCamelCase field.name/>());
+        </#if>
       <#else>
     // Id property is not directly assignable in writer
       </#if>

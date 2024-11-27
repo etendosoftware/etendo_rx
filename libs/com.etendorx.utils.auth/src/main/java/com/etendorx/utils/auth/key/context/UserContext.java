@@ -45,6 +45,8 @@ public class UserContext {
 
   private String restMethod;
 
+  private String restUri;
+
   private boolean isTriggerEnabled;
 
   private String dateFormat;
@@ -54,4 +56,5 @@ public class UserContext {
   private String timeZone;
 
   private String externalSystemId;
+
 }

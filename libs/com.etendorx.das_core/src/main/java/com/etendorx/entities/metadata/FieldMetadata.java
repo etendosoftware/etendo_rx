@@ -21,14 +21,15 @@ public class FieldMetadata {
   final String adColumnId;
   final String adTableIdRel;
   final boolean isArray;
-
+  final String entityName;
   public FieldMetadata(String type, String dbColumn, String adColumnId, String adTableIdRel,
-      boolean isArray) {
+      boolean isArray, String entityName) {
     this.type = type;
     this.dbColumn = dbColumn;
     this.adColumnId = adColumnId;
     this.adTableIdRel = adTableIdRel;
     this.isArray = isArray;
+    this.entityName = entityName;
   }
 
   public String getType() {
@@ -50,4 +51,6 @@ public class FieldMetadata {
   public boolean isArray() {
     return isArray;
   }
+
+  public String getEntityName() { return entityName; }
 }

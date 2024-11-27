@@ -31,6 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extends BaseDTOModel, F extends BaseDTOModel>
@@ -44,6 +45,7 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
   private final AuditServiceInterceptor auditService;
   private final JsonPathEntityRetriever<T> retriever;
   private final Validator validator;
+  private final Optional<DefaultValuesHandler> defaultValuesHandler;
   ExternalIdService externalIdService;
   @Value("${"$"}{post-upsert:true}")
   private boolean postUpsert;
@@ -51,7 +53,8 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
   public BaseDTORepositoryDefault(RestCallTransactionHandler transactionHandler,
       BaseDASRepository<T> repository, DTOConverter<T, E, F> converter,
       JsonPathEntityRetriever<T> retriever, AuditServiceInterceptor auditService,
-      Validator validator, ExternalIdService externalIdService) {
+      Validator validator, ExternalIdService externalIdService,
+      Optional<DefaultValuesHandler> defaultValuesHandler) {
     this.transactionHandler = transactionHandler;
     this.repository = repository;
     this.converter = converter;
@@ -59,6 +62,7 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
     this.retriever = retriever;
     this.validator = validator;
     this.externalIdService = externalIdService;
+    this.defaultValuesHandler = defaultValuesHandler;
   }
 
   /**
@@ -134,6 +138,7 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
       if (entity == null) {
         throw new IllegalStateException("Entity conversion failed");
       }
+      setDefaultValues(entity, isNew);
       setAuditValuesIfApplicable(entity, isNew);
       Set<ConstraintViolation<T>> violations = validator.validate(entity);
       if (!violations.isEmpty()) {
@@ -155,12 +160,27 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
       externalIdService.add(entity.getTableId(), dtoEntity.getId(), entity);
       externalIdService.flush();
       transactionHandler.commit();
+      triggerEventHandlers(entity, isNew);
       return converter.convert(retriever.get(newId));
     } catch (ResponseStatusException e) {
       throw e;
     } catch (Exception e) {
       e.printStackTrace();
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+  }
+
+  private void triggerEventHandlers(T entity, boolean isNew) {
+    if(defaultValuesHandler != null) {
+      defaultValuesHandler.ifPresent(
+          valuesHandler -> valuesHandler.triggerEventHandlers(entity, isNew));
+    }
+  }
+
+  private void setDefaultValues(T entity, boolean isNew) {
+    if(defaultValuesHandler != null) {
+      defaultValuesHandler.ifPresent(
+          valuesHandler -> valuesHandler.setDefaultValues(entity, isNew));
     }
   }
 

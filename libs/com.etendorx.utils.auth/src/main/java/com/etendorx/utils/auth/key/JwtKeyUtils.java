@@ -31,6 +31,10 @@ public class JwtKeyUtils {
   public static final String ROLE_ID = "ad_role_id";
   public static final String SERVICE_SEARCH_KEY = "search_key";
   public static final String SERVICE_ID = "service_id";
+  public static final String CLASSIC_USER = "user";
+  public static final String CLASSIC_CLIENT = "client";
+  public static final String CLASSIC_ORGANIZATION = "organization";
+  public static final String CLASSIC_ROLE = "role";
 
   /**
    * Generates a {@link PrivateKey} from a key String
@@ -139,7 +143,24 @@ public class JwtKeyUtils {
 
   public static Map<String, Object> getTokenValues(String publicKey, String token) {
     try {
-      return new HashMap<>(parseUnsignedToken(publicKey, token));
+      var map = new HashMap<>(parseUnsignedToken(publicKey, token));
+      if(!map.containsKey(USER_ID_CLAIM) && map.containsKey(CLASSIC_USER)) {
+        map.put(USER_ID_CLAIM, map.get(CLASSIC_USER));
+        map.remove(CLASSIC_USER);
+      }
+      if(!map.containsKey(CLIENT_ID_CLAIM) && map.containsKey(CLASSIC_CLIENT)) {
+        map.put(CLIENT_ID_CLAIM, map.get(CLASSIC_CLIENT));
+        map.remove(CLASSIC_CLIENT);
+      }
+      if(!map.containsKey(ORG_ID) && map.containsKey(CLASSIC_ORGANIZATION)) {
+        map.put(ORG_ID, map.get(CLASSIC_ORGANIZATION));
+        map.remove(CLASSIC_ORGANIZATION);
+      }
+      if(!map.containsKey(ROLE_ID) && map.containsKey(CLASSIC_ROLE)) {
+        map.put(ROLE_ID, map.get(CLASSIC_ROLE));
+        map.remove(CLASSIC_ROLE);
+      }
+      return map;
     } catch (Exception e) {
       logger.error("Error parsing the token '{}' - {}", token, e.getMessage());
       throw new IllegalArgumentException(e);
