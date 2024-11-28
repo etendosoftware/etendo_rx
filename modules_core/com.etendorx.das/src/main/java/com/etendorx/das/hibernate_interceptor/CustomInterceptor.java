@@ -3,11 +3,11 @@ package com.etendorx.das.hibernate_interceptor;
 import com.etendorx.das.utils.DefaultFilters;
 import com.etendorx.utils.auth.key.context.AppContext;
 import com.etendorx.utils.auth.key.context.UserContext;
+import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
 public class CustomInterceptor implements StatementInspector {
 

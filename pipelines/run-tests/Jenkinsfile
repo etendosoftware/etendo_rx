@@ -243,6 +243,10 @@ spec:
                             cd ${RX_DIR}
                             ./pipelines/run-tests/build-update.sh ${RX_DIR} pending \"Building Etendo RX Environment\" ${ACCESS_TOKEN} ${GIT_COMMIT} ${BUILD_URL}
                             mkdir -p modules
+                            mkdir -p modules_test
+                            cd modules_test
+                            git clone --branch develop https://github.com/etendosoftware/com.etendorx.integration.petclinic.git
+                            cd ..
                             ./gradlew generate.entities --info
                             """
                             currentBuild.result = SUCCESS
@@ -366,6 +370,12 @@ spec:
                                     counter++
                                 }
                             }
+
+                            dir(RX_DIR) {
+                                sh "./gradlew :com.etendorx.integration.petclinic:test --info jacocoTestReport"
+                                sh "mv modules_test/com.etendorx.integration.petclinic/build/jacoco/test.exec modules_test/com.etendorx.integration.petclinic/build/jacoco/test${counter}.exec"
+                            }
+
                             echo "---------------------- Das Tests Successful ----------------------"
                         } catch (Exception e) {
                             echo "---------------------- Das Tests Failed ----------------------"

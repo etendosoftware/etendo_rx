@@ -26,10 +26,10 @@ public class DefaultFilters {
   public static final String SUPER_USER_ID = "100";
   public static final String SUPER_USER_CLIENT_ID = "0";
   public static final String SUPER_USER_ORG_ID = "0";
-  public static final String REG_EXP_SELECT = "\\sfrom\\s(\\w*)\\s(\\w*0_)\\s?(where)?";
+  public static final String REG_EXP_SELECT = "\\sfrom\\s(\\w*)\\s(\\w*[a-z]1_0)\\s?(where)?";
   public static final String REG_EXP_INSERT = "insert\\sinto\\s(\\w*)";
   public static final String REG_EXP_UPDATE = "update\\s(\\w*)()?.*(where)?"; //NOSONAR
-  public static final String REG_EXP_DELETE = "delete\\sfrom\\s(\\w*)\\s(\\w*0_)\\s?(where)?";
+  public static final String REG_EXP_DELETE = "delete\\sfrom\\s(\\w*)\\s(\\w*o1_0)\\s?(where)?";
   public static final String GET_METHOD = "GET";
   public static final String POST_METHOD = "POST";
   public static final String PUT_METHOD = "PUT";
@@ -80,7 +80,7 @@ public class DefaultFilters {
     return conditions;
   }
 
-  private static String applyFilters(String sql, QueryInfo tableInfo, List<String> conditions) {
+  static String applyFilters(String sql, QueryInfo tableInfo, List<String> conditions) {
     String whereClause = String.join(AND, conditions);
     String finalSql;
     String baseLookup;
@@ -101,6 +101,8 @@ public class DefaultFilters {
     if (StringUtils.equals(finalSql, sql)) {
       throw new QueryException("applyFilters ERROR - SQL query was not modified");
     }
+    log.info("sql: {}", sql);
+    log.info("finalSql: {}", finalSql);
     return finalSql;
   }
 
@@ -125,7 +127,7 @@ public class DefaultFilters {
     return StringUtils.isEmpty(userId) || StringUtils.isEmpty(clientId);
   }
 
-  private static QueryInfo getQueryInfo(String sql) {
+  static QueryInfo getQueryInfo(String sql) {
     Pattern qryPattern = null;
     String sqlAction;
     if (sql.startsWith(SELECT)) {
