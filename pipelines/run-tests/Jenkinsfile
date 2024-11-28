@@ -210,6 +210,7 @@ spec:
                                     sh """
                                     cd modules
                                     GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@github.com:etendosoftware/com.etendoerp.etendorx.git
+                                    git clone --branch develop https://github.com/etendosoftware/com.etendoerp.integration.petclinic.git
                                     """
                                     
                                     sh "./gradlew install --info --stacktrace"
@@ -373,7 +374,6 @@ spec:
 
                             dir(RX_DIR) {
                                 sh "./gradlew :com.etendorx.integration.petclinic:test --info jacocoTestReport"
-                                sh "mv modules_test/com.etendorx.integration.petclinic/build/jacoco/test.exec modules_test/com.etendorx.integration.petclinic/build/jacoco/test${counter}.exec"
                             }
 
                             echo "---------------------- Das Tests Successful ----------------------"
@@ -475,6 +475,7 @@ spec:
                 }
             }
         }
+
         stage('Generate Coverage Report') { // MARK: Generate Coverage Report
             when {
                 expression {
