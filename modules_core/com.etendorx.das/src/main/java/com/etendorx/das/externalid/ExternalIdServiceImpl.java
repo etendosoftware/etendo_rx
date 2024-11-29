@@ -12,7 +12,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.log4j.Log4j2;
 import org.openbravo.model.ad.datamodel.Table;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -188,9 +190,9 @@ public class ExternalIdServiceImpl implements ExternalIdService {
    * @param externalSystemId the ID of the external system
    */
   private String getInternalId(String tableId, String externalId, String externalSystemId) {
-    String internalId = getExternalIdFromDatabase(tableId, externalId, externalSystemId);
+    String internalId = getExternalIdFromDatabase(tableId, externalId, externalSystemId, null);
     if (internalId == null) {
-      internalId = getExternalIdFromDatabase(tableId, externalId, null);
+      internalId = getExternalIdFromDatabase(tableId, externalId, null, null);
     }
     return internalId;
   }
@@ -217,22 +219,14 @@ public class ExternalIdServiceImpl implements ExternalIdService {
    * @param value            the value
    * @param externalSystemId the ID of the external system
    */
-  private String getExternalIdFromDatabase(String tableId, String value, String externalSystemId) {
-    Specification<ExternalInstanceMapping> spec = (root, query, criteriaBuilder) -> {
-      Predicate predicate = criteriaBuilder.and(criteriaBuilder.equal(root.get("table").get("id"), tableId),
-          criteriaBuilder.equal(root.get("externalSystemEntity"), value));
-      if(externalSystemId == null) {
-        criteriaBuilder.and(predicate, criteriaBuilder.isNull(root.get("eTRXInstanceConnector")));
-      } else{
-        criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("eTRXInstanceConnector").get("id"), externalSystemId));
-      }
-      return predicate;
-    };
-    return instanceExternalIdRepository.findAll(spec)
-        .stream()
+  private String getExternalIdFromDatabase(String tableId, String value, String externalSystemId, @PageableDefault(size = 20) final Pageable pageable) {
+    return instanceExternalIdRepository
+        .searchByConnInstanceAndExternalEntityId(externalSystemId, value, tableId, pageable)
+       .stream()
         .findFirst()
         .map(ExternalInstanceMapping::getEtendoEntity)
         .orElse(null);
+
   }
 
   /**

@@ -83,3 +83,4 @@ Thumbs.db
 .scannerwork
 /buildSrc/
 **/out
+/libs/com.etendorx.generate_entities/modules_gen/
