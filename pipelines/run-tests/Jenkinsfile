@@ -189,7 +189,8 @@ spec:
                                 sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@github.com:etendosoftware/etendo_core.git"
                                 dir("etendo_core") {
                                     sh """
-                                    echo -e "context.name=${CONTEXT_NAME}\n
+                                    echo "\n
+                                    context.name=${CONTEXT_NAME}\n
                                     bbdd.sid=${BBDD_SID}\n
                                     bbdd.port=${BBDD_PORT}\n
                                     bbdd.systemUser=${BBDD_SYSTEMUSER}\n
