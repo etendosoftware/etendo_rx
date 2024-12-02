@@ -58,8 +58,11 @@ public class FieldMappingRestCallTest {
   static class FieldMappingRestCallTestConfiguration {
   }
 
-  private static final String TOKEN = "eyJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJzd3MiLCJhZF9vcmdfaWQiOiIwIiwiaXNzIjoic3dzIiwiYWRfcm9sZV9pZCI6IjAiLCJhZF91c2VyX2lkIjoiMTAwIiwiYWRfY2xpZW50X2lkIjoiMCIsIndhcmVob3VzZSI6IkIyRDQwRDhBNUQ2NDRERDg5RTMyOURDMjk3MzA5MDU1IiwiaWF0IjoxNzMyODgzMDU1fQ.MEUCIDl_0Fh8snTQ_nImOJjjZPf3BbEn98wXFnm9WGAXDmIhAiEAvKtNz4qFUzYtdU4I_UG3xJmDGBoDjsYWo42aPP8UT_U";
-  public static final String publicKey = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE9Om8W9iL04NYBB0ZT/EagilvThZAPM9zmisnjmQioxpyUe6RIxpNGkRyp7qI0DAp24ejFA3/69rPf453/9Qv8g==";
+  private static final String TOKEN = "eyJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJzd3MiLCJhZF9vcmdfaWQiOiIwIiwiaXNzIjoic3dzIiwiYWRfcm9sZV9pZCI6IjAiLCJhZF91c2VyX2lkIjoiMCIsImFkX2NsaWVudF9pZCI6IjAiLCJ3YXJlaG91c2UiOiI0RDQ1RkU0QzUxNTA0MTcwOTA0N0Y1MUQxMzlBMjFBQyIsImlhdCI6MTczMzE1NDc3OH0.MEYCIQCI9CPtK3NSLVQX0BECcGir6B5Wf7Iy4Q-FtkZ15_AteQIhAJ3gln_aPJd9F2Zi6tfa_wo_nDgqlJTODYejonTXAiyT";
+  public static final String publicKey = "-----BEGIN PUBLIC KEY-----" +
+      "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEoGkI6HwMwn/d7+KrPmfaLuYO+ID/" +
+      "wfVMZ/IpyfP9K0oRXVe/+tAfBHmcT4ok03tc75JfVf+SEZEJFyCa5mOFCA==" +
+      "-----END PUBLIC KEY-----";
 
   public static Stream<Arguments> validRequestParams() {
     return Stream.of(
