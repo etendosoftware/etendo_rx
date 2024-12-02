@@ -32,4 +32,7 @@ public class AppContext {
     return currentUser.get();
   }
 
+  public static boolean isUserInContext() {
+    return currentUser.get() != null;
+  }
 }
