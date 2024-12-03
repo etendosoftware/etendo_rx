@@ -10,6 +10,8 @@ import com.etendorx.utils.auth.key.JwtKeyUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +19,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -44,6 +49,9 @@ public class AuthService {
 
   @Value("${token}")
   private String token;
+
+  @Value("${das.url:http://das:8092}")
+  private String dasUrl;
 
   public void validateJwtRequest(JwtRequest jwtRequest) {
     log.debug("Running JWT request validation");
@@ -97,6 +105,9 @@ public class AuthService {
       String rxServiceId = accessList.get(0).getRxServiceId();
       HttpHeaders headers = new HttpHeaders();
       headers.add(HEADER_TOKEN, token);
+      if (restUtils == null) {
+        restUtils = new RestUtils(new RestTemplate(), dasUrl);
+      }
       RxService rxService = restUtils.getEntity("/auth/ETRX_Rx_Services/" + rxServiceId,
           RxService.class);
       if (!StringUtils.equals(rxService.getSearchkey(), authRequest.getService())) {
@@ -118,12 +129,14 @@ public class AuthService {
    * @param userModel the user model
    * @return the JWT claims
    */
-  public Claims generateUserClaims(UserModel userModel, String searchKey) {
-    Claims claims = new DefaultClaims();
+  public JSONObject generateUserClaims(UserModel userModel, String searchKey) {
+    JSONObject claims = new JSONObject();
     ServiceAccess servicesAccess = new ServiceAccess();
     if (!isSuperUser(userModel)) {
       servicesAccess = userModel.geteTRXRxServicesAccessList().get(0);
     }
+    claims.put("username", userModel.getUsername());
+    claims.put("password", userModel.getPassword());
     claims.put(JwtKeyUtils.USER_ID_CLAIM, userModel.getId());
     claims.put(JwtKeyUtils.CLIENT_ID_CLAIM,
         getOrDefaultValue(userModel.getDefaultClient(), userModel.getClient()));

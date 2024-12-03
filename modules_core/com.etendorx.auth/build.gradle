@@ -123,5 +123,5 @@ springBoot {
 
 test.onlyIf {
     // TODO: Test execution needs to be parametrized
-    false
+    true
 }
