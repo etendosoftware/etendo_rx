@@ -102,7 +102,7 @@ public class JwtKeyUtils {
     try {
       return keyGenerator.apply(KeyFactory.getInstance("RSA"), keySpec.apply(cleanKey));
     } catch (NoSuchAlgorithmException e) {
-      throw new JwtKeyException("Unsopported Algorithm - Use a EC or RSA Token", e);
+      throw new JwtKeyException("Unsopported Algorithm - Use a EC Token", e);
     }
   }
 
