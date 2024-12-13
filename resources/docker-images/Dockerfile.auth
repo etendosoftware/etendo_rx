@@ -1,0 +1,4 @@
+FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu AS auth
+COPY modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-2.1.0.jar /opt/app/lib/com.etendorx.auth.jar
+ENV CONFIG_SERVER_URL="http://classic:8080/etendo/buildConfig"
+ENTRYPOINT ["java", "-Dfile.encoding=UTF-8" , "-Dloader.path=/opt/app/lib/" , "-jar", "/opt/app/lib/com.etendorx.auth.jar"]
