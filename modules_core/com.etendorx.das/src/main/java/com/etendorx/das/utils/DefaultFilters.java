@@ -23,10 +23,11 @@ public class DefaultFilters {
   public static final String DELETE = "delete";
   public static final String WHERE = " where ";
   public static final String FROM = " from ";
+  public static final String OFFSET = " offset ? ";
   public static final String SUPER_USER_ID = "100";
   public static final String SUPER_USER_CLIENT_ID = "0";
   public static final String SUPER_USER_ORG_ID = "0";
-  public static final String REG_EXP_SELECT = "\\sfrom\\s(\\w*)\\s(\\w*[a-z]1_0)\\s?(where)?";
+  public static final String REG_EXP_SELECT = "\\sfrom\\s+(\\w+)\\s+(\\w+)(?:\\s+join\\s+\\w+\\s+\\w+\\s+on\\s+[^ ]+)*\\s+(where)?";
   public static final String REG_EXP_INSERT = "insert\\sinto\\s(\\w*)";
   public static final String REG_EXP_UPDATE = "update\\s(\\w*)()?.*(where)?"; //NOSONAR
   public static final String REG_EXP_DELETE = "delete\\sfrom\\s(\\w*)\\s(\\w*[a-z]1_0)\\s?(where)?";
@@ -93,16 +94,19 @@ public class DefaultFilters {
       throw new QueryException("applyFilters ERROR - SQL operation not supported");
     }
     if (tableInfo.isContainsWhere()) {
-      String lookup = baseLookup + WHERE;
-      finalSql = sql.replace(lookup, lookup + whereClause + AND);
+      if (sql.contains(OFFSET)) {
+        finalSql = sql.replace(OFFSET, AND + whereClause + OFFSET);
+      } else {
+        finalSql = sql.concat(AND + whereClause);
+      }
     } else {
       finalSql = sql.replace(baseLookup, baseLookup + WHERE + whereClause);
     }
     if (StringUtils.equals(finalSql, sql)) {
       throw new QueryException("applyFilters ERROR - SQL query was not modified");
     }
-    log.info("sql: {}", sql);
-    log.info("finalSql: {}", finalSql);
+    log.debug("sql: {}", sql);
+    log.debug("finalSql: {}", finalSql);
     return finalSql;
   }
 

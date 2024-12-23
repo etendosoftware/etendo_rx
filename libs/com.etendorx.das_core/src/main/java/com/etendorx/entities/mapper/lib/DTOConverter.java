@@ -44,6 +44,15 @@ public interface DTOConverter<E, F, G> {
   E convert(G dto, E entity);
 
   /**
+   * Read DTO and transform to Entity (POST Method)
+   *
+   * @param dto
+   * @param entity
+   * @return Entity updated
+   */
+  E convertList(G dto, E entity);
+
+  /**
    * Read Entity list and transform to DTO list (GET Method)
    *
    * @param entities

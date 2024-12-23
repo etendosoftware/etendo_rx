@@ -96,7 +96,7 @@ public class OBCONFieldMapping implements DTOReadMapping<InstanceConnectorMappin
       FieldMetadata field = metadataUtil.getPropertyMetadata(
           tableId,
           propertySegments[i]);
-      if (field != null && field.getAdTableIdRel() != null) {
+      if (field != null && (field.isArray() || field.getAdTableIdRel() != null)) {
         tableId = field.getAdTableIdRel();
         entityName = field.getEntityName();
         isArrayProperty = field.isArray();
