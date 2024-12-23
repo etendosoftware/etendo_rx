@@ -153,9 +153,9 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
         <#if field.entityFieldMap??>
           <#list field.entityFieldMap as relField>
             <#if relField.property == "_identifier">
-            el.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+            line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
             <#else>
-            el.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+            line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
             </#if>
           </#list>
         </#if>
@@ -181,9 +181,9 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
         <#if field.entityFieldMap??>
             <#list field.entityFieldMap as relField>
                 <#if relField.property == "_identifier">
-                    el.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+                    newLine.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
                 <#else>
-                    el.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+                    newLine.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
                 </#if>
             </#list>
         </#if>
