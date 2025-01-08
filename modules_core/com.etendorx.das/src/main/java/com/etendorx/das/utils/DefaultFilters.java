@@ -27,7 +27,7 @@ public class DefaultFilters {
   public static final String SUPER_USER_ID = "100";
   public static final String SUPER_USER_CLIENT_ID = "0";
   public static final String SUPER_USER_ORG_ID = "0";
-  public static final String REG_EXP_SELECT = "\\sfrom\\s+(\\w+)\\s+(\\w+)(?:\\s+join\\s+\\w+\\s+\\w+\\s+on\\s+[^ ]+)*\\s+(where)?";
+  public static final String REG_EXP_SELECT = "\\sfrom\\s+(\\w+)\\s+(\\w+)(?:\\s+join\\s+\\w+\\s+\\w+\\s+on\\s+[^ ]+)*\\s+(where)?"; //NOSONAR
   public static final String REG_EXP_INSERT = "insert\\sinto\\s(\\w*)";
   public static final String REG_EXP_UPDATE = "update\\s(\\w*)()?.*(where)?"; //NOSONAR
   public static final String REG_EXP_DELETE = "delete\\sfrom\\s(\\w*)\\s(\\w*[a-z]1_0)\\s?(where)?";
@@ -94,8 +94,8 @@ public class DefaultFilters {
       throw new QueryException("applyFilters ERROR - SQL operation not supported");
     }
     if (tableInfo.isContainsWhere()) {
-      if (sql.contains(OFFSET)) {
-        finalSql = sql.replace(OFFSET, AND + whereClause + OFFSET);
+      if (StringUtils.contains(sql, OFFSET)) {
+        finalSql = StringUtils.replace(sql, OFFSET, AND + whereClause + OFFSET);
       } else {
         finalSql = sql.concat(AND + whereClause);
       }

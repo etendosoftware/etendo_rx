@@ -27,44 +27,44 @@ import org.springframework.data.domain.Page;
 public interface DTOConverter<E, F, G> {
 
   /**
-   * Read Entity and transform to DTO (GET Method)
+   * Converts an entity to a DTO (GET Method).
    *
-   * @param entity
-   * @return DTO converted
+   * @param entity the entity to convert
+   * @return the converted DTO
    */
   F convert(E entity);
 
   /**
-   * Read DTO and transform to Entity (POST Method)
+   * Converts a DTO to an entity (POST Method).
    *
-   * @param dto
-   * @param entity
-   * @return Entity updated
+   * @param dto the DTO to convert
+   * @param entity the entity to update
+   * @return the updated entity
    */
   E convert(G dto, E entity);
 
   /**
-   * Read DTO and transform to Entity (POST Method)
+   * Converts a list of DTOs to a list of entities (POST Method).
    *
-   * @param dto
-   * @param entity
-   * @return Entity updated
+   * @param dto the DTO to convert
+   * @param entity the entity to update
+   * @return the updated entity
    */
   E convertList(G dto, E entity);
 
   /**
-   * Read Entity list and transform to DTO list (GET Method)
+   * Converts a list of entities to a list of DTOs (GET Method).
    *
-   * @param entities
-   * @return a list of DTOs converted
+   * @param entities the list of entities to convert
+   * @return a page of converted DTOs
    */
   Page<F> convert(Page<E> entities);
 
   /**
-   * Read Entity list and transform to DTO list (GET Method)
+   * Converts an iterable of entities to an iterable of DTOs (GET Method).
    *
-   * @param entities
-   * @return a list of DTOs converted
+   * @param entities the iterable of entities to convert
+   * @return an iterable of converted DTOs
    */
   Iterable<F> convert(Iterable<E> entities);
 
