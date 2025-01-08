@@ -476,7 +476,6 @@ spec:
                 }
             }
         }
-
         stage('Generate Coverage Report') { // MARK: Generate Coverage Report
             when {
                 expression {
