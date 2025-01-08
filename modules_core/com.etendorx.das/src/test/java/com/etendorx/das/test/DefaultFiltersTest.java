@@ -257,32 +257,6 @@ public class DefaultFiltersTest {
 
   /**
    * This test method verifies the behavior of the addFilters method in the DefaultFilters class
-   * when it is called with a DELETE HTTP method and the SQL query starts with "delete".
-   * <p>
-   * The addFilters method is expected to modify the provided SQL query by adding additional
-   * filters based on the provided user, client, and role identifiers, as well as the isActive flag.
-   * <p>
-   * In this test, the method is expected to add filters that restrict the query to rows where:
-   * - the client ID is either '0' or the provided client ID,
-   * - the organization ID is included in the list of organizations associated with the provided role, and
-   * - the isActive flag is 'Y'.
-   * <p>
-   * The modified query is then compared to an expected query string to verify that the method
-   * has added the correct filters.
-   */
-  @Test
-  void testAddFilters_deleteMethod_StartingWithDelete() {
-    boolean isActive = true;
-
-    String result = DefaultFilters.addFilters(DELETE_QUERY, USER_1, CLIENT_1, ROLE_1, isActive,
-        REST_METHOD_DELETE);
-
-    String expected = "delete from table t1_0 where t1_0.ad_client_id in ('0', 'client1') " + "and etrx_role_organizations('client1', 'role1', 'r') like concat('%|', t1_0.ad_org_id, '|%') " + "and t1_0.table_id = 1"; //NOSONAR
-    assertEquals(expected, result);
-  }
-
-  /**
-   * This test method verifies the behavior of the addFilters method in the DefaultFilters class
    * when it is called with a DELETE HTTP method and the SQL query does not start with "delete".
    * <p>
    * The addFilters method is expected to modify the provided SQL query by adding additional

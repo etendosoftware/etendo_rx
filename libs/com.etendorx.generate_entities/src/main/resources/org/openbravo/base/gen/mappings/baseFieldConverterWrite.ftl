@@ -66,6 +66,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.etendorx.entities.entities.AuditServiceInterceptor;
+import com.etendorx.entities.mapper.lib.PostSyncService;
 
 import java.util.ArrayList;
 
@@ -81,12 +82,13 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
     <#if genUtils.isOneToMany(field) || (field.createRelated?? && field.createRelated)>
   private final ${genUtils.getDTOConverter(field)} ${field.name}Converter;
     </#if>
-    <#if !genUtils.isOneToMany(field) && (field.createRelated?? && field.createRelated)>
+    <#if field.createRelated?? && field.createRelated>
   private final ${genUtils.getRepository(field)} ${field.name}Repository;
     </#if>
   </#if>
 </#list>
   private final ExternalIdService externalIdService;
+  private final PostSyncService postSyncService;
 
   public ${mappingPrefix}${entity.externalName}FieldConverterWrite(
 <#list extMappings as field>
@@ -97,13 +99,14 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
     <#if genUtils.isOneToMany(field) || (field.createRelated?? && field.createRelated)>
     ${genUtils.getDTOConverter(field)} ${field.name}Converter,
     </#if>
-    <#if !genUtils.isOneToMany(field) && (field.createRelated?? && field.createRelated)>
+    <#if field.createRelated?? && field.createRelated>
     ${genUtils.getRepository(field)} ${field.name}Repository,
     </#if>
   </#if>
 </#list>
     AuditServiceInterceptor auditServiceInterceptor,
-    ExternalIdService externalIdService
+    ExternalIdService externalIdService,
+    PostSyncService postSyncService
   ) {
     super();
 <#list extMappings as field>
@@ -114,13 +117,14 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
     <#if genUtils.isOneToMany(field) || (field.createRelated?? && field.createRelated)>
     this.${field.name}Converter = ${field.name}Converter;
     </#if>
-    <#if !genUtils.isOneToMany(field) && (field.createRelated?? && field.createRelated)>
+    <#if field.createRelated?? && field.createRelated>
     this.${field.name}Repository = ${field.name}Repository;
     </#if>
   </#if>
 </#list>
     this.auditServiceInterceptor = auditServiceInterceptor;
     this.externalIdService = externalIdService;
+    this.postSyncService = postSyncService;
   }
 
   public String getId(${mappingPrefix}${entity.externalName}DTOWrite entity) {
@@ -128,9 +132,9 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
   }
 
 <#list extMappings as field>
-      <#if field.createRelated?? && field.createRelated>
-      // createRelated ${field.createRelated?c}
-      </#if>
+  <#if field.createRelated?? && field.createRelated>
+  // createRelated ${field.createRelated?c}
+  </#if>
   public void set<@toCamelCase field.name/>(${entity.table.className} entity, ${mappingPrefix}${entity.externalName}DTOWrite dto) {
     <#if field.fieldMapping == "JM">
     ${field.name}.map(entity, dto);
@@ -145,30 +149,60 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
       for (${genUtils.getDto(field, "")} el : dto.get${field.name?cap_first}()) {
         ${genUtils.getReturnType(field)} line = this.${field.name}Retriever.get(el.getId());
         if(line == null) {
-          line = new ${genUtils.getReturnType(field)}();
+            line = new ${genUtils.getReturnType(field)}();
+        <#if field.entityFieldMap??>
+          <#list field.entityFieldMap as relField>
+            <#if relField.property == "_identifier">
+            line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+            <#else>
+            line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+            </#if>
+          </#list>
+        </#if>
+            line = ${field.name}Converter.convert(el, line);
+            line = ${field.name}Converter.convertList(el, line);
+        <#if field.entityFieldMap??>
+          <#list field.entityFieldMap as relField>
+            <#if relField.property == "_identifier">
+            line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+            <#else>
+            line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+            </#if>
+          </#list>
+        </#if>
+            auditServiceInterceptor.setAuditValues(line);
+            entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}().add(line);
+            externalIdService.add("${genUtils.getPropertyTableId(field)}", el.getId(), line);
+        } else {
+            final ${genUtils.getReturnType(field)} newLine = line;
+            postSyncService.add(new Runnable() {
+                @Override
+                public void run() {
+        <#if field.entityFieldMap??>
+            <#list field.entityFieldMap as relField>
+                <#if relField.property == "_identifier">
+                    newLine.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+                <#else>
+                    newLine.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+                </#if>
+            </#list>
+        </#if>
+                    ${field.name}Converter.convert(el, newLine);
+                    ${field.name}Converter.convertList(el, newLine);
+        <#if field.entityFieldMap??>
+            <#list field.entityFieldMap as relField>
+                <#if relField.property == "_identifier">
+                    newLine.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
+                <#else>
+                    newLine.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
+                </#if>
+            </#list>
+        </#if>
+                    auditServiceInterceptor.setAuditValues(newLine);
+                    entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}().add(newLine);
+                }
+            });
         }
-        <#if field.entityFieldMap??>
-          <#list field.entityFieldMap as relField>
-            <#if relField.property == "_identifier">
-        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
-            <#else>
-        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
-            </#if>
-          </#list>
-        </#if>
-        line = ${field.name}Converter.convert(el, line);
-        <#if field.entityFieldMap??>
-          <#list field.entityFieldMap as relField>
-            <#if relField.property == "_identifier">
-        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity);
-            <#else>
-        line.set${NamingUtil.getSafeJavaName(firstProperty(relField.relatedField.property))?cap_first}(entity.get${NamingUtil.getSafeJavaName(firstProperty(relField.property))?cap_first}());
-            </#if>
-          </#list>
-        </#if>
-        auditServiceInterceptor.setAuditValues(line, true);
-        entity.get${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}().add(line);
-        externalIdService.add("${genUtils.getPropertyTableId(field)}", el.getId(), line);
       }
       <#else>
       var dtoRel = dto.get${field.name?cap_first}();
@@ -200,9 +234,9 @@ public class ${mappingPrefix}${entity.externalName}FieldConverterWrite {
           </#if>
         </#list>
       </#if>
-      auditServiceInterceptor.setAuditValues(el, true);
+      auditServiceInterceptor.setAuditValues(el);
       ${field.name}Repository.save(el);
-      externalIdService.add("${genUtils.getPropertyTableId(field)}", el.getId(), el);
+      externalIdService.add("${genUtils.getPropertyTableId(field)}", dtoRel.getId(), el);
         </#if>
       entity.set${NamingUtil.getSafeJavaName(firstProperty(field.property))?cap_first}(el);
       </#if>

@@ -32,7 +32,6 @@ public class ExternalIdServiceImpl implements ExternalIdService {
   private final ETRX_instance_externalidRepository instanceExternalIdRepository;
   private final ADTableRepository adTableRepository;
   private final ETRX_Instance_ConnectorRepository instanceConnectorRepository;
-
   private final ThreadLocal<Queue<EntityToStore>> currentEntity = new ThreadLocal<>();
   private final AuditServiceInterceptor auditService;
 
@@ -139,7 +138,7 @@ public class ExternalIdServiceImpl implements ExternalIdService {
     externalInstanceMapping.setExternalSystemEntity(entity.getExternalId());
     externalInstanceMapping.setETRXInstanceConnector(
         instanceConnectorRepository.findById(externalSystemId).orElse(null));
-    auditService.setAuditValues(externalInstanceMapping, true);
+    auditService.setAuditValues(externalInstanceMapping);
     if (isValidToStore(externalInstanceMapping)) {
       instanceExternalIdRepository.save(externalInstanceMapping);
     } else {
@@ -164,7 +163,6 @@ public class ExternalIdServiceImpl implements ExternalIdService {
    * It creates a Specification to find the ExternalInstanceMapping and returns the internal ID.
    *
    * @param tableId    the ID of the table
-   * @param key        the key
    * @param externalId the value
    */
   @Override
@@ -208,7 +206,7 @@ public class ExternalIdServiceImpl implements ExternalIdService {
   private void handleMissingInternalId(boolean externalIdRequired, String externalId,
       String externalSystemId, String tableId) {
     String message = "ExternalIdService.convertExternalToInternalId: No internal id found for externalSystemId " + externalSystemId + " table " + tableId + " external id: " + externalId;
-    log.error(message);
+    log.warn(message);
   }
 
   /**
