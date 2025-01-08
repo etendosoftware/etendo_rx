@@ -24,6 +24,7 @@ import org.openbravo.base.model.Property;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * Utility class for code generation.
@@ -40,6 +41,13 @@ public class CodeGenerationUtils {
    * Singleton instance of CodeGenerationUtils.
    */
   private static CodeGenerationUtils instance = null;
+
+  /**
+   * A list of fully qualified names of numeric classes.
+   * This list is used to check if a given class name represents a numeric type.
+   */
+  public static final List<String> NUMERIC_CLASSES = List.of("java.math.Integer", "java.math.BigDecimal", "java.lang.Double",
+      "java.lang.Float", "java.lang.Long");
 
   public static String getNull() {
     return null;
@@ -165,10 +173,27 @@ public class CodeGenerationUtils {
     return getBaseName(field) + "DTOConverter";
   }
 
+  /**
+   * Returns the JsonPath converter for the given ETRXEntityField.
+   * It retrieves the base name of the field and appends "JsonPathConverter" to it.
+   *
+   * @param field the ETRXEntityField to get the JsonPath converter for
+   * @return the JsonPath converter for the given ETRXEntityField
+   */
   public String getRetriever(ETRXEntityField field) {
     return getBaseName(field) + "JsonPathRetriever";
   }
 
+  /**
+   * Returns the repository name for the given ETRXEntityField.
+   * It retrieves the Property for the field, and if the Property is not null, it gets the target entity of the Property,
+   * and returns the name of the target entity concatenated with "Repository".
+   * If the Property is null, it throws an IllegalArgumentException.
+   *
+   * @param field the ETRXEntityField to get the repository name for
+   * @return the repository name for the given ETRXEntityField
+   * @throws IllegalArgumentException if the Property for the field is null
+   */
   public String getRepository(ETRXEntityField field) {
     var property = getProperty(field);
     if(property != null) {
@@ -208,6 +233,16 @@ public class CodeGenerationUtils {
     return null;
   }
 
+  /**
+   * Returns the table ID for the given ETRXEntityField.
+   * If the related ETRXProjectionEntity and its table are not null, it returns the table's ID.
+   * Otherwise, it retrieves the first segment of the property, finds the corresponding Property in the ModelProvider,
+   * and returns the table ID of the target entity of the Property.
+   * If no matching Property is found, it returns null.
+   *
+   * @param field the ETRXEntityField to get the table ID for
+   * @return the table ID for the given ETRXEntityField, or null if no matching Property is found
+   */
   public String getPropertyTableId(ETRXEntityField field) {
     if (field.getEtrxProjectionEntityRelated() != null && field.getEtrxProjectionEntityRelated().getTable() != null) {
       return field.getEtrxProjectionEntityRelated().getTable().getId();
@@ -227,6 +262,14 @@ public class CodeGenerationUtils {
     return null;
   }
 
+  /**
+   * Returns the first segment of the given property string.
+   * The property string is split by the "." character, and the first segment is returned.
+   * If the property string is null, null is returned.
+   *
+   * @param property the property string to get the first segment from
+   * @return the first segment of the property string, or null if the property string is null
+   */
   public String firstProperty(String property) {
     if (property == null) {
       return null;
@@ -235,6 +278,15 @@ public class CodeGenerationUtils {
     return parts.length > 0 ? parts[0] : null;
   }
 
+  /**
+   * Returns the primitive type of the given ETRXEntityField in the ETRXProjectionEntity.
+   * If the full qualified type of the field is null, it retrieves the primitive type from the ModelProvider.
+   * Otherwise, it returns null.
+   *
+   * @param entity the ETRXProjectionEntity to get the primitive type for
+   * @param field the ETRXEntityField to get the primitive type for
+   * @return the primitive type of the given ETRXEntityField in the ETRXProjectionEntity, or null if the full qualified type is not null
+   */
   public String getPrimitiveType(ETRXProjectionEntity entity, ETRXEntityField field) {
     if(getFullQualifiedType(entity, field) == null) {
       return ModelProvider.getInstance()
@@ -245,6 +297,50 @@ public class CodeGenerationUtils {
     }
   }
 
+  /**
+   * Checks if the provided class name is a numeric type.
+   *
+   * @param className the fully qualified name of the class to check (e.g., "java.lang.Integer", "java.lang.Double", etc.)
+   * @return true if the class name is in the list of predefined numeric classes, false otherwise
+   */
+  public boolean isNumeric(String className) {
+    return NUMERIC_CLASSES.contains(className);
+  }
+
+  /**
+   * Returns the appropriate numeric parser method from the NumberUtils class based on the provided class name.
+   *
+   * @param className the fully qualified name of the numeric class (e.g., "java.lang.Integer", "java.lang.Double", etc.)
+   * @return the name of the NumberUtils method that can be used to parse a string into an instance of the provided class.
+   *         For example, if "java.lang.Integer" is provided, the method will return "NumberUtils.createInteger".
+   *         If the provided class name does not match any of the predefined cases, the method will return "NumberUtils.createNumber",
+   *         which can handle any numeric type.
+   */
+  public String getNumericParser(String className) {
+    switch (className) {
+      case "java.math.Integer":
+        return "NumberUtils.createInteger";
+      case "java.math.BigDecimal":
+        return "NumberUtils.createBigDecimal";
+      case "java.lang.Double":
+        return "NumberUtils.createDouble";
+      case "java.lang.Float":
+        return "NumberUtils.createFloat";
+      case "java.lang.Long":
+        return "NumberUtils.createLong";
+      default:
+        return "NumberUtils.createNumber";
+    }
+  }
+
+  /**
+   * Returns the fully qualified type of the given ETRXEntityField in the ETRXProjectionEntity.
+   * It retrieves the fully qualified type from the ModelProvider using the table of the entity and the first property of the field.
+   *
+   * @param entity the ETRXProjectionEntity to get the fully qualified type for
+   * @param field the ETRXEntityField to get the fully qualified type for
+   * @return the fully qualified type of the given ETRXEntityField in the ETRXProjectionEntity
+   */
   public String getFullQualifiedType(ETRXProjectionEntity entity, ETRXEntityField field) {
     return ModelProvider.getInstance().getColumnTypeFullQualified(entity.getTable(), entity.getTable().getName() +"." + firstProperty(field.getProperty()));
   }

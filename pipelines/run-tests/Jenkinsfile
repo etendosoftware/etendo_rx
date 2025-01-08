@@ -189,7 +189,8 @@ spec:
                                 sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@github.com:etendosoftware/etendo_core.git"
                                 dir("etendo_core") {
                                     sh """
-                                    echo -e "context.name=${CONTEXT_NAME}\n
+                                    echo "\n
+                                    context.name=${CONTEXT_NAME}\n
                                     bbdd.sid=${BBDD_SID}\n
                                     bbdd.port=${BBDD_PORT}\n
                                     bbdd.systemUser=${BBDD_SYSTEMUSER}\n
@@ -209,7 +210,8 @@ spec:
 
                                     sh """
                                     cd modules
-                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@github.com:etendosoftware/com.etendoerp.etendorx.git
+                                    git clone --branch develop https://github.com/etendosoftware/com.etendoerp.integration.petclinic.git
                                     """
                                     
                                     sh "./gradlew install --info --stacktrace"
@@ -243,6 +245,10 @@ spec:
                             cd ${RX_DIR}
                             ./pipelines/run-tests/build-update.sh ${RX_DIR} pending \"Building Etendo RX Environment\" ${ACCESS_TOKEN} ${GIT_COMMIT} ${BUILD_URL}
                             mkdir -p modules
+                            mkdir -p modules_test
+                            cd modules_test
+                            git clone --branch develop https://github.com/etendosoftware/com.etendorx.integration.petclinic.git
+                            cd ..
                             ./gradlew generate.entities --info
                             """
                             currentBuild.result = SUCCESS
@@ -366,6 +372,11 @@ spec:
                                     counter++
                                 }
                             }
+
+                            dir(RX_DIR) {
+                                sh "./gradlew :com.etendorx.integration.petclinic:test --info jacocoTestReport"
+                            }
+
                             echo "---------------------- Das Tests Successful ----------------------"
                         } catch (Exception e) {
                             echo "---------------------- Das Tests Failed ----------------------"

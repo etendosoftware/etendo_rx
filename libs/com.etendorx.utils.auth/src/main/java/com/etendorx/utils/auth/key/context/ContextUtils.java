@@ -70,9 +70,5 @@ public class ContextUtils {
     JwtKeyUtils.validateTokenValues(dataMap,
         List.of(JwtKeyUtils.USER_ID_CLAIM, JwtKeyUtils.CLIENT_ID_CLAIM, JwtKeyUtils.ORG_ID,
             JwtKeyUtils.ROLE_ID));
-    // TODO Improve superuser detection
-    if(!StringUtils.equals((String) dataMap.get("ad_user_id"), "100")) {
-      JwtKeyUtils.validateTokenValues(dataMap, List.of(JwtKeyUtils.SERVICE_ID));
-    }
   }
 }

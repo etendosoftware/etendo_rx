@@ -54,6 +54,5 @@ public class TokenUtil {
     userContext.setOrganizationId((String) tokenValuesMap.get(JwtKeyUtils.ORG_ID));
     userContext.setRoleId((String) tokenValuesMap.get(JwtKeyUtils.ROLE_ID));
     userContext.setSearchKey((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
-    userContext.setServiceId((String) tokenValuesMap.get(JwtKeyUtils.SERVICE_ID));
   }
 }

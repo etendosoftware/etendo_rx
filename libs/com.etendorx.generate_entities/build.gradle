@@ -59,6 +59,10 @@ dependencies {
 
     implementation project(":com.etendorx.generate_entities.core")
     implementation project(":com.etendorx.generate_entities.extradomaintype")
+
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.14.2'
+
 }
 
 test {
