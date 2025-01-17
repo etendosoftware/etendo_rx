@@ -75,15 +75,15 @@ public class DefaultFilters {
     switch (restMethod) {
       case GET_METHOD:
         return replaceInQuery(sql, clientId, roleId, isActive);
+      case DELETE_METHOD, PUT_METHOD:
+      case PATCH_METHOD:
+        return replaceInQuery(sql, clientId, roleId, StringUtils.startsWith(sql, SELECT));
       case POST_METHOD:
-        if (sql.startsWith(SELECT)) {
+        if (StringUtils.startsWith(sql, SELECT)) {
           return replaceInQuery(sql, clientId, roleId, isActive);
         } else {
           return sql;
         }
-      case PATCH_METHOD:
-        return replaceInQuery(sql, clientId, roleId, sql.startsWith(SELECT));
-      case DELETE_METHOD, PUT_METHOD:
       default:
         log.error("[ processSql ] - Unknown HTTP method: " + restMethod);
         throw new IllegalArgumentException("Unknown HTTP method: " + restMethod);
@@ -91,24 +91,25 @@ public class DefaultFilters {
   }
 
   /**
-   * Generates a list of default WHERE clause conditions based on the provided table alias, client ID, role ID, and active filter status.
+   * Generates a list of default WHERE clause conditions based on the provided SQL statement, client ID, role ID, and active filter status.
+   * The method extracts information about the SQL query and constructs the conditions accordingly.
    *
-   * @param tableAlias the alias of the table in the SQL query
+   * @param statement the SQL statement to be analyzed
    * @param clientId the client ID to be used in the conditions
    * @param roleId the role ID to be used in the conditions
    * @param isActiveFilter a boolean indicating whether the active filter should be applied
    * @return a list of conditions to be applied as filters to the SQL query
    */
-  private static List<String> getDefaultWhereClause(String tableAlias, String clientId,
-      String roleId, boolean isActiveFilter) {
+  private static List<String> getDefaultWhereClause(Statement statement, String clientId, String roleId, boolean isActiveFilter) {
     List<String> conditions = new ArrayList<>();
-    if (!StringUtils.isEmpty(tableAlias)) {
-      conditions.add(String.format("%s.ad_client_id in ('0', '%s')", tableAlias, clientId));
+    QueryInfo tableInfo = getQueryInfo(statement);
+    if (!StringUtils.isEmpty(tableInfo.getTableAlias())) {
+      conditions.add(String.format("%s.ad_client_id in ('0', '%s')", tableInfo.getTableAlias(), clientId));
       conditions.add(String.format(
           "etrx_role_organizations('%s', '%s', 'r') like concat('%%|', %s.ad_org_id, '|%%')",
-          clientId, roleId, tableAlias));
+          clientId, roleId, tableInfo.getTableAlias()));
       if (isActiveFilter) {
-        conditions.add(String.format("%s.isactive = 'Y'", tableAlias));
+        conditions.add(String.format("%s.isactive = 'Y'", tableInfo.getTableAlias()));
       }
     } else {
       conditions.add(String.format("ad_client_id in ('0', '%s')", clientId));
@@ -123,19 +124,18 @@ public class DefaultFilters {
   }
 
   /**
-   * Applies the given conditions as filters to the provided SQL query.
+   * Applies the provided conditions as filters to the SQL query.
    * The method modifies the SQL query by adding the conditions to the WHERE clause.
    *
    * @param sql the original SQL query
-   * @param conditions a list of conditions to be applied as filters to the SQL query
-   * @return the SQL query with the applied filters
-   * @throws QueryException if the SQL operation is not supported or if the SQL query was not modified
-   * @throws RuntimeException if there is a parsing error
+   * @param statement the SQL statement to be modified
+   * @param conditions the list of conditions to be applied as filters
+   * @return the modified SQL query with the applied filters
+   * @throws QueryException if there is a parsing error or if the SQL query was not modified
    */
-  static String applyFilters(String sql, List<String> conditions) {
+  static String applyFilters(String sql, Statement statement, List<String> conditions) {
     String finalSql;
     try {
-      Statement statement = CCJSqlParserUtil.parse(sql);
       if (statement instanceof Select select) {
         PlainSelect plainSelect = select.getPlainSelect();
         for (String condition : conditions) {
@@ -159,7 +159,7 @@ public class DefaultFilters {
             delete.setWhere(andExpression);
           }
       } else if (statement instanceof Insert) {
-          return sql;
+          return statement.toString();
       } else {
           throw new QueryException("applyFilters ERROR - SQL operation not supported");
       }
@@ -167,7 +167,7 @@ public class DefaultFilters {
       if (StringUtils.equals(finalSql, sql)) {
         throw new QueryException("applyFilters ERROR - SQL query was not modified");
       }
-      log.debug("sql: {}", sql);
+      log.debug("sql: {}", statement.toString());
       log.debug("finalSql: {}", finalSql);
     } catch (JSQLParserException e) {
       throw new QueryException(e);
@@ -177,19 +177,26 @@ public class DefaultFilters {
 
   /**
    * Replaces the SQL query with the appropriate filters based on the client ID, role ID, and active filter status.
+   * The method parses the SQL query, generates the default WHERE clause conditions, and applies the filters to the query.
    *
    * @param sql the original SQL query
    * @param clientId the client ID to be used in the filters
    * @param roleId the role ID to be used in the filters
    * @param isActiveFilter a boolean indicating whether the active filter should be applied
    * @return the SQL query with the applied filters
+   * @throws QueryException if there is a parsing error
    */
   @NotNull
   private static String replaceInQuery(String sql, String clientId, String roleId,
       boolean isActiveFilter) {
-    QueryInfo tableInfo = getQueryInfo(sql);
-    List<String> conditions = getDefaultWhereClause(tableInfo.getTableAlias(), clientId, roleId, isActiveFilter);
-    return applyFilters(sql, conditions);
+    try {
+      Statement statement = CCJSqlParserUtil.parse(sql);
+      List<String> conditions = getDefaultWhereClause(statement, clientId, roleId, isActiveFilter);
+      return applyFilters(sql, statement, conditions);
+    } catch (JSQLParserException e) {
+      log.error("[replaceInQuery] - PATTERN ERROR: " + e.getMessage());
+      throw new QueryException("replaceInQuery ERROR");
+    }
   }
 
   /**
@@ -219,47 +226,41 @@ public class DefaultFilters {
   }
 
   /**
-   * Extracts information about the SQL query such as the action (SELECT, UPDATE, INSERT, DELETE),
-   * the table name, the table alias, and whether the query contains a WHERE clause.
+   * Extracts information about the SQL query such as the table name, the table alias, and whether the query contains a WHERE clause.
+   * The method determines the type of SQL statement (SELECT, UPDATE, INSERT, DELETE) and extracts relevant information accordingly.
    *
-   * @param sql the SQL query to be analyzed
+   * @param statement the SQL statement to be analyzed
    * @return a QueryInfo object containing details about the SQL query
    * @throws QueryException if the SQL operation is not supported or if there is a parsing error
    */
-  static QueryInfo getQueryInfo(String sql) {
+  static QueryInfo getQueryInfo(Statement statement) {
     String sqlAction = null;
     String tableName = null;
     String tableAlias = null;
     boolean containsWhere = false;
-    try {
-      Statement statement = CCJSqlParserUtil.parse(sql);
-      if (statement instanceof Select select) {
-        PlainSelect plainSelect = select.getPlainSelect();
-        sqlAction = SELECT;
-        tableName = plainSelect.getFromItem().getASTNode().jjtGetFirstToken().toString();
-        tableAlias = plainSelect.getFromItem().getAlias().getName();
-        containsWhere = plainSelect.getWhere() != null;
-      } else if (statement instanceof Update update) {
-        sqlAction = UPDATE;
-        tableName = update.getTable().getName();
-        containsWhere = update.getWhere() != null;
-      } else if (statement instanceof Insert insert) {
-        sqlAction = INSERT;
-        tableName = insert.getTable().getName();
-      } else if (statement instanceof Delete delete) {
-        sqlAction = DELETE;
-        tableName = delete.getTable().getName();
-        tableAlias = delete.getTable().getAlias().getName();
-        containsWhere = delete.getWhere() != null;
-      } else {
-        log.error("getQueryInfo ERROR - SQL operation not supported: " + sql);
-        throw new QueryException("getQueryInfo ERROR - SQL operation not supported");
-      }
-      return new QueryInfo(sqlAction, tableName, tableAlias, containsWhere);
-    } catch (JSQLParserException e) {
-      log.error("[getQueryInfo] - PATTERN ERROR: " + e.getMessage());
-      throw new QueryException("getQueryInfo ERROR");
+    if (statement instanceof Select select) {
+      PlainSelect plainSelect = select.getPlainSelect();
+      sqlAction = SELECT;
+      tableName = plainSelect.getFromItem().getASTNode().jjtGetFirstToken().toString();
+      tableAlias = plainSelect.getFromItem().getAlias().getName();
+      containsWhere = plainSelect.getWhere() != null;
+    } else if (statement instanceof Update update) {
+      sqlAction = UPDATE;
+      tableName = update.getTable().getName();
+      containsWhere = update.getWhere() != null;
+    } else if (statement instanceof Insert insert) {
+      sqlAction = INSERT;
+      tableName = insert.getTable().getName();
+    } else if (statement instanceof Delete delete) {
+      sqlAction = DELETE;
+      tableName = delete.getTable().getName();
+      tableAlias = delete.getTable().getAlias().getName();
+      containsWhere = delete.getWhere() != null;
+    } else {
+      log.error("getQueryInfo ERROR - SQL operation not supported: " + statement.toString());
+      throw new QueryException("getQueryInfo ERROR - SQL operation not supported");
     }
+    return new QueryInfo(sqlAction, tableName, tableAlias, containsWhere);
   }
 
   /**
