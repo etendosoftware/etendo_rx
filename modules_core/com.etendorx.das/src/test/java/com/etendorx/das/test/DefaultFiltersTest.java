@@ -117,7 +117,7 @@ public class DefaultFiltersTest {
         ROLE_ID_101112, isActive, REST_METHOD_PUT);
 
     // Assert
-    String expected = "update t1_0 set column = 'value' where t1_0.ad_client_id in ('0', '456') " + "and etrx_role_organizations('456', '101112', 'r') like concat('%|', t1_0.ad_org_id, '|%') " + "and t1_0.table_id = 1"; //NOSONAR
+    String expected = "UPDATE t1_0 SET column = 'value' WHERE t1_0.table_id = 1 AND ad_client_id IN ('0', '456') AND etrx_role_organizations('456', '101112', 'r') LIKE concat('%|', ad_org_id, '|%')"; //NOSONAR
     Assertions.assertEquals(expected, result);
   }
 

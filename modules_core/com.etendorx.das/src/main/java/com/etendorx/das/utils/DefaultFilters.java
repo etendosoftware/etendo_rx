@@ -25,10 +25,10 @@ import java.util.List;
  */
 @Slf4j
 public class DefaultFilters {
-  public static final String SELECT = "select"; // SQL SELECT action
-  public static final String INSERT = "insert into"; // SQL INSERT action
-  public static final String UPDATE = "update"; // SQL UPDATE action
-  public static final String DELETE = "delete"; // SQL DELETE action
+  public static final String SELECT = "SELECT"; // SQL SELECT action
+  public static final String INSERT = "INSERT INTO"; // SQL INSERT action
+  public static final String UPDATE = "UPDATE"; // SQL UPDATE action
+  public static final String DELETE = "DELETE"; // SQL DELETE action
   public static final String SUPER_USER_ID = "100"; // Superuser ID
   public static final String SUPER_USER_CLIENT_ID = "0"; // Superuser client ID
   public static final String GET_METHOD = "GET"; // HTTP GET method
@@ -77,9 +77,9 @@ public class DefaultFilters {
         return replaceInQuery(sql, clientId, roleId, isActive);
       case DELETE_METHOD, PUT_METHOD:
       case PATCH_METHOD:
-        return replaceInQuery(sql, clientId, roleId, StringUtils.startsWith(sql, SELECT));
+        return replaceInQuery(sql, clientId, roleId, StringUtils.startsWithIgnoreCase(sql, SELECT));
       case POST_METHOD:
-        if (StringUtils.startsWith(sql, SELECT)) {
+        if (StringUtils.startsWithIgnoreCase(sql, SELECT)) {
           return replaceInQuery(sql, clientId, roleId, isActive);
         } else {
           return sql;
