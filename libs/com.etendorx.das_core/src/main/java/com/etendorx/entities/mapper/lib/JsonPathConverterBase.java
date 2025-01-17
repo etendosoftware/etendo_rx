@@ -111,7 +111,7 @@ public abstract class JsonPathConverterBase<E> implements JsonPathConverter<E> {
       if(m.containsKey("id")) {
         Object val = m.get("id");
         if(val instanceof String) {
-          log.warn("Extracted id from map: {}", o.toString());
+          log.debug("Extracted id from map: {}", o.toString());
           return (String) val;
         }
       }
