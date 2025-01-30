@@ -1,3 +1,6 @@
 FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu AS config
-COPY modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-2.1.0.jar /opt/app/lib/com.etendorx.config.jar
+ARG RX_VERSION
+ENV RX_VERSION=${RX_VERSION}
+COPY modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-2.2.0.jar /opt/app/lib/com.etendorx.config.jar
 ENTRYPOINT ["java", "-Dfile.encoding=UTF-8" , "-Dloader.path=./lib/" , "-jar", "/opt/app/lib/com.etendorx.config.jar"]
+
