@@ -48,7 +48,7 @@ public class AuditServiceInterceptorImpl implements AuditServiceInterceptor {
   }
 
   @Override
-  public void setAuditValues(BaseRXObject baseObject, boolean newRecord) {
+  public void setAuditValues(BaseRXObject baseObject) {
     log.debug("Setting audit values for {}", baseObject.getClass().getSimpleName());
     log.debug("UserContext: {}", userContext);
     log.debug("UserContext.userId {}", userContext.getUserId());
@@ -74,9 +74,9 @@ public class AuditServiceInterceptorImpl implements AuditServiceInterceptor {
   }
 
   @Override
-  public void setAuditValues(BaseSerializableObject baseObject, boolean newRecord) {
+  public void setAuditValues(BaseSerializableObject baseObject) {
     if(baseObject instanceof BaseRXObject) {
-      setAuditValues((BaseRXObject) baseObject, newRecord);
+      setAuditValues((BaseRXObject) baseObject);
     }
   }
 }

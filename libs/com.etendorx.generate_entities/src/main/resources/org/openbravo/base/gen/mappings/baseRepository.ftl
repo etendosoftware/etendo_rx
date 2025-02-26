@@ -5,6 +5,7 @@ import com.etendorx.entities.entities.BaseDTORepositoryDefault;
 import com.etendorx.entities.jparepo.${entity.table.name}Repository;
 import com.etendorx.entities.mapper.lib.DefaultValuesHandler;
 import com.etendorx.entities.mapper.lib.ExternalIdService;
+import com.etendorx.entities.mapper.lib.PostSyncService;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.validation.Validator;
 import ${entity.table.thePackage.javaPackage}.${entity.table.className};
@@ -26,9 +27,10 @@ public class ${mappingPrefix}${entity.externalName}DTORepositoryDefault extends 
       AuditServiceInterceptor auditService,
       Validator validator,
       ExternalIdService externalIdService,
-      Optional<DefaultValuesHandler> defaultValuesHandler
+      Optional<DefaultValuesHandler> defaultValuesHandler,
+      PostSyncService postSyncService
     ) {
-    super(restCallTransactionHandler, repository, converter, retriever, auditService, validator, externalIdService, defaultValuesHandler);
+    super(restCallTransactionHandler, repository, converter, retriever, auditService, validator, externalIdService, defaultValuesHandler, postSyncService);
   }
 
   <#list modelProviderRX.getETRXRepositories(entity) as repo>

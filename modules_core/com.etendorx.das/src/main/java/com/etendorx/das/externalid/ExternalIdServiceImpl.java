@@ -32,7 +32,6 @@ public class ExternalIdServiceImpl implements ExternalIdService {
   private final ETRX_instance_externalidRepository instanceExternalIdRepository;
   private final ADTableRepository adTableRepository;
   private final ETRX_Instance_ConnectorRepository instanceConnectorRepository;
-
   private final ThreadLocal<Queue<EntityToStore>> currentEntity = new ThreadLocal<>();
   private final AuditServiceInterceptor auditService;
 
@@ -122,28 +121,32 @@ public class ExternalIdServiceImpl implements ExternalIdService {
   }
 
   /**
-   * This method stores the external ID of an entity.
-   * It creates an ExternalInstanceMapping object and sets its properties.
-   * If the externalInstanceMapping object is valid, it is saved in the instanceExternalIdRepository.
+   * Stores the external ID of an entity.
+   * This method checks if a record with the given externalSystemId, externalId, adTableId, and entity identifier already exists.
+   * If the record does not exist, it creates a new ExternalInstanceMapping object, sets its properties, and saves it in the instanceExternalIdRepository.
    *
    * @param externalSystemId the ID of the external system
-   * @param entity           the entity to store
-   * @param baseRXObject     the BaseRXObject to store
+   * @param entity the entity to store
+   * @param baseRXObject the BaseRXObject to store
    */
   private void storeExternalId(String externalSystemId, EntityToStore entity,
       BaseRXObject baseRXObject) {
-    Table table = adTableRepository.findById(entity.getAdTableId()).orElse(null);
-    ExternalInstanceMapping externalInstanceMapping = new ExternalInstanceMapping();
-    externalInstanceMapping.setTable(table);
-    externalInstanceMapping.setEtendoEntity(baseRXObject.get_identifier());
-    externalInstanceMapping.setExternalSystemEntity(entity.getExternalId());
-    externalInstanceMapping.setETRXInstanceConnector(
-        instanceConnectorRepository.findById(externalSystemId).orElse(null));
-    auditService.setAuditValues(externalInstanceMapping, true);
-    if (isValidToStore(externalInstanceMapping)) {
-      instanceExternalIdRepository.save(externalInstanceMapping);
-    } else {
-      log.error("ExternalInstanceMapping is not valid: " + externalInstanceMapping);
+    boolean existsRecord = instanceExternalIdRepository.existsRecord(externalSystemId, entity.getExternalId(), entity.getAdTableId(), baseRXObject.get_identifier(), null).stream()
+        .findFirst().isPresent();
+    if (!existsRecord) {
+      Table table = adTableRepository.findById(entity.getAdTableId()).orElse(null);
+      ExternalInstanceMapping externalInstanceMapping = new ExternalInstanceMapping();
+      externalInstanceMapping.setTable(table);
+      externalInstanceMapping.setEtendoEntity(baseRXObject.get_identifier());
+      externalInstanceMapping.setExternalSystemEntity(entity.getExternalId());
+      externalInstanceMapping.setETRXInstanceConnector(
+          instanceConnectorRepository.findById(externalSystemId).orElse(null));
+      auditService.setAuditValues(externalInstanceMapping);
+      if (isValidToStore(externalInstanceMapping)) {
+        instanceExternalIdRepository.save(externalInstanceMapping);
+      } else {
+        log.error("ExternalInstanceMapping is not valid: " + externalInstanceMapping);
+      }
     }
   }
 
@@ -164,7 +167,6 @@ public class ExternalIdServiceImpl implements ExternalIdService {
    * It creates a Specification to find the ExternalInstanceMapping and returns the internal ID.
    *
    * @param tableId    the ID of the table
-   * @param key        the key
    * @param externalId the value
    */
   @Override
@@ -208,7 +210,7 @@ public class ExternalIdServiceImpl implements ExternalIdService {
   private void handleMissingInternalId(boolean externalIdRequired, String externalId,
       String externalSystemId, String tableId) {
     String message = "ExternalIdService.convertExternalToInternalId: No internal id found for externalSystemId " + externalSystemId + " table " + tableId + " external id: " + externalId;
-    log.error(message);
+    log.debug(message);
   }
 
   /**
