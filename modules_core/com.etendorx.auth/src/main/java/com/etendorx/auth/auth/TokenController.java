@@ -2,19 +2,12 @@ package com.etendorx.auth.auth;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.UUID;
-
-import javax.swing.text.html.HTMLDocument;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -68,7 +61,6 @@ public class TokenController {
       );
       HttpHeaders tokenHeaders = new HttpHeaders();
       tokenHeaders.set("Authorization", "Bearer " + token);
-      // check if exists
       new RestTemplate().exchange(dasUrl + AUTH_TOKEN_INFO_URI_WITH_DATE_FORMAT,
           HttpMethod.POST,
           new HttpEntity<>(tokenInfo, tokenHeaders),
