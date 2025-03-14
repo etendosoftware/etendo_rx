@@ -82,7 +82,9 @@ public class JwtKeyUtils {
   public static <T extends Key> T readKey(String originalKey, String spec,
       Function<String, EncodedKeySpec> keySpec,
       BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator) {
+    logger.info("Reading the '{}' key: '{}'", spec, originalKey);
     String cleanKey = cleanKeyHeaders(originalKey, spec);
+    logger.info("Cleaned key: '{}'", cleanKey);
     try {
       return keyGenerator.apply(KeyFactory.getInstance("EC"), keySpec.apply(cleanKey));
     } catch (JwtKeyException ex) {
