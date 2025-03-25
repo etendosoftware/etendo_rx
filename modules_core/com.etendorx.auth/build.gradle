@@ -72,6 +72,9 @@ dependencies {
 
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    // JSONObject
+    implementation group: 'org.codehaus.jettison', name: 'jettison', version: '1.5.4'
 }
 
 ext {

@@ -1,6 +1,7 @@
 package com.etendorx.auth.filter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jettison.json.JSONObject;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -12,8 +13,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -44,26 +47,72 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
       throws IOException, ServletException {
     Map<String, String> params = parseQueryString(request.getQueryString());
-    if (params.containsKey(ERROR)) {
-      request.setAttribute("errorMessage" , params.get(ERROR));
-      if (StringUtils.equals("access_denied", params.get(ERROR))) {
-        throw new AccessDeniedException(params.get(ERROR));
-      }
-      request.setAttribute("errorMessage" , "internal_error");
-      throw new RuntimeException("Internal error occurred.");
+//    if (params.containsKey(ERROR)) {
+//      request.setAttribute("errorMessage" , params.get(ERROR));
+//      if (StringUtils.equals("access_denied", params.get(ERROR))) {
+//        throw new AccessDeniedException(params.get(ERROR));
+//      }
+//      request.setAttribute("errorMessage" , "internal_error");
+//      throw new RuntimeException("Internal error occurred.");
+//    }
+    String user = null;
+    String etrxOauthProviderId = null;
+    if (params.containsKey("code")) {
+      user = (String) request.getSession().getAttribute(USER_ID);
+      etrxOauthProviderId = (String) request.getSession().getAttribute(ETRX_OAUTH_PROVIDER_ID);
     }
-    if (params.containsKey(USER_ID) && params.containsKey(ETRX_OAUTH_PROVIDER_ID)) {
+
+    if (params.containsKey("state") && (user == null || etrxOauthProviderId == null)) {
+      String encodedState = params.get("state");
+      try {
+        // Decodificar Base64
+        byte[] decodedBytes = Base64.getDecoder().decode(encodedState);
+        String decodedState = new String(decodedBytes, StandardCharsets.UTF_8);
+
+        // Convertir el `state` a JSON
+        JSONObject jsonState = new JSONObject(decodedState);
+
+        // Obtener los parámetros personalizados enviados en `state`
+        String customParam1 = jsonState.optString("userId", null);
+        String customParam2 = jsonState.optString("etrxOauthProviderId", null);
+        String originalState = jsonState.optString("state", null);
+
+        // Guardar en sesión para usarlos después
+        request.getSession().setAttribute("oauth2_state", originalState);
+        request.getSession().setAttribute("userId", customParam1);
+        request.getSession().setAttribute("etrxOauthProviderId", customParam2);
+
+      } catch (Exception e) {
+        throw new RuntimeException("Error al decodificar el state: " + e.getMessage(), e);
+      }
+    }
+
+    if ((params.containsKey(USER_ID) && params.containsKey(ETRX_OAUTH_PROVIDER_ID)) ||
+        (user != null && etrxOauthProviderId != null)) {
       try {
         String fullURL = request.getRequestURL() + "?" + request.getQueryString();
         URI uri = new URI(fullURL);
         request.getSession().setAttribute("loginURL", uri.getPath());
-        request.getSession().setAttribute(USER_ID, params.get(USER_ID));
-        request.getSession().setAttribute(ETRX_OAUTH_PROVIDER_ID, params.get(ETRX_OAUTH_PROVIDER_ID));
+        request.getSession().setAttribute(USER_ID, user != null ? user : params.get(USER_ID));
+        request.getSession().setAttribute(ETRX_OAUTH_PROVIDER_ID, etrxOauthProviderId != null ? etrxOauthProviderId : params.get(ETRX_OAUTH_PROVIDER_ID));
       } catch (URISyntaxException e) {
         request.setAttribute("errorMessage" , "internal_error");
         throw new RuntimeException("Error parsing URI", e);
       }
     }
+//    if (params.containsKey("code")) {
+//      try {
+//        String fullURL = request.getRequestURL() + "?" + request.getQueryString();
+//        URI uri = new URI(fullURL);
+//        request.getSession().setAttribute("code", params.get("code"));
+//        request.getSession().setAttribute("loginURL", uri.getPath());
+//        request.getSession().setAttribute(USER_ID, "100");
+//        request.getSession().setAttribute(ETRX_OAUTH_PROVIDER_ID, "A9739572ADF94BD2AE0963D1637494D6");
+//      } catch (URISyntaxException e) {
+//        request.setAttribute("errorMessage" , "internal_error");
+//        throw new RuntimeException("Error parsing URI", e);
+//      }
+//    }
       filterChain.doFilter(request, response);
   }
 

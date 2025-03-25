@@ -25,7 +25,8 @@ public class SecurityConfig {
   private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
   @Bean
-  protected DefaultSecurityFilterChain configure(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
+  protected DefaultSecurityFilterChain configure(HttpSecurity http,
+      ClientRegistrationRepository clientRegistrationRepository) throws Exception {
     http
         .authorizeHttpRequests(a -> a
             .requestMatchers("/api/genToken").authenticated()

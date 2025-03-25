@@ -35,7 +35,7 @@ public class TokenController {
   private ResourceLoader resourceLoader;
 
   private static final String AUTH_TOKEN_INFO_URI_WITH_DATE_FORMAT = "/auth/ETRX_Token_Info?_dateFormat=yyyy-MM-dd'T'HH:mm:ss.SSSX";
-  @Value("${token}")
+  @Value("${adminToken}")
   String token;
   @Value("${das.url}")
   String dasUrl;
