@@ -44,6 +44,8 @@ public class TokenController {
   public Object index(HttpServletRequest request, @RequestParam(required = false) String userId,
       @RequestParam(required = false) String etrxOauthProviderId) {
     try {
+      log.info("userId from TokenController : " + userId);
+      log.info("etrxOauthProviderId from TokenController : " + etrxOauthProviderId);
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       DefaultOAuth2User user = (DefaultOAuth2User) authentication.getPrincipal();
       if (StringUtils.equals("FailedTokenCreation", user.getAttribute("name"))) {

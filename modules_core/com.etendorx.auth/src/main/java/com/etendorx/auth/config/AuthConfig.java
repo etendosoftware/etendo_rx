@@ -43,8 +43,9 @@ public class AuthConfig {
       String userNameAttributeName = "name";
       try {
         String userId = (String) request.getSession().getAttribute("userId");
+        logger.info("userId from request on AuthConfig: " + userId);
         String etrxOauthProviderId = (String) request.getSession().getAttribute("etrxOauthProviderId");
-
+        logger.info("etrxOauthProviderId from request on AuthConfig: " + etrxOauthProviderId);
         fillUserAttributes(userAttributes,
             accessToken.getTokenValue(),
             accessToken.getExpiresAt(),

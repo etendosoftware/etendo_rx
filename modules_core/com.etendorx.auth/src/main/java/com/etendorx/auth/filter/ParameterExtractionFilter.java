@@ -47,19 +47,13 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
       throws IOException, ServletException {
     Map<String, String> params = parseQueryString(request.getQueryString());
-//    if (params.containsKey(ERROR)) {
-//      request.setAttribute("errorMessage" , params.get(ERROR));
-//      if (StringUtils.equals("access_denied", params.get(ERROR))) {
-//        throw new AccessDeniedException(params.get(ERROR));
-//      }
-//      request.setAttribute("errorMessage" , "internal_error");
-//      throw new RuntimeException("Internal error occurred.");
-//    }
     String user = null;
     String etrxOauthProviderId = null;
     if (params.containsKey("code")) {
       user = (String) request.getSession().getAttribute(USER_ID);
+      logger.info("userId from request on ParameterExtractionFilter: " + user);
       etrxOauthProviderId = (String) request.getSession().getAttribute(ETRX_OAUTH_PROVIDER_ID);
+      logger.info("etrxOauthProviderId from request on ParameterExtractionFilter: " + etrxOauthProviderId);
     }
 
     if (params.containsKey("state") && (user == null || etrxOauthProviderId == null)) {
@@ -73,14 +67,16 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
         JSONObject jsonState = new JSONObject(decodedState);
 
         // Obtener los parámetros personalizados enviados en `state`
-        String customParam1 = jsonState.optString("userId", null);
-        String customParam2 = jsonState.optString("etrxOauthProviderId", null);
+        String userIdStr = jsonState.optString("userId", null);
+        logger.info("userIdStr from state on ParameterExtractionFilter: " + userIdStr);
+        String providerIdStr = jsonState.optString("etrxOauthProviderId", null);
+        logger.info("providerIdStr from state on ParameterExtractionFilter: " + providerIdStr);
         String originalState = jsonState.optString("state", null);
 
         // Guardar en sesión para usarlos después
         request.getSession().setAttribute("oauth2_state", originalState);
-        request.getSession().setAttribute("userId", customParam1);
-        request.getSession().setAttribute("etrxOauthProviderId", customParam2);
+        request.getSession().setAttribute("userId", userIdStr);
+        request.getSession().setAttribute("etrxOauthProviderId", providerIdStr);
 
       } catch (Exception e) {
         throw new RuntimeException("Error al decodificar el state: " + e.getMessage(), e);
@@ -90,6 +86,10 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
     if ((params.containsKey(USER_ID) && params.containsKey(ETRX_OAUTH_PROVIDER_ID)) ||
         (user != null && etrxOauthProviderId != null)) {
       try {
+        logger.info("user from request on ParameterExtractionFilter: " + user
+            + "and also (params.containsKey(USER_ID): " + params.containsKey(USER_ID));
+        logger.info("etrxOauthProviderId from request on ParameterExtractionFilter: " + etrxOauthProviderId
+            + "and also (params.containsKey(ETRX_OAUTH_PROVIDER_ID): " + params.containsKey(ETRX_OAUTH_PROVIDER_ID));
         String fullURL = request.getRequestURL() + "?" + request.getQueryString();
         URI uri = new URI(fullURL);
         request.getSession().setAttribute("loginURL", uri.getPath());
