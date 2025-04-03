@@ -87,9 +87,9 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
         (user != null && etrxOauthProviderId != null)) {
       try {
         logger.info("user from request on ParameterExtractionFilter: " + user
-            + "and also (params.containsKey(USER_ID): " + params.containsKey(USER_ID));
+            + " and also (params.containsKey(USER_ID): " + params.containsKey(USER_ID));
         logger.info("etrxOauthProviderId from request on ParameterExtractionFilter: " + etrxOauthProviderId
-            + "and also (params.containsKey(ETRX_OAUTH_PROVIDER_ID): " + params.containsKey(ETRX_OAUTH_PROVIDER_ID));
+            + " and also (params.containsKey(ETRX_OAUTH_PROVIDER_ID): " + params.containsKey(ETRX_OAUTH_PROVIDER_ID));
         String fullURL = request.getRequestURL() + "?" + request.getQueryString();
         URI uri = new URI(fullURL);
         request.getSession().setAttribute("loginURL", uri.getPath());
@@ -100,19 +100,6 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
         throw new RuntimeException("Error parsing URI", e);
       }
     }
-//    if (params.containsKey("code")) {
-//      try {
-//        String fullURL = request.getRequestURL() + "?" + request.getQueryString();
-//        URI uri = new URI(fullURL);
-//        request.getSession().setAttribute("code", params.get("code"));
-//        request.getSession().setAttribute("loginURL", uri.getPath());
-//        request.getSession().setAttribute(USER_ID, "100");
-//        request.getSession().setAttribute(ETRX_OAUTH_PROVIDER_ID, "A9739572ADF94BD2AE0963D1637494D6");
-//      } catch (URISyntaxException e) {
-//        request.setAttribute("errorMessage" , "internal_error");
-//        throw new RuntimeException("Error parsing URI", e);
-//      }
-//    }
       filterChain.doFilter(request, response);
   }
 

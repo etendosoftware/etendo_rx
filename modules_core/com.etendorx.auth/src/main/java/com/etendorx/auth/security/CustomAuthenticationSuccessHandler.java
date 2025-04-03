@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +22,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
   // The URI for generating a token with parameters
   private static final String API_GEN_TOKEN_URI_WITH_PARAMS = "/api/genToken?userId=%s&etrxOauthProviderId=%s";
+  private static final String USER_ID = "userId";
+  private static final String ETRX_OAUTH_PROVIDER_ID = "etrxOauthProviderId";
 
   /**
    * This method is called when an authentication attempt is successful.
@@ -36,8 +39,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
     DefaultOAuth2User user = (DefaultOAuth2User) authentication.getPrincipal();
-    String userId = user.getAttribute("userId");
-    String etrxOauthProviderId = user.getAttribute("etrxOauthProviderId");
+    String userId = !StringUtils.isBlank(user.getAttribute(USER_ID)) ? user.getAttribute(USER_ID) :
+        (String) request.getSession().getAttribute(USER_ID);
+    String etrxOauthProviderId = !StringUtils.isBlank(user.getAttribute(ETRX_OAUTH_PROVIDER_ID)) ?
+        user.getAttribute(ETRX_OAUTH_PROVIDER_ID) :
+        (String) request.getSession().getAttribute(ETRX_OAUTH_PROVIDER_ID);
 
     // Check if the required parameters are present
     if (userId == null || etrxOauthProviderId == null) {
