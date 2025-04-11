@@ -83,6 +83,8 @@ public class AuthControllerDasRequest {
     JwtRequest request = new JwtRequest();
     request.setUsername("admin");
     request.setPassword("admin");
+    request.setSecret("1234");
+    request.setService("auth");
 
     ResultActions resultActions = this.mockMvc.perform(
         MockMvcRequestBuilders.post("/api/authenticate")
@@ -111,6 +113,8 @@ public class AuthControllerDasRequest {
     JwtRequest request = new JwtRequest();
     request.setUsername(username);
     request.setPassword(password);
+    request.setSecret("1234");
+    request.setService("auth");
 
     ResultActions resultActions = this.mockMvc.perform(
         MockMvcRequestBuilders.post("/api/authenticate")

@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -44,6 +46,9 @@ public class AuthService {
 
   @Value("${token}")
   private String token;
+
+  @Value("${das.url:}")
+  private String dasUrl;
 
   public void validateJwtRequest(JwtRequest jwtRequest) {
     log.debug("Running JWT request validation");
@@ -75,7 +80,13 @@ public class AuthService {
    */
   public UserModel validateCredentials(String username, String password) {
     log.debug("Sending request to the DAS server.");
-    UserModel userModel = restUtils.getEntity("/auth/ADUser/" + username, UserModel.class);
+    UserModel userModel = new UserModel();
+    try {
+      userModel = restUtils.getEntity("/auth/ADUser/" + username, UserModel.class);
+    } catch (HttpClientErrorException.NotFound e) {
+      log.debug("Username not found.");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_MESSAGE);
+    }
     if (!PasswordHash.matches(password, userModel.getPassword())) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_MESSAGE);
     }
@@ -97,6 +108,7 @@ public class AuthService {
       String rxServiceId = accessList.get(0).getRxServiceId();
       HttpHeaders headers = new HttpHeaders();
       headers.add(HEADER_TOKEN, token);
+      restUtils = restUtils == null ? new RestUtils(new RestTemplate(), dasUrl) : restUtils;
       RxService rxService = restUtils.getEntity("/auth/ETRX_Rx_Services/" + rxServiceId,
           RxService.class);
       if (!StringUtils.equals(rxService.getSearchkey(), authRequest.getService())) {

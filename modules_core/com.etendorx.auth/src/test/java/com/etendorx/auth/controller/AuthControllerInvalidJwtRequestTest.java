@@ -48,6 +48,8 @@ public class AuthControllerInvalidJwtRequestTest {
     JwtRequest request = new JwtRequest();
     request.setUsername(username);
     request.setPassword(password);
+    request.setSecret("1234");
+    request.setService("auth");
 
     ResultActions resultActions = this.mockMvc.perform(
         MockMvcRequestBuilders.post("/api/authenticate")

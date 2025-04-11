@@ -7,7 +7,6 @@ import com.etendorx.auth.feign.model.UserModel;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,15 +14,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.interfaces.ECPrivateKey;
+import java.security.spec.ECGenParameterSpec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
-// TODO: DEPRECATED TEST SINCE SWS TOKENIZATION
 public class AuthControllerTest {
 
   @Mock
@@ -60,15 +59,15 @@ public class AuthControllerTest {
     claims.setSubject("subject");
     claims.put("userId", userModel.getId());
 
-    KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
-    keyGenerator.init(256);
-    SecretKey secretKey = keyGenerator.generateKey();
-    byte[] ey = secretKey.getEncoded();
+    KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
+    ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256r1");
+    keyPairGenerator.initialize(ecSpec);
+    KeyPair keyPair = keyPairGenerator.generateKeyPair();
+    ECPrivateKey ecPrivateKey = (ECPrivateKey) keyPair.getPrivate();
 
-    byte[] privateKey = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256).getEncoded();
     String token = Jwts.builder()
         .setClaims(claims)
-        .signWith(SignatureAlgorithm.HS256, privateKey)
+        .signWith(SignatureAlgorithm.ES256, ecPrivateKey)
         .compact();
 
     doNothing().when(authServices).validateJwtRequest(request);

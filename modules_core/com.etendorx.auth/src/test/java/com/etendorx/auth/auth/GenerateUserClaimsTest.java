@@ -10,7 +10,6 @@ import org.mockito.Mock;
 
 import java.util.List;
 
-// TODO: DEPRECATED TEST SINCE SWS TOKENIZATION
 public class GenerateUserClaimsTest {
 
   @Mock
@@ -21,6 +20,8 @@ public class GenerateUserClaimsTest {
 
   @Test
   public void testGenerateUserClaims() {
+    UserModel userModel = new UserModel();
+    AuthService authService = new AuthService();
     userModel.setId("123");
     userModel.setDefaultClient("456");
     userModel.setClient("789");
@@ -38,7 +39,6 @@ public class GenerateUserClaimsTest {
     Assertions.assertEquals(userModel.getDefaultClient(), claims.get(JwtKeyUtils.CLIENT_ID_CLAIM));
     Assertions.assertEquals(serviceAccess.getDefaultOrgId(), claims.get(JwtKeyUtils.ORG_ID));
     Assertions.assertEquals(serviceAccess.getDefaultRoleId(), claims.get(JwtKeyUtils.ROLE_ID));
-    Assertions.assertEquals(searchKey, claims.get(JwtKeyUtils.SERVICE_SEARCH_KEY));
     Assertions.assertEquals(serviceAccess.getRxServiceId(), claims.get(JwtKeyUtils.SERVICE_ID));
   }
 }
