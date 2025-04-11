@@ -1,18 +1,22 @@
 package com.etendorx.utils.auth.key;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.crypto.ECDSAVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+
 import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.*;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -69,17 +73,13 @@ public class JwtKeyUtils {
     return false;
   }
 
-  public static Map<String, Object> getJwtClaims(PublicKey publicKey, String jwt) {
-    Algorithm algorithm = Algorithm.ECDSA256((java.security.interfaces.ECPublicKey) publicKey);
-
-    DecodedJWT decodedJWT = JWT.require(algorithm)
-        .build()
-        .verify(jwt);
-
-    Map<String, Object> claimsMap = new HashMap<>();
-    decodedJWT.getClaims().forEach((key, claim) -> claimsMap.put(key, claim.as(Object.class)));
-
-    return claimsMap;
+  public static Map<String, Object> getJwtClaims(PublicKey publicKey, String jwt) throws ParseException,
+      JOSEException {
+    SignedJWT signedJWT = SignedJWT.parse(jwt);
+    ECDSAVerifier verifier = new ECDSAVerifier((ECPublicKey) publicKey);
+    signedJWT.verify(verifier);
+    JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+    return new HashMap<>(claimsSet.getClaims());
   }
 
   public static <T extends Key> T readKey(String originalKey, String spec,
@@ -135,7 +135,8 @@ public class JwtKeyUtils {
     return key.replaceAll("\\s+", "");
   }
 
-  public static Map<String, Object> parseUnsignedToken(String publicKey, String token) {
+  public static Map<String, Object> parseUnsignedToken(String publicKey, String token) throws ParseException,
+      JOSEException {
     PublicKey pk = JwtKeyUtils.readPublicKey(publicKey);
     return JwtKeyUtils.getJwtClaims(pk, token);
   }
