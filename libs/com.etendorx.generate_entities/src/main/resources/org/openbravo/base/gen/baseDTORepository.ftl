@@ -31,6 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extends BaseDTOModel, F extends BaseDTOModel>
@@ -44,14 +45,17 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
   private final AuditServiceInterceptor auditService;
   private final JsonPathEntityRetriever<T> retriever;
   private final Validator validator;
+  private final Optional<DefaultValuesHandler> defaultValuesHandler;
   ExternalIdService externalIdService;
   @Value("${"$"}{post-upsert:true}")
   private boolean postUpsert;
+  PostSyncService postSyncService;
 
   public BaseDTORepositoryDefault(RestCallTransactionHandler transactionHandler,
       BaseDASRepository<T> repository, DTOConverter<T, E, F> converter,
       JsonPathEntityRetriever<T> retriever, AuditServiceInterceptor auditService,
-      Validator validator, ExternalIdService externalIdService) {
+      Validator validator, ExternalIdService externalIdService,
+      Optional<DefaultValuesHandler> defaultValuesHandler, PostSyncService postSyncService) {
     this.transactionHandler = transactionHandler;
     this.repository = repository;
     this.converter = converter;
@@ -59,6 +63,8 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
     this.retriever = retriever;
     this.validator = validator;
     this.externalIdService = externalIdService;
+    this.defaultValuesHandler = defaultValuesHandler;
+    this.postSyncService = postSyncService;
   }
 
   /**
@@ -134,7 +140,8 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
       if (entity == null) {
         throw new IllegalStateException("Entity conversion failed");
       }
-      setAuditValuesIfApplicable(entity, isNew);
+      setDefaultValues(entity);
+      setAuditValuesIfApplicable(entity);
       Set<ConstraintViolation<T>> violations = validator.validate(entity);
       if (!violations.isEmpty()) {
         List<String> messages = new ArrayList<>();
@@ -154,13 +161,34 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
       newId = converter.convert(entity).getId();
       externalIdService.add(entity.getTableId(), dtoEntity.getId(), entity);
       externalIdService.flush();
+
+      entity = converter.convertList(dtoEntity, entity);
+      entity = repository.save(entity);
+      postSyncService.flush();
+      externalIdService.flush();
       transactionHandler.commit();
+
+      triggerEventHandlers(entity, isNew);
       return converter.convert(retriever.get(newId));
     } catch (ResponseStatusException e) {
       throw e;
     } catch (Exception e) {
       e.printStackTrace();
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+  }
+
+  private void triggerEventHandlers(T entity, boolean isNew) {
+    if(defaultValuesHandler != null) {
+      defaultValuesHandler.ifPresent(
+          valuesHandler -> valuesHandler.triggerEventHandlers(entity, isNew));
+    }
+  }
+
+  private void setDefaultValues(T entity) {
+    if(defaultValuesHandler != null) {
+      defaultValuesHandler.ifPresent(
+          valuesHandler -> valuesHandler.setDefaultValues(entity));
     }
   }
 
@@ -179,11 +207,10 @@ public class BaseDTORepositoryDefault<T extends BaseSerializableObject, E extend
    * Set audit values if applicable
    *
    * @param entity
-   * @param isNew
    */
-  private void setAuditValuesIfApplicable(Object entity, boolean isNew) {
+  private void setAuditValuesIfApplicable(Object entity) {
     if (BaseRXObject.class.isAssignableFrom(entity.getClass())) {
-      auditService.setAuditValues((BaseRXObject) entity, isNew);
+      auditService.setAuditValues((BaseRXObject) entity);
     }
   }
 

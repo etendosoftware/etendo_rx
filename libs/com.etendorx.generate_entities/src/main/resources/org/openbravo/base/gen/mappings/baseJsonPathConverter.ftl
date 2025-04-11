@@ -229,7 +229,11 @@ public class ${mappingPrefix}${entity.externalName}JsonPathConverter extends Jso
       <#if field.fieldMapping == "EM" && genUtils.isOneToMany(field) >
         list
       <#else>
-        _${NamingUtil.getSafeJavaName(field.name)}.getValue()
+        <#if field.name == "id" >
+          _${NamingUtil.getSafeJavaName(field.name)}.getValue().toString()
+        <#else>
+          _${NamingUtil.getSafeJavaName(field.name)}.getValue()
+        </#if>
       </#if>
     </#if>
       );

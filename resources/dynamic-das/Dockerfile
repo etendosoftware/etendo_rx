@@ -25,10 +25,10 @@ ENV DB_SID=etendo
 WORKDIR /app
 
 # Copy only the necessary build files
-COPY build.gradle /app-template/
+COPY resources/dynamic-das/build.gradle /app-template/
 # Copy specific module gradle files and Makefile
-COPY modules_gen/com.etendorx.entities/build.gradle /app-template/modules_gen/com.etendorx.entities/
-COPY modules_gen/com.etendorx.entities/Makefile /app-template/modules_gen/com.etendorx.entities/
+COPY resources/dynamic-das/modules_gen/com.etendorx.entities/build.gradle /app-template/modules_gen/com.etendorx.entities/
+COPY resources/dynamic-das/modules_gen/com.etendorx.entities/Makefile /app-template/modules_gen/com.etendorx.entities/
 
 # Prefer non-interactive gradle commands to reduce logs and potential hangups
 CMD cp -r /app-template/* /app/ && \

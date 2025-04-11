@@ -18,6 +18,7 @@ package com.etendorx.das.connector;
 import com.etendoerp.etendorx.data.ETRXEntityField;
 import com.etendoerp.etendorx.data.InstanceConnectorMapping;
 import com.etendorx.entities.mapper.lib.DTOReadMapping;
+import com.etendorx.entities.metadata.FieldMetadata;
 import com.etendorx.entities.metadata.MetadataUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -65,7 +66,7 @@ public class OBCONFieldMapping implements DTOReadMapping<InstanceConnectorMappin
       map.put("jsonpath", StringUtils.defaultIfBlank(etrxEntityField.getJsonpath(),
           "$." + etrxEntityField.getName()));
       map.put("fieldMapping", etrxEntityField.getFieldMapping());
-      map.put("isExternalIdentifier", processProperty(map, etrxEntityField, entity));
+      map.put("isExternalIdentifier", processProperty(map, etrxEntityField));
       fieldMapping.add(map);
     }
     return fieldMapping;
@@ -78,23 +79,35 @@ public class OBCONFieldMapping implements DTOReadMapping<InstanceConnectorMappin
    *
    * @param map             The map to add the table ID to.
    * @param etrxEntityField The ETRXEntityField to process the property of.
-   * @param entity          The InstanceConnectorMapping entity that contains the ETRXEntityField.
    * @return True if the property was processed successfully, false otherwise.
    */
-  private boolean processProperty(Map<String, Object> map, ETRXEntityField etrxEntityField,
-      InstanceConnectorMapping entity) {
+  private boolean processProperty(Map<String, Object> map, ETRXEntityField etrxEntityField) {
     String property = etrxEntityField.getProperty();
     if (StringUtils.isBlank(property)) {
       return false;
     }
     String[] propertySegments = property.split("\\.");
-    var field = metadataUtil.getPropertyMetadata(
-        entity.getEtrxEntityMapping().getProjectionEntity().getTableEntity().getId(),
-        propertySegments[0]);
-    if (field != null && field.getAdTableIdRel() != null) {
-      map.put("ad_table_id", field.getAdTableIdRel());
-      return true;
+    String tableId = etrxEntityField.getEtrxProjectionEntity().getTableEntity().getId();
+    String entityName = etrxEntityField.getEtrxProjectionEntity().getTableEntity().getName();
+    boolean isProcessProperty = false;
+    boolean isArrayProperty = false;
+
+    for (int i = 0; i < propertySegments.length; i++) {
+      FieldMetadata field = metadataUtil.getPropertyMetadata(
+          tableId,
+          propertySegments[i]);
+      if (field != null && (field.isArray() || field.getAdTableIdRel() != null)) {
+        tableId = field.getAdTableIdRel();
+        entityName = field.getEntityName();
+        isArrayProperty = field.isArray();
+        isProcessProperty = true;
+      }
     }
-    return false;
+    if (isProcessProperty) {
+      map.put("ad_table_id", tableId);
+      map.put("entityName", entityName);
+      map.put("isArray", isArrayProperty);
+    }
+    return isProcessProperty;
   }
 }

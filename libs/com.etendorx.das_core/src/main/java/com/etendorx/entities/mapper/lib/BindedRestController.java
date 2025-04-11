@@ -32,7 +32,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -164,7 +163,7 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
    * @param jsonPath  The JsonPath expression to be used for parsing.
    * @return The parsed JSON data as an Object.
    */
-  private Object parseJson(String rawEntity, String jsonPath) {
+  protected Object parseJson(String rawEntity, String jsonPath) {
     Configuration conf = Configuration.defaultConfiguration().addOptions();
     DocumentContext documentContext = JsonPath.using(conf).parse(rawEntity);
     return documentContext.read(jsonPath, Object.class);

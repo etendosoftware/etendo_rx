@@ -20,6 +20,7 @@ public class ${entity.name}_Metadata_ extends EntityMetadata {
     <#assign columnName = ""/>
     <#assign columnId = ""/>
     <#assign isArray = "false"/>
+    <#assign entityName = "null"/>
     <#if p.columnName??>
         <#assign columnName = p.columnName?lower_case/>
     </#if>
@@ -29,6 +30,8 @@ public class ${entity.name}_Metadata_ extends EntityMetadata {
     <#if !p.computedColumn>
         <#if p.isId()>
         <#assign type = "String"/>
+        <#assign ad_table_id_rel = "\"${p.entity.tableId}\""/>
+        <#assign entityName = "\"${p.entity.name}\""/>
         </#if>
         <#if p.columnName??>
             <#if p.isPrimitive() && !p.isId()>
@@ -42,6 +45,7 @@ public class ${entity.name}_Metadata_ extends EntityMetadata {
                     <#if p.targetEntity?? >
         <#assign type = p.targetEntity.className/>
         <#assign ad_table_id_rel = "\"${p.targetEntity.tableId}\""/>
+        <#assign entityName = "\"${p.targetEntity.name}\""/>
                     <#else>
                     </#if>
                 </#if>
@@ -49,6 +53,8 @@ public class ${entity.name}_Metadata_ extends EntityMetadata {
         <#else>
             <#if p.oneToMany && p.targetEntity?? && !p.isId() && !p.targetEntity.className?ends_with("_ComputedColumns")>
         <#assign type = p.targetEntity.className/>
+        <#assign ad_table_id_rel = "\"${p.targetEntity.tableId}\""/>
+        <#assign entityName = "\"${p.targetEntity.name}\""/>
         <#assign isArray = "true"/>
             </#if>
         </#if>
@@ -57,7 +63,7 @@ public class ${entity.name}_Metadata_ extends EntityMetadata {
         <#assign type = p.getObjectTypeName()/>
         </#if>
     </#if>
-    getFields().put("${p.javaName}", new FieldMetadata("${type}", "${columnName}", "${columnId}", ${ad_table_id_rel}, ${isArray}));
+    getFields().put("${p.javaName}", new FieldMetadata("${type}", "${columnName}", "${columnId}", ${ad_table_id_rel}, ${isArray}, ${entityName}));
 </#list>
   }
 

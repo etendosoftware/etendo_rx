@@ -16,6 +16,6 @@
  package com.etendorx.entities.entities;
 
 public interface AuditServiceInterceptor {
-  void setAuditValues(BaseRXObject baseObject, boolean newRecord);
-  void setAuditValues(BaseSerializableObject baseObject, boolean newRecord);
+  void setAuditValues(BaseRXObject baseObject);
+  void setAuditValues(BaseSerializableObject baseObject);
 }

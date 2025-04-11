@@ -19,7 +19,7 @@ pipeline {
     EMAIL_ADDRESS       = credentials('email_builds')
     ETENDO_RX_URL       = "https://github.com/etendosoftware/etendo_rx"
     ETENDO_BASE_URL     = "https://github.com/etendosoftware/etendo_base"
-    MODULE_RX_URL       = "git@bitbucket.org:koodu_software/com.etendoerp.etendorx.git"
+    MODULE_RX_URL       = "git@github.com:etendosoftware/com.etendoerp.etendorx.git"
     COMMIT_AUTHOR_NAME  = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
     COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
     SUCCESS             = "SUCCESS"
@@ -125,7 +125,7 @@ spec:
               echo "---------------- Prepare gradle.properties ----------------"
               sh """
               cd etendo_core
-              echo -e \"\n
+              echo \"\n
               context.name=${CONTEXT_NAME}\n
               bbdd.sid=${BBDD_SID}\n
               bbdd.port=${BBDD_PORT}\n

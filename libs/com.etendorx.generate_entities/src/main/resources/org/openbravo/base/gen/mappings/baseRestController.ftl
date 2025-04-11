@@ -18,6 +18,8 @@ package com.etendorx.entities.mappings;
 import com.etendorx.entities.mapper.lib.BindedRestController;
 import com.etendorx.entities.mapper.lib.DASRepository;
 import com.etendorx.entities.mapper.lib.JsonPathConverter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -30,6 +32,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/${mappingPrefix?lower_case}/${entity.externalName}")
@@ -39,6 +46,28 @@ public class ${mappingPrefix}${entity.externalName}RestController extends Binded
   JsonPathConverter<${mappingPrefix}${entity.externalName}DTOWrite> converter,
   @Autowired @Qualifier("${mappingPrefix}${entity.externalName}DASRepository") DASRepository<${mappingPrefix}${entity.externalName}DTORead, ${mappingPrefix}${entity.externalName}DTOWrite> repository, Validator validator) {
     super(converter, repository, validator);
+  }
+
+  @PostMapping
+  @ResponseStatus(HttpStatus.OK)
+  @Transactional
+  @Operation(
+      security = { @SecurityRequirement(name = "basicScheme") },
+      requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+          description = "${entity.externalName} object or a list of ${entity.externalName} objects",
+          required = true,
+          content = {
+              @io.swagger.v3.oas.annotations.media.Content(
+                  mediaType = "application/json",
+                  schema = @io.swagger.v3.oas.annotations.media.Schema(oneOf = { ${mappingPrefix}${entity.externalName}DTOWriteRequest.class, ${mappingPrefix}${entity.externalName}DTOWriteRequest.class })
+              )
+          }
+      )
+  )
+  public ResponseEntity<Object> post(
+      @RequestBody String orderPostRequest,
+      @RequestParam(required = false, name = "json_path") String jsonPath) {
+    return super.post(orderPostRequest, jsonPath);
   }
 
   <#list modelProviderRX.getETRXRepositories(entity) as repo>

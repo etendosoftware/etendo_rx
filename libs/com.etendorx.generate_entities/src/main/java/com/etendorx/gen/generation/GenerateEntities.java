@@ -165,6 +165,8 @@ public class GenerateEntities {
   private List<MappingGenerator> getMappingGenerators() {
     var mappingGenerators = new ArrayList<MappingGenerator>();
     mappingGenerators.add(new GenerateBaseDTO());
+    mappingGenerators.add(new GenerateBaseDTORequest());
+    mappingGenerators.add(new GenerateBaseDTORequestList());
     mappingGenerators.add(new GenerateBaseFieldConverterRead());
     mappingGenerators.add(new GenerateBaseFieldConverterWrite());
     mappingGenerators.add(new GenerateBaseJsonPathConverter());
