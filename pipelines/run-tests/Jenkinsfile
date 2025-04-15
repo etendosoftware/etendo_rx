@@ -30,6 +30,8 @@ pipeline {
         SONARQUBE_URL       = credentials('sonarqube-url')
         SONARQUBE_TOKEN     = credentials('sonar-token-access')
 
+        TOMCAT_URL          = "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.98/bin/apache-tomcat-9.0.98.tar.gz"
+
         SUCCESS             = 'SUCCESS'
         FAILED              = 'FAILED'
         ABORTED             = 'ABORTED'
@@ -184,6 +186,15 @@ spec:
                     script {
                         try {
                             sh "./pipelines/run-tests/build-update.sh ${RX_DIR} pending \"Build Environment Etendo Core\" ${ACCESS_TOKEN} ${GIT_COMMIT} ${BUILD_URL}"
+                            echo "---------------- Stack Configuration ----------------"
+
+                            sh "wget -O apache-tomcat.tar.gz $TOMCAT_URL"
+                            sh "tar -xvf apache-tomcat.tar.gz -C $WORKSPACE"
+
+							env.TOMCAT_FOLDER = sh(script: "basename ${TOMCAT_URL} .tar.gz", returnStdout: true).trim()
+                            env.CATALINA_HOME = "${WORKSPACE}/${TOMCAT_FOLDER}"
+                            env.CATALINA_BASE = "${WORKSPACE}/${TOMCAT_FOLDER}"
+
                             withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
                                 echo "---------------------- Starting Classic Environment ----------------------"
                                 sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@github.com:etendosoftware/etendo_core.git"
@@ -220,6 +231,9 @@ spec:
                                     echo "---------------------- Classic Environment Successful ----------------------"
                                 }
                             }
+                            sh "${WORKSPACE}/${TOMCAT_FOLDER}/bin/catalina.sh start"
+                            sh "sleep 1m"
+                            echo "--------------- Build Environment Successful ---------------"
                         } catch (Exception e) {
                             echo "---------------------- Classic Environment Failed ----------------------"
                             echo 'Exception occurred: ' + e.toString()
