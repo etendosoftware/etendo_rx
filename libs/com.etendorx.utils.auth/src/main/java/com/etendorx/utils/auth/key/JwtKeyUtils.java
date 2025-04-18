@@ -24,9 +24,15 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * Utility class for handling JWT keys.
+ * <p>
+ * This class provides methods to read and validate JWT keys, as well as to parse JWT tokens and
+ * extract claims.
+ */
 public class JwtKeyUtils {
 
-  final static Logger logger = LoggerFactory.getLogger(JwtKeyUtils.class);
+  static final Logger logger = LoggerFactory.getLogger(JwtKeyUtils.class);
 
   public static final String USER_ID_CLAIM = "ad_user_id";
   public static final String CLIENT_ID_CLAIM = "ad_client_id";
@@ -38,6 +44,10 @@ public class JwtKeyUtils {
   public static final String CLASSIC_CLIENT = "client";
   public static final String CLASSIC_ORGANIZATION = "organization";
   public static final String CLASSIC_ROLE = "role";
+
+  private JwtKeyUtils() {
+    throw new UnsupportedOperationException("Utility class");
+  }
 
   /**
    * Generates a {@link PrivateKey} from a key String
@@ -61,6 +71,13 @@ public class JwtKeyUtils {
         JwtKeyUtils::publicKeyGenerator);
   }
 
+  /**
+   * Validates a JWT token using the provided public key.
+   *
+   * @param publicKey The public key to verify the JWT
+   * @param jwt       The JWT to validate
+   * @return true if the token is valid, false otherwise
+   */
   public static boolean isValidToken(PublicKey publicKey, String jwt) {
     try {
       getJwtClaims(publicKey, jwt);
@@ -73,6 +90,15 @@ public class JwtKeyUtils {
     return false;
   }
 
+  /**
+   * Parses a JWT and returns the claims as a Map
+   *
+   * @param publicKey The public key to verify the JWT
+   * @param jwt       The JWT to parse
+   * @return A Map with the claims
+   * @throws ParseException If the JWT is not valid
+   * @throws JOSEException  If the JWT is not valid
+   */
   public static Map<String, Object> getJwtClaims(PublicKey publicKey, String jwt) throws ParseException,
       JOSEException {
     SignedJWT signedJWT = SignedJWT.parse(jwt);
@@ -82,6 +108,13 @@ public class JwtKeyUtils {
     return new HashMap<>(claimsSet.getClaims());
   }
 
+  /**
+   * Cleans the key string by removing headers and whitespace.
+   *
+   * @param originalKey The original key string
+   * @param spec        The key specification (e.g., "PUBLIC" or "PRIVATE")
+   * @return The cleaned key string
+   */
   public static <T extends Key> T readKey(String originalKey, String spec,
       Function<String, EncodedKeySpec> keySpec,
       BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator) {
@@ -90,13 +123,21 @@ public class JwtKeyUtils {
       return keyGenerator.apply(KeyFactory.getInstance("EC"), keySpec.apply(cleanKey));
     } catch (JwtKeyException ex) {
       logger.warn("Deprecated Public Key - Upgrade Core");
-      return handleKeyException(spec, keySpec, keyGenerator, cleanKey);
+      return handleKeyException(keySpec, keyGenerator, cleanKey);
     } catch (NoSuchAlgorithmException e) {
       throw new JwtKeyException("Error reading the '" + spec + "' key.", e);
     }
   }
 
-  private static <T extends Key> T handleKeyException(String spec, Function<String, EncodedKeySpec> keySpec,
+  /**
+   * Handles the key exception by attempting to read the key using a different algorithm.
+   *
+   * @param keySpec       The key specification function
+   * @param keyGenerator  The key generator function
+   * @param cleanKey      The cleaned key string
+   * @return The generated key
+   */
+  private static <T extends Key> T handleKeyException(Function<String, EncodedKeySpec> keySpec,
       BiFunction<KeyFactory, EncodedKeySpec, T> keyGenerator, String cleanKey) {
     try {
       return keyGenerator.apply(KeyFactory.getInstance("RSA"), keySpec.apply(cleanKey));
@@ -105,10 +146,23 @@ public class JwtKeyUtils {
     }
   }
 
+  /**
+   * Generates a {@link PKCS8EncodedKeySpec} from a key string.
+   *
+   * @param data The raw key string
+   * @return The generated PKCS8EncodedKeySpec
+   */
   public static EncodedKeySpec privateKeySpec(String data) {
     return new PKCS8EncodedKeySpec(Base64.getDecoder().decode(data));
   }
 
+  /**
+   * Generates a {@link PrivateKey} from a key specification.
+   *
+   * @param kf   The KeyFactory to use
+   * @param spec The key specification
+   * @return The generated PrivateKey
+   */
   public static PrivateKey privateKeyGenerator(KeyFactory kf, EncodedKeySpec spec) {
     try {
       return kf.generatePrivate(spec);
@@ -117,10 +171,23 @@ public class JwtKeyUtils {
     }
   }
 
+  /**
+   * Generates a {@link X509EncodedKeySpec} from a key string.
+   *
+   * @param data The raw key string
+   * @return The generated X509EncodedKeySpec
+   */
   public static EncodedKeySpec publicKeySpec(String data) {
     return new X509EncodedKeySpec(Base64.getDecoder().decode(data));
   }
 
+  /**
+   * Generates a {@link PublicKey} from a key specification.
+   *
+   * @param kf   The KeyFactory to use
+   * @param spec The key specification
+   * @return The generated PublicKey
+   */
   public static PublicKey publicKeyGenerator(KeyFactory kf, EncodedKeySpec spec) {
     try {
       return kf.generatePublic(spec);
@@ -129,18 +196,41 @@ public class JwtKeyUtils {
     }
   }
 
+  /**
+   * Cleans the key string by removing headers and whitespace.
+   *
+   * @param key    The original key string
+   * @param header The header to remove (e.g., "PUBLIC" or "PRIVATE")
+   * @return The cleaned key string
+   */
   public static String cleanKeyHeaders(String key, String header) {
     key = key.replace("-----BEGIN " + header + " KEY-----", "");
     key = key.replace("-----END " + header + " KEY-----", "");
     return key.replaceAll("\\s+", "");
   }
 
+  /**
+   * Parses an unsigned JWT token and returns the claims as a Map.
+   *
+   * @param publicKey The public key to verify the JWT
+   * @param token     The JWT token to parse
+   * @return A Map with the claims
+   * @throws ParseException If the JWT is not valid
+   * @throws JOSEException  If the JWT is not valid
+   */
   public static Map<String, Object> parseUnsignedToken(String publicKey, String token) throws ParseException,
       JOSEException {
     PublicKey pk = JwtKeyUtils.readPublicKey(publicKey);
     return JwtKeyUtils.getJwtClaims(pk, token);
   }
 
+  /**
+   * Parses a JWT token and returns the claims as a Map.
+   *
+   * @param publicKey The public key to verify the JWT
+   * @param token     The JWT token to parse
+   * @return A Map with the claims
+   */
   public static Map<String, Object> getTokenValues(String publicKey, String token) {
     try {
       var map = new HashMap<>(parseUnsignedToken(publicKey, token));
@@ -167,6 +257,13 @@ public class JwtKeyUtils {
     }
   }
 
+  /**
+   * Validates that the token contains the required key values.
+   *
+   * @param tokenValuesMap The map of token values
+   * @param keyValues      The list of required key values
+   * @throws IllegalArgumentException if any required key value is missing
+   */
   public static void validateTokenValues(Map<String, Object> tokenValuesMap,
       List<String> keyValues) {
     for (String keyValue : keyValues) {

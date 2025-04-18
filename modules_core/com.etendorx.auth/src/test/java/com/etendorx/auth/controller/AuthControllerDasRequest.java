@@ -1,138 +1,102 @@
 package com.etendorx.auth.controller;
 
-import com.etendorx.auth.auth.AuthService;
 import com.etendorx.auth.auth.jwt.JwtRequest;
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.matching.UrlPattern;
-import org.junit.jupiter.api.Assertions;
+import com.jayway.jsonpath.JsonPath;
+
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
+import com.etendorx.auth.test.utils.AuthTestUtils;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.fail;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AuthControllerDasRequest {
 
-  @Autowired
-  private MockMvc mockMvc;
-
-  @Value("${das.endpoint}")
-  private String dasEndpoint;
-
-  private WireMockServer wireMockServer;
-
-  void configureMockServer() {
-    Map<String, Object> url = AuthControllerUtils.parseUrl(dasEndpoint);
-    String host = (String) url.get("host");
-    int port = (Integer) url.get("port");
-
-    wireMockServer = new WireMockServer(port);
-    wireMockServer.start();
-    configureFor(host, port);
-
-    addMockUrl(String.valueOf(port));
-  }
-
-  void addMockUrl(String port) {
-    UrlPattern urlSearchUser = WireMock.urlEqualTo(
-        "/ADUser/search/searchByUsername?username=admin&active=true&projection=auth");
-    // Mock User
-    stubFor(WireMock.get(urlSearchUser)
-        .willReturn(WireMock.aResponse()
-            .withStatus(200)
-            .withHeader("Content-Type", MediaTypes.HAL_JSON_VALUE)
-            .withBody(AuthControllerUtils.getSearchUserResponseBody(port))));
-
-    UrlPattern urlUndefinedSearchUser = WireMock.urlEqualTo(
-        "/ADUser/search/searchByUsername?username=undefined&active=true&projection=auth");
-    // Mock User
-    stubFor(WireMock.get(urlUndefinedSearchUser)
-        .willReturn(WireMock.aResponse()
-            .withStatus(200)
-            .withHeader("Content-Type", MediaTypes.HAL_JSON_VALUE)
-            .withBody(AuthControllerUtils.getUsernameNotFoundResponseBody(port))));
+  @BeforeAll
+  static void startServices() throws IOException, InterruptedException, URISyntaxException {
+    AuthTestUtils.startConfigServer();
+    AuthTestUtils.startDASServer();
+    AuthTestUtils.startAuthServer();
   }
 
   @Test
-  void validCredentialsTokenCreation() throws Exception {
-    configureMockServer();
-
+  void validCredentialsTokenCreation() {
     JwtRequest request = new JwtRequest();
     request.setUsername("admin");
     request.setPassword("admin");
     request.setSecret("1234");
     request.setService("auth");
 
-    ResultActions resultActions = this.mockMvc.perform(
-        MockMvcRequestBuilders.post("/api/authenticate")
-            .content(AuthControllerUtils.asJsonString(request))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON));
+    final ResponseEntity<String> response = getStringResponseEntity(request);
 
-    resultActions.andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.token").exists());
-
-    wireMockServer.stop();
+    assertEquals("", HttpStatus.OK, response.getStatusCode());
+    String token = JsonPath.read(response.getBody(), "$.token");
+    assertNotNull(token);
   }
 
   public static Stream<Arguments> params() {
     return Stream.of(
-        // Undefined username
         Arguments.of("undefined", "pass123"), Arguments.of("admin", "und")
-
     );
   }
 
   @ParameterizedTest
   @MethodSource("params")
-  void invalidCredentials(String username, String password) throws Exception {
-    configureMockServer();
-
+  void invalidCredentials(String username, String password) {
     JwtRequest request = new JwtRequest();
     request.setUsername(username);
     request.setPassword(password);
     request.setSecret("1234");
     request.setService("auth");
 
-    ResultActions resultActions = this.mockMvc.perform(
-        MockMvcRequestBuilders.post("/api/authenticate")
-            .content(AuthControllerUtils.asJsonString(request))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON));
+    try {
+      ResponseEntity<String> response = getStringResponseEntity(request);
+      fail("It should be a 401 Unauthorized response, but it was: " + response.getStatusCode());
+    } catch (HttpClientErrorException.Unauthorized ex) {
+      assertEquals("", HttpStatus.UNAUTHORIZED, ex.getStatusCode());
 
-    resultActions.andDo(print())
-        .andExpect(status().isUnauthorized())
-        .andExpect(
-            result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
-        .andExpect(result -> {
-          Assertions.assertEquals(
-              Objects.requireNonNull((ResponseStatusException) result.getResolvedException())
-                  .getReason(), AuthService.UNAUTHORIZED_MESSAGE);
-        });
-
-    wireMockServer.stop();
+      HttpStatusCode responseBody = ex.getStatusCode();
+      assertEquals("", responseBody, HttpStatus.UNAUTHORIZED);
+    }
   }
 
+
+  private static @NotNull ResponseEntity<String> getStringResponseEntity(JwtRequest request) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+    HttpEntity<String> entity = new HttpEntity<>(AuthControllerUtils.asJsonString(request), headers);
+    RestTemplate restTemplate = new RestTemplate();
+    return restTemplate.postForEntity("http://localhost:8094/api/authenticate", entity, String.class);
+  }
+
+  @AfterAll
+  static void stopRunningServices() {
+    AuthTestUtils.stopRunningServices();
+  }
 }

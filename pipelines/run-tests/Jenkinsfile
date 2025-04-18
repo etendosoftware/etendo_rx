@@ -26,7 +26,7 @@ pipeline {
 
         BUILD_CLASSIC       = true
 
-        SONAR_VERSION       = "4.6.2.2472"
+        SONAR_VERSION       = "5.0.1.3006"
         SONARQUBE_URL       = credentials('sonarqube-url')
         SONARQUBE_TOKEN     = credentials('sonar-token-access')
 
@@ -156,7 +156,7 @@ spec:
                             sed -i 's/^grpc.enabled=.*/grpc.enabled=true/' gradle.properties
                             sed -i 's/^data-rest.enabled=.*/data-rest.enabled=true/' gradle.properties
                             mkdir -p modules
-                            ./gradlew :setup
+                            ./gradlew setup
                             """
                             
                             env.COMMIT_INFO = "<p>Commit: ${RX_REPO_URL}/commit/${GIT_COMMIT}<br>Author: ${COMMIT_AUTHOR_NAME} (${COMMIT_AUTHOR_EMAIL})</p>"
@@ -198,7 +198,7 @@ spec:
 
                             withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
                                 echo "---------------------- Starting Classic Environment ----------------------"
-                                sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@github.com:etendosoftware/etendo_core.git"
+                                sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch release/24.4 git@github.com:etendosoftware/etendo_core.git"
                                 dir("etendo_core") {
                                     sh """
                                     echo "\n
@@ -216,18 +216,18 @@ spec:
                                     allow.root=true\n
                                     org.gradle.jvmargs=-Dfile.encoding=UTF-8" > gradle.properties
                                     """
-                                    sh "./gradlew prepareConfig --info --stacktrace"
-                                    sh "./gradlew setup --info --stacktrace"
-                                    sh "./gradlew expandModules --info --stacktrace"
+                                    sh "./gradlew prepareConfig --stacktrace"
+                                    sh "./gradlew setup --stacktrace"
+                                    sh "./gradlew expandModules --stacktrace"
 
                                     sh """
                                     cd modules
-                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch feature/ETP-1041 git@github.com:etendosoftware/com.etendoerp.etendorx.git
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch main git@github.com:etendosoftware/com.etendoerp.etendorx.git
                                     git clone --branch develop https://github.com/etendosoftware/com.etendoerp.integration.petclinic.git
                                     """
                                     
-                                    sh "./gradlew install --info --stacktrace"
-                                    sh "./gradlew smartbuild --info --stacktrace"
+                                    sh "./gradlew install --stacktrace"
+                                    sh "./gradlew smartbuild --stacktrace"
                                     currentBuild.result = SUCCESS
                                     echo "---------------------- Classic Environment Successful ----------------------"
                                 }
@@ -318,7 +318,7 @@ spec:
                             cd modules_test
                             git clone --branch develop https://github.com/etendosoftware/com.etendorx.integration.petclinic.git
                             cd ..
-                            ./gradlew generate.entities --info
+                            ./gradlew generate.entities
                             """
                             currentBuild.result = SUCCESS
                             echo "---------------------- Build of Etendo RX Successful ----------------------"
@@ -345,11 +345,11 @@ spec:
                         echo "---------------------- Running AsyncProcess Tests ----------------------"
                         sh """
                         cd ${RX_DIR}
-                        ./gradlew :com.etendorx.asyncprocess:test jacocoRootReport --info
+                        ./gradlew :com.etendorx.asyncprocess:test jacocoRootReport
                         """
                         echo "---------------------- AsyncProcess Tests Successful ----------------------"
                     } catch (Exception e) {
-                        echo "---------------------- AsyncProcess Tests Faile∫d ----------------------"
+                        echo "---------------------- AsyncProcess Tests Failed ----------------------"
                         echo 'Exception occurred: ' + e.toString()
                         currentBuild.result = UNSTABLE
                         unstable('AsyncProcess Tests Failed')
@@ -377,15 +377,22 @@ spec:
                 container("compiler") {
                     script {
                         try {
-                            echo "---------------------- Running Auth Tests ----------------------"
                             sh """
+                            echo "---------------------- Building services ----------------------"
                             cd ${RX_DIR}
-                            export SPRING_CONFIG_IMPORT=configserver:http://localhost:8080/etendo/buildConfig;
-                            export SPRING_APPLICATION_NAME=auth;
-                            ./gradlew com.etendorx.config:bootRun --info
-                            sleep 30s
-                            curl http://localhost:8080/etendo/auth/default
-                            ./gradlew :com.etendorx.auth:test jacocoTestReport --info
+                            ./gradlew com.etendorx.configserver:build -x test;
+							./gradlew com.etendorx.das:build -x test;
+							./gradlew com.etendorx.entities:build -x test;
+							./gradlew com.etendorx.auth:build -x test;
+
+							cp modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-2.3.0.jar /tmp/;
+							cp modules_core/com.etendorx.das/build/libs/com.etendorx.das-2.3.0.jar /tmp/;
+							cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-2.3.0-plain.jar /tmp/;
+							cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-2.3.0.jar /tmp/;
+
+                            echo "---------------------- Running Auth Tests ----------------------"
+                            ./gradlew com.etendorx.auth:test;
+                            ./gradlew jacocoTestReport;
                             """
                             echo "---------------------- Auth Tests Successful ----------------------"
                         } catch (Exception e) {
@@ -487,7 +494,7 @@ spec:
                             echo "---------------------- Running Edge Tests ----------------------"
                             sh """
                             cd ${RX_DIR}
-                            ./gradlew :com.etendorx.edge:test jacocoTestReport --info
+                            ./gradlew :com.etendorx.edge:test jacocoTestReport
                             """
                             echo "---------------------- Edge Tests Successful ----------------------"
                         } catch (Exception e) {
@@ -525,7 +532,7 @@ spec:
                             echo "---------------------- Running Event Handler Tests ----------------------"
                             sh """
                             cd ${RX_DIR}
-                            ./gradlew :com.etendorx.test.eventhandler:test jacocoTestReport --info
+                            ./gradlew :com.etendorx.test.eventhandler:test jacocoTestReport
                             """
                             echo "---------------------- Event Handler Successful ----------------------"
                         } catch (Exception e) {
@@ -561,7 +568,7 @@ spec:
                     script {
                         dir(RX_DIR) {
                             echo "---------------------- Run jacocoRootReport ----------------------"
-                            sh "./gradlew jacocoRootReport --info"
+                            sh "./gradlew jacocoRootReport"
 
                             env.JACOCO_REPORT = "build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 

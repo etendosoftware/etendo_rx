@@ -6,22 +6,14 @@ import com.etendorx.utils.auth.key.JwtKeyUtils;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import java.util.List;
 
-public class GenerateUserClaimsTest {
-
-  @Mock
-  private UserModel userModel;
-
-  @Mock
-  private AuthService authService;
+class GenerateUserClaimsTest {
 
   @Test
-  public void testGenerateUserClaims() {
+  void testGenerateUserClaims() {
     UserModel userModel = new UserModel();
-    AuthService authService = new AuthService();
     userModel.setId("123");
     userModel.setDefaultClient("456");
     userModel.setClient("789");
@@ -33,6 +25,7 @@ public class GenerateUserClaimsTest {
 
     String searchKey = "exampleSearchKey";
 
+    AuthService authService = new AuthService();
     Claims claims = authService.generateUserClaims(userModel, searchKey);
 
     Assertions.assertEquals(userModel.getId(), claims.get(JwtKeyUtils.USER_ID_CLAIM));

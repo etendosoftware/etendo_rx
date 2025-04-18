@@ -2,6 +2,10 @@ package com.etendorx.auth.controller;
 
 import com.etendorx.auth.auth.AuthService;
 import com.etendorx.auth.auth.jwt.JwtRequest;
+import com.etendorx.auth.test.utils.AuthTestUtils;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -14,6 +18,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -24,12 +30,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AuthControllerInvalidJwtRequestTest {
+class AuthControllerInvalidJwtRequestTest {
 
   @Autowired
   private MockMvc mockMvc;
 
-  public static Stream<Arguments> invalidJwtRequestParams() {
+  static Process configProcess;
+
+  @BeforeAll
+  static void startConfig() throws IOException, InterruptedException, URISyntaxException {
+    AuthTestUtils.startConfigServer();
+  }
+
+  private static Stream<Arguments> invalidJwtRequestParams() {
     return Stream.of(
         // Undefined username
         Arguments.of(null, null, AuthService.UNDEFINED_USERNAME_MESSAGE),
@@ -43,7 +56,7 @@ public class AuthControllerInvalidJwtRequestTest {
 
   @ParameterizedTest
   @MethodSource("invalidJwtRequestParams")
-  public void invalidJwtRequest(String username, String password, String errorMessage)
+  void invalidJwtRequest(String username, String password, String errorMessage)
       throws Exception {
     JwtRequest request = new JwtRequest();
     request.setUsername(username);
@@ -68,4 +81,8 @@ public class AuthControllerInvalidJwtRequestTest {
         });
   }
 
+  @AfterAll
+  static void stopConfig() {
+    AuthTestUtils.stopRunningServices();
+  }
 }
