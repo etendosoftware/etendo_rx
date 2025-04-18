@@ -47,7 +47,7 @@ public class AuthService {
   @Value("${token}")
   private String token;
 
-  @Value("${das.url:}")
+  @Value("${das.url}")
   private String dasUrl;
 
   public void validateJwtRequest(JwtRequest jwtRequest) {
