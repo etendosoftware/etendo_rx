@@ -26,7 +26,7 @@ pipeline {
 
         BUILD_CLASSIC       = true
 
-        SONAR_VERSION       = "4.6.2.2472"
+        SONAR_VERSION       = "5.0.1.3006"
         SONARQUBE_URL       = credentials('sonarqube-url')
         SONARQUBE_TOKEN     = credentials('sonar-token-access')
 
@@ -198,7 +198,7 @@ spec:
 
                             withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
                                 echo "---------------------- Starting Classic Environment ----------------------"
-                                sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@github.com:etendosoftware/etendo_core.git"
+                                sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch release/24.4 git@github.com:etendosoftware/etendo_core.git"
                                 dir("etendo_core") {
                                     sh """
                                     echo "\n
@@ -222,7 +222,7 @@ spec:
 
                                     sh """
                                     cd modules
-                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch feature/ETP-1041 git@github.com:etendosoftware/com.etendoerp.etendorx.git
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch main git@github.com:etendosoftware/com.etendoerp.etendorx.git
                                     git clone --branch develop https://github.com/etendosoftware/com.etendoerp.integration.petclinic.git
                                     """
                                     
@@ -349,7 +349,7 @@ spec:
                         """
                         echo "---------------------- AsyncProcess Tests Successful ----------------------"
                     } catch (Exception e) {
-                        echo "---------------------- AsyncProcess Tests Faile∫d ----------------------"
+                        echo "---------------------- AsyncProcess Tests Failed ----------------------"
                         echo 'Exception occurred: ' + e.toString()
                         currentBuild.result = UNSTABLE
                         unstable('AsyncProcess Tests Failed')
@@ -377,15 +377,22 @@ spec:
                 container("compiler") {
                     script {
                         try {
-                            echo "---------------------- Running Auth Tests ----------------------"
                             sh """
+                            echo "---------------------- Building services ----------------------"
                             cd ${RX_DIR}
-                            export SPRING_CONFIG_IMPORT=configserver:http://localhost:8080/etendo/buildConfig;
-                            export SPRING_APPLICATION_NAME=auth;
-                            ./gradlew com.etendorx.config:bootRun --info
-                            sleep 30s
-                            curl http://localhost:8080/etendo/auth/default
-                            ./gradlew :com.etendorx.auth:test jacocoTestReport --info
+                            ./gradlew com.etendorx.configserver:build -x test;
+							./gradlew com.etendorx.das:build -x test;
+							./gradlew com.etendorx.entities:build -x test;
+							./gradlew com.etendorx.auth:build -x test;
+
+							cp modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-2.3.0.jar /tmp/;
+							cp modules_core/com.etendorx.das/build/libs/com.etendorx.das-2.3.0.jar /tmp/;
+							cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-2.3.0-plain.jar /tmp/;
+							cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-2.3.0.jar /tmp/;
+
+                            echo "---------------------- Running Auth Tests ----------------------"
+                            ./gradlew com.etendorx.auth:test
+                            ./gradlew jacocoTestReport
                             """
                             echo "---------------------- Auth Tests Successful ----------------------"
                         } catch (Exception e) {

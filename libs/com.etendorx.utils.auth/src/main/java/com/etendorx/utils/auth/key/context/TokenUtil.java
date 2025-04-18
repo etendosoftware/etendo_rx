@@ -15,6 +15,9 @@
  */
 package com.etendorx.utils.auth.key.context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.etendorx.utils.auth.key.JwtKeyUtils;
 import com.etendorx.utils.auth.key.config.JwtClassicConfig;
 import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
@@ -22,6 +25,8 @@ import com.etendorx.utils.auth.key.exceptions.ForbiddenException;
 import java.util.Map;
 
 public class TokenUtil {
+
+  private static final Logger log = LoggerFactory.getLogger(TokenUtil.class);
 
   TokenUtil() {
   }
@@ -47,6 +52,8 @@ public class TokenUtil {
       }
     }
     if(tokenValuesMap == null) {
+      log.debug("Token: {} is not valid", token);
+      log.debug("Public Key used: {}", publicKey);
       throw new ForbiddenException("Invalid token");
     }
     userContext.setUserId((String) tokenValuesMap.get(JwtKeyUtils.USER_ID_CLAIM));
