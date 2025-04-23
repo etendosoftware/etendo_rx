@@ -62,7 +62,14 @@ public class ${mappingPrefix}${readEntity.externalName}DTOConverter extends
     }
     ${mappingPrefix}${readEntity.externalName}DTORead dto = new ${mappingPrefix}${readEntity.externalName}DTORead();
 <#list readEntity.fields as field>
+  <#if !genUtils.isOneToMany(field)>
     dto.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(readConverter.get<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity));
+  </#if>
+</#list>
+<#list readEntity.fields as field>
+  <#if genUtils.isOneToMany(field)>
+    dto.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(readConverter.get<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity));
+  </#if>
 </#list>
     return dto;
   }
@@ -74,8 +81,26 @@ public class ${mappingPrefix}${readEntity.externalName}DTOConverter extends
     if (entity == null) {
       entity = new ${writeEntity.table.className}();
     }
-<#list writeEntity.fields as field>
+<#assign sortedWriteFields = writeEntity.fields?sort_by(["line"])?reverse />
+<#list sortedWriteFields as field>
+  <#if !genUtils.isOneToMany(field)>
     writeConverter.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity, dto);
+  </#if>
+</#list>
+    return entity;
+  }
+
+  // WRITE LIST
+  @Override
+  public ${writeEntity.table.className} convertList(${mappingPrefix}${writeEntity.externalName}DTOWrite dto, ${writeEntity.table.className} entity) {
+    if (entity == null) {
+      entity = new ${writeEntity.table.className}();
+    }
+<#assign sortedWriteFields = writeEntity.fields?sort_by(["line"])?reverse />
+<#list sortedWriteFields as field>
+  <#if genUtils.isOneToMany(field)>
+    writeConverter.set<@toCamelCase field.name?trim?replace("\n", "", "r")/>(entity, dto);
+  </#if>
 </#list>
     return entity;
   }
