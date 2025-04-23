@@ -1,6 +1,11 @@
 FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu AS config
 ARG RX_VERSION
 ENV RX_VERSION=${RX_VERSION}
+RUN useradd -m -s /bin/bash etendo && \
+    mkdir -p /opt/app/lib && \
+    chown -R etendo:etendo /opt/app
 COPY modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-${RX_VERSION}.jar /opt/app/lib/com.etendorx.config.jar
-ENTRYPOINT ["java", "-Dfile.encoding=UTF-8" , "-Dloader.path=./lib/" , "-jar", "/opt/app/lib/com.etendorx.config.jar"]
+USER etendo
+
+ENTRYPOINT ["java", "-Dfile.encoding=UTF-8", "-Dloader.path=./lib/", "-jar", "/opt/app/lib/com.etendorx.config.jar"]
 
