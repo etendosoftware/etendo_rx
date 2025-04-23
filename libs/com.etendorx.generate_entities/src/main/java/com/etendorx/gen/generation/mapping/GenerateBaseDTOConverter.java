@@ -99,6 +99,7 @@ public class GenerateBaseDTOConverter {
     data.put("readEntity", readEntity);
     data.put("writeEntity", writeEntity);
     data.put("modelProvider", ModelProvider.getInstance());
+    data.put("genUtils", CodeGenerationUtils.getInstance());
     return data;
   }
 

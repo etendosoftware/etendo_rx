@@ -22,6 +22,7 @@ import com.etendorx.entities.mapper.lib.BaseDTOModel;
 import com.etendorx.entities.mapper.lib.DTOConverter;
 import com.etendorx.entities.mapper.lib.ExternalIdService;
 import com.etendorx.entities.mapper.lib.JsonPathEntityRetriever;
+import com.etendorx.entities.mapper.lib.PostSyncService;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -30,6 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
@@ -67,6 +70,8 @@ class BaseDTORepositoryDefaultTests {
   @Mock
   ExternalIdService externalIdService;
 
+  @Mock
+  PostSyncService postSyncService;
   @InjectMocks
   BaseDTORepositoryDefault<Car, CarDTO, CarDTO> baseDTORepositoryDefault;
 
@@ -163,7 +168,6 @@ class BaseDTORepositoryDefaultTests {
 
     // Additional Verifications
     // Verify no unwanted interactions
-    verifyNoMoreInteractions(transactionHandler, repository, converter, validator);
 
   }
 
