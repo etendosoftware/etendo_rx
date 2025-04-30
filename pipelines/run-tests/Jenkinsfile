@@ -26,9 +26,11 @@ pipeline {
 
         BUILD_CLASSIC       = true
 
-        SONAR_VERSION       = "4.6.2.2472"
+        SONAR_VERSION       = "5.0.1.3006"
         SONARQUBE_URL       = credentials('sonarqube-url')
         SONARQUBE_TOKEN     = credentials('sonar-token-access')
+
+        TOMCAT_URL          = "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.98/bin/apache-tomcat-9.0.98.tar.gz"
 
         SUCCESS             = 'SUCCESS'
         FAILED              = 'FAILED'
@@ -78,9 +80,10 @@ spec:
               - bash
               - '-c'
               - >-
-                chmod a+x /var/run/docker.sock && rm
-                /etc/apt/sources.list.d/pgdg.list || echo 0 && apt update && apt
-                install -y curl
+                chmod a+x /var/run/docker.sock &&
+                rm /etc/apt/sources.list.d/pgdg.list || echo 0 &&
+                apt update &&
+                apt install -y curl postgresql-client
       terminationMessagePath: /dev/termination-log
       terminationMessagePolicy: File
       imagePullPolicy: IfNotPresent
@@ -153,7 +156,7 @@ spec:
                             sed -i 's/^grpc.enabled=.*/grpc.enabled=true/' gradle.properties
                             sed -i 's/^data-rest.enabled=.*/data-rest.enabled=true/' gradle.properties
                             mkdir -p modules
-                            ./gradlew :setup
+                            ./gradlew setup
                             """
                             
                             env.COMMIT_INFO = "<p>Commit: ${RX_REPO_URL}/commit/${GIT_COMMIT}<br>Author: ${COMMIT_AUTHOR_NAME} (${COMMIT_AUTHOR_EMAIL})</p>"
@@ -184,9 +187,18 @@ spec:
                     script {
                         try {
                             sh "./pipelines/run-tests/build-update.sh ${RX_DIR} pending \"Build Environment Etendo Core\" ${ACCESS_TOKEN} ${GIT_COMMIT} ${BUILD_URL}"
+                            echo "---------------- Stack Configuration ----------------"
+
+                            sh "wget -O apache-tomcat.tar.gz $TOMCAT_URL"
+                            sh "tar -xvf apache-tomcat.tar.gz -C $WORKSPACE"
+
+							env.TOMCAT_FOLDER = sh(script: "basename ${TOMCAT_URL} .tar.gz", returnStdout: true).trim()
+                            env.CATALINA_HOME = "${WORKSPACE}/${TOMCAT_FOLDER}"
+                            env.CATALINA_BASE = "${WORKSPACE}/${TOMCAT_FOLDER}"
+
                             withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
                                 echo "---------------------- Starting Classic Environment ----------------------"
-                                sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@github.com:etendosoftware/etendo_core.git"
+                                sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch release/24.4 git@github.com:etendosoftware/etendo_core.git"
                                 dir("etendo_core") {
                                     sh """
                                     echo "\n
@@ -204,22 +216,79 @@ spec:
                                     allow.root=true\n
                                     org.gradle.jvmargs=-Dfile.encoding=UTF-8" > gradle.properties
                                     """
-                                    sh "./gradlew prepareConfig --info --stacktrace"
-                                    sh "./gradlew setup --info --stacktrace"
-                                    sh "./gradlew expandModules --info --stacktrace"
+                                    sh "./gradlew prepareConfig --stacktrace"
+                                    sh "./gradlew setup --stacktrace"
+                                    sh "./gradlew expandModules --stacktrace"
 
                                     sh """
                                     cd modules
-                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch develop git@github.com:etendosoftware/com.etendoerp.etendorx.git
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch main git@github.com:etendosoftware/com.etendoerp.etendorx.git
                                     git clone --branch develop https://github.com/etendosoftware/com.etendoerp.integration.petclinic.git
                                     """
                                     
-                                    sh "./gradlew install --info --stacktrace"
-                                    sh "./gradlew smartbuild --info --stacktrace"
+                                    sh "./gradlew install --stacktrace"
+                                    sh "./gradlew smartbuild --stacktrace"
                                     currentBuild.result = SUCCESS
                                     echo "---------------------- Classic Environment Successful ----------------------"
                                 }
                             }
+
+                            echo "---------------------- Inserting Configs ----------------------"
+                            withEnv(["PGPASSWORD=${env.BBDD_PASSWORD}"]) {
+                                sh """
+                                    psql -h localhost -U ${BBDD_USER} -d ${BBDD_SID} <<EOF
+
+                                    INSERT INTO smfsws_config (
+                                        smfsws_config_id, ad_client_id, ad_org_id, isactive, created, createdby,
+                                        updated, updatedby, expirationtime, privatekey
+                                    ) VALUES (
+                                        '07054A65ACCB423F90D270130DCD02E4',
+                                        '0',
+                                        '0',
+                                        'Y',
+                                        '2025-04-16 13:19:11.492',
+                                        '100',
+                                        '2025-04-16 13:19:11.492',
+                                        '100',
+                                        0,
+                                        '{"private-key":"-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgoP6uMq5AuRjREe3oUUeuh6LJTYWTnPvr7Ds8+mstk5+hRANCAASjRJgZeEBfLflXzTYeSFuPSlwBGlVKXDY1+baWJM2L0E+o3NLyLWFY1qjfudRUY8H3AkSoNY3KmfT67h7We56F-----END PRIVATE KEY-----","public-key":"-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEo0SYGXhAXy35V802Hkhbj0pcARpVSlw2Nfm2liTNi9BPqNzS8i1hWNao37nUVGPB9wJEqDWNypn0+u4e1nuehQ==-----END PUBLIC KEY-----"}'
+                                    );
+
+                                    INSERT INTO etrx_config (
+                                        etrx_config_id, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby,
+                                        service_name, service_url, updateable_configs, public_url, restart_services
+                                    ) VALUES
+                                    ('B9393395A3074D5FBD3E1863D9BD2671', '0', '0', 'Y', '2025-04-16 13:27:01.655', '100', '2025-04-16 13:27:01.655', '100', 'config', 'http://localhost:8888', 'N', 'http://localhost:8888', 'Y'),
+                                    ('E00B0AADFF024417BF67D0313AAFCF28', '0', '0', 'Y', '2025-04-16 13:27:01.66',  '100', '2025-04-16 13:27:01.66',  '100', 'auth', 'http://localhost:8094', 'Y', 'http://localhost:8094', 'Y'),
+                                    ('1E738098F45344DAAD18A8FC352E0876', '0', '0', 'Y', '2025-04-16 13:27:01.669', '100', '2025-04-16 13:27:01.669', '100', 'das', 'http://localhost:8092', 'Y', 'http://localhost:8092', 'Y'),
+                                    ('80B5E214E3B444FFBF48FA7F563E8F0D', '0', '0', 'Y', '2025-04-16 13:27:01.673', '100', '2025-04-16 13:27:01.673', '100', 'edge', 'http://localhost:8096', 'Y', 'http://localhost:8096', 'Y'),
+                                    ('B3FB8056DC2F4D37BD0B85CD0CB998A8', '0', '0', 'Y', '2025-04-16 13:27:01.676', '100', '2025-04-16 13:27:01.676', '100', 'asyncprocess', 'http://localhost:9092', 'Y', 'http://localhost:9092', 'Y'),
+                                    ('0976C13F5C364F918D9A94282A0EF980', '0', '0', 'Y', '2025-04-16 13:27:01.689', '100', '2025-04-16 13:27:01.689', '100', 'obconnsrv', 'http://localhost:8101', 'Y', 'http://localhost:8101', 'Y'),
+                                    ('C1EB36E4B2A1442FB45C78926CDD4E36', '0', '0', 'Y', '2025-04-16 13:27:01.691', '100', '2025-04-16 13:27:01.691', '100', 'worker', 'http://localhost:0', 'Y', 'http://localhost:0', 'Y');
+
+                                    INSERT INTO etrx_service_param (
+                                        etrx_service_param_id, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby,
+                                        param_value, param_key, etrx_config_id
+                                    ) VALUES
+                                    ('5C321A9820CE4AA496F07D06F24CC70E', '0', '0', 'Y', '2025-04-16 13:27:01.656', '100', '2025-04-16 13:27:01.656', '100', 'http://localhost:8092', 'das.url', 'B9393395A3074D5FBD3E1863D9BD2671'),
+                                    ('FDBDF078070047E0A49D09FBDB87FDD6', '0', '0', 'Y', '2025-04-16 13:27:01.657', '100', '2025-04-16 13:27:01.657', '100', 'http://localhost:8080', 'classic.url', 'B9393395A3074D5FBD3E1863D9BD2671'),
+                                    ('11950F994DBB40019E900209B0B0BDAE', '0', '0', 'Y', '2025-04-16 13:27:01.665', '100', '2025-04-16 13:27:01.665', '100', 'http://localhost:8092', 'das.url', 'E00B0AADFF024417BF67D0313AAFCF28'),
+                                    ('37CF36206FC54E1996D28DEF4FAB7FC4', '0', '0', 'Y', '2025-04-16 13:27:01.666', '100', '2025-04-16 13:27:01.666', '100', 'http://localhost:8080', 'classic.url', 'E00B0AADFF024417BF67D0313AAFCF28'),
+                                    ('5DC4588085AF42A38547A3E996988E62', '0', '0', 'Y', '2025-04-16 13:27:01.669', '100', '2025-04-16 13:27:01.669', '100', 'http://localhost:8092', 'das.url', '1E738098F45344DAAD18A8FC352E0876'),
+                                    ('B107590E820F48328EA7EE7880DE5E65', '0', '0', 'Y', '2025-04-16 13:27:01.671', '100', '2025-04-16 13:27:01.671', '100', 'http://localhost:8080', 'classic.url', '1E738098F45344DAAD18A8FC352E0876'),
+                                    ('F2F1FAD5AD284162A8BF70E538810D3D', '0', '0', 'Y', '2025-04-16 13:27:01.674', '100', '2025-04-16 13:27:01.674', '100', 'http://localhost:8092', 'das.url', '80B5E214E3B444FFBF48FA7F563E8F0D'),
+                                    ('F14FE88FE871496D957FA5D299EF55F9', '0', '0', 'Y', '2025-04-16 13:27:01.675', '100', '2025-04-16 13:27:01.675', '100', 'http://localhost:8080', 'classic.url', '80B5E214E3B444FFBF48FA7F563E8F0D'),
+                                    ('93A49116DBE449FDAF8F178058215223', '0', '0', 'Y', '2025-04-16 13:27:01.677', '100', '2025-04-16 13:27:01.677', '100', 'http://localhost:8092', 'das.url', 'B3FB8056DC2F4D37BD0B85CD0CB998A8'),
+                                    ('52D7DAA3B85E466F98D112B2B68FBB72', '0', '0', 'Y', '2025-04-16 13:27:01.688', '100', '2025-04-16 13:27:01.688', '100', 'http://localhost:8080', 'classic.url', 'B3FB8056DC2F4D37BD0B85CD0CB998A8'),
+                                    ('4F679F105FFB40429EE0AEA007E35F30', '0', '0', 'Y', '2025-04-16 13:27:01.69',  '100', '2025-04-16 13:27:01.69',  '100', 'http://localhost:8092', 'das.url', '0976C13F5C364F918D9A94282A0EF980'),
+                                    ('7DF211A4800F4BEDABD264A906736EC3', '0', '0', 'Y', '2025-04-16 13:27:01.69',  '100', '2025-04-16 13:27:01.69',  '100', 'http://localhost:8080', 'classic.url', '0976C13F5C364F918D9A94282A0EF980'),
+                                    ('18F282F7C6D64DE69D2BB96E039C8798', '0', '0', 'Y', '2025-04-16 13:27:01.692', '100', '2025-04-16 13:27:01.692', '100', 'http://localhost:8092', 'das.url', 'C1EB36E4B2A1442FB45C78926CDD4E36'),
+                                    ('90CCE704383048779AD4DCE4CF4C4A80', '0', '0', 'Y', '2025-04-16 13:27:01.692', '100', '2025-04-16 13:27:01.692', '100', 'http://localhost:8080', 'classic.url', 'C1EB36E4B2A1442FB45C78926CDD4E36');
+                                """
+                            }
+							sh "${WORKSPACE}/${TOMCAT_FOLDER}/bin/catalina.sh start"
+							sh "sleep 1m"
+                            echo "--------------- Build Environment Successful ---------------"
                         } catch (Exception e) {
                             echo "---------------------- Classic Environment Failed ----------------------"
                             echo 'Exception occurred: ' + e.toString()
@@ -249,7 +318,7 @@ spec:
                             cd modules_test
                             git clone --branch develop https://github.com/etendosoftware/com.etendorx.integration.petclinic.git
                             cd ..
-                            ./gradlew generate.entities --info
+                            ./gradlew generate.entities
                             """
                             currentBuild.result = SUCCESS
                             echo "---------------------- Build of Etendo RX Successful ----------------------"
@@ -276,11 +345,11 @@ spec:
                         echo "---------------------- Running AsyncProcess Tests ----------------------"
                         sh """
                         cd ${RX_DIR}
-                        ./gradlew :com.etendorx.asyncprocess:test jacocoRootReport --info
+                        ./gradlew :com.etendorx.asyncprocess:test jacocoRootReport
                         """
                         echo "---------------------- AsyncProcess Tests Successful ----------------------"
                     } catch (Exception e) {
-                        echo "---------------------- AsyncProcess Tests Faile∫d ----------------------"
+                        echo "---------------------- AsyncProcess Tests Failed ----------------------"
                         echo 'Exception occurred: ' + e.toString()
                         currentBuild.result = UNSTABLE
                         unstable('AsyncProcess Tests Failed')
@@ -308,10 +377,22 @@ spec:
                 container("compiler") {
                     script {
                         try {
-                            echo "---------------------- Running Auth Tests ----------------------"
                             sh """
+                            echo "---------------------- Building services ----------------------"
                             cd ${RX_DIR}
-                            ./gradlew :com.etendorx.auth:test jacocoTestReport --info
+                            ./gradlew com.etendorx.configserver:build -x test;
+							./gradlew com.etendorx.das:build -x test;
+							./gradlew com.etendorx.entities:build -x test;
+							./gradlew com.etendorx.auth:build -x test;
+
+							cp modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-2.3.0.jar /tmp/;
+							cp modules_core/com.etendorx.das/build/libs/com.etendorx.das-2.3.0.jar /tmp/;
+							cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-2.3.0-plain.jar /tmp/;
+							cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-2.3.0.jar /tmp/;
+
+                            echo "---------------------- Running Auth Tests ----------------------"
+                            ./gradlew com.etendorx.auth:test;
+                            ./gradlew jacocoTestReport;
                             """
                             echo "---------------------- Auth Tests Successful ----------------------"
                         } catch (Exception e) {
@@ -413,7 +494,7 @@ spec:
                             echo "---------------------- Running Edge Tests ----------------------"
                             sh """
                             cd ${RX_DIR}
-                            ./gradlew :com.etendorx.edge:test jacocoTestReport --info
+                            ./gradlew :com.etendorx.edge:test jacocoTestReport
                             """
                             echo "---------------------- Edge Tests Successful ----------------------"
                         } catch (Exception e) {
@@ -451,7 +532,7 @@ spec:
                             echo "---------------------- Running Event Handler Tests ----------------------"
                             sh """
                             cd ${RX_DIR}
-                            ./gradlew :com.etendorx.test.eventhandler:test jacocoTestReport --info
+                            ./gradlew :com.etendorx.test.eventhandler:test jacocoTestReport
                             """
                             echo "---------------------- Event Handler Successful ----------------------"
                         } catch (Exception e) {
@@ -487,7 +568,7 @@ spec:
                     script {
                         dir(RX_DIR) {
                             echo "---------------------- Run jacocoRootReport ----------------------"
-                            sh "./gradlew jacocoRootReport --info"
+                            sh "./gradlew jacocoRootReport"
 
                             env.JACOCO_REPORT = "build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 
