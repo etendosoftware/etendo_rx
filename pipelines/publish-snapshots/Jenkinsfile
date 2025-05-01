@@ -36,7 +36,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: jenkins-node-rx-snap-0
-  namespace: jenkins
+  namespace: jenkins2025
   labels:
     app.kubernetes.io/name: jenkins-node-rx-snap
 spec:
