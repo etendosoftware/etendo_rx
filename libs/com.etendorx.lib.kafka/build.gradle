@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.1.4'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
     implementation 'org.apache.kafka:kafka-streams:3.6.0'
     implementation 'org.projectlombok:lombok:1.18.30'
@@ -24,7 +24,7 @@ dependencies {
 }
 
 ext {
-    set('springCloudVersion', "2022.0.4")
+    set('springCloudVersion', "2024.0.0")
 }
 
 dependencyManagement {
