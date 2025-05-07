@@ -124,40 +124,27 @@ public class DefaultFilters {
   }
 
   /**
-   * Applies the provided conditions as filters to the SQL query.
-   * The method modifies the SQL query by adding the conditions to the WHERE clause.
+   * Applies the provided conditions as filters to the given SQL statement.
+   * This method modifies the SQL statement by adding the specified conditions
+   * to the WHERE clause, depending on the type of SQL operation (SELECT, UPDATE, DELETE).
+   * If the statement is an INSERT, it returns the statement as is.
    *
    * @param sql the original SQL query
-   * @param statement the SQL statement to be modified
+   * @param statement the parsed SQL statement to be modified
    * @param conditions the list of conditions to be applied as filters
    * @return the modified SQL query with the applied filters
-   * @throws QueryException if there is a parsing error or if the SQL query was not modified
+   * @throws QueryException if the SQL operation is not supported, the query was not modified,
+   *                        or there is an error parsing the conditions
    */
   static String applyFilters(String sql, Statement statement, List<String> conditions) {
     String finalSql;
     try {
       if (statement instanceof Select select) {
-        PlainSelect plainSelect = select.getPlainSelect();
-        for (String condition : conditions) {
-          AndExpression andExpression = new AndExpression();
-          andExpression.setLeftExpression(plainSelect.getWhere());
-          andExpression.setRightExpression(CCJSqlParserUtil.parseCondExpression(condition));
-          plainSelect.setWhere(andExpression);
-        }
+        applyFiltersInSelect(conditions, select);
       } else if (statement instanceof Update update) {
-          for (String condition : conditions) {
-            AndExpression andExpression = new AndExpression();
-            andExpression.setLeftExpression(update.getWhere());
-            andExpression.setRightExpression(CCJSqlParserUtil.parseCondExpression(condition));
-            update.setWhere(andExpression);
-          }
+        applyFiltersInUpdate(conditions, update);
       } else if (statement instanceof Delete delete) {
-          for (String condition : conditions) {
-            AndExpression andExpression = new AndExpression();
-            andExpression.setLeftExpression(delete.getWhere());
-            andExpression.setRightExpression(CCJSqlParserUtil.parseCondExpression(condition));
-            delete.setWhere(andExpression);
-          }
+        applyFiltersInDelete(conditions, delete);
       } else if (statement instanceof Insert) {
           return statement.toString();
       } else {
@@ -173,6 +160,66 @@ public class DefaultFilters {
       throw new QueryException(e);
     }
     return finalSql;
+  }
+
+  /**
+   * Applies the provided conditions as filters to a SQL DELETE statement.
+   * This method modifies the WHERE clause of the DELETE statement by adding
+   * the specified conditions using an AND expression.
+   *
+   * @param conditions the list of conditions to be applied as filters
+   * @param delete the SQL DELETE statement to be modified
+   * @throws JSQLParserException if there is an error parsing the conditions or modifying the statement
+   */
+  private static void applyFiltersInDelete(List<String> conditions, Delete delete) throws JSQLParserException {
+    for (String condition : conditions) {
+      AndExpression andExpression = new AndExpression();
+      andExpression.setLeftExpression(delete.getWhere());
+      andExpression.setRightExpression(CCJSqlParserUtil.parseCondExpression(condition));
+      delete.setWhere(andExpression);
+    }
+  }
+
+  /**
+   * Applies the provided conditions as filters to a SQL UPDATE statement.
+   * This method modifies the WHERE clause of the UPDATE statement by adding
+   * the specified conditions using an AND expression.
+   *
+   * @param conditions the list of conditions to be applied as filters
+   * @param update the SQL UPDATE statement to be modified
+   * @throws JSQLParserException if there is an error parsing the conditions or modifying the statement
+   */
+  private static void applyFiltersInUpdate(List<String> conditions, Update update) throws JSQLParserException {
+    for (String condition : conditions) {
+      AndExpression andExpression = new AndExpression();
+      andExpression.setLeftExpression(update.getWhere());
+      andExpression.setRightExpression(CCJSqlParserUtil.parseCondExpression(condition));
+      update.setWhere(andExpression);
+    }
+  }
+
+  /**
+   * Applies the provided conditions as filters to a SQL SELECT statement.
+   * This method modifies the WHERE clause of the SELECT statement by adding
+   * the specified conditions using an AND expression. If the WHERE clause
+   * does not exist, it initializes it with the first condition.
+   *
+   * @param conditions the list of conditions to be applied as filters
+   * @param select the SQL SELECT statement to be modified
+   * @throws JSQLParserException if there is an error parsing the conditions or modifying the statement
+   */
+  private static void applyFiltersInSelect(List<String> conditions, Select select) throws JSQLParserException {
+    PlainSelect plainSelect = select.getPlainSelect();
+    for (String condition : conditions) {
+      if (plainSelect.getWhere() == null) {
+        plainSelect.setWhere(CCJSqlParserUtil.parseCondExpression(condition));
+      } else {
+        AndExpression andExpression = new AndExpression();
+        andExpression.setLeftExpression(plainSelect.getWhere());
+        andExpression.setRightExpression(CCJSqlParserUtil.parseCondExpression(condition));
+        plainSelect.setWhere(andExpression);
+      }
+    }
   }
 
   /**

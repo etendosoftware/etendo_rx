@@ -26,9 +26,8 @@ public class JwtService {
         .setIssuer(ISS)
         .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
         .addClaims(claims)
-        .signWith(SignatureAlgorithm.RS256, privateKey)
+        .signWith(SignatureAlgorithm.ES256, privateKey)
         .compact();
     return new JwtResponse(token);
   }
-
 }

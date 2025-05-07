@@ -15,12 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class JwtRequestValidationTest {
 
+  private static final String PASSWORD = "password";
+  private static final String SERVICE = "service";
+  private static final String SECRET = "secret";
+  private static final String USERNAME = "username";
   @InjectMocks
   private AuthService jwtRequestValidation;
 
   @Test
   void shouldThrowExceptionWhenUsernameIsEmpty() {
-    JwtRequest jwtRequest = new JwtRequest("", "password", "service", "secret");
+    JwtRequest jwtRequest = new JwtRequest("", PASSWORD, SERVICE, SECRET);
     ResponseStatusException exception = assertThrows(ResponseStatusException.class,
         () -> jwtRequestValidation.validateJwtRequest(jwtRequest));
     assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -29,7 +33,7 @@ class JwtRequestValidationTest {
 
   @Test
   void shouldThrowExceptionWhenPasswordIsEmpty() {
-    JwtRequest jwtRequest = new JwtRequest("username", "", "service", "secret");
+    JwtRequest jwtRequest = new JwtRequest(USERNAME, "", SERVICE, SECRET);
     ResponseStatusException exception = assertThrows(ResponseStatusException.class,
         () -> jwtRequestValidation.validateJwtRequest(jwtRequest));
     assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -38,19 +42,15 @@ class JwtRequestValidationTest {
 
   @Test
   void shouldThrowExceptionWhenServiceIsEmpty() {
-    JwtRequest jwtRequest = new JwtRequest("username", "password", "", "secret");
-    ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-        () -> jwtRequestValidation.validateJwtRequest(jwtRequest));
-    assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(exception.getReason()).isEqualTo(UNDEFINED_SERVICE_MESSAGE);
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> new JwtRequest(USERNAME, PASSWORD, "", SECRET));
+    assertThat(exception.getMessage()).isEqualTo("Service cannot be null or empty");
   }
 
   @Test
   void shouldThrowExceptionWhenSecretIsEmpty() {
-    JwtRequest jwtRequest = new JwtRequest("username", "password", "service", "");
-    ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-        () -> jwtRequestValidation.validateJwtRequest(jwtRequest));
-    assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(exception.getReason()).isEqualTo(UNDEFINED_SECRET_MESSAGE);
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> new JwtRequest(USERNAME, PASSWORD, SERVICE, ""));
+    assertThat(exception.getMessage()).isEqualTo("Secret cannot be null or empty");
   }
 }
