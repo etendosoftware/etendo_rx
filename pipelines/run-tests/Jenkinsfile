@@ -47,7 +47,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: jenkins-node-core-unittests-rx
-  namespace: jenkins
+  namespace: jenkins2025
   labels:
     app.kubernetes.io/name: jenkins-node-core-unittests-rx
 spec:
@@ -377,30 +377,33 @@ spec:
                 container("compiler") {
                     script {
                         try {
-                            sh """
                             echo "---------------------- Building services ----------------------"
-                            cd ${RX_DIR}
-                            ./gradlew com.etendorx.configserver:build -x test;
-							./gradlew com.etendorx.das:build -x test;
-							./gradlew com.etendorx.entities:build -x test;
-							./gradlew com.etendorx.auth:build -x test;
+                            dir("${RX_DIR}") {
+                                sh """
+                                    ./gradlew com.etendorx.configserver:build -x test
+                                    ./gradlew com.etendorx.das:build -x test
+                                    ./gradlew com.etendorx.entities:build -x test
+                                    ./gradlew com.etendorx.auth:build -x test
+                                """
 
-                            def rxVersion = sh(
-                                script: "grep 'gradle.ext.version' settings.gradle | awk -F\"'\" '{print \$2}'",
-                                returnStdout: true
-                            ).trim()
+                                def rxVersion = sh(
+                                    script: "grep 'gradle.ext.version' settings.gradle | awk -F\"'\" '{print \$2}'",
+                                    returnStdout: true
+                                ).trim()
 
-                            env.RX_VERSION = rxVersion
+                                env.RX_VERSION = rxVersion
 
-							cp modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-${env.RX_VERSION}.jar /tmp/;
-							cp modules_core/com.etendorx.das/build/libs/com.etendorx.das-${env.RX_VERSION}.jar /tmp/;
-							cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-${env.RX_VERSION}-plain.jar /tmp/;
-							cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-${env.RX_VERSION}.jar /tmp/;
+                                sh """
+                                    cp modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-${env.RX_VERSION}.jar /tmp/
+                                    cp modules_core/com.etendorx.das/build/libs/com.etendorx.das-${env.RX_VERSION}.jar /tmp/
+                                    cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-${env.RX_VERSION}-plain.jar /tmp/
+                                    cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-${env.RX_VERSION}.jar /tmp/
 
-                            echo "---------------------- Running Auth Tests ----------------------"
-                            ./gradlew com.etendorx.auth:test;
-                            ./gradlew jacocoTestReport;
-                            """
+                                    echo "---------------------- Running Auth Tests ----------------------"
+                                    ./gradlew com.etendorx.auth:test
+                                    ./gradlew jacocoTestReport
+                                """
+                            }
                             echo "---------------------- Auth Tests Successful ----------------------"
                         } catch (Exception e) {
                             echo "---------------------- Auth Tests Failed ----------------------"

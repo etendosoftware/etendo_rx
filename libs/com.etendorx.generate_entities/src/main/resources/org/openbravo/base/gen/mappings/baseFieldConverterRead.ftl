@@ -36,7 +36,7 @@
   <#if name == "id">
   <#assign nullCheck = nullCheck + ") {\n      return " + result + ".toString();\n    } else {\n      return null;\n    }">
   <#else>
-  <#assign nullCheck = nullCheck + ") {\n      return mappingUtils.handleBaseObject(" + result + ");\n    } else {\n      return null;\n    }">
+  <#assign nullCheck = nullCheck + ") {\n      try {\n        return mappingUtils.handleBaseObject(" + result + ");\n      } catch (EntityNotFoundException e) {\n        return null;\n      }\n    }\n    return null;">
   </#if>
   ${nullCheck}
 </#macro>
@@ -82,6 +82,8 @@ import ${entity.table.thePackage.javaPackage}.${entity.table.className};
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Component
 public class ${mappingPrefix}${entity.externalName}FieldConverterRead {
