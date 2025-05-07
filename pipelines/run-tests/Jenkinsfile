@@ -385,10 +385,17 @@ spec:
 							./gradlew com.etendorx.entities:build -x test;
 							./gradlew com.etendorx.auth:build -x test;
 
-							cp modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-2.3.0.jar /tmp/;
-							cp modules_core/com.etendorx.das/build/libs/com.etendorx.das-2.3.0.jar /tmp/;
-							cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-2.3.0-plain.jar /tmp/;
-							cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-2.3.0.jar /tmp/;
+                            def rxVersion = sh(
+                                script: "grep 'gradle.ext.version' settings.gradle | awk -F\"'\" '{print \$2}'",
+                                returnStdout: true
+                            ).trim()
+
+                            env.RX_VERSION = rxVersion
+
+							cp modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-${env.RX_VERSION}.jar /tmp/;
+							cp modules_core/com.etendorx.das/build/libs/com.etendorx.das-${env.RX_VERSION}.jar /tmp/;
+							cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-${env.RX_VERSION}-plain.jar /tmp/;
+							cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-${env.RX_VERSION}.jar /tmp/;
 
                             echo "---------------------- Running Auth Tests ----------------------"
                             ./gradlew com.etendorx.auth:test;
