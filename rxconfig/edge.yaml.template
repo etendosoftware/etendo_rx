@@ -26,12 +26,11 @@ spring:
           filters:
             - RewritePath=/login, /api/authenticate
 
-        # Zapier secure paths
-        - id: zapier_secure_path_route
-          uri: ${etendorx.zapier.url}
+        # Root route
+        - id: root-route
+          uri: no://op
           predicates:
-            - Method=GET, POST, DELETE
-            - Path=/secure/zapier/**
+            - Method=GET,POST
+            - Path=/
           filters:
-            - JwtAuthenticationFilter
-            - RewritePath=/secure/zapier(?<segment>/?.*), $\{segment}
+            - SetStatus=200
