@@ -26,6 +26,7 @@ public class AuthTestUtils {
   private static final String CONFIG_URL = "http://localhost:8888";
   private static final Logger log = LoggerFactory.getLogger(AuthTestUtils.class);
   private static final String JAVA_HOME = "java.home";
+  private static final String RX_VERSION = "RX_VERSION";
   public static final String WORKSPACE = "WORKSPACE";
 
   static Process configProcess;
@@ -48,9 +49,10 @@ public class AuthTestUtils {
    */
   public static void startConfigServer() throws URISyntaxException, IOException, InterruptedException {
     String javaHome = System.getProperty(JAVA_HOME);
+    String rxVersion = System.getenv(RX_VERSION);
     String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
     final String rootProjectPath = getRootProjectPath();
-    ProcessBuilder pb = new ProcessBuilder(javaBin, "-jar", "/tmp/com.etendorx.configserver-2.3.0.jar");
+    ProcessBuilder pb = new ProcessBuilder(javaBin, "-jar", "/tmp/com.etendorx.configserver-" + rxVersion + ".jar");
     Map<String, String> env = pb.environment();
     env.put("SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCHLOCATIONS", "file://" + rootProjectPath + "/rxconfig");
     env.put("SPRING_PROFILES_ACTIVE", "native");
@@ -68,13 +70,14 @@ public class AuthTestUtils {
    */
   public static void startDASServer() throws IOException, InterruptedException {
     String javaHome = System.getProperty(JAVA_HOME);
+    String rxVersion = System.getenv(RX_VERSION);
     String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
     ProcessBuilder pbDAS = new ProcessBuilder(
       javaBin,
       "-Dfile.encoding=UTF-8",
       "-Dloader.path=/tmp/",
       "-jar",
-      "/tmp/com.etendorx.das-2.3.0.jar"
+      "/tmp/com.etendorx.das-" + rxVersion + ".jar"
     );
 
     pbDAS.redirectOutput(ProcessBuilder.Redirect.INHERIT);
@@ -91,8 +94,9 @@ public class AuthTestUtils {
    */
   public static void startAuthServer() throws IOException, InterruptedException {
     String javaHome = System.getProperty(JAVA_HOME);
+    String rxVersion = System.getenv(RX_VERSION);
     String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-    ProcessBuilder pbAuth = new ProcessBuilder(javaBin, "-jar", "/tmp/com.etendorx.auth-2.3.0.jar");
+    ProcessBuilder pbAuth = new ProcessBuilder(javaBin, "-jar", "/tmp/com.etendorx.auth-" + rxVersion + ".jar");
     Map<String, String> envAuth = pbAuth.environment();
     envAuth.put("CONFIG_SERVER_URL", CONFIG_URL);
     envAuth.put("SPRING_CONFIG_IMPORT", "configserver:${config.server.url}");

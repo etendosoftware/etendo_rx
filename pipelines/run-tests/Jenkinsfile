@@ -88,7 +88,7 @@ spec:
       terminationMessagePolicy: File
       imagePullPolicy: IfNotPresent
     - name: postgres
-      image: postgres:14
+      image: postgres:16
       workingDir: /home/jenkins
       env:
         - name: POSTGRES_PASSWORD
@@ -198,7 +198,7 @@ spec:
 
                             withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
                                 echo "---------------------- Starting Classic Environment ----------------------"
-                                sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch release/24.4 git@github.com:etendosoftware/etendo_core.git"
+                                sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch main git@github.com:etendosoftware/etendo_core.git"
                                 dir("etendo_core") {
                                     sh """
                                     echo "\n
@@ -377,23 +377,33 @@ spec:
                 container("compiler") {
                     script {
                         try {
-                            sh """
                             echo "---------------------- Building services ----------------------"
-                            cd ${RX_DIR}
-                            ./gradlew com.etendorx.configserver:build -x test;
-							./gradlew com.etendorx.das:build -x test;
-							./gradlew com.etendorx.entities:build -x test;
-							./gradlew com.etendorx.auth:build -x test;
+                            dir("${RX_DIR}") {
+                                sh """
+                                    ./gradlew com.etendorx.configserver:build -x test
+                                    ./gradlew com.etendorx.das:build -x test
+                                    ./gradlew com.etendorx.entities:build -x test
+                                    ./gradlew com.etendorx.auth:build -x test
+                                """
 
-							cp modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-2.3.0.jar /tmp/;
-							cp modules_core/com.etendorx.das/build/libs/com.etendorx.das-2.3.0.jar /tmp/;
-							cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-2.3.0-plain.jar /tmp/;
-							cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-2.3.0.jar /tmp/;
+                                def rxVersion = sh(
+                                    script: "grep 'gradle.ext.version' settings.gradle | awk -F\"'\" '{print \$2}'",
+                                    returnStdout: true
+                                ).trim()
 
-                            echo "---------------------- Running Auth Tests ----------------------"
-                            ./gradlew com.etendorx.auth:test;
-                            ./gradlew jacocoTestReport;
-                            """
+                                env.RX_VERSION = rxVersion
+
+                                sh """
+                                    cp modules_core/com.etendorx.configserver/build/libs/com.etendorx.configserver-${env.RX_VERSION}.jar /tmp/
+                                    cp modules_core/com.etendorx.das/build/libs/com.etendorx.das-${env.RX_VERSION}.jar /tmp/
+                                    cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-${env.RX_VERSION}-plain.jar /tmp/
+                                    cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-${env.RX_VERSION}.jar /tmp/
+
+                                    echo "---------------------- Running Auth Tests ----------------------"
+                                    ./gradlew com.etendorx.auth:test
+                                    ./gradlew jacocoTestReport
+                                """
+                            }
                             echo "---------------------- Auth Tests Successful ----------------------"
                         } catch (Exception e) {
                             echo "---------------------- Auth Tests Failed ----------------------"

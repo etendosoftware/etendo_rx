@@ -121,4 +121,9 @@ task jacocoRootReport(type: JacocoReport) {
         xml.required = true
         html.required = true
     }
+    subprojects {
+        tasks.withType(Test).configureEach {
+            environment 'RX_VERSION', rootProject.gradle.ext.version
+        }
+    }
 }
