@@ -1,11 +1,15 @@
-FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu
+FROM amazoncorretto:17.0.14
 
-ARG GRADLE_VERSION=7.4.2
-RUN apt update && apt install -y wget unzip make
+ARG GRADLE_VERSION=8.12.1
+ARG OPEN_TELEMETRY_VERSION=v2.17.0
+
+RUN yum install -y wget unzip make
 
 RUN wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp \
     && unzip -d /opt/gradle /tmp/gradle-${GRADLE_VERSION}-bin.zip \
     && rm /tmp/gradle-${GRADLE_VERSION}-bin.zip
+
+RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/${OPEN_TELEMETRY_VERSION}/opentelemetry-javaagent.jar -P /opt/open-telemetry
 
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -29,29 +33,7 @@ COPY resources/dynamic-das/build.gradle /app-template/
 # Copy specific module gradle files and Makefile
 COPY resources/dynamic-das/modules_gen/com.etendorx.entities/build.gradle /app-template/modules_gen/com.etendorx.entities/
 COPY resources/dynamic-das/modules_gen/com.etendorx.entities/Makefile /app-template/modules_gen/com.etendorx.entities/
+COPY resources/dynamic-das/run.sh /app-template/
+RUN chmod +x /app-template/run.sh
 
-# Prefer non-interactive gradle commands to reduce logs and potential hangups
-CMD cp -r /app-template/* /app/ && \
-    cd /app && \
-    export DOWNLOAD_DEP=${DEPENDENCIES} && \
-    echo " DOWNLOAD_DEP=${DOWNLOAD_DEP}" && \
-    export DEPENDENCIES="com.etendorx:generate-entities:${ETENDORX_VERSION}" && \
-    gradle ${TASK} --no-daemon --info && gradle --stop && \
-    rm -rf /app/modules_gen/com.etendorx.entities/src && \
-    echo "bbdd.rdbms=POSTGRE\nbbdd.driver=org.postgresql.Driver\nbbdd.url=jdbc:postgresql://${DB_HOST}:${DB_PORT}\nbbdd.sid=${DB_SID}\nbbdd.systemUser=postgres\nbbdd.systemPassword=syspass\nbbdd.user=tad\nbbdd.password=tad\nbbdd.sessionConfig=select\nupdate_dateFormat('DD-MM-YYYY')\nrx.generateCode=true" > /app/gradle.properties && \
-    java -jar libs/app.jar && \
-    cd /app/modules_gen/com.etendorx.entities && \
-    echo "ETENDORX_VERSION=${ETENDORX_VERSION}" > gradle.properties && \
-    make compile && \
-    cd /app && \
-    export DEPENDENCIES="com.etendorx:das:${ETENDORX_VERSION}" && \
-    echo " DEPENDENCIES=${DEPENDENCIES}" && \
-    gradle ${TASK} --no-daemon --info --refresh-dependencies && \
-    export DEPENDENCIES=$DOWNLOAD_DEP && \
-    echo " DEPENDENCIES=${DEPENDENCIES}" && \
-    gradle ${TASK} --no-daemon --info --refresh-dependencies && \
-    gradle --stop && \
-    echo "------ CHECKING FOR CONFIG SERVER ------" && \
-    gradle waitForConfigServer && \
-    echo "------- STARTING APP -------\n" && \
-    java -Dloader.path=./modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-1.0.0-plain.jar,./libs/ -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT} -jar libs/app.jar
+CMD [ "/app-template/run.sh" ]
