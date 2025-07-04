@@ -34,6 +34,7 @@ publishing {
 }
 
 dependencies {
+    implementation 'org.codehaus.jettison:jettison:1.5.4'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.boot:spring-boot-starter-security'
