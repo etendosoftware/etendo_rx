@@ -45,7 +45,7 @@ public class TokenController {
   private static final DateTimeFormatter EXPIRES_AT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnnX")
       .withZone(ZoneOffset.UTC);
 
-  @Value("${adminToken}")
+  @Value("${admin.token}")
   String token;
   @Value("${das.url}")
   String dasUrl;
