@@ -1,5 +1,6 @@
 package com.etendorx.auth.filter;
 
+import com.etendorx.auth.exception.OAuthException;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONObject;
@@ -71,7 +72,7 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
    * @param errorValue the value of the 'error' parameter
    * @param request    the current HTTP request
    * @throws AccessDeniedException if the error is "access_denied"
-   * @throws RuntimeException      for all other errors
+   * @throws OAuthException      for all other errors
    */
   private void handleError(String errorValue, HttpServletRequest request) throws AccessDeniedException {
     request.setAttribute(ERROR_MESSAGE, errorValue);
@@ -80,7 +81,7 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
     }
 
     request.setAttribute(ERROR_MESSAGE, "internal_error");
-    throw new RuntimeException("Internal error occurred.");
+    throw new OAuthException("Internal error occurred.");
   }
 
   /**
@@ -127,7 +128,7 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
    *
    * @param encodedState the base64-encoded and URL-decoded state parameter
    * @return a JSONObject representing the decoded state
-   * @throws RuntimeException if decoding or parsing fails
+   * @throws OAuthException if decoding or parsing fails
    */
   private JSONObject decodeState(String encodedState) {
     try {
@@ -136,7 +137,7 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
       return new JSONObject(decoded);
     } catch (Exception e) {
       logger.error("Error decoding or parsing state parameter", e);
-      throw new RuntimeException("Invalid state parameter", e);
+      throw new OAuthException("Invalid state parameter", e);
     }
   }
 
@@ -146,7 +147,7 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
    * @param request     the current HTTP request
    * @param userId      the user identifier to store
    * @param providerId  the OAuth provider identifier to store
-   * @throws RuntimeException if building the URI fails
+   * @throws OAuthException if building the URI fails
    */
   private void setSessionAttributes(HttpServletRequest request, String userId, String providerId) {
     try {
@@ -154,12 +155,17 @@ public class ParameterExtractionFilter extends OncePerRequestFilter {
       URI uri = new URI(fullURL);
 
       HttpSession session = request.getSession();
-      session.setAttribute("loginURL", uri.getPath());
+      String path = uri.getPath();
+      if (path != null && path.startsWith("/") && !path.contains("..")) {
+        session.setAttribute("loginURL", path);
+      } else {
+        session.setAttribute("loginURL", "/default");
+      }
       session.setAttribute(USER_ID, userId);
       session.setAttribute(ETRX_OAUTH_PROVIDER_ID, providerId);
     } catch (URISyntaxException e) {
       request.setAttribute(ERROR_MESSAGE, "internal_error");
-      throw new RuntimeException("Error parsing URI", e);
+      throw new OAuthException("Error parsing URI", e);
     }
   }
 
