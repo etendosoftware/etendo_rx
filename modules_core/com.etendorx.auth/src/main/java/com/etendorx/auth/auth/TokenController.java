@@ -2,25 +2,25 @@ package com.etendorx.auth.auth;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Optional;
 import java.util.UUID;
 
-import javax.swing.text.html.HTMLDocument;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,7 +42,10 @@ public class TokenController {
   private ResourceLoader resourceLoader;
 
   private static final String AUTH_TOKEN_INFO_URI_WITH_DATE_FORMAT = "/auth/ETRX_Token_Info?_dateFormat=yyyy-MM-dd'T'HH:mm:ss.SSSX";
-  @Value("${token}")
+  private static final DateTimeFormatter EXPIRES_AT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnnX")
+      .withZone(ZoneOffset.UTC);
+
+  @Value("${admin.token}")
   String token;
   @Value("${das.url}")
   String dasUrl;
@@ -59,10 +62,28 @@ public class TokenController {
             "If the problem persists, please contact your system administrator.");
       }
       String uuid = UUID.randomUUID().toString().toUpperCase().replace("-", "");
+      String expiresAt = Optional.ofNullable(user.getAttribute("expiresAt"))
+          .map(Object::toString)
+          .filter(StringUtils::isNotBlank)
+          .orElseGet(() -> {
+            Instant idTokenExpiresAt = ((DefaultOidcUser) user).getIdToken().getExpiresAt();
+            assert idTokenExpiresAt != null : "";
+            return idTokenExpiresAt.toString();
+          });
+
+      String tokenValue = Optional.ofNullable(user.getAttribute("token"))
+          .map(Object::toString)
+          .filter(StringUtils::isNotBlank)
+          .orElseGet(() -> {
+            String idTokenValue = ((DefaultOidcUser) user).getIdToken().getTokenValue();
+            assert idTokenValue != null : "";
+            return idTokenValue;
+          });
+
       TokenInfo tokenInfo = new TokenInfo(
           uuid,
-          user.getAttribute("expiresAt").toString(),
-          user.getAttribute("token").toString(),
+          parseAndFormatExpiresAt(expiresAt),
+          tokenValue,
           userId,
           etrxOauthProviderId
       );
@@ -82,6 +103,23 @@ public class TokenController {
       log.error(e.getMessage(), e);
       request.setAttribute(ERROR_MESSAGE, "internal_error");
       throw new RuntimeException("An unexpected error occurred: " + e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Parses a date string into an Instant and returns it as a string
+   * in ISO-8601 format with nanoseconds and 'Z' timezone.
+   *
+   * @param expiresAtString the date string to parse
+   * @return the formatted date string, or null if invalid
+   */
+  public static String parseAndFormatExpiresAt(String expiresAtString) {
+    try {
+      Instant instant = Instant.parse(expiresAtString);
+      return EXPIRES_AT_FORMATTER.format(instant);
+    } catch (DateTimeParseException | NullPointerException e) {
+      log.error("Invalid date: " + expiresAtString);
+      return null;
     }
   }
 

@@ -24,7 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 import com.etendorx.auth.test.utils.AuthTestUtils;
 
