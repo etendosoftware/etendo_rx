@@ -1,30 +1,43 @@
-FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu
+FROM amazoncorretto:17.0.14-alpine3.21
 
-ARG GRADLE_VERSION=7.4.2
-RUN apt update && apt install -y wget unzip
+ARG GRADLE_VERSION=8.12.1
+ARG OPEN_TELEMETRY_VERSION=v2.18.1
 
-RUN wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp \
-    && unzip -d /opt/gradle /tmp/gradle-${GRADLE_VERSION}-bin.zip \
-    && rm /tmp/gradle-${GRADLE_VERSION}-bin.zip
+# Install system tools
+RUN apk add --no-cache wget unzip
 
-# Delete cache and tmp files
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Install Gradle and remove archive
+RUN GRADLE_ZIP=gradle-${GRADLE_VERSION}-bin.zip \
+    && wget https://services.gradle.org/distributions/${GRADLE_ZIP} -P /tmp \
+    && unzip /tmp/${GRADLE_ZIP} -d /opt/gradle \
+    && rm /tmp/${GRADLE_ZIP}
 
-# Configurar variables de entorno para Gradle
+# Install OpenTelemetry Java Agent
+RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/${OPEN_TELEMETRY_VERSION}/opentelemetry-javaagent.jar -P /opt/open-telemetry
+
+# Set environment variables for Gradle
 ENV GRADLE_HOME=/opt/gradle/gradle-${GRADLE_VERSION}
 ENV PATH=${PATH}:${GRADLE_HOME}/bin
 ENV TASK="run"
 ENV CONFIG_SERVER_URL=http://localhost:8888
 ENV SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCHLOCATIONS=
 ENV SPRING_PROFILES_ACTIVE=
-ENV DEBUG_PORT=8000
+ENV DEBUG_PORT=5005
+# OpenTelemetry configuration
+ENV OTEL_SERVICE_NAME=dynamic-gradle
+ENV OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+ENV OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+ENV OTEL_TRACES_EXPORTER=otlp
+ENV OTEL_METRICS_EXPORTER=none
+ENV OTEL_LOGS_EXPORTER=none
+ENV OTEL_EXPORTER_OTLP_TIMEOUT=10000
 
+# Set the working directory for any subsequent ADD, COPY, CMD, ENTRYPOINT, or RUN instructions
 WORKDIR /app
-COPY resources/dynamic-gradle/build.gradle /app 
 
-CMD gradle ${TASK} --no-daemon --info && \
-    gradle --stop && \
-    echo "------ CHECKING FOR CONFIG SERVER ------" && \
-    gradle waitForConfigServer && \
-    echo "------- STARTING APP -------\n" && \
-    java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT} -jar libs/app.jar
+# Copy only the necessary build files
+COPY resources/dynamic-gradle/build.gradle /app
+COPY resources/dynamic-gradle/run.sh /app
+RUN chmod +x /app/run.sh
+
+ENTRYPOINT [ "/app/run.sh" ]

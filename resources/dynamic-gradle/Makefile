@@ -1,7 +1,6 @@
 PHONY: build push
 
-VERSION:=1.0.0
-
+VERSION:=1.1.0
 
 build:
 	echo "Build amd64"
@@ -18,4 +17,3 @@ build:
 	docker manifest annotate etendo/dynamic-gradle:$(VERSION) etendo/dynamic-gradle:$(VERSION)-amd64 --os linux --arch amd64
 	docker manifest annotate etendo/dynamic-gradle:$(VERSION) etendo/dynamic-gradle:$(VERSION)-arm64 --os linux --arch arm64
 	docker manifest push etendo/dynamic-gradle:$(VERSION)
-

@@ -1,6 +1,6 @@
 .PHONY: build
 
-VERSION = 1.0.1
+VERSION = 1.1.0
 
 build:
 	echo "Build amd64"
@@ -14,4 +14,3 @@ build:
 	docker manifest annotate etendo/dynamic-das:$(VERSION) etendo/dynamic-das:$(VERSION)-amd64 --os linux --arch amd64
 	docker manifest annotate etendo/dynamic-das:$(VERSION) etendo/dynamic-das:$(VERSION)-arm64 --os linux --arch arm64
 	docker manifest push etendo/dynamic-das:$(VERSION)
-
