@@ -1,8 +1,8 @@
-pipeline {
-    options {
-        disableConcurrentBuilds()
-    }
+def updateCommitStatus(repositoryName, status, description, accessToken, gitCommit, buildUrl, contextBuild) {
+  sh "./pipelines/run-tests/utils/build-update.sh ${repositoryName} ${status} \"${description}\" ${accessToken} ${gitCommit} ${buildUrl} \"${contextBuild}\""
+}
 
+pipeline {
     environment { // MARK: Environment variables
         CONTEXT_NAME        = 'etendo'
         BBDD_SID            = 'etendo'
@@ -26,94 +26,25 @@ pipeline {
 
         BUILD_CLASSIC       = true
 
-        SONAR_VERSION       = "5.0.1.3006"
-        SONARQUBE_URL       = credentials('sonarqube-url')
-        SONARQUBE_TOKEN     = credentials('sonar-token-access')
-
         TOMCAT_URL          = "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.98/bin/apache-tomcat-9.0.98.tar.gz"
 
         SUCCESS             = 'SUCCESS'
         FAILED              = 'FAILED'
         ABORTED             = 'ABORTED'
         UNSTABLE            = 'UNSTABLE'
+
+        COMMIT_INPROGRESS_STATUS = "pending"
+        COMMIT_SUCCESS_STATUS    = "success"
+        COMMIT_FAILED_STATUS     = "failure"
+
+        CONTEXT_BUILD = "RX Core Tests"
     }
 
     agent { // MARK: Agent
         kubernetes {
             inheritFrom 'jenkins-node-rx'
             defaultContainer 'jnlp'
-            yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  name: jenkins-node-core-unittests-rx
-  namespace: jenkins2025
-  labels:
-    app.kubernetes.io/name: jenkins-node-core-unittests-rx
-spec:
-  containers:
-    - name: compiler
-      image: etendo/compiler_jenkins:1.0.7
-      ports:
-        - name: ssh
-          containerPort: 22
-          protocol: TCP
-        - name: visualvm
-          containerPort: 8000
-          protocol: TCP
-      resources:
-        limits:
-          cpu: 3072m
-          memory: 5000Mi
-        requests:
-          cpu: 3072m
-          memory: 5000Mi
-      volumeMounts:
-        - name: rsa-keys
-          mountPath: /root/.ssh/
-        - name: docker-sock
-          mountPath: /var/run/docker.sock
-      lifecycle:
-        postStart:
-          exec:
-            command:
-              - bash
-              - '-c'
-              - >-
-                chmod a+x /var/run/docker.sock &&
-                rm /etc/apt/sources.list.d/pgdg.list || echo 0 &&
-                apt update &&
-                apt install -y curl postgresql-client
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: File
-      imagePullPolicy: IfNotPresent
-    - name: postgres
-      image: postgres:16
-      workingDir: /home/jenkins
-      env:
-        - name: POSTGRES_PASSWORD
-          value: syspass
-      resources: {}
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: File
-      imagePullPolicy: IfNotPresent
-  volumes:
-    - name: rsa-keys
-      configMap:
-        name: rsa-keys
-        defaultMode: 384
-    - name: docker-sock
-      hostPath:
-        path: /var/run/docker.sock
-  restartPolicy: Always
-  terminationGracePeriodSeconds: 30
-  dnsPolicy: ClusterFirst
-  serviceAccountName: default
-  serviceAccount: default
-  securityContext:
-    privileged: true
-
-"""
+            yamlFile 'pipelines/run-tests/Agent.yaml'
         }
     }
     stages { // MARK: Stages
@@ -122,10 +53,14 @@ spec:
                 container('compiler') {
                     script {
                         try {
+                            env.DESCRIPTION = "Clone and Setup RX"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
                             echo "---------------------- Setting up Environment Variables ----------------------"
-                            env.EXIST_JACOCO_REPORT = false
-                            env.STATUSTEST = "1"
-                            env.STATUSRX = "1"
+                            env.JACOCO_REPORT_EXISTS = false // Flag to track if any JaCoCo report is generated
+                            env.TEST_STATUS = SUCCESS // Overall test status
+                            env.RX_STATUS = SUCCESS // Overall RX build status
+                            env.FAILED_SUITES = "" // List to collect failed test suites
 
                             echo "---------------------- Clonning RX Repo ----------------------"
                             sh """
@@ -159,7 +94,7 @@ spec:
                             ./gradlew setup
                             """
                             
-                            env.COMMIT_INFO = "<p>Commit: ${RX_REPO_URL}/commit/${GIT_COMMIT}<br>Author: ${COMMIT_AUTHOR_NAME} (${COMMIT_AUTHOR_EMAIL})</p>"
+                            env.COMMIT_INFO = "<p>• Commit: ${RX_REPO_URL}/commit/${GIT_COMMIT}<br>• Author: ${COMMIT_AUTHOR_NAME} (${COMMIT_AUTHOR_EMAIL})</p>"
                             echo "---------------------- Commit Info ----------------------"
                             echo "${COMMIT_INFO}"
 
@@ -170,13 +105,13 @@ spec:
                             echo "---------------------- Clone and Setup RX Repo Failed ----------------------"
                             currentBuild.result = FAILED
                             error('Clone and Setup RX Repo Failed')
-                            env.STATUSRX = "0"
+                            env.RX_STATUS = FAILED
                         }
                     }
                 }
             }
         }
-        stage ('Build Environment Etendo Core') { // MARK: Build Environment Etendo Core
+        stage ('Build Environment Etendo Classic') { // MARK: Build Environment Etendo Classic
             when {
                 expression {
                     env.BUILD_CLASSIC == "true" && currentBuild.result == SUCCESS
@@ -186,13 +121,15 @@ spec:
                 container('compiler') {
                     script {
                         try {
-                            sh "./pipelines/run-tests/build-update.sh ${RX_DIR} pending \"Build Environment Etendo Core\" ${ACCESS_TOKEN} ${GIT_COMMIT} ${BUILD_URL}"
+                            env.DESCRIPTION = "Building Etendo Classic Environment"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
+
                             echo "---------------- Stack Configuration ----------------"
+                            sh "wget -O apache-tomcat.tar.gz ${TOMCAT_URL}"
+                            sh "tar -xvf apache-tomcat.tar.gz -C ${WORKSPACE}"
 
-                            sh "wget -O apache-tomcat.tar.gz $TOMCAT_URL"
-                            sh "tar -xvf apache-tomcat.tar.gz -C $WORKSPACE"
-
-							env.TOMCAT_FOLDER = sh(script: "basename ${TOMCAT_URL} .tar.gz", returnStdout: true).trim()
+                            env.TOMCAT_FOLDER = sh(script: "basename ${TOMCAT_URL} .tar.gz", returnStdout: true).trim()
                             env.CATALINA_HOME = "${WORKSPACE}/${TOMCAT_FOLDER}"
                             env.CATALINA_BASE = "${WORKSPACE}/${TOMCAT_FOLDER}"
 
@@ -201,19 +138,19 @@ spec:
                                 sh "GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch main git@github.com:etendosoftware/etendo_core.git"
                                 dir("etendo_core") {
                                     sh """
-                                    echo "\n
-                                    context.name=${CONTEXT_NAME}\n
-                                    bbdd.sid=${BBDD_SID}\n
-                                    bbdd.port=${BBDD_PORT}\n
-                                    bbdd.systemUser=${BBDD_SYSTEMUSER}\n
-                                    bbdd.systemPassword=${BBDD_SYSTEMPASS}\n
-                                    bbdd.user=${BBDD_USER}\n
-                                    bbdd.password=${BBDD_PASSWORD}\n
-                                    nexusUser=${NEXUS_USER}\n
-                                    nexusPassword=${NEXUS_PASSWORD}\n
-                                    githubUser=${GITHUB_USER}\n
-                                    githubToken=${GITHUB_TOKEN}\n
-                                    allow.root=true\n
+                                    echo "
+                                    context.name=${CONTEXT_NAME}
+                                    bbdd.sid=${BBDD_SID}
+                                    bbdd.port=${BBDD_PORT}
+                                    bbdd.systemUser=${BBDD_SYSTEMUSER}
+                                    bbdd.systemPassword=${BBDD_SYSTEMPASS}
+                                    bbdd.user=${BBDD_USER}
+                                    bbdd.password=${BBDD_PASSWORD}
+                                    nexusUser=${NEXUS_USER}
+                                    nexusPassword=${NEXUS_PASSWORD}
+                                    githubUser=${GITHUB_USER}
+                                    githubToken=${GITHUB_TOKEN}
+                                    allow.root=true
                                     org.gradle.jvmargs=-Dfile.encoding=UTF-8" > gradle.properties
                                     """
                                     sh "./gradlew prepareConfig --stacktrace"
@@ -223,7 +160,7 @@ spec:
                                     sh """
                                     cd modules
                                     GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch main git@github.com:etendosoftware/com.etendoerp.etendorx.git
-                                    git clone --branch develop https://github.com/etendosoftware/com.etendoerp.integration.petclinic.git
+                                    git clone --branch main https://github.com/etendosoftware/com.etendoerp.integration.petclinic.git
                                     """
                                     
                                     sh "./gradlew install --stacktrace"
@@ -236,64 +173,18 @@ spec:
                             echo "---------------------- Inserting Configs ----------------------"
                             withEnv(["PGPASSWORD=${env.BBDD_PASSWORD}"]) {
                                 sh """
-                                    psql -h localhost -U ${BBDD_USER} -d ${BBDD_SID} <<EOF
-
-                                    INSERT INTO smfsws_config (
-                                        smfsws_config_id, ad_client_id, ad_org_id, isactive, created, createdby,
-                                        updated, updatedby, expirationtime, privatekey
-                                    ) VALUES (
-                                        '07054A65ACCB423F90D270130DCD02E4',
-                                        '0',
-                                        '0',
-                                        'Y',
-                                        '2025-04-16 13:19:11.492',
-                                        '100',
-                                        '2025-04-16 13:19:11.492',
-                                        '100',
-                                        0,
-                                        '{"private-key":"-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgoP6uMq5AuRjREe3oUUeuh6LJTYWTnPvr7Ds8+mstk5+hRANCAASjRJgZeEBfLflXzTYeSFuPSlwBGlVKXDY1+baWJM2L0E+o3NLyLWFY1qjfudRUY8H3AkSoNY3KmfT67h7We56F-----END PRIVATE KEY-----","public-key":"-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEo0SYGXhAXy35V802Hkhbj0pcARpVSlw2Nfm2liTNi9BPqNzS8i1hWNao37nUVGPB9wJEqDWNypn0+u4e1nuehQ==-----END PUBLIC KEY-----"}'
-                                    );
-
-                                    INSERT INTO etrx_config (
-                                        etrx_config_id, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby,
-                                        service_name, service_url, updateable_configs, public_url, restart_services
-                                    ) VALUES
-                                    ('B9393395A3074D5FBD3E1863D9BD2671', '0', '0', 'Y', '2025-04-16 13:27:01.655', '100', '2025-04-16 13:27:01.655', '100', 'config', 'http://localhost:8888', 'N', 'http://localhost:8888', 'Y'),
-                                    ('E00B0AADFF024417BF67D0313AAFCF28', '0', '0', 'Y', '2025-04-16 13:27:01.66',  '100', '2025-04-16 13:27:01.66',  '100', 'auth', 'http://localhost:8094', 'Y', 'http://localhost:8094', 'Y'),
-                                    ('1E738098F45344DAAD18A8FC352E0876', '0', '0', 'Y', '2025-04-16 13:27:01.669', '100', '2025-04-16 13:27:01.669', '100', 'das', 'http://localhost:8092', 'Y', 'http://localhost:8092', 'Y'),
-                                    ('80B5E214E3B444FFBF48FA7F563E8F0D', '0', '0', 'Y', '2025-04-16 13:27:01.673', '100', '2025-04-16 13:27:01.673', '100', 'edge', 'http://localhost:8096', 'Y', 'http://localhost:8096', 'Y'),
-                                    ('B3FB8056DC2F4D37BD0B85CD0CB998A8', '0', '0', 'Y', '2025-04-16 13:27:01.676', '100', '2025-04-16 13:27:01.676', '100', 'asyncprocess', 'http://localhost:9092', 'Y', 'http://localhost:9092', 'Y'),
-                                    ('0976C13F5C364F918D9A94282A0EF980', '0', '0', 'Y', '2025-04-16 13:27:01.689', '100', '2025-04-16 13:27:01.689', '100', 'obconnsrv', 'http://localhost:8101', 'Y', 'http://localhost:8101', 'Y'),
-                                    ('C1EB36E4B2A1442FB45C78926CDD4E36', '0', '0', 'Y', '2025-04-16 13:27:01.691', '100', '2025-04-16 13:27:01.691', '100', 'worker', 'http://localhost:0', 'Y', 'http://localhost:0', 'Y');
-
-                                    INSERT INTO etrx_service_param (
-                                        etrx_service_param_id, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby,
-                                        param_value, param_key, etrx_config_id
-                                    ) VALUES
-                                    ('5C321A9820CE4AA496F07D06F24CC70E', '0', '0', 'Y', '2025-04-16 13:27:01.656', '100', '2025-04-16 13:27:01.656', '100', 'http://localhost:8092', 'das.url', 'B9393395A3074D5FBD3E1863D9BD2671'),
-                                    ('FDBDF078070047E0A49D09FBDB87FDD6', '0', '0', 'Y', '2025-04-16 13:27:01.657', '100', '2025-04-16 13:27:01.657', '100', 'http://localhost:8080', 'classic.url', 'B9393395A3074D5FBD3E1863D9BD2671'),
-                                    ('11950F994DBB40019E900209B0B0BDAE', '0', '0', 'Y', '2025-04-16 13:27:01.665', '100', '2025-04-16 13:27:01.665', '100', 'http://localhost:8092', 'das.url', 'E00B0AADFF024417BF67D0313AAFCF28'),
-                                    ('37CF36206FC54E1996D28DEF4FAB7FC4', '0', '0', 'Y', '2025-04-16 13:27:01.666', '100', '2025-04-16 13:27:01.666', '100', 'http://localhost:8080', 'classic.url', 'E00B0AADFF024417BF67D0313AAFCF28'),
-                                    ('5DC4588085AF42A38547A3E996988E62', '0', '0', 'Y', '2025-04-16 13:27:01.669', '100', '2025-04-16 13:27:01.669', '100', 'http://localhost:8092', 'das.url', '1E738098F45344DAAD18A8FC352E0876'),
-                                    ('B107590E820F48328EA7EE7880DE5E65', '0', '0', 'Y', '2025-04-16 13:27:01.671', '100', '2025-04-16 13:27:01.671', '100', 'http://localhost:8080', 'classic.url', '1E738098F45344DAAD18A8FC352E0876'),
-                                    ('F2F1FAD5AD284162A8BF70E538810D3D', '0', '0', 'Y', '2025-04-16 13:27:01.674', '100', '2025-04-16 13:27:01.674', '100', 'http://localhost:8092', 'das.url', '80B5E214E3B444FFBF48FA7F563E8F0D'),
-                                    ('F14FE88FE871496D957FA5D299EF55F9', '0', '0', 'Y', '2025-04-16 13:27:01.675', '100', '2025-04-16 13:27:01.675', '100', 'http://localhost:8080', 'classic.url', '80B5E214E3B444FFBF48FA7F563E8F0D'),
-                                    ('93A49116DBE449FDAF8F178058215223', '0', '0', 'Y', '2025-04-16 13:27:01.677', '100', '2025-04-16 13:27:01.677', '100', 'http://localhost:8092', 'das.url', 'B3FB8056DC2F4D37BD0B85CD0CB998A8'),
-                                    ('52D7DAA3B85E466F98D112B2B68FBB72', '0', '0', 'Y', '2025-04-16 13:27:01.688', '100', '2025-04-16 13:27:01.688', '100', 'http://localhost:8080', 'classic.url', 'B3FB8056DC2F4D37BD0B85CD0CB998A8'),
-                                    ('4F679F105FFB40429EE0AEA007E35F30', '0', '0', 'Y', '2025-04-16 13:27:01.69',  '100', '2025-04-16 13:27:01.69',  '100', 'http://localhost:8092', 'das.url', '0976C13F5C364F918D9A94282A0EF980'),
-                                    ('7DF211A4800F4BEDABD264A906736EC3', '0', '0', 'Y', '2025-04-16 13:27:01.69',  '100', '2025-04-16 13:27:01.69',  '100', 'http://localhost:8080', 'classic.url', '0976C13F5C364F918D9A94282A0EF980'),
-                                    ('18F282F7C6D64DE69D2BB96E039C8798', '0', '0', 'Y', '2025-04-16 13:27:01.692', '100', '2025-04-16 13:27:01.692', '100', 'http://localhost:8092', 'das.url', 'C1EB36E4B2A1442FB45C78926CDD4E36'),
-                                    ('90CCE704383048779AD4DCE4CF4C4A80', '0', '0', 'Y', '2025-04-16 13:27:01.692', '100', '2025-04-16 13:27:01.692', '100', 'http://localhost:8080', 'classic.url', 'C1EB36E4B2A1442FB45C78926CDD4E36');
+                                    psql -h localhost -U ${BBDD_USER} -d ${BBDD_SID} -f ./pipelines/run-tests/utils/sql/insert_test_configurations.sql
                                 """
                             }
 							sh "${WORKSPACE}/${TOMCAT_FOLDER}/bin/catalina.sh start"
 							sh "sleep 1m"
                             echo "--------------- Build Environment Successful ---------------"
                         } catch (Exception e) {
-                            echo "---------------------- Classic Environment Failed ----------------------"
+                            env.ERROR_MESSAGE = "Build of Classic Environment Failed"
+                            echo "--------------- ${env.ERROR_MESSAGE} ---------------"
                             echo 'Exception occurred: ' + e.toString()
                             currentBuild.result = FAILED
-                            error('Classic Environment Failed')
+                            error(env.ERROR_MESSAGE)
                         }
                     }
                 }
@@ -309,25 +200,28 @@ spec:
                 container('compiler') {
                     script {
                         try {
-                            echo "---------------------- Building Etendo RX Environment ----------------------"
+                            env.DESCRIPTION = "Building Etendo RX Environment"
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+
                             sh """
                             cd ${RX_DIR}
-                            ./pipelines/run-tests/build-update.sh ${RX_DIR} pending \"Building Etendo RX Environment\" ${ACCESS_TOKEN} ${GIT_COMMIT} ${BUILD_URL}
                             mkdir -p modules
                             mkdir -p modules_test
                             cd modules_test
-                            git clone --branch develop https://github.com/etendosoftware/com.etendorx.integration.petclinic.git
+                            git clone --branch main https://github.com/etendosoftware/com.etendorx.integration.petclinic.git
                             cd ..
                             ./gradlew generate.entities
                             """
                             currentBuild.result = SUCCESS
                             echo "---------------------- Build of Etendo RX Successful ----------------------"
                         } catch (Exception e) {
-                            echo "---------------------- Build of Etendo RX Failed ----------------------"
+                            env.ERROR_MESSAGE = "Build of Etendo RX Failed"
+                            echo "--------------- ${env.ERROR_MESSAGE} ---------------"
                             echo 'Exception occurred: ' + e.toString()
                             currentBuild.result = FAILED
-                            error('Build of Etendo RX Failed')
-                            env.STATUSRX = "0"
+                            error(env.ERROR_MESSAGE)
+                            env.RX_STATUS = FAILED
                         }
                     }
                 }
@@ -341,42 +235,53 @@ spec:
             }
             steps {
                 script {
+                    def suiteName = "com.etendorx.asyncprocess"
                     try {
-                        echo "---------------------- Running AsyncProcess Tests ----------------------"
+                        env.DESCRIPTION = "Running ${suiteName} Tests"
+                        echo "---------------------- ${env.DESCRIPTION} ----------------------"
+                        updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
                         sh """
                         cd ${RX_DIR}
-                        ./gradlew :com.etendorx.asyncprocess:test jacocoRootReport
+                        ./gradlew :${suiteName}:test jacocoRootReport
                         """
-                        echo "---------------------- AsyncProcess Tests Successful ----------------------"
+                        echo "---------------------- ${suiteName} Tests Successful ----------------------"
                     } catch (Exception e) {
-                        echo "---------------------- AsyncProcess Tests Failed ----------------------"
+                        env.ERROR_MESSAGE = "${suiteName} Tests Failed"
+                        echo "--------------- ${env.ERROR_MESSAGE} ---------------"
                         echo 'Exception occurred: ' + e.toString()
                         currentBuild.result = UNSTABLE
-                        unstable('AsyncProcess Tests Failed')
-                        env.STATUSTEST = "0"
-                    } 
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: "${RX_DIR}/modules_core/com.etendorx.asyncprocess/build/reports/tests/test",
-                        reportFiles: '*.html',
-                        reportName: 'ASYNPROCESS TESTS REPORT',
-                        reportTitles: ''
-                    ])
+                        unstable(env.ERROR_MESSAGE)
+                        env.TEST_STATUS = UNSTABLE
+                        def currentFailed = env.FAILED_SUITES ?: ""
+                        env.FAILED_SUITES = currentFailed.isEmpty() ? "${suiteName}" : "${currentFailed}, ${suiteName}"
+                    } finally {
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: "${RX_DIR}/modules_core/${suiteName}/build/reports/tests/test",
+                            reportFiles: '*.html',
+                            reportName: "${suiteName} Tests Report",
+                            reportTitles: ''
+                        ])
+                    }
                 }
             }
         }
         stage ("Run Auth Tests") { // MARK: Run Auth Tests
             when {
                 expression {
-                    env.STATUSRX == "1"
+                    env.RX_STATUS == SUCCESS
                 }
             }
             steps {
                 container("compiler") {
                     script {
+                        def suiteName = "com.etendorx.auth"
                         try {
+                            env.DESCRIPTION = "Running ${suiteName} Tests"
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
                             echo "---------------------- Building services ----------------------"
                             dir("${RX_DIR}") {
                                 sh """
@@ -399,29 +304,33 @@ spec:
                                     cp modules_gen/com.etendorx.entities/build/libs/com.etendorx.entities-${env.RX_VERSION}-plain.jar /tmp/
                                     cp modules_core/com.etendorx.auth/build/libs/com.etendorx.auth-${env.RX_VERSION}.jar /tmp/
 
-                                    echo "---------------------- Running Auth Tests ----------------------"
-                                    ./gradlew com.etendorx.auth:test
+                                    echo "---------------------- Running ${suiteName} Tests ----------------------"
+                                    ./gradlew ${suiteName}:test
                                     ./gradlew jacocoTestReport
                                 """
                             }
-                            echo "---------------------- Auth Tests Successful ----------------------"
+                            echo "---------------------- ${suiteName} Tests Successful ----------------------"
                         } catch (Exception e) {
-                            echo "---------------------- Auth Tests Failed ----------------------"
+                            env.ERROR_MESSAGE = "${suiteName} Tests Failed"
+                            echo "--------------- ${env.ERROR_MESSAGE} ---------------"
                             echo 'Exception occurred: ' + e.toString()
                             currentBuild.result = UNSTABLE
-                            unstable('Auth Tests Failed')
-                            env.STATUSTEST = "0"
-                        }
-                        if (fileExists("${RX_DIR}/modules_core/com.etendorx.auth/build/reports/tests/test")) {
-                            publishHTML([
-                                allowMissing: false,
-                                alwaysLinkToLastBuild: false,
-                                keepAll: true,
-                                reportDir: "${RX_DIR}/modules_core/com.etendorx.auth/build/reports/tests/test",
-                                reportFiles: '*.html',
-                                reportName: 'AUTH TESTS REPORT',
-                                reportTitles: ''
-                            ])
+                            unstable(env.ERROR_MESSAGE)
+                            env.TEST_STATUS = UNSTABLE
+                            def currentFailed = env.FAILED_SUITES ?: ""
+                            env.FAILED_SUITES = currentFailed.isEmpty() ? "${suiteName}" : "${currentFailed}, ${suiteName}"
+                        } finally {
+                            if (fileExists("${RX_DIR}/modules_core/com.etendorx.auth/build/reports/tests/test")) {
+                                publishHTML([
+                                    allowMissing: false,
+                                    alwaysLinkToLastBuild: false,
+                                    keepAll: true,
+                                    reportDir: "${RX_DIR}/modules_core/${suiteName}/build/reports/tests/test",
+                                    reportFiles: '*.html',
+                                    reportName: "${suiteName} Tests Report",
+                                    reportTitles: ''
+                                ])
+                            }
                         }
                     }
                 }
@@ -430,14 +339,18 @@ spec:
         stage ("Run Das Tests") { // MARK: Run Das Tests
             when {
                 expression {
-                    env.STATUSRX == "1"
+                    env.RX_STATUS == SUCCESS
                 }
             }
             steps {
                 container("compiler") {
                     script {
+                        def suiteName = "com.etendorx.das"
                         try {
-                            echo "---------------------- Running Das Tests ----------------------"
+                            env.DESCRIPTION = "Running ${suiteName} Tests"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
+
                             def tests = [
                                 "com.etendorx.das.test.RepositoryTest",
                                 "com.etendorx.das.test.RestCallTest",
@@ -458,34 +371,78 @@ spec:
 
                             dir(RX_DIR) {
                                 tests.each { test ->
-                                    sh "./gradlew :com.etendorx.das:test --info --tests ${test} jacocoTestReport"
-                                    sh "mv modules_core/com.etendorx.das/build/jacoco/test.exec modules_core/com.etendorx.das/build/jacoco/test${counter}.exec"
+                                    sh "./gradlew :${suiteName}:test --info --tests ${test} jacocoTestReport"
+                                    sh "mv modules_core/${suiteName}/build/jacoco/test.exec modules_core/${suiteName}/build/jacoco/test${counter}.exec"
                                     counter++
                                 }
                             }
-
-                            dir(RX_DIR) {
-                                sh "./gradlew :com.etendorx.integration.petclinic:test --info jacocoTestReport"
-                            }
-
-                            echo "---------------------- Das Tests Successful ----------------------"
+                            echo "---------------------- ${suiteName} Tests Successful ----------------------"
                         } catch (Exception e) {
-                            echo "---------------------- Das Tests Failed ----------------------"
+                            env.ERROR_MESSAGE = "${suiteName} Tests Failed"
+                            echo "--------------- ${env.ERROR_MESSAGE} ---------------"
                             echo 'Exception occurred: ' + e.toString()
                             currentBuild.result = UNSTABLE
-                            unstable('Das Tests Failed')
-                            env.STATUSTEST = "0"
+                            unstable(env.ERROR_MESSAGE)
+                            env.TEST_STATUS = UNSTABLE
+                            def currentFailed = env.FAILED_SUITES ?: ""
+                            env.FAILED_SUITES = currentFailed.isEmpty() ? "${suiteName}" : "${currentFailed}, ${suiteName}"
+                        } finally {
+                            if (fileExists("${RX_DIR}/modules_core/${suiteName}/build/reports/tests/test")) {
+                                publishHTML([
+                                    allowMissing: false,
+                                    alwaysLinkToLastBuild: false,
+                                    keepAll: true,
+                                    reportDir: "${RX_DIR}/modules_core/${suiteName}/build/reports/tests/test",
+                                    reportFiles: '*.html',
+                                    reportName: "${suiteName} Tests Report",
+                                    reportTitles: ''
+                                ])
+                            }
                         }
-                        if (fileExists("${RX_DIR}/modules_core/com.etendorx.das/build/reports/tests/test")) {
-                            publishHTML([
-                                allowMissing: false,
-                                alwaysLinkToLastBuild: false,
-                                keepAll: true,
-                                reportDir: "${RX_DIR}/modules_core/com.etendorx.das/build/reports/tests/test",
-                                reportFiles: '*.html',
-                                reportName: 'DAS TESTS REPORT',
-                                reportTitles: ''
-                            ])
+                    }
+                }
+            }
+        }
+        stage ("Run Integration Pet Clinic (RX) Tests") { // MARK: Run Integration Pet Clinic Tests
+            when {
+                expression {
+                    env.RX_STATUS == SUCCESS
+                }
+            }
+            steps {
+                container("compiler") {
+                    script {
+                        def suiteName = "com.etendorx.integration.petclinic"
+                        try {
+                            env.DESCRIPTION = "Running ${suiteName} Tests"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
+                            dir(RX_DIR) {
+                                sh "./gradlew :${suiteName}:test --info jacocoTestReport"
+                            }
+
+                            echo "---------------------- ${suiteName} Tests Successful ----------------------"
+                        } catch (Exception e) {
+                            env.ERROR_MESSAGE = "${suiteName} Tests Failed"
+                            echo "--------------- ${env.ERROR_MESSAGE} ---------------"
+                            echo 'Exception occurred: ' + e.toString()
+                            currentBuild.result = UNSTABLE
+                            unstable(env.ERROR_MESSAGE)
+                            env.TEST_STATUS = UNSTABLE
+                            def currentFailed = env.FAILED_SUITES ?: ""
+                            env.FAILED_SUITES = currentFailed.isEmpty() ? "${suiteName}" : "${currentFailed}, ${suiteName}"
+                        } finally {
+                            if (fileExists("${RX_DIR}/modules_core/${suiteName}/build/reports/tests/test")) {
+                                publishHTML([
+                                    allowMissing: false,
+                                    alwaysLinkToLastBuild: false,
+                                    keepAll: true,
+                                    reportDir: "${RX_DIR}/modules_core/${suiteName}/build/reports/tests/test",
+                                    reportFiles: '*.html',
+                                    reportName: "${suiteName} Tests Report",
+                                    reportTitles: ''
+                                ])
+                            }
                         }
                     }
                 }
@@ -494,36 +451,44 @@ spec:
         stage ("Run Edge Tests") { // MARK: Run Edge Tests
             when {
                 expression {
-                    env.STATUSRX == "1"
+                    env.RX_STATUS == SUCCESS
                 }
             }
             steps {
                 container("compiler") {
                     script {
+                        def suiteName = "com.etendorx.edge"
                         try {
-                            echo "---------------------- Running Edge Tests ----------------------"
+                            env.DESCRIPTION = "Running ${suiteName} Tests"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
+
                             sh """
                             cd ${RX_DIR}
-                            ./gradlew :com.etendorx.edge:test jacocoTestReport
+                            ./gradlew :${suiteName}:test jacocoTestReport
                             """
-                            echo "---------------------- Edge Tests Successful ----------------------"
+                            echo "---------------------- ${suiteName} Tests Successful ----------------------"
                         } catch (Exception e) {
+                            env.ERROR_MESSAGE = "${suiteName} Tests Failed"
+                            echo "--------------- ${env.ERROR_MESSAGE} ---------------"
                             echo 'Exception occurred: ' + e.toString()
-                            echo "---------------------- Edge Tests Failed ----------------------"
                             currentBuild.result = UNSTABLE
-                            unstable('Edge Tests Failed')
-                            env.STATUSTEST = "0"
-                        }
-                        if (fileExists("${RX_DIR}/modules_core/com.etendorx.edge/build/reports/tests/test")) {
-                            publishHTML([
-                                allowMissing: false,
-                                alwaysLinkToLastBuild: false,
-                                keepAll: true,
-                                reportDir: "${RX_DIR}/modules_core/com.etendorx.edge/build/reports/tests/test",
-                                reportFiles: '*.html',
-                                reportName: 'EDGE TESTS REPORT',
-                                reportTitles: ''
-                            ])
+                            unstable(env.ERROR_MESSAGE)
+                            env.TEST_STATUS = UNSTABLE
+                            def currentFailed = env.FAILED_SUITES ?: ""
+                            env.FAILED_SUITES = currentFailed.isEmpty() ? "${suiteName}" : "${currentFailed}, ${suiteName}"
+                        } finally {
+                            if (fileExists("${RX_DIR}/modules_core/${suiteName}/build/reports/tests/test")) {
+                                publishHTML([
+                                    allowMissing: false,
+                                    alwaysLinkToLastBuild: false,
+                                    keepAll: true,
+                                    reportDir: "${RX_DIR}/modules_core/${suiteName}/build/reports/tests/test",
+                                    reportFiles: '*.html',
+                                    reportName: "${suiteName} Tests Report",
+                                    reportTitles: ''
+                                ])
+                            }
                         }
                     }
                 }
@@ -532,36 +497,44 @@ spec:
         stage ("Run Event Handler Tests") { // MARK: Run Event Handler Tests
             when {
                 expression {
-                    env.STATUSRX == "1"
+                    env.RX_STATUS == SUCCESS
                 }
             }
             steps {
                 container("compiler") {
                     script {
+                        def suiteName = "com.etendorx.test.eventhandler"
                         try {
-                            echo "---------------------- Running Event Handler Tests ----------------------"
+                            env.DESCRIPTION = "Running ${suiteName}"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
+
                             sh """
                             cd ${RX_DIR}
-                            ./gradlew :com.etendorx.test.eventhandler:test jacocoTestReport
+                            ./gradlew :${suiteName}:test jacocoTestReport
                             """
-                            echo "---------------------- Event Handler Successful ----------------------"
+                            echo "---------------------- ${suiteName} Successful ----------------------"
                         } catch (Exception e) {
-                            echo "---------------------- Event Handler Failed ----------------------"
+                            env.ERROR_MESSAGE = "${suiteName} Failed"
+                            echo "--------------- ${env.ERROR_MESSAGE} ---------------"
                             echo 'Exception occurred: ' + e.toString()
                             currentBuild.result = UNSTABLE
-                            unstable('Event Handler Failed')
-                            env.STATUSTEST = "0"
-                        }
-                        if (fileExists("${RX_DIR}/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test")) {
-                            publishHTML([
-                                allowMissing: false,
-                                alwaysLinkToLastBuild: false,
-                                keepAll: true,
-                                reportDir: "${RX_DIR}/modules_test/com.etendorx.test.eventhandler/build/reports/tests/test",
-                                reportFiles: '*.html',
-                                reportName: 'EVENT HANDLER TESTS REPORT',
-                                reportTitles: ''
-                            ])
+                            unstable(env.ERROR_MESSAGE)
+                            env.TEST_STATUS = UNSTABLE
+                            def currentFailed = env.FAILED_SUITES ?: ""
+                            env.FAILED_SUITES = currentFailed.isEmpty() ? "${suiteName}" : "${currentFailed}, ${suiteName}"
+                        } finally {
+                            if (fileExists("${RX_DIR}/modules_test/${suiteName}/build/reports/tests/test")) {
+                                publishHTML([
+                                    allowMissing: false,
+                                    alwaysLinkToLastBuild: false,
+                                    keepAll: true,
+                                    reportDir: "${RX_DIR}/modules_test/${suiteName}/build/reports/tests/test",
+                                    reportFiles: '*.html',
+                                    reportName: "${suiteName} Tests Report",
+                                    reportTitles: ''
+                                ])
+                            }
                         }
                     }
                 }
@@ -570,13 +543,17 @@ spec:
         stage('Generate Coverage Report') { // MARK: Generate Coverage Report
             when {
                 expression {
-                    env.STATUSRX == "1" && env.STATUSTEST == "1"
+                    env.RX_STATUS == SUCCESS && env.TEST_STATUS == SUCCESS
                 }
             }
             steps {
                 container("compiler") {
                     script {
                         dir(RX_DIR) {
+                            env.DESCRIPTION = "Generating Coverage Report"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
+
                             echo "---------------------- Run jacocoRootReport ----------------------"
                             sh "./gradlew jacocoRootReport"
 
@@ -584,7 +561,7 @@ spec:
 
                             if (fileExists("${JACOCO_REPORT}")) {
                                 echo "---------------------- Jacoco Report Found ----------------------"
-                                env.EXIST_JACOCO_REPORT = true
+                                env.JACOCO_REPORT_EXISTS = true
                             }
                         }
                     }
@@ -595,85 +572,129 @@ spec:
         stage('Run SonarQube Analysis') { // MARK: Run SonarQube Analysis
             when {
                 expression {
-                    env.STATUSRX == "1" && env.STATUSTEST == "1" && EXIST_JACOCO_REPORT
+                    env.RX_STATUS == SUCCESS && env.TEST_STATUS == SUCCESS && env.JACOCO_REPORT_EXISTS
                 }
             }
             steps {
-                container("compiler") {
+                container('compiler') {
                     script {
-                        echo "---------------------- Installing SonarQube Scanner ----------------------"
-                        sh """
-                        apt-get update && apt-get install -y wget unzip
-                        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_VERSION}-linux.zip
-                        unzip sonar-scanner-cli-${SONAR_VERSION}-linux.zip
-                        """
-                        env.PATH = "${env.PATH}:${WORKSPACE}/sonar-scanner-${SONAR_VERSION}-linux/bin"
-                        dir(RX_DIR) {
-                            def sonarSources = "./libs,./modules_core" 
-                            def sonarProjectKey = sh(script: "grep 'sonar.projectKey' sonar-project.properties | cut -d '=' -f2", returnStdout: true).trim()
-                            echo "SonarQube Project Key: ${sonarProjectKey}"
+                        try {
+                            env.DESCRIPTION = "Running SonarQube Analysis"
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                            echo "---------------------- ${env.DESCRIPTION} ----------------------"
 
-                            echo "---------------------- Running SonarQube ----------------------"
+                            echo "---------------------- Installing SonarQube Scanner ----------------------"
                             sh """
-                            ${WORKSPACE}/sonar-scanner-${SONAR_VERSION}-linux/bin/sonar-scanner -X \
-                                -Dsonar.projectKey=${sonarProjectKey} \
-                                -Dsonar.sources=${sonarSources} \
-                                -Dsonar.host.url=${SONARQUBE_URL} \
-                                -Dsonar.login=${SONARQUBE_TOKEN} \
-                                -Dsonar.branch.name=${GIT_BRANCH} \
-                                -Dsonar.projectVersion=${GIT_COMMIT} \
-                                -Dsonar.java.coveragePlugin=jacoco \
-                                -Dsonar.coverage.jacoco.xmlReportPaths=${JACOCO_REPORT}
+                            apt-get update && apt-get install -y wget unzip
+                            wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_VERSION}-linux.zip
+                            unzip sonar-scanner-cli-${SONAR_VERSION}-linux.zip
                             """
-                            
-                            echo "---------------------- Getting SonarQube Report URL ----------------------"
-                            def branchName = URLEncoder.encode(GIT_BRANCH, 'UTF-8')
-                            sh "echo \"${SONARQUBE_URL}\" > url_sonar.txt"
-                            def sonarUrl = readFile('url_sonar.txt').trim()
-                            def projectUrl = "${sonarUrl}dashboard?id=${sonarProjectKey}&branch=${branchName}"
-                            env.PROJECT_URL = "${projectUrl}"
-                            echo "Sonar Project URL: ${PROJECT_URL}"
+                            env.PATH = "${env.PATH}:${WORKSPACE}/sonar-scanner-${SONAR_VERSION}-linux/bin"
+                            dir(RX_DIR) {
+                                def sonarSources = "./libs,./modules_core" 
+                                def sonarProjectKey = sh(script: "grep 'sonar.projectKey' sonar-project.properties | cut -d '=' -f2", returnStdout: true).trim()
+                                env.PROJECT_KEY = sonarProjectKey
+                                echo "SonarQube Project Key: ${env.PROJECT_KEY}"
 
-                            echo "---------------------- SonarQube Analysis Successful ----------------------"
+                                echo "---------------------- Running SonarQube ----------------------"
+                                sh """
+                                ${WORKSPACE}/sonar-scanner-${SONAR_VERSION}-linux/bin/sonar-scanner -X \
+                                    -Dsonar.projectKey=${env.PROJECT_KEY} \
+                                    -Dsonar.sources=${sonarSources} \
+                                    -Dsonar.host.url=${SONAR_SERVER} \
+                                    -Dsonar.login=${SONAR_TOKEN} \
+                                    -Dsonar.branch.name=${GIT_BRANCH} \
+                                    -Dsonar.projectVersion=${GIT_COMMIT} \
+                                    -Dsonar.java.coveragePlugin=jacoco \
+                                    -Dsonar.scm.revision=${GIT_COMMIT} \
+                                    -Dsonar.coverage.jacoco.xmlReportPaths=${JACOCO_REPORT}
+                                """
+                                
+                                echo "---------------------- Getting SonarQube Report URL ----------------------"
+                                def branchName = URLEncoder.encode(GIT_BRANCH, 'UTF-8')
+                                def projectUrl = "${SONAR_SERVER}/dashboard?id=${env.PROJECT_KEY}&branch=${branchName}"
+                                env.PROJECT_URL = "${projectUrl}"
+                                echo "SonarQube Project URL: ${env.PROJECT_URL}"
+                                echo "---------------------- SonarQube Analysis Successful ----------------------"
+                            }
+                        } catch (Exception e) {
+                            env.ERROR_MESSAGE = "SonarQube Analysis Failed"
+                            echo "--------------- ${env.ERROR_MESSAGE} ---------------"
+                            echo 'Exception occurred: ' + e.toString()
+                            currentBuild.result = FAILED
+                            error(env.ERROR_MESSAGE)
                         }
+                    }
+                }
+            }
+        }
+        stage('Compare Coverage Results') { // MARK: - Compare Coverage Results
+            when {
+                expression {
+                    currentBuild.result == SUCCESS && env.JACOCO_REPORT_EXISTS && !(env.GIT_BRANCH == env.MAIN_BRANCH || env.GIT_BRANCH.startsWith("release/"))
+                }
+            }
+            steps {
+                script {
+                    try {
+                        env.DESCRIPTION = "Comparing Coverage Results"
+                        updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                        echo "---------------------- ${env.DESCRIPTION} ----------------------"
+                        def branchCurrent = URLEncoder.encode(GIT_BRANCH, 'UTF-8')
+                        def branchCompare = 'main'
+                        echo "-------------------------- Comparing Coverage with ${branchCompare} Branch --------------------------"
+
+                        def rootDir = pwd()
+                        def sonarUtils = load "${rootDir}/pipelines/run-tests/utils/sonarUtils.groovy"
+
+                        // Only check commit on PR branches
+                        def checkCommitCurrent = GIT_BRANCH.startsWith('feature/') || GIT_BRANCH.startsWith('hotfix/') || GIT_BRANCH.startsWith('epic/')
+                        echo "Check commit for current branch (${GIT_BRANCH}): ${checkCommitCurrent}"
+                        def coverageCurrent = sonarUtils.getCoverageWithRetry(
+                            GIT_BRANCH,
+                            checkCommitCurrent,
+                            env.PROJECT_KEY,
+                            SONAR_TOKEN,
+                            SONAR_SERVER,
+                            GIT_COMMIT
+                        )
+                        def coverageOriginBranch = sonarUtils.getCoverageWithRetry(
+                            branchCompare,
+                            false,
+                            env.PROJECT_KEY,
+                            SONAR_TOKEN,
+                            SONAR_SERVER,
+                            null
+                        )
+
+                        echo "Current branch (${env.GIT_BRANCH}) coverage: ${coverageCurrent}%"
+                        echo "${branchCompare} branch coverage: ${coverageOriginBranch}%"
+                        if (coverageCurrent < coverageOriginBranch) {
+                            env.ERROR_MESSAGE = "Coverage (${coverageCurrent}%) is lower than ${branchCompare} branch (${coverageOriginBranch}%)"
+                            echo "-------------------------- ${env.ERROR_MESSAGE} --------------------------"
+                            currentBuild.result = UNSTABLE
+                            env.COMPARE_COVERAGE_STATUS = FAILED
+                            unstable(env.ERROR_MESSAGE)
+                        } else {
+                            echo '-------------------------- Coverage is OK --------------------------'
+                            currentBuild.result = SUCCESS
+                        }
+                    } catch (Exception e) {
+                        env.ERROR_MESSAGE = "Comparing Coverage Results Failed"
+                        echo "-------------------------- ${env.ERROR_MESSAGE} --------------------------"
+                        echo "Exception occurred: " + e.toString()
+                        currentBuild.result = UNSTABLE
+                        unstable(env.ERROR_MESSAGE)
                     }
                 }
             }
         }
     }
     post { // MARK: Post Actions
-        fixed {
-            mail to: EMAIL_ADDRESS,
-            subject: "✅ FIXED - ${currentBuild.fullDisplayName}",
-            mimeType: "text/html",
-            body: """
-                <html>
-                    <head>
-                        <style>
-                            body { font-family: 'Arial', sans-serif; }
-                            .header { font-size: 16px; font-weight: bold; color: #333; }
-                        </style>
-                    </head>
-                    <body>
-                        <p><em>${new Date()}</em></p>
-                        <p>__________________________________________________________</p>
-
-                        <h2 class="header">✅ ERRORS FIXED ✅</h2>
-
-                        ${COMMIT_INFO}
-
-                        <p>The problems found in the previous run/s have been fixed! 💪<br>Check out the output in the following link: ${env.BUILD_URL}</p>
-
-                        <p class="footer"><em>Best regards,<br>#EtendoBot 🤖</em></p>
-                        <p>__________________________________________________________</p>
-                    </body>
-                </html>
-            """
-        }
         failure {
             script {
-                sh "./pipelines/run-tests/build-update.sh ${RX_DIR} failure \"Failed Build Environments\" ${ACCESS_TOKEN} ${GIT_COMMIT} ${BUILD_URL}"
-                echo "---------------------- Failed Build Environments ----------------------"
+                updateCommitStatus(RX_DIR, COMMIT_FAILED_STATUS, env.ERROR_MESSAGE, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                echo "---------------------- ${env.ERROR_MESSAGE} ----------------------"
             }
             cleanWs deleteDirs: true
             mail to: EMAIL_ADDRESS,
@@ -684,14 +705,15 @@ spec:
                     <head>
                         <style>
                             body { font-family: 'Arial', sans-serif; }
-                            .header { font-size: 16px; font-weight: bold; color: #333; }
+                            .header { font-size: 16px; font-weight: bold; color: #FF0000; }
                         </style>
                     </head>
                     <body>
-                        <p><em>${new Date()}</em></p>
                         <p>__________________________________________________________</p>
 
                         <h2 class="header">🚫 ERROR 🚫</h2>
+
+                        <p><strong>Reasons ⇢ <em>${env.ERROR_MESSAGE}</em></strong></p>
 
                         ${COMMIT_INFO}
 
@@ -705,31 +727,54 @@ spec:
         }
         unstable {
             script {
-                sh "./pipelines/run-tests/build-update.sh ${RX_DIR} failure \"Failed Tests\" ${ACCESS_TOKEN} ${GIT_COMMIT} ${BUILD_URL}"
-                echo "---------------------- Failed Test ----------------------"
+                def mailSubject = ""
+                def moreInfo = ""
+                def bodyMessageError = ""
+
+                if (env.TEST_STATUS == UNSTABLE) {
+                    mailSubject = "Failed Tests"
+                    if (env.FAILED_SUITES && !env.FAILED_SUITES.isEmpty()) {
+                        bodyMessageError = "Failed Test Suites: ${env.FAILED_SUITES}"
+                    } else {
+                        bodyMessageError = "Failed tests have been detected in the RX Project."
+                    }
+                } else if (env.COMPARE_COVERAGE_STATUS == FAILED) {
+                    mailSubject = "Coverage Decreased"
+                    bodyMessageError = env.ERROR_MESSAGE
+                    moreInfo = "Check the <a href='${env.PROJECT_URL}'>SonarQube Report</a> for more details about the coverage.<br/>"
+                }
+                env.EMAIL_SUBJECT = mailSubject
+                env.MORE_INFO = moreInfo
+                env.BODY_MESSAGE_ERROR = bodyMessageError
+
+                updateCommitStatus(RX_DIR, COMMIT_FAILED_STATUS, env.EMAIL_SUBJECT, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                echo "---------------------- ${env.EMAIL_SUBJECT} ----------------------"
             }
             cleanWs deleteDirs: true
             mail to: EMAIL_ADDRESS,
-            subject: "⚠️ TESTS FAILED - ${currentBuild.fullDisplayName}",
+            subject: "⚠️ ${env.EMAIL_SUBJECT} - ${currentBuild.fullDisplayName}",
             mimeType: "text/html",
             body:  """
                 <html>
                     <head>
                         <style>
                             body { font-family: 'Arial', sans-serif; }
-                            .header { font-size: 16px; font-weight: bold; color: #333; }
+                            .header { font-size: 16px; font-weight: bold; color: #FFA500; }
                         </style>
                     </head>
                     <body>
-                        <p><em>${new Date()}</em></p>
                         <p>__________________________________________________________</p>
 
-                        <h2 class="header">⚠️ BUILD UNSTABLE ⚠️</h2>
+                        <h2 class="header">⚠️ ${env.EMAIL_SUBJECT} ⚠️</h2>
+                        
+                        <p><strong>Reasons ⇢ <em>${env.BODY_MESSAGE_ERROR}</em></strong></p>
 
                         ${COMMIT_INFO}
 
-                        <p>Tests have been detected that have failed in Etendo RX.<br>💡 These tests were run on a Postgres database environment.<br>To more information on the failing run visit: ${env.BUILD_URL}</p>
-
+                        <p>
+                            ${env.MORE_INFO}
+                            To more information on the failing run, visit <a href='${env.BUILD_URL}'>Jenkins Build</a>
+                        </p>
                         <p class="footer"><em>Best regards,<br>#EtendoBot 🤖</em></p>
                         <p>__________________________________________________________</p>
                     </body>
@@ -738,8 +783,9 @@ spec:
         }
         success {
             script {
-                sh "./pipelines/run-tests/build-update.sh ${RX_DIR} success \"Successful Test Suites\" ${ACCESS_TOKEN} ${GIT_COMMIT} ${BUILD_URL}"
-                echo "---------------------- DONE ----------------------"
+                env.DESCRIPTION = "Successful Test Suites"
+                updateCommitStatus(RX_DIR, COMMIT_SUCCESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                echo "---------------------- ${env.DESCRIPTION} ----------------------"
             }
             cleanWs deleteDirs: true
         }
