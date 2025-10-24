@@ -18,8 +18,12 @@ pipeline {
         JAVA_HOME           = '/usr/lib/jvm/java-17-openjdk-amd64'
         ACCESS_TOKEN        = credentials('access_token_github')
         EMAIL_ADDRESS       = credentials('email_builds')
-        RX_REPO_URL         = "https://github.com/etendosoftware/etendo_rx"
-        RX_DIR              = "etendo_rx"
+        RX_REPO_URL         = 'https://github.com/etendosoftware/etendo_rx'
+        RX_DIR              = 'etendo_rx'
+
+        MODULE_RX_URL                  = 'git@github.com:etendosoftware/com.etendoerp.etendorx.git'
+        PET_CLINIC_CLASSIC_MODULE_URL  = 'https://github.com/etendosoftware/com.etendoerp.integration.petclinic.git'
+        PET_CLINIC_RX_MODULE_URL       = 'https://github.com/etendosoftware/com.etendorx.integration.petclinic.git'
 
         COMMIT_AUTHOR_NAME  = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
         COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
@@ -204,8 +208,8 @@ pipeline {
 
                                     sh """
                                     cd modules
-                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch main git@github.com:etendosoftware/com.etendoerp.etendorx.git
-                                    git clone --branch main https://github.com/etendosoftware/com.etendoerp.integration.petclinic.git
+                                    GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch main ${MODULE_RX_URL}
+                                    git clone --branch main ${PET_CLINIC_CLASSIC_MODULE_URL}
                                     """
                                     
                                     sh "./gradlew install --stacktrace"
@@ -254,7 +258,7 @@ pipeline {
                             mkdir -p modules
                             mkdir -p modules_test
                             cd modules_test
-                            git clone --branch main https://github.com/etendosoftware/com.etendorx.integration.petclinic.git
+                            git clone --branch main ${PET_CLINIC_RX_MODULE_URL}
                             cd ..
                             ./gradlew generate.entities
                             """

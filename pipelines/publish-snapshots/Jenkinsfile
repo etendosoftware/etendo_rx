@@ -29,7 +29,9 @@ pipeline {
     ABORTED = 'ABORTED'
 
     JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
+
     ETENDO_RX_FOLDER = 'etendo_rx'
+    ETENDO_CLASSIC_FOLDER = 'etendo_core'
   }
 
   agent { // MARK: Agent Definition
@@ -52,8 +54,8 @@ pipeline {
           try {
             echo "--------------- Checking if pipeline should be skipped ---------------"
             def changedFiles = sh(
-                script: "git diff --name-only HEAD~1 HEAD",
-                returnStdout: true
+              script: "git diff --name-only HEAD~1 HEAD",
+              returnStdout: true
             ).trim()
                 
             echo "Files changed in last commit: ${changedFiles}"
@@ -63,21 +65,22 @@ pipeline {
             def onlyJenkinsfile = filesList.every { it.startsWith("pipelines/run-tests/") } && filesList.size() > 0
 
             if (onlyJenkinsfile) {
-                echo "⏭️ Only pipelines/run-tests/ related files were changed. Skipping pipeline execution."
-                env.DESCRIPTION = "Pipeline Skipped - Only pipelines/run-tests/ files changed"
-                
-                echo "✅ Pipeline execution aborted successfully. Commit marked as success."
-                currentBuild.result = ABORTED
-                return
+              echo "⏭️ Only pipelines/run-tests/ related files were changed. Skipping pipeline execution."
+              env.DESCRIPTION = "Pipeline Skipped - Only pipelines/run-tests/ files changed"
+              
+              echo "✅ Pipeline execution aborted successfully. Commit marked as success."
+              currentBuild.result = ABORTED
+              return
             } else {
-                echo "✅ Pipeline will continue - Changes detected in other files or multiple files changed."
-                currentBuild.result = SUCCESS
+              echo "✅ Pipeline will continue - Changes detected in other files or multiple files changed."
+              currentBuild.result = SUCCESS
             }
           } catch (Exception e) {
-            echo "❌ Error in pipeline skip condition check: ${e.getMessage()}"            
-            env.DESCRIPTION = "Pipeline Check Failed"
+            env.ERROR_MESSAGE = "❌ Pipeline Check Failed"
+            echo "-------------- ${env.ERROR_MESSAGE} --------------"
+            echo "Exception occurred: " + e.toString()
             currentBuild.result = FAILED
-            error("Failed to check pipeline skip condition: ${e.getMessage()}")
+            error(env.ERROR_MESSAGE)
           }
         }
       }
@@ -95,12 +98,16 @@ pipeline {
             try {
               echo '-------------- Building Classic Environment --------------'
               sh """
-              git clone --branch develop ${ETENDO_BASE_URL} etendo_core
+              git clone --branch develop ${ETENDO_BASE_URL} ${ETENDO_CLASSIC_FOLDER}
               """
+
+              env.COMMIT_INFO = "<p>• Commit: ${ETENDO_RX_URL}/commit/${GIT_COMMIT}<br>• Author: ${COMMIT_AUTHOR_NAME} (${COMMIT_AUTHOR_EMAIL})</p>"
+              echo "---------------------- Commit Info ----------------------"
+              echo "${COMMIT_INFO}"
 
               echo '-------------- Prepare gradle.properties --------------'
               sh """
-              cd etendo_core
+              cd ${ETENDO_CLASSIC_FOLDER}
               echo \"
               context.name=${CONTEXT_NAME}
               bbdd.sid=${BBDD_SID}
@@ -121,7 +128,7 @@ pipeline {
               echo '-------------- Clone modules of Classic --------------'
               withCredentials([sshUserPrivateKey(credentialsId: 'my-credentials', keyFileVariable: 'keyfile')]) {
                 sh """
-                cd etendo_core
+                cd ${ETENDO_CLASSIC_FOLDER}
                 mkdir -p modules
                 cd modules
                 GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch ${GIT_BRANCH} ${MODULE_RX_URL}
@@ -136,22 +143,23 @@ pipeline {
 
               echo '-------------- Compile Classic --------------'
               sh """
-              cd etendo_core
-              echo '${buildGradleContent}' >> build.gradle
-              cat build.gradle
-              ./gradlew clean --info
-              ./gradlew prepareConfig --info
-              ./gradlew setup --info
-              ./gradlew install --info
+                cd ${ETENDO_CLASSIC_FOLDER}
+                echo '${buildGradleContent}' >> build.gradle
+                cat build.gradle
+                ./gradlew clean --info
+                ./gradlew prepareConfig --info
+                ./gradlew setup --info
+                ./gradlew install --info
               """
 
               echo '-------------- Build Classic Environment Succesful --------------'
               currentBuild.result = SUCCESS
             } catch (Exception e) {
-              echo '-------------- Build Classic Environment Failed --------------'
+              env.ERROR_MESSAGE = 'Build Classic Environment Failed'
+              echo "-------------- ${env.ERROR_MESSAGE} --------------"
               echo "Exception occurred: " + e.toString()
               currentBuild.result = FAILED
-              error('Build Classic Failed')
+              error(env.ERROR_MESSAGE)
             }
           }
         }
@@ -213,23 +221,24 @@ pipeline {
 
               echo '-------------- Change version to Snapshot --------------'
               sh """
-              cd ${ETENDO_RX_FOLDER}
-              sed -i \"s/gradle.ext.version = \\(.*\\)\'/gradle.ext.version = \\1-SNAPSHOT\'/g\" settings.gradle
+                cd ${ETENDO_RX_FOLDER}
+                sed -i \"s/gradle.ext.version = \\(.*\\)\'/gradle.ext.version = \\1-SNAPSHOT\'/g\" settings.gradle
               """
 
               echo '-------------- Generate Entities --------------'
               sh """
-              cd ${ETENDO_RX_FOLDER}
-              ./gradlew generate.entities --info
+                cd ${ETENDO_RX_FOLDER}
+                ./gradlew generate.entities --info
               """
 
               echo '-------------- Build RX Environment Succesful --------------'
               currentBuild.result = SUCCESS
             } catch (Exception e) {
-              echo '-------------- Build RX Environment Failed --------------'
+              env.ERROR_MESSAGE = 'Build RX Environment Failed'
+              echo "-------------- ${env.ERROR_MESSAGE} --------------"
               echo "Exception occurred: " + e.toString()
               currentBuild.result = FAILED
-              error('Build RX Failed')
+              error(env.ERROR_MESSAGE)
             }
           }
         }
@@ -250,16 +259,18 @@ pipeline {
             try {
               echo '-------------- Publishing Snapshot JARs --------------'
               sh """
-              export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-              cd ${ETENDO_RX_FOLDER}
-              ./gradlew publish --info
+                export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+                cd ${ETENDO_RX_FOLDER}
+                ./gradlew publish --info
               """
               echo '-------------- Snapshot JARs Published --------------'
               currentBuild.result = SUCCESS
             } catch (Exception e) {
-              echo '-------------- Publication of Snapshot JARs Failed --------------'
+              env.ERROR_MESSAGE = 'Publication of Snapshot JARs Failed'
+              echo "-------------- ${env.ERROR_MESSAGE} --------------"
               echo "Exception occurred: " + e.toString()
               currentBuild.result = FAILED
+              error(env.ERROR_MESSAGE)
             }
           }
         }
@@ -268,43 +279,34 @@ pipeline {
   }
 
   post { // MARK: Post Actions
-    fixed {
-      mail to: EMAIL_ADDRESS,
-      subject: "✅ FIXED - ${currentBuild.fullDisplayName}",
-      body: """
-${new Date()}
-__________________________________________________________
-
-✅ ERRORS FIXED ✅
-
-Commit: ${ETENDO_RX_URL}/commit/${env.GIT_COMMIT}
-Author: ${COMMIT_AUTHOR_NAME} <${COMMIT_AUTHOR_EMAIL}>
-
-The problems found in the previous run/s have been fixed! 💪
-Check out the output in the following link:
-${env.BUILD_URL}
-__________________________________________________________
-        """
-    }
     failure {
-      cleanWs deleteDirs: true
       mail to: EMAIL_ADDRESS,
-      subject: "⛔ ERROR - ${currentBuild.fullDisplayName}",
-      body:  """
-${new Date()}
-__________________________________________________________
+        subject: "⛔ ERROR - ${currentBuild.fullDisplayName}",
+        mimeType: "text/html",
+        body:  """
+          <html>
+            <head>
+              <style>
+                body { font-family: 'Arial', sans-serif; }
+                .header { font-size: 16px; font-weight: bold; color: #FF0000; }
+              </style>
+            </head>
+              <body>
+                <p>__________________________________________________________</p>
 
-⛔ ERROR ⛔
+                <h2 class="header">🚫 ERROR 🚫</h2>
 
-Commit: ${ETENDO_RX_URL}/commit/${env.GIT_COMMIT}
-Author: ${COMMIT_AUTHOR_NAME} <${COMMIT_AUTHOR_EMAIL}>
+                <p><strong>Reasons ⇢ <em>${env.ERROR_MESSAGE}</em></strong></p>
 
-The build or publication has failed unexpectedly.
-💡 This build was on an Etendo Environment.
-To more information on the failing run visit:
-${env.BUILD_URL}
-__________________________________________________________
-      """
+                ${COMMIT_INFO}
+
+                <p>The build has failed unexpectedly.<br>To more information on the failing run visit: ${env.BUILD_URL}</p>
+
+                <p class="footer"><em>Best regards,<br>#EtendoBot 🤖</em></p>
+                <p>__________________________________________________________</p>
+              </body>
+          </html>
+        """
     }
   }
 }
