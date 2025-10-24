@@ -42,6 +42,11 @@ pipeline {
 
   stages {
     stage('Check Pipeline Skip Condition') { // MARK: Check Pipeline Skip Condition
+      when {
+        expression {
+          GIT_BRANCH == 'develop'
+        }
+      }
       steps {
         script {
           try {

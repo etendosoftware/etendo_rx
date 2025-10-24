@@ -48,7 +48,52 @@ pipeline {
         }
     }
     stages { // MARK: Stages
+        stage('Check Pipeline Skip Condition') { // MARK: Check Pipeline Skip Condition
+            steps {
+                script {
+                    try {
+                        env.DESCRIPTION = "Checking if pipeline should be skipped"
+                        updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                        echo "--------------- ${env.DESCRIPTION} ---------------"
+                        def changedFiles = sh(
+                            script: "git diff --name-only HEAD~1 HEAD",
+                            returnStdout: true
+                        ).trim()
+                            
+                        echo "Files changed in last commit: ${changedFiles}"
+                        
+                        // Check if only JenkinsFileTestCompile was changed
+                        def filesList = changedFiles.split('\n')
+                        def onlyJenkinsfile = filesList.every { it.startsWith("pipelines/publish-snapshots/") } && filesList.size() > 0
+
+                        if (onlyJenkinsfile) {
+                            echo "⏭️ Only pipelines/publish-snapshots/ related files were changed. Skipping pipeline execution."
+                            env.DESCRIPTION = "Pipeline Skipped - Only pipelines/publish-snapshots/ files changed"
+                            updateCommitStatus(RX_DIR, COMMIT_SUCCESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+
+                            echo "✅ Pipeline execution aborted successfully. Commit marked as success."
+                            currentBuild.result = ABORTED
+                            return
+                        } else {
+                            echo "✅ Pipeline will continue - Changes detected in other files or multiple files changed."
+                            updateCommitStatus(RX_DIR, COMMIT_INPROGRESS_STATUS, env.DESCRIPTION, ACCESS_TOKEN, GIT_COMMIT, BUILD_URL, CONTEXT_BUILD)
+                            currentBuild.result = SUCCESS
+                        }
+                    } catch (Exception e) {
+                        echo "❌ Error in pipeline skip condition check: ${e.getMessage()}"            
+                        env.DESCRIPTION = "Pipeline Check Failed"
+                        currentBuild.result = FAILED
+                        error("Failed to check pipeline skip condition: ${e.getMessage()}")
+                    }
+                }
+            }
+        }
         stage ('Clone and Setup RX Repo') { // MARK: Clone RX Repo
+            when {
+                expression {
+                    currentBuild.result == SUCCESS
+                }
+            }
             steps {
                 container('compiler') {
                     script {
