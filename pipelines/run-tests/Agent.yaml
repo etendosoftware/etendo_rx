@@ -26,8 +26,6 @@ spec:
       volumeMounts:
         - name: rsa-keys
           mountPath: /root/.ssh/
-        - name: docker-sock
-          mountPath: /var/run/docker.sock
       lifecycle:
         postStart:
           exec:
@@ -59,9 +57,6 @@ spec:
       configMap:
         name: rsa-keys
         defaultMode: 384
-    - name: docker-sock
-      hostPath:
-        path: /var/run/docker.sock
   restartPolicy: Always
   terminationGracePeriodSeconds: 30
   dnsPolicy: ClusterFirst
