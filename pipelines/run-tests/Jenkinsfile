@@ -29,7 +29,6 @@ pipeline {
         COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
 
         BUILD_CLASSIC       = true
-
         TOMCAT_URL          = "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.98/bin/apache-tomcat-9.0.98.tar.gz"
 
         SUCCESS             = 'SUCCESS'
@@ -680,7 +679,7 @@ pipeline {
         stage('Compare Coverage Results') { // MARK: - Compare Coverage Results
             when {
                 expression {
-                    currentBuild.result == SUCCESS && env.JACOCO_REPORT_EXISTS && !(env.GIT_BRANCH == env.MAIN_BRANCH || env.GIT_BRANCH.startsWith("release/"))
+                    currentBuild.result == SUCCESS && env.JACOCO_REPORT_EXISTS && !(env.GIT_BRANCH == 'main' || env.GIT_BRANCH.startsWith("release/"))
                 }
             }
             steps {
