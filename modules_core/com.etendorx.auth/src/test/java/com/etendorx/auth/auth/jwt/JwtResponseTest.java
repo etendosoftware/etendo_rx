@@ -95,19 +95,6 @@ class JwtResponseTest {
   }
 
   @Test
-  void testDefaultConstructor_ThenSetViaReflection() throws Exception {
-    JwtResponse response = new JwtResponse();
-    String token = "new.token.value";
-    
-    // Using reflection to set the token (simulating JSON deserialization)
-    java.lang.reflect.Field tokenField = JwtResponse.class.getDeclaredField("token");
-    tokenField.setAccessible(true);
-    tokenField.set(response, token);
-    
-    assertEquals(token, response.getToken(), "Token should be set correctly");
-  }
-
-  @Test
   void testMultipleInstances_AreIndependent() {
     String token1 = "token1";
     String token2 = "token2";

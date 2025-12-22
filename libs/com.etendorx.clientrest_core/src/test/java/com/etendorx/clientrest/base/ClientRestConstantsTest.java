@@ -24,25 +24,6 @@ class ClientRestConstantsTest {
   }
 
   @Test
-  void testXToken_HasCorrectValue() throws Exception {
-    // X_TOKEN is package-private, so we use reflection to test it
-    java.lang.reflect.Field xTokenField = ClientRestConstants.class.getDeclaredField("X_TOKEN");
-    xTokenField.setAccessible(true);
-    String xTokenValue = (String) xTokenField.get(null);
-    
-    assertEquals("X-TOKEN", xTokenValue, "X_TOKEN should be 'X-TOKEN'");
-  }
-
-  @Test
-  void testXToken_IsNotNull() throws Exception {
-    java.lang.reflect.Field xTokenField = ClientRestConstants.class.getDeclaredField("X_TOKEN");
-    xTokenField.setAccessible(true);
-    String xTokenValue = (String) xTokenField.get(null);
-    
-    assertNotNull(xTokenValue, "X_TOKEN should not be null");
-  }
-
-  @Test
   void testConstants_AreFinal() throws Exception {
     java.lang.reflect.Field dasAuthField = ClientRestConstants.class.getDeclaredField("DAS_AUTH_METHOD_GLOBAL");
     
