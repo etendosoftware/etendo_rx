@@ -44,7 +44,7 @@ public class JwtRequest implements Serializable {
   }
 
   public void setSecret(String secret) {
-    if (StringUtils.isEmpty(secret)) {
+    if (StringUtils.isBlank(secret)) {
       throw new IllegalArgumentException("Secret cannot be null or empty");
     }
     this.secret = secret;
@@ -55,7 +55,7 @@ public class JwtRequest implements Serializable {
   }
 
   public void setService(String service) {
-    if (StringUtils.isEmpty(service)) {
+    if (StringUtils.isBlank(service)) {
       throw new IllegalArgumentException("Service cannot be null or empty");
     }
     this.service = service;

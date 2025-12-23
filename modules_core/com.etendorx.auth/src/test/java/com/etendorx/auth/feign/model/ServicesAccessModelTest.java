@@ -89,10 +89,16 @@ class ServicesAccessModelTest {
     ServicesAccessModel model = new ServicesAccessModel();
     
     Embedded embedded1 = new Embedded();
+    RxService service1 = new RxService();
+    service1.setSearchkey("service1");
+    embedded1.setRxServiceses(java.util.Collections.singletonList(service1));
     model.set_embedded(embedded1);
     assertEquals(embedded1, model.get_embedded());
     
     Embedded embedded2 = new Embedded();
+    RxService service2 = new RxService();
+    service2.setSearchkey("service2");
+    embedded2.setRxServiceses(java.util.Collections.singletonList(service2));
     model.set_embedded(embedded2);
     assertEquals(embedded2, model.get_embedded());
     assertNotEquals(embedded1, embedded2);

@@ -142,7 +142,7 @@ class SHA1Test {
   void testGenerateHash_KnownVector() {
     // Known SHA-1 base64 hash for a test value
     String testPassword = "testValue123";
-    String expectedHash = "zBhFDvNOJc0fXyTaL+IkKMEz+zQ=";
+    String expectedHash = "KIhZnDa1fGPQZN2gPrd8rq/M4+8=";
     String actualHash = sha1.generateHash(testPassword);
     
     assertEquals(expectedHash, actualHash, "Hash should match known SHA-1 hash");

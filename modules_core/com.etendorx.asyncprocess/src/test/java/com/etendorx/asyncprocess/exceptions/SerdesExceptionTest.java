@@ -41,7 +41,7 @@ class SerdesExceptionTest {
     SerdesException exception = new SerdesException("Test", null);
     
     assertTrue(exception instanceof Exception, "Should be an Exception");
-    assertFalse(exception instanceof RuntimeException, "Should not be a RuntimeException");
+    assertFalse(RuntimeException.class.isInstance(exception), "Should not be a RuntimeException");
   }
 
   @Test
