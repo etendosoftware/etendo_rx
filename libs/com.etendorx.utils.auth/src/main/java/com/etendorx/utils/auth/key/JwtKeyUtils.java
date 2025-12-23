@@ -2,7 +2,9 @@ package com.etendorx.utils.auth.key;
 
 import com.etendorx.utils.auth.key.exceptions.JwtKeyException;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.*;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -102,8 +105,17 @@ public class JwtKeyUtils {
   public static Map<String, Object> getJwtClaims(PublicKey publicKey, String jwt) throws ParseException,
       JOSEException {
     SignedJWT signedJWT = SignedJWT.parse(jwt);
-    ECDSAVerifier verifier = new ECDSAVerifier((ECPublicKey) publicKey);
-    signedJWT.verify(verifier);
+    JWSVerifier verifier;
+    if (publicKey instanceof ECPublicKey) {
+      verifier = new ECDSAVerifier((ECPublicKey) publicKey);
+    } else if (publicKey instanceof RSAPublicKey) {
+      verifier = new RSASSAVerifier((RSAPublicKey) publicKey);
+    } else {
+      throw new JwtException("Unsupported public key type: " + publicKey.getClass().getName());
+    }
+    if (!signedJWT.verify(verifier)) {
+      throw new JwtException("Signature verification failed");
+    }
     JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
     return new HashMap<>(claimsSet.getClaims());
   }

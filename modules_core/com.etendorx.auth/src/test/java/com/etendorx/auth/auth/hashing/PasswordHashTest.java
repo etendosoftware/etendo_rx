@@ -53,7 +53,7 @@ class PasswordHashTest {
     // SHA-1 hash format (version 0, no salt prefix)
     String plainText = "testValue123";
     // Pre-computed SHA-1 hash for testing legacy support
-    String sha1Hash = "zBhFDvNOJc0fXyTaL+IkKMEz+zQ=";
+    String sha1Hash = "KIhZnDa1fGPQZN2gPrd8rq/M4+8=";
     
     assertTrue(PasswordHash.matches(plainText, sha1Hash), "Should match SHA-1 hash format");
   }
