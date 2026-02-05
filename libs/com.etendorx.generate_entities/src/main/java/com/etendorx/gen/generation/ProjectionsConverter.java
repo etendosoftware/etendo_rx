@@ -20,6 +20,8 @@ import java.util.Set;
 
 public class ProjectionsConverter {
 
+  private static final String DEFAULT_TYPE = "Object";
+
   /**
    * Converts the ETRX projections to projections
    *
@@ -114,37 +116,48 @@ public class ProjectionsConverter {
    */
   private String resolvePropertyType(Table table, String property) {
     if (property == null || property.isEmpty()) {
-      return "Object";
+      return DEFAULT_TYPE;
     }
 
-    // Check if it's a navigated property (contains a dot)
-    if (property.contains(".")) {
-      String[] parts = property.split("\\.", 2);
-      String navigationProperty = parts[0];
-      String remainingPath = parts[1];
-
-      // Find the navigation property in the current entity
-      Entity currentEntity = ModelProvider.getInstance().getEntityByTableName(table.getTableName());
-      if (currentEntity != null) {
-        Property navProp = currentEntity.getProperty(navigationProperty, false);
-        if (navProp != null && navProp.getTargetEntity() != null) {
-          // Recursively resolve the remaining path in the target entity's table
-          String targetTableName = navProp.getTargetEntity().getTableName();
-          if (targetTableName != null) {
-            Table targetTable = ModelProvider.getInstance().getTable(targetTableName);
-            if (targetTable != null) {
-              return resolvePropertyType(targetTable, remainingPath);
-            }
-          }
-        }
-      }
-      return "Object";
+    if (!property.contains(".")) {
+      return resolveSimpleProperty(table, property);
     }
 
-    // Simple property - resolve directly
+    return resolveNavigatedProperty(table, property);
+  }
+
+  private String resolveSimpleProperty(Table table, String property) {
     String type = ModelProvider.getInstance().getColumnTypeName(table,
         table.getName() + "." + property);
-    return type != null ? type : "Object";
+    return type != null ? type : DEFAULT_TYPE;
+  }
+
+  private String resolveNavigatedProperty(Table table, String property) {
+    String[] parts = property.split("\\.", 2);
+    String navigationProperty = parts[0];
+    String remainingPath = parts[1];
+
+    Entity currentEntity = ModelProvider.getInstance().getEntityByTableName(table.getTableName());
+    if (currentEntity == null) {
+      return DEFAULT_TYPE;
+    }
+
+    Property navProp = currentEntity.getProperty(navigationProperty, false);
+    if (navProp == null || navProp.getTargetEntity() == null) {
+      return DEFAULT_TYPE;
+    }
+
+    String targetTableName = navProp.getTargetEntity().getTableName();
+    if (targetTableName == null) {
+      return DEFAULT_TYPE;
+    }
+
+    Table targetTable = ModelProvider.getInstance().getTable(targetTableName);
+    if (targetTable == null) {
+      return DEFAULT_TYPE;
+    }
+
+    return resolvePropertyType(targetTable, remainingPath);
   }
 
   /**
