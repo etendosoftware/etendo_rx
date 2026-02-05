@@ -87,8 +87,15 @@ public class ${newClassName}${projectionName?cap_first}Model extends Representat
     ${field.type} ${field.name};
 
     <#elseif field.value??>
+    <#-- Only add if the field does not exist in entity.properties to avoid duplicates -->
+    <#assign fieldExistsInEntity = false>
+    <#list entity.properties as p>
+        <#if p.javaName == field.name><#assign fieldExistsInEntity = true></#if>
+    </#list>
+    <#if !fieldExistsInEntity>
     ${field.type} ${field.name};
 
+    </#if>
     </#if>
 </#list>
 
