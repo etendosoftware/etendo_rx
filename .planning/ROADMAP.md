@@ -7,11 +7,12 @@
 
 **Requirements covered:** FR-1, FR-8
 
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Models, cache config, and DynamicMetadataService implementation
-- [ ] 01-02-PLAN.md -- Unit tests for DynamicMetadataService
+- [ ] 01-01-PLAN.md -- Models, dependencies, and DynamicMetadataService interface
+- [ ] 01-02-PLAN.md -- Cache config and DynamicMetadataServiceImpl implementation
+- [ ] 01-03-PLAN.md -- Unit tests for DynamicMetadataService
 
 **Deliverables:**
 - `DynamicMetadataService` that reads `etrx_projection`, `etrx_projection_entity`, `etrx_entity_field` from DB
