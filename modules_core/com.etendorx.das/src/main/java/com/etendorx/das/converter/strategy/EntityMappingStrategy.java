@@ -189,7 +189,7 @@ public class EntityMappingStrategy implements FieldConversionStrategy {
     private Map<String, Object> createStub(Object entity) {
         Map<String, Object> stub = new HashMap<>();
         if (entity instanceof BaseRXObject rxObj) {
-            stub.put("id", rxObj.getId());
+            stub.put("id", propertyAccessorService.getNestedProperty(entity, "id"));
             stub.put("_identifier", rxObj.get_identifier());
         }
         return stub;

@@ -38,9 +38,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- Foundation: strategy interface, PropertyAccessor, ConversionContext, simple strategies (DM, CV, CM)
-- [ ] 02-02-PLAN.md -- Complex strategies (EM, JM, JP) and DynamicDTOConverter orchestrator
-- [ ] 02-03-PLAN.md -- Unit tests for converter and strategies
+- [x] 02-01-PLAN.md -- Foundation: strategy interface, PropertyAccessor, ConversionContext, simple strategies (DM, CV, CM)
+- [x] 02-02-PLAN.md -- Complex strategies (EM, JM, JP) and DynamicDTOConverter orchestrator
+- [x] 02-03-PLAN.md -- Unit tests for converter and strategies
 
 **Deliverables:**
 - `DynamicDTOConverter` implementing bidirectional conversion
