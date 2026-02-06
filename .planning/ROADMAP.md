@@ -69,8 +69,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- EntityClassResolver, DynamicRepositoryException, and DynamicRepository with full CRUD/batch/pagination
-- [ ] 03-02-PLAN.md -- Unit tests for EntityClassResolver and DynamicRepository
+- [x] 03-01-PLAN.md -- EntityClassResolver, DynamicRepositoryException, and DynamicRepository with full CRUD/batch/pagination
+- [x] 03-02-PLAN.md -- Unit tests for EntityClassResolver and DynamicRepository
 
 **Deliverables:**
 - `EntityClassResolver` resolving entity classes via Hibernate metamodel at startup
