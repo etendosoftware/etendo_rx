@@ -33,19 +33,25 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Generic dynamic repository providing CRUD and batch operations for any JPA entity
@@ -252,5 +258,211 @@ public class DynamicRepository {
         return path;
     }
 
-    // --- WRITE OPERATIONS (Task 3) ---
+    // --- WRITE OPERATIONS (use manual transactionHandler, NOT @Transactional) ---
+
+    /**
+     * Saves a new entity from a DTO map.
+     * Delegates to {@link #performSaveOrUpdate} with isNew=true.
+     *
+     * @param dto            the DTO map with field values
+     * @param projectionName the projection name
+     * @param entityName     the entity name within the projection
+     * @return the saved entity as a Map
+     */
+    public Map<String, Object> save(Map<String, Object> dto, String projectionName, String entityName) {
+        EntityMetadata entityMeta = metadataService.getProjectionEntity(projectionName, entityName)
+            .orElseThrow(() -> new DynamicRepositoryException(
+                "Entity metadata not found for projection: " + projectionName + ", entity: " + entityName));
+        return performSaveOrUpdate(dto, entityMeta, true);
+    }
+
+    /**
+     * Updates an existing entity from a DTO map.
+     * Delegates to {@link #performSaveOrUpdate} with isNew=false.
+     *
+     * @param dto            the DTO map with field values
+     * @param projectionName the projection name
+     * @param entityName     the entity name within the projection
+     * @return the updated entity as a Map
+     */
+    public Map<String, Object> update(Map<String, Object> dto, String projectionName, String entityName) {
+        EntityMetadata entityMeta = metadataService.getProjectionEntity(projectionName, entityName)
+            .orElseThrow(() -> new DynamicRepositoryException(
+                "Entity metadata not found for projection: " + projectionName + ", entity: " + entityName));
+        return performSaveOrUpdate(dto, entityMeta, false);
+    }
+
+    /**
+     * Saves a batch of entities in a single transaction.
+     * All entities share the same transactionHandler.begin/commit lifecycle.
+     * If any entity fails, the entire batch rolls back.
+     *
+     * @param dtos           list of DTO maps to save
+     * @param projectionName the projection name
+     * @param entityName     the entity name within the projection
+     * @return list of saved entities as Maps
+     */
+    public List<Map<String, Object>> saveBatch(List<Map<String, Object>> dtos,
+                                                String projectionName, String entityName) {
+        EntityMetadata entityMeta = metadataService.getProjectionEntity(projectionName, entityName)
+            .orElseThrow(() -> new DynamicRepositoryException(
+                "Entity metadata not found for projection: " + projectionName + ", entity: " + entityName));
+
+        List<Map<String, Object>> results = new ArrayList<>();
+        try {
+            transactionHandler.begin();
+            for (Map<String, Object> dto : dtos) {
+                Map<String, Object> result = performSaveOrUpdateInternal(dto, entityMeta, true);
+                results.add(result);
+            }
+            transactionHandler.commit();
+            return results;
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        }
+    }
+
+    // --- WRITE HELPERS ---
+
+    /**
+     * Wraps {@link #performSaveOrUpdateInternal} with its own transactionHandler begin/commit.
+     * Used by single save/update operations. Batch operations call performSaveOrUpdateInternal
+     * directly within their own transaction scope.
+     *
+     * @param dto        the DTO map
+     * @param entityMeta the entity metadata
+     * @param isNew      true for create, false for update (may be overridden by upsert logic)
+     * @return the saved/updated entity as a Map
+     */
+    private Map<String, Object> performSaveOrUpdate(Map<String, Object> dto,
+                                                     EntityMetadata entityMeta, boolean isNew) {
+        try {
+            transactionHandler.begin();
+            Map<String, Object> result = performSaveOrUpdateInternal(dto, entityMeta, isNew);
+            transactionHandler.commit();
+            return result;
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Core save/update implementation replicating the exact order of operations
+     * from BaseDTORepositoryDefault.performSaveOrUpdate(), with two critical differences:
+     *
+     * 1. New entities are pre-instantiated via {@link EntityClassResolver} + newInstance(),
+     *    ensuring the converter NEVER triggers its internal AD_Table.javaClassName lookup.
+     * 2. Audit values are NOT set here -- {@link DynamicDTOConverter#convertToEntity} already
+     *    calls auditServiceInterceptor.setAuditValues() internally (lines 192-194).
+     *
+     * @param dto        the DTO map
+     * @param entityMeta the entity metadata
+     * @param isNewParam initial new/update hint (may be overridden by upsert check)
+     * @return the saved entity as a Map
+     */
+    private Map<String, Object> performSaveOrUpdateInternal(Map<String, Object> dto,
+                                                             EntityMetadata entityMeta,
+                                                             boolean isNewParam) {
+        boolean isNew = isNewParam;
+        Class<?> entityClass = entityClassResolver.resolveByTableId(entityMeta.tableId());
+        Object existingEntity = null;
+        String dtoId = (String) dto.get("id");
+
+        // Upsert: check existence when ID provided
+        if (dtoId != null) {
+            existingEntity = entityManager.find(entityClass, dtoId);
+            if (existingEntity != null) {
+                isNew = false;
+            }
+        }
+
+        // CRITICAL: Pre-instantiate new entity via metamodel if no existing entity found.
+        // This ensures convertToEntity() never hits its internal AD_Table.javaClassName path.
+        if (existingEntity == null) {
+            try {
+                existingEntity = entityClass.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                throw new DynamicRepositoryException(
+                    "Cannot instantiate entity class: " + entityClass.getName(), e);
+            }
+        }
+
+        // Convert DTO to entity -- converter receives non-null entity, skips instantiation.
+        // NOTE: converter also calls auditService.setAuditValues() internally. Do NOT call it again here.
+        Object entity = converter.convertToEntity(dto, existingEntity, entityMeta, entityMeta.fields());
+
+        // Default values (if handler exists)
+        defaultValuesHandler.ifPresent(h -> h.setDefaultValues(entity));
+
+        // Validate (skip "id" violations) -- audit was already set by converter
+        validateEntity(entity);
+
+        // First save
+        Object mergedEntity = entityManager.merge(entity);
+        entityManager.flush();
+
+        // External ID registration (AFTER merge so entity has ID)
+        String tableId = entityMeta.tableId();
+        externalIdService.add(tableId, dtoId, mergedEntity);
+        externalIdService.flush();
+
+        // Second save (after potential list processing)
+        mergedEntity = entityManager.merge(mergedEntity);
+        postSyncService.flush();
+        externalIdService.flush();
+
+        // Return freshly read result
+        String newId = getEntityId(mergedEntity);
+        Object freshEntity = entityManager.find(entityClass, newId);
+        return converter.convertToMap(freshEntity, entityMeta);
+    }
+
+    /**
+     * Validates entity using Jakarta Validator, skipping "id" property violations.
+     * Generated entities have {@code @NotNull} on the ID field, but JPA generates
+     * the ID during persist, so "id: must not be null" is expected for new entities.
+     *
+     * @param entity the entity to validate
+     * @throws ResponseStatusException with BAD_REQUEST if non-id violations exist
+     */
+    private void validateEntity(Object entity) {
+        Set<ConstraintViolation<Object>> violations = validator.validate(entity);
+        if (!violations.isEmpty()) {
+            List<String> messages = new ArrayList<>();
+            boolean hasViolations = false;
+            for (ConstraintViolation<Object> violation : violations) {
+                // Skip "id" path -- JPA generates ID, so it's null before persist
+                if (!StringUtils.equals(violation.getPropertyPath().toString(), "id")) {
+                    messages.add(violation.getPropertyPath() + ": " + violation.getMessage());
+                    hasViolations = true;
+                }
+            }
+            if (hasViolations) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Validation failed: " + messages);
+            }
+        }
+    }
+
+    /**
+     * Extracts the entity ID using BeanUtils PropertyUtils.
+     * All generated entities have a String "id" property.
+     *
+     * @param entity the JPA entity
+     * @return the entity ID as a String
+     * @throws DynamicRepositoryException if ID extraction fails
+     */
+    private String getEntityId(Object entity) {
+        try {
+            Object id = PropertyUtils.getProperty(entity, "id");
+            return (String) id;
+        } catch (Exception e) {
+            throw new DynamicRepositoryException(
+                "Cannot extract ID from entity: " + entity.getClass().getName(), e);
+        }
+    }
 }
