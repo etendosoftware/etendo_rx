@@ -35,6 +35,13 @@ Plans:
 
 **Requirements covered:** FR-2, FR-6
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md -- Foundation: strategy interface, PropertyAccessor, ConversionContext, simple strategies (DM, CV, CM)
+- [ ] 02-02-PLAN.md -- Complex strategies (EM, JM, JP) and DynamicDTOConverter orchestrator
+- [ ] 02-03-PLAN.md -- Unit tests for converter and strategies
+
 **Deliverables:**
 - `DynamicDTOConverter` implementing bidirectional conversion
 - Entity -> Map (read): iterate fields from metadata, extract values via reflection/property access
