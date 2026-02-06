@@ -2,19 +2,19 @@
 
 ## Current State
 - **Milestone:** 1 - Dynamic DAS Core
-- **Phase:** 1 - Dynamic Metadata Service (COMPLETE)
-- **Plan:** 03 of 03 (completed)
-- **Last activity:** 2026-02-06 - Completed Phase 01: Dynamic Metadata Service
-- **Next action:** Resolve compilation blockers, then proceed to Phase 02
-- **Verification:** PASSED (14/14 must-haves verified)
+- **Phase:** 2 - Generic DTO Converter (In progress)
+- **Plan:** 01 of 03 (completed)
+- **Last activity:** 2026-02-06 - Completed 02-01-PLAN.md
+- **Next action:** Continue to 02-02 (Complex Field Strategies)
+- **Verification:** N/A (plan level, phase verification after plan 03)
 
-**Progress:** ████████░░░░░░░░ 3/3 plans complete (100%) - VERIFIED
+**Progress:** ████░░░░░░░░░░░░ 4/12 plans complete (33%)
 
 ## Phase Status
 | Phase | Name | Status |
 |-------|------|--------|
 | 1 | Dynamic Metadata Service | COMPLETE + VERIFIED (14/14 must-haves, tests blocked from execution) |
-| 2 | Generic DTO Converter | pending |
+| 2 | Generic DTO Converter | In progress (1/3 plans complete) |
 | 3 | Generic Repository Layer | pending |
 | 4 | Generic REST Controller & Endpoint Registration | pending |
 | 5 | Coexistence & Migration Support | pending |
@@ -37,6 +37,11 @@
 | Fallback to DB for getFields() on cache miss | 01-02 | Ensures method robustness for edge cases |
 | Default to DIRECT_MAPPING for unknown field mapping types | 01-02 | Prevents application crash from data inconsistencies |
 | Use real Caffeine cache in tests rather than mocking | 01-03 | Accurate cache behavior verification |
+| Use Apache Commons BeanUtils for nested property access | 02-01 | Handles dot notation and null intermediate properties gracefully |
+| PropertyAccessorService returns null instead of throwing | 02-01 | Matches generated converter behavior for missing properties |
+| ConversionContext tracks visited entities by class+id | 02-01 | Prevents infinite recursion in circular entity relationships |
+| DirectMappingStrategy chains getNestedProperty -> handleBaseObject | 02-01 | Replicates generated converter type coercion behavior |
+| Constant strategies (CV, CM) are read-only | 02-01 | Generated converters never write constant fields |
 
 ## Blockers & Concerns
 
@@ -51,8 +56,8 @@
 
 ## Session Continuity
 
-- **Last session:** 2026-02-06T01:43:43Z
-- **Stopped at:** Completed Phase 01 (all plans done, tests cannot execute due to blockers)
+- **Last session:** 2026-02-06T13:12:36Z
+- **Stopped at:** Completed 02-01-PLAN.md
 - **Resume file:** None
 
 ## Context Files
@@ -65,3 +70,4 @@
 - `.planning/phases/01-dynamic-metadata-service/01-02-SUMMARY.md` - Cache configuration and service implementation completed
 - `.planning/phases/01-dynamic-metadata-service/01-03-SUMMARY.md` - Unit tests completed (blocked from execution)
 - `.planning/phases/01-dynamic-metadata-service/01-VERIFICATION.md` - Phase 1 verification report (14/14 passed)
+- `.planning/phases/02-generic-dto-converter/02-01-SUMMARY.md` - Converter foundation with strategy pattern and three simple strategies (DM, CV, CM)
