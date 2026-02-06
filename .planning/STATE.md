@@ -2,13 +2,13 @@
 
 ## Current State
 - **Milestone:** 1 - Dynamic DAS Core
-- **Phase:** 4 - Generic REST Controller & Endpoint Registration (In Progress)
-- **Plan:** 02 of 03 (completed)
-- **Last activity:** 2026-02-06 - Completed 04-02-PLAN.md
-- **Next action:** Phase 4 Plan 03 (Unit Tests for DynamicRestController)
-- **Verification:** Pending (phase in progress)
+- **Phase:** 4 - Generic REST Controller & Endpoint Registration (Complete)
+- **Plan:** 03 of 03 (completed)
+- **Last activity:** 2026-02-06 - Completed 04-03-PLAN.md
+- **Next action:** Phase 4 verification OR Phase 5 planning
+- **Verification:** Pending (all plans complete, awaiting phase verification)
 
-**Progress:** ██████████░░░░░░ 10/12 plans complete (83%)
+**Progress:** ███████████░░░░░ 11/12 plans complete (92%)
 
 ## Phase Status
 | Phase | Name | Status |
@@ -16,7 +16,7 @@
 | 1 | Dynamic Metadata Service | COMPLETE + VERIFIED (14/14 must-haves, tests blocked from execution) |
 | 2 | Generic DTO Converter | All 3 plans complete, awaiting phase verification |
 | 3 | Generic Repository Layer | COMPLETE + VERIFIED (11/11 must-haves, tests blocked from execution) |
-| 4 | Generic REST Controller & Endpoint Registration | In progress (2/3 plans complete) |
+| 4 | Generic REST Controller & Endpoint Registration | All 3 plans complete, awaiting phase verification |
 | 5 | Coexistence & Migration Support | pending |
 
 ## Key Decisions
@@ -69,6 +69,9 @@
 | PUT returns 201 CREATED (not 200 OK) | 04-02 | Matches BindedRestController.put() which returns HttpStatus.CREATED |
 | ExternalIdTranslationService called on all write operations | 04-02 | Repository always receives internal IDs |
 | Strip page/size/sort from allParams for filter map | 04-02 | Prevents pagination params from becoming CriteriaBuilder predicates |
+| Test package: com.etendorx.das.unit.controller | 04-03 | Follows existing unit subpackage convention (unit.repository, unit.converter) |
+| LENIENT strictness for DynamicRestControllerTest | 04-03 | Shared mock setup in @BeforeEach not used by every test |
+| Direct controller method invocation (not MockMvc) | 04-03 | Pure unit testing consistent with DynamicRepositoryTest pattern |
 
 ## Blockers & Concerns
 
@@ -83,8 +86,8 @@
 
 ## Session Continuity
 
-- **Last session:** 2026-02-06T22:54:53Z
-- **Stopped at:** Completed 04-02-PLAN.md
+- **Last session:** 2026-02-06T23:02:24Z
+- **Stopped at:** Completed 04-03-PLAN.md
 - **Resume file:** None
 
 ## Context Files
@@ -104,3 +107,4 @@
 - `.planning/phases/03-generic-repository-layer/03-02-SUMMARY.md` - 27 unit tests for EntityClassResolver (8) and DynamicRepository (19)
 - `.planning/phases/04-generic-rest-controller/04-01-SUMMARY.md` - ExternalIdTranslationService and DynamicEndpointRegistry for controller support
 - `.planning/phases/04-generic-rest-controller/04-02-SUMMARY.md` - DynamicRestController with GET/POST/PUT CRUD endpoints
+- `.planning/phases/04-generic-rest-controller/04-03-SUMMARY.md` - 32 unit tests for controller layer (ExternalIdTranslation, EndpointRegistry, RestController)
