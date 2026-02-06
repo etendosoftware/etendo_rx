@@ -10,9 +10,9 @@
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Models, dependencies, and DynamicMetadataService interface
-- [ ] 01-02-PLAN.md -- Cache config and DynamicMetadataServiceImpl implementation
-- [ ] 01-03-PLAN.md -- Unit tests for DynamicMetadataService
+- [x] 01-01-PLAN.md -- Models, dependencies, and DynamicMetadataService interface
+- [x] 01-02-PLAN.md -- Cache config and DynamicMetadataServiceImpl implementation
+- [x] 01-03-PLAN.md -- Unit tests for DynamicMetadataService
 
 **Deliverables:**
 - `DynamicMetadataService` that reads `etrx_projection`, `etrx_projection_entity`, `etrx_entity_field` from DB

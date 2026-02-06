@@ -23,7 +23,17 @@ public enum FieldMappingType {
     /**
      * JSON Path - JsonPath extraction from a JSON field
      */
-    JSON_PATH("JP");
+    JSON_PATH("JP"),
+
+    /**
+     * Entity Mapping - Maps to a related entity (foreign key / one-to-many)
+     */
+    ENTITY_MAPPING("EM"),
+
+    /**
+     * Constant Mapping - Maps using a constant value with special handling
+     */
+    CONSTANT_MAPPING("CM");
 
     private final String code;
 

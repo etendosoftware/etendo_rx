@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,16 +55,25 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
      * This ensures the first request doesn't experience a cold start delay.
      */
     @EventListener(ApplicationReadyEvent.class)
+    @Transactional(readOnly = true)
     public void preloadCache() {
         log.info("Preloading projection metadata cache...");
 
         try {
-            // Load all projections with their entities in a single query using JOIN FETCH
+            // Step 1: Load projections with their entities (only from modules in development)
             String jpql = "SELECT DISTINCT p FROM ETRX_Projection p " +
-                         "LEFT JOIN FETCH p.eTRXProjectionEntityList";
+                         "LEFT JOIN FETCH p.eTRXProjectionEntityList " +
+                         "JOIN p.module m WHERE m.inDevelopment = true";
+            List<ETRXProjection> projections = entityManager
+                .createQuery(jpql, ETRXProjection.class).getResultList();
 
-            TypedQuery<ETRXProjection> query = entityManager.createQuery(jpql, ETRXProjection.class);
-            List<ETRXProjection> projections = query.getResultList();
+            // Step 2: Load entity fields in a separate query (avoids MultipleBagFetchException)
+            entityManager.createQuery(
+                "SELECT DISTINCT pe FROM ETRX_Projection_Entity pe " +
+                "LEFT JOIN FETCH pe.eTRXEntityFieldList " +
+                "WHERE pe.projection IN :projections", ETRXProjectionEntity.class)
+                .setParameter("projections", projections)
+                .getResultList();
 
             log.info("Found {} projections to preload", projections.size());
 
@@ -134,7 +144,8 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
             String jpql = "SELECT DISTINCT p FROM ETRX_Projection p " +
                          "LEFT JOIN FETCH p.eTRXProjectionEntityList pe " +
                          "LEFT JOIN FETCH pe.eTRXEntityFieldList " +
-                         "WHERE p.name = :name";
+                         "JOIN p.module m " +
+                         "WHERE p.name = :name AND m.inDevelopment = true";
 
             TypedQuery<ETRXProjection> query = entityManager.createQuery(jpql, ETRXProjection.class);
             query.setParameter("name", name);

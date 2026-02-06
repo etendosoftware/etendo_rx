@@ -54,4 +54,9 @@ public interface DynamicMetadataService {
      * This should be called when projection metadata is modified.
      */
     void invalidateCache();
+
+    /**
+     * Preloads all projection metadata into the cache.
+     */
+    void preloadCache();
 }
