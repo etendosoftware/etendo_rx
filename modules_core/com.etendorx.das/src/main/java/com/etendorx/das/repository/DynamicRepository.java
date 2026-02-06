@@ -33,6 +33,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Selection;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -165,9 +166,9 @@ public class DynamicRepository {
         long total = entityManager.createQuery(countQuery).getSingleResult();
 
         // Data query
-        CriteriaQuery<?> dataQuery = cb.createQuery(entityClass);
+        CriteriaQuery<Object> dataQuery = (CriteriaQuery<Object>) cb.createQuery(entityClass);
         Root<?> dataRoot = dataQuery.from(entityClass);
-        dataQuery.select(dataRoot);
+        dataQuery.select((Selection<? extends Object>) dataRoot);
         List<Predicate> dataPredicates = buildPredicates(cb, dataRoot, filters, entityMeta.fields());
         if (!dataPredicates.isEmpty()) {
             dataQuery.where(dataPredicates.toArray(new Predicate[0]));

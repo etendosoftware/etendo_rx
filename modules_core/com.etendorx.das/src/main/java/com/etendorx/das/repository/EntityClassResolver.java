@@ -70,6 +70,7 @@ public class EntityClassResolver {
             try {
                 Field field = javaType.getDeclaredField("TABLE_ID");
                 if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) {
+                    field.setAccessible(true);
                     String tableId = (String) field.get(null);
                     if (tableId != null) {
                         tableIdToClass.put(tableId, javaType);

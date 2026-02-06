@@ -84,7 +84,7 @@ public class EntityClassResolverTest {
     @SuppressWarnings("unchecked")
     private EntityType<?> mockEntityType(Class<?> javaType) {
         EntityType<?> mockType = mock(EntityType.class);
-        when(mockType.getJavaType()).thenReturn((Class) javaType);
+        doReturn(javaType).when(mockType).getJavaType();
         return mockType;
     }
 

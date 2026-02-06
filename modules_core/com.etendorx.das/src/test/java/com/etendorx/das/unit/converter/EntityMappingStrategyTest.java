@@ -163,11 +163,12 @@ public class EntityMappingStrategyTest {
 
         // Create a mock BaseRXObject as the related entity
         BaseRXObject relatedEntity = mock(BaseRXObject.class);
-        when(relatedEntity.getId()).thenReturn("org-123");
         when(relatedEntity.get_identifier()).thenReturn("Test Organization");
 
         when(propertyAccessorService.getNestedProperty(parentEntity, "organization"))
             .thenReturn(relatedEntity);
+        when(propertyAccessorService.getNestedProperty(relatedEntity, "id"))
+            .thenReturn("org-123");
 
         // Pre-visit the entity to simulate it already being converted (cycle)
         ctx.isVisited(relatedEntity);
@@ -199,11 +200,12 @@ public class EntityMappingStrategyTest {
         FieldMetadata field = createEMField("organization", "organization", "related-entity-1");
 
         BaseRXObject relatedEntity = mock(BaseRXObject.class);
-        when(relatedEntity.getId()).thenReturn("org-123");
         when(relatedEntity.get_identifier()).thenReturn("Test Organization");
 
         when(propertyAccessorService.getNestedProperty(parentEntity, "organization"))
             .thenReturn(relatedEntity);
+        when(propertyAccessorService.getNestedProperty(relatedEntity, "id"))
+            .thenReturn("org-123");
 
         // Mock metadata lookup via DynamicDTOConverter.findEntityMetadataById
         EntityMetadata relatedMeta = createEntityMetadata("related-entity-1", "Organization",

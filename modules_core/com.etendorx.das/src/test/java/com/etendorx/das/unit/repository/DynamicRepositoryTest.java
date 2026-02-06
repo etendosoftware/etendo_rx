@@ -179,8 +179,8 @@ public class DynamicRepositoryTest {
     private TestEntity setupSaveStubs(EntityMetadata entityMeta, Map<String, Object> dto) {
         when(metadataService.getProjectionEntity(anyString(), anyString()))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId(entityMeta.tableId()))
-            .thenReturn(TestEntity.class);
+        doReturn(TestEntity.class)
+            .when(entityClassResolver).resolveByTableId(entityMeta.tableId());
 
         TestEntity mergedEntity = new TestEntity();
         mergedEntity.setId("generated-id");
@@ -217,7 +217,7 @@ public class DynamicRepositoryTest {
 
         when(metadataService.getProjectionEntity("proj", "TestEntity"))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId("table-e1")).thenReturn(TestEntity.class);
+        doReturn(TestEntity.class).when(entityClassResolver).resolveByTableId("table-e1");
         when(entityManager.find(TestEntity.class, "id1")).thenReturn(entity);
         when(converter.convertToMap(entity, entityMeta)).thenReturn(expectedMap);
 
@@ -238,7 +238,7 @@ public class DynamicRepositoryTest {
         EntityMetadata entityMeta = createEntityMetadata("e1", "TestEntity", Collections.emptyList());
         when(metadataService.getProjectionEntity("proj", "TestEntity"))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId("table-e1")).thenReturn(TestEntity.class);
+        doReturn(TestEntity.class).when(entityClassResolver).resolveByTableId("table-e1");
         when(entityManager.find(TestEntity.class, "id1")).thenReturn(null);
 
         // Act & Assert
@@ -271,7 +271,7 @@ public class DynamicRepositoryTest {
 
         when(metadataService.getProjectionEntity("proj", "TestEntity"))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId("table-e1")).thenReturn(TestEntity.class);
+        doReturn(TestEntity.class).when(entityClassResolver).resolveByTableId("table-e1");
         when(entityManager.find(TestEntity.class, "id1")).thenReturn(entity);
         when(converter.convertToMap(any(), any(EntityMetadata.class))).thenReturn(Map.of());
 
@@ -293,7 +293,7 @@ public class DynamicRepositoryTest {
         CriteriaQuery<Long> countQuery = mock(CriteriaQuery.class);
         Root<?> countRoot = mock(Root.class);
         when(cb.createQuery(Long.class)).thenReturn(countQuery);
-        when(countQuery.from(entityClass)).thenReturn(countRoot);
+        doReturn(countRoot).when(countQuery).from(entityClass);
         when(countQuery.select(any())).thenReturn(countQuery);
 
         TypedQuery<Long> countTypedQuery = mock(TypedQuery.class);
@@ -333,7 +333,7 @@ public class DynamicRepositoryTest {
 
         when(metadataService.getProjectionEntity("proj", "TestEntity"))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId("table-e1")).thenReturn(TestEntity.class);
+        doReturn(TestEntity.class).when(entityClassResolver).resolveByTableId("table-e1");
 
         CriteriaBuilder cb = mock(CriteriaBuilder.class);
         when(entityManager.getCriteriaBuilder()).thenReturn(cb);
@@ -368,7 +368,7 @@ public class DynamicRepositoryTest {
 
         when(metadataService.getProjectionEntity("proj", "TestEntity"))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId("table-e1")).thenReturn(TestEntity.class);
+        doReturn(TestEntity.class).when(entityClassResolver).resolveByTableId("table-e1");
 
         CriteriaBuilder cb = mock(CriteriaBuilder.class);
         when(entityManager.getCriteriaBuilder()).thenReturn(cb);
@@ -395,7 +395,7 @@ public class DynamicRepositoryTest {
 
         when(metadataService.getProjectionEntity("proj", "TestEntity"))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId("table-e1")).thenReturn(TestEntity.class);
+        doReturn(TestEntity.class).when(entityClassResolver).resolveByTableId("table-e1");
 
         CriteriaBuilder cb = mock(CriteriaBuilder.class);
         when(entityManager.getCriteriaBuilder()).thenReturn(cb);
@@ -506,8 +506,8 @@ public class DynamicRepositoryTest {
 
         when(metadataService.getProjectionEntity(anyString(), anyString()))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId(entityMeta.tableId()))
-            .thenReturn(TestEntity.class);
+        doReturn(TestEntity.class)
+            .when(entityClassResolver).resolveByTableId(entityMeta.tableId());
         when(entityManager.find(TestEntity.class, "existing-id")).thenReturn(existingEntity);
         when(entityManager.merge(any())).thenReturn(existingEntity);
         when(converter.convertToEntity(any(), any(), any(), anyList())).thenReturn(existingEntity);
@@ -539,8 +539,8 @@ public class DynamicRepositoryTest {
 
         when(metadataService.getProjectionEntity(anyString(), anyString()))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId(entityMeta.tableId()))
-            .thenReturn(TestEntity.class);
+        doReturn(TestEntity.class)
+            .when(entityClassResolver).resolveByTableId(entityMeta.tableId());
         // Entity not found in DB
         when(entityManager.find(TestEntity.class, "new-id")).thenReturn(null);
 
@@ -615,8 +615,8 @@ public class DynamicRepositoryTest {
 
         when(metadataService.getProjectionEntity(anyString(), anyString()))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId(entityMeta.tableId()))
-            .thenReturn(TestEntity.class);
+        doReturn(TestEntity.class)
+            .when(entityClassResolver).resolveByTableId(entityMeta.tableId());
 
         TestEntity mergedEntity = new TestEntity();
         mergedEntity.setId("generated-id");
@@ -649,8 +649,8 @@ public class DynamicRepositoryTest {
 
         when(metadataService.getProjectionEntity(anyString(), anyString()))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId(entityMeta.tableId()))
-            .thenReturn(TestEntity.class);
+        doReturn(TestEntity.class)
+            .when(entityClassResolver).resolveByTableId(entityMeta.tableId());
 
         TestEntity entity = new TestEntity();
         when(converter.convertToEntity(any(), any(), any(), anyList())).thenReturn(entity);
@@ -702,8 +702,8 @@ public class DynamicRepositoryTest {
         EntityMetadata entityMeta = createEntityMetadata("e1", "TestEntity", Collections.emptyList());
         when(metadataService.getProjectionEntity(anyString(), anyString()))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId(entityMeta.tableId()))
-            .thenReturn(TestEntity.class);
+        doReturn(TestEntity.class)
+            .when(entityClassResolver).resolveByTableId(entityMeta.tableId());
         when(validator.validate(any())).thenReturn(Collections.emptySet());
 
         TestEntity mergedEntity = new TestEntity();
@@ -736,8 +736,8 @@ public class DynamicRepositoryTest {
         EntityMetadata entityMeta = createEntityMetadata("e1", "TestEntity", Collections.emptyList());
         when(metadataService.getProjectionEntity(anyString(), anyString()))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId(entityMeta.tableId()))
-            .thenReturn(TestEntity.class);
+        doReturn(TestEntity.class)
+            .when(entityClassResolver).resolveByTableId(entityMeta.tableId());
         when(validator.validate(any())).thenReturn(Collections.emptySet());
 
         TestEntity mergedEntity = new TestEntity();
@@ -767,8 +767,8 @@ public class DynamicRepositoryTest {
         EntityMetadata entityMeta = createEntityMetadata("e1", "TestEntity", Collections.emptyList());
         when(metadataService.getProjectionEntity(anyString(), anyString()))
             .thenReturn(Optional.of(entityMeta));
-        when(entityClassResolver.resolveByTableId(entityMeta.tableId()))
-            .thenReturn(TestEntity.class);
+        doReturn(TestEntity.class)
+            .when(entityClassResolver).resolveByTableId(entityMeta.tableId());
 
         // First DTO succeeds
         TestEntity mergedEntity = new TestEntity();
