@@ -95,10 +95,17 @@ Plans:
 
 **Requirements covered:** FR-3, NFR-1, NFR-2, NFR-3, NFR-4
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 04-01-PLAN.md -- ExternalIdTranslationService and DynamicEndpointRegistry supporting services
+- [ ] 04-02-PLAN.md -- DynamicRestController with GET/POST/PUT endpoints, json_path, batch support
+- [ ] 04-03-PLAN.md -- Unit tests for controller, translation service, and endpoint registry
+
 **Deliverables:**
-- `DynamicRestController` handling `/{prefix}/{entityName}/**` routes
-- GET `/` - list with pagination (delegates to DynamicDASRepository.findAll)
-- GET `/{id}` - get by ID (delegates to DynamicDASRepository.findById)
+- `DynamicRestController` handling `/{projectionName}/{entityExternalName}/**` routes
+- GET `/` - list with pagination (delegates to DynamicRepository.findAll)
+- GET `/{id}` - get by ID (delegates to DynamicRepository.findById)
 - POST `/` - create entity/entities, support `json_path` parameter
 - PUT `/{id}` - update entity
 - JSON response format compatible with existing generated DTOs
@@ -107,7 +114,7 @@ Plans:
 - Integration with existing JWT authentication (no changes to Edge)
 - Logging of dynamic endpoint access
 - OpenAPI documentation via SpringDoc annotations
-- Integration tests for all CRUD endpoints
+- Unit tests for all components
 
 **Success criteria:**
 - Dynamic endpoints accessible at same URL patterns as generated ones
