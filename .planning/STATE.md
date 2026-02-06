@@ -2,20 +2,20 @@
 
 ## Current State
 - **Milestone:** 1 - Dynamic DAS Core
-- **Phase:** 3 - Generic Repository Layer (In progress)
-- **Plan:** 01 of 01 (completed)
-- **Last activity:** 2026-02-06 - Completed 03-01-PLAN.md
+- **Phase:** 3 - Generic Repository Layer (Complete)
+- **Plan:** 02 of 02 (completed)
+- **Last activity:** 2026-02-06 - Completed 03-02-PLAN.md
 - **Next action:** Phase 3 verification, then Phase 4
 - **Verification:** Phase 3 verification pending
 
-**Progress:** ███████░░░░░░░░░ 7/12 plans complete (58%)
+**Progress:** ████████░░░░░░░░ 8/12 plans complete (67%)
 
 ## Phase Status
 | Phase | Name | Status |
 |-------|------|--------|
 | 1 | Dynamic Metadata Service | COMPLETE + VERIFIED (14/14 must-haves, tests blocked from execution) |
 | 2 | Generic DTO Converter | All 3 plans complete, awaiting phase verification |
-| 3 | Generic Repository Layer | Plan 01 complete (1/1 plans) |
+| 3 | Generic Repository Layer | All 2 plans complete (implementation + tests), awaiting phase verification |
 | 4 | Generic REST Controller & Endpoint Registration | pending |
 | 5 | Coexistence & Migration Support | pending |
 
@@ -57,6 +57,9 @@
 | Only DIRECT_MAPPING fields for CriteriaBuilder filtering | 03-01 | Other mapping types (EM, JM, CV, JP) lack direct entity properties |
 | DefaultValuesHandler injected as Optional | 03-01 | Safety for cases where no implementation exists |
 | convertExternalToInternalId deferred to Phase 4 controller | 03-01 | Repository always receives internal IDs; translation is controller concern |
+| Inner test entity classes with @Table for EntityClassResolver tests | 03-02 | Avoids dependency on generated entities with compilation issues |
+| LENIENT strictness for DynamicRepositoryTest | 03-02 | Complex save stubs shared across tests; not all used by every test |
+| CriteriaBuilder helper method for findAll tests | 03-02 | Reduces verbose mock chain duplication |
 
 ## Blockers & Concerns
 
@@ -71,8 +74,8 @@
 
 ## Session Continuity
 
-- **Last session:** 2026-02-06T19:06:26Z
-- **Stopped at:** Completed 03-01-PLAN.md
+- **Last session:** 2026-02-06T19:12:45Z
+- **Stopped at:** Completed 03-02-PLAN.md
 - **Resume file:** None
 
 ## Context Files
@@ -89,3 +92,4 @@
 - `.planning/phases/02-generic-dto-converter/02-02-SUMMARY.md` - Complex strategies (EM, JM, JP) and DynamicDTOConverter orchestrator
 - `.planning/phases/02-generic-dto-converter/02-03-SUMMARY.md` - 27 unit tests for DM strategy, EM strategy, and converter orchestrator
 - `.planning/phases/03-generic-repository-layer/03-01-SUMMARY.md` - EntityClassResolver, DynamicRepository with full CRUD + batch + pagination
+- `.planning/phases/03-generic-repository-layer/03-02-SUMMARY.md` - 27 unit tests for EntityClassResolver (8) and DynamicRepository (19)
