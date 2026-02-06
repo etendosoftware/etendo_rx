@@ -98,9 +98,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md -- ExternalIdTranslationService and DynamicEndpointRegistry supporting services
-- [ ] 04-02-PLAN.md -- DynamicRestController with GET/POST/PUT endpoints, json_path, batch support
-- [ ] 04-03-PLAN.md -- Unit tests for controller, translation service, and endpoint registry
+- [x] 04-01-PLAN.md -- ExternalIdTranslationService and DynamicEndpointRegistry supporting services
+- [x] 04-02-PLAN.md -- DynamicRestController with GET/POST/PUT endpoints, json_path, batch support
+- [x] 04-03-PLAN.md -- Unit tests for controller, translation service, and endpoint registry
 
 **Deliverables:**
 - `DynamicRestController` handling `/{projectionName}/{entityExternalName}/**` routes
