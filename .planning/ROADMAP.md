@@ -62,29 +62,31 @@ Plans:
 ---
 
 ### Phase 3: Generic Repository Layer
-**Goal:** Create a dynamic repository that wraps JPA repositories and provides CRUD + pagination using the dynamic converter.
+**Goal:** Dynamic repository using EntityManager directly for CRUD + pagination + batch, with exact transaction orchestration matching generated repos.
 
 **Requirements covered:** FR-4, FR-5, FR-7
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md -- EntityClassResolver, DynamicRepositoryException, and DynamicRepository with full CRUD/batch/pagination
+- [ ] 03-02-PLAN.md -- Unit tests for EntityClassResolver and DynamicRepository
+
 **Deliverables:**
-- `DynamicDASRepository` implementing `DASRepository<Map<String, Object>, Map<String, Object>>`
-- Runtime JPA repository lookup by entity class (Spring ApplicationContext)
-- `findAll(Pageable)` -> query JPA repo, convert results via DynamicDTOConverter
-- `findById(String)` -> lookup entity, convert to Map
-- `save(Map)` -> convert Map to entity, validate, persist, handle external IDs
-- `update(Map)` -> find existing, merge Map into entity, validate, persist
-- Transaction management via `RestCallTransactionHandler`
-- External ID integration (`ExternalIdService.add()`, `flush()`)
-- Jakarta Validator integration for mandatory field checks
-- Upsert support (check existence before create)
-- Integration tests against H2/test database
+- `EntityClassResolver` resolving entity classes via Hibernate metamodel at startup
+- `DynamicRepository` with findById, findAll (pagination + filtering), save (upsert), update, saveBatch
+- Transaction management via `RestCallTransactionHandler` (manual begin/commit for writes)
+- External ID integration (`ExternalIdService.add()`, `flush()` called twice per save)
+- Jakarta Validator integration with "id" property skip
+- CriteriaBuilder-based dynamic field filtering on DIRECT_MAPPING fields
+- Unit tests with mocked dependencies verifying exact order of operations
 
 **Success criteria:**
 - CRUD operations work end-to-end with dynamic conversion
-- Transaction boundaries match generated repository behavior
-- External IDs stored correctly after save
-- Validation errors returned for missing mandatory fields
-- Tests cover: create, read, update, list, upsert, validation failure
+- Transaction boundaries match generated repository behavior exactly
+- External IDs registered after merge, flushed twice per save
+- Validation errors returned for missing mandatory fields (skipping "id")
+- Tests cover: create, read, update, list, upsert, validation failure, batch
 
 ---
 
