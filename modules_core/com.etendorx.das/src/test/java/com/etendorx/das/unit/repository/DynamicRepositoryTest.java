@@ -168,7 +168,8 @@ public class DynamicRepositoryTest {
             false,                  // identity
             true,                   // restEndPoint
             name,                   // externalName
-            fields
+            fields,
+            false                   // moduleInDevelopment
         );
     }
 

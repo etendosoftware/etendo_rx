@@ -124,10 +124,22 @@ public class DynamicRepository {
 
         Class<?> entityClass = entityClassResolver.resolveByTableId(entityMeta.tableId());
 
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] Repository.findById | entity={} class={} id={}",
+                entityName, entityClass.getSimpleName(), id);
+        }
+
         Object entity = entityManager.find(entityClass, id);
         if (entity == null) {
+            if (entityMeta.moduleInDevelopment()) {
+                log.info("[X-Ray] Repository.findById | not found id={}", id);
+            }
             throw new EntityNotFoundException(
                 "Entity " + entityName + " not found with id: " + id);
+        }
+
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] Repository.findById | found id={}", id);
         }
 
         return converter.convertToMap(entity, entityMeta);
@@ -153,6 +165,13 @@ public class DynamicRepository {
                 "Entity metadata not found for projection: " + projectionName + ", entity: " + entityName));
 
         Class<?> entityClass = entityClassResolver.resolveByTableId(entityMeta.tableId());
+
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] Repository.findAll | entity={} class={} filters={}",
+                entityName, entityClass.getSimpleName(),
+                filters != null ? filters.size() : 0);
+        }
+
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         // Count query for total elements
@@ -198,6 +217,13 @@ public class DynamicRepository {
         List<Map<String, Object>> converted = results.stream()
             .map(entity -> converter.convertToMap(entity, entityMeta))
             .toList();
+
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] Repository.findAll | entity={} class={} total={} page={}/{}",
+                entityName, entityClass.getSimpleName(), total,
+                pageable.getPageNumber(),
+                total > 0 ? (total - 1) / pageable.getPageSize() : 0);
+        }
 
         return new PageImpl<>(converted, pageable, total);
     }
@@ -311,12 +337,19 @@ public class DynamicRepository {
 
         List<Map<String, Object>> results = new ArrayList<>();
         try {
+            if (entityMeta.moduleInDevelopment()) {
+                log.info("[X-Ray] Repository.saveBatch | size={} entity={}",
+                    dtos.size(), entityName);
+            }
             transactionHandler.begin();
             for (Map<String, Object> dto : dtos) {
                 Map<String, Object> result = performSaveOrUpdateInternal(dto, entityMeta, true);
                 results.add(result);
             }
             transactionHandler.commit();
+            if (entityMeta.moduleInDevelopment()) {
+                log.info("[X-Ray] Repository.saveBatch | committed {} items", results.size());
+            }
             return results;
         } catch (ResponseStatusException e) {
             throw e;
@@ -373,6 +406,11 @@ public class DynamicRepository {
         Object existingEntity = null;
         String dtoId = (String) dto.get("id");
 
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] Repository.save | operation={} class={} dtoId={}",
+                isNew ? "INSERT" : "UPDATE", entityClass.getSimpleName(), dtoId);
+        }
+
         // Upsert: check existence when ID provided
         if (dtoId != null) {
             existingEntity = entityManager.find(entityClass, dtoId);
@@ -405,6 +443,10 @@ public class DynamicRepository {
         // First save
         Object mergedEntity = entityManager.merge(entity);
         entityManager.flush();
+
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] Repository.save | merged, newId={}", getEntityId(mergedEntity));
+        }
 
         // External ID registration (AFTER merge so entity has ID)
         String tableId = entityMeta.tableId();

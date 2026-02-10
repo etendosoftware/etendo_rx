@@ -14,6 +14,7 @@ import java.util.List;
  * @param restEndPoint  Whether to expose this entity as a REST endpoint
  * @param externalName  External name for REST API (if different from name)
  * @param fields        List of field mappings for this entity
+ * @param moduleInDevelopment Whether the owning module has isInDevelopment=true
  */
 public record EntityMetadata(
     String id,
@@ -23,5 +24,6 @@ public record EntityMetadata(
     boolean identity,
     boolean restEndPoint,
     String externalName,
-    List<FieldMetadata> fields
+    List<FieldMetadata> fields,
+    boolean moduleInDevelopment
 ) {}

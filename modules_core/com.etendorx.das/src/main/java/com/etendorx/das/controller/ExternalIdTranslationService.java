@@ -87,8 +87,13 @@ public class ExternalIdTranslationService {
         String internalId = externalIdService.convertExternalToInternalId(
             entityMeta.tableId(), dtoId);
         dto.put("id", internalId);
-        log.debug("Translated top-level id '{}' -> '{}' for table {}", dtoId, internalId,
-            entityMeta.tableId());
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] Translated id '{}' -> '{}' (table: {})",
+                dtoId, internalId, entityMeta.tableId());
+        } else {
+            log.debug("Translated top-level id '{}' -> '{}' for table {}", dtoId, internalId,
+                entityMeta.tableId());
+        }
     }
 
     /**
@@ -126,8 +131,13 @@ public class ExternalIdTranslationService {
             // Replace the value in the DTO maintaining the original structure
             replaceReferenceId(dto, field.name(), value, internalId);
 
-            log.debug("Translated EM field '{}' id '{}' -> '{}' using table {}",
-                field.name(), referenceId, internalId, relatedEntityMeta.tableId());
+            if (entityMeta.moduleInDevelopment()) {
+                log.info("[X-Ray] Translated EM field '{}' id '{}' -> '{}' (table: {})",
+                    field.name(), referenceId, internalId, relatedEntityMeta.tableId());
+            } else {
+                log.debug("Translated EM field '{}' id '{}' -> '{}' using table {}",
+                    field.name(), referenceId, internalId, relatedEntityMeta.tableId());
+            }
         }
     }
 

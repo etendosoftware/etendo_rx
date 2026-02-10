@@ -70,8 +70,14 @@ public class DynamicEndpointRegistry {
                     : entity.name();
 
                 if (entity.restEndPoint()) {
-                    log.info("Dynamic endpoint registered: /{}/{}",
-                        projectionName.toLowerCase(), displayName);
+                    if (projection.moduleInDevelopment()) {
+                        log.info("[X-Ray] Dynamic endpoint: /{}/{} (module: {}, dev: true)",
+                            projectionName.toLowerCase(), displayName,
+                            projection.moduleName());
+                    } else {
+                        log.info("Dynamic endpoint registered: /{}/{}",
+                            projectionName.toLowerCase(), displayName);
+                    }
                     totalEndpoints++;
                 } else {
                     log.debug("Skipping REST endpoint for: {}/{} (restEndPoint=false)",
@@ -93,7 +99,7 @@ public class DynamicEndpointRegistry {
      */
     public boolean isRestEndpoint(String projectionName, String entityExternalName) {
         ProjectionMetadata projection = metadataService.getProjection(
-            projectionName.toUpperCase()).orElse(null);
+            projectionName).orElse(null);
         if (projection == null) {
             return false;
         }
@@ -114,14 +120,14 @@ public class DynamicEndpointRegistry {
      * Resolves an entity within a projection by its external name.
      * Matches against externalName if available, falls back to entity name.
      *
-     * @param projectionName      the projection name (case-insensitive, converted to uppercase)
+     * @param projectionName      the projection name (matched as-is against cache keys)
      * @param entityExternalName  the external name of the entity to resolve
      * @return Optional containing the entity metadata if found, empty otherwise
      */
     public Optional<EntityMetadata> resolveEntityByExternalName(String projectionName,
                                                                   String entityExternalName) {
         ProjectionMetadata projection = metadataService.getProjection(
-            projectionName.toUpperCase()).orElse(null);
+            projectionName).orElse(null);
         if (projection == null) {
             return Optional.empty();
         }

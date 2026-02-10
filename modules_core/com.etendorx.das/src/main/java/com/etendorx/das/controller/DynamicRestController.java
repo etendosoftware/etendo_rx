@@ -129,8 +129,21 @@ public class DynamicRestController {
         Map<String, String> filters = new HashMap<>(allParams != null ? allParams : Map.of());
         filters.keySet().removeAll(Arrays.asList("page", "size", "sort"));
 
-        return repository.findAll(
-            projectionName.toUpperCase(), entityMeta.name(), filters, pageable);
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] GET /{}/{} findAll | page={} size={} filters={}",
+                projectionName, entityName, pageable.getPageNumber(),
+                pageable.getPageSize(), filters);
+        }
+
+        Page<Map<String, Object>> result = repository.findAll(
+            projectionName, entityMeta.name(), filters, pageable);
+
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] GET /{}/{} findAll | returned {} records",
+                projectionName, entityName, result.getNumberOfElements());
+        }
+
+        return result;
     }
 
     /**
@@ -152,11 +165,21 @@ public class DynamicRestController {
 
         EntityMetadata entityMeta = resolveEntityMetadata(projectionName, entityName);
 
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] GET /{}/{}/{} findById", projectionName, entityName, id);
+        }
+
         try {
             Map<String, Object> result = repository.findById(
-                id, projectionName.toUpperCase(), entityMeta.name());
+                id, projectionName, entityMeta.name());
+            if (entityMeta.moduleInDevelopment()) {
+                log.info("[X-Ray] GET /{}/{}/{} findById | found", projectionName, entityName, id);
+            }
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (jakarta.persistence.EntityNotFoundException e) {
+            if (entityMeta.moduleInDevelopment()) {
+                log.info("[X-Ray] GET /{}/{}/{} findById | not found", projectionName, entityName, id);
+            }
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found");
         }
     }
@@ -185,6 +208,11 @@ public class DynamicRestController {
 
         EntityMetadata entityMeta = resolveEntityMetadata(projectionName, entityName);
 
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] POST /{}/{} create | jsonPath={}",
+                projectionName, entityName, jsonPath != null ? jsonPath : "$");
+        }
+
         if (rawEntity == null || rawEntity.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Raw entity cannot be null or empty");
@@ -201,6 +229,10 @@ public class DynamicRestController {
             // Handle rawData based on type
             if (rawData instanceof JSONArray) {
                 // Batch processing
+                if (entityMeta.moduleInDevelopment()) {
+                    log.info("[X-Ray] POST /{}/{} create | batch=true size={}",
+                        projectionName, entityName, ((JSONArray) rawData).size());
+                }
                 List<Map<String, Object>> dtos = new ArrayList<>();
                 for (Object rawDatum : (JSONArray) rawData) {
                     if (rawDatum instanceof Map) {
@@ -214,14 +246,26 @@ public class DynamicRestController {
                     }
                 }
                 List<Map<String, Object>> results = repository.saveBatch(
-                    dtos, projectionName.toUpperCase(), entityMeta.name());
+                    dtos, projectionName, entityMeta.name());
+                if (entityMeta.moduleInDevelopment()) {
+                    log.info("[X-Ray] POST /{}/{} create | batch completed, count={}",
+                        projectionName, entityName, results.size());
+                }
                 return new ResponseEntity<>(results, HttpStatus.CREATED);
             } else if (rawData instanceof Map) {
                 // Single entity
+                if (entityMeta.moduleInDevelopment()) {
+                    log.info("[X-Ray] POST /{}/{} create | batch=false",
+                        projectionName, entityName);
+                }
                 Map<String, Object> dto = (Map<String, Object>) rawData;
                 externalIdTranslationService.translateExternalIds(dto, entityMeta);
                 Map<String, Object> result = repository.save(
-                    dto, projectionName.toUpperCase(), entityMeta.name());
+                    dto, projectionName, entityMeta.name());
+                if (entityMeta.moduleInDevelopment()) {
+                    log.info("[X-Ray] POST /{}/{} create | completed, id={}",
+                        projectionName, entityName, result.get("id"));
+                }
                 return new ResponseEntity<>(result, HttpStatus.CREATED);
             } else {
                 // Fallback: parse rawEntity with ObjectMapper as Map
@@ -229,7 +273,11 @@ public class DynamicRestController {
                 Map<String, Object> dto = objectMapper.readValue(rawEntity, Map.class);
                 externalIdTranslationService.translateExternalIds(dto, entityMeta);
                 Map<String, Object> result = repository.save(
-                    dto, projectionName.toUpperCase(), entityMeta.name());
+                    dto, projectionName, entityMeta.name());
+                if (entityMeta.moduleInDevelopment()) {
+                    log.info("[X-Ray] POST /{}/{} create | completed (fallback), id={}",
+                        projectionName, entityName, result.get("id"));
+                }
                 return new ResponseEntity<>(result, HttpStatus.CREATED);
             }
         } catch (JsonProcessingException e) {
@@ -267,6 +315,10 @@ public class DynamicRestController {
 
         EntityMetadata entityMeta = resolveEntityMetadata(projectionName, entityName);
 
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] PUT /{}/{}/{} update", projectionName, entityName, id);
+        }
+
         if (id == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is required");
         }
@@ -281,7 +333,11 @@ public class DynamicRestController {
             externalIdTranslationService.translateExternalIds(dto, entityMeta);
 
             Map<String, Object> result = repository.update(
-                dto, projectionName.toUpperCase(), entityMeta.name());
+                dto, projectionName, entityMeta.name());
+            if (entityMeta.moduleInDevelopment()) {
+                log.info("[X-Ray] PUT /{}/{}/{} update | completed",
+                    projectionName, entityName, id);
+            }
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         } catch (JsonProcessingException e) {
             log.error("JSON processing error while updating entity {}", id, e);

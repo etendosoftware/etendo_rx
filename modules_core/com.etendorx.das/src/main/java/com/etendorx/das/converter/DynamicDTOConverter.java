@@ -135,6 +135,11 @@ public class DynamicDTOConverter {
      * @return a LinkedHashMap preserving field order, or null if entity is null
      */
     public Map<String, Object> convertToMap(Object entity, EntityMetadata entityMetadata) {
+        if (entityMetadata.moduleInDevelopment()) {
+            log.info("[X-Ray] Converter.toMap | entity={} fields={}",
+                entity != null ? entity.getClass().getSimpleName() : "null",
+                entityMetadata.fields().size());
+        }
         return convertToMap(entity, entityMetadata, entityMetadata.fields(), new ConversionContext());
     }
 
@@ -159,6 +164,11 @@ public class DynamicDTOConverter {
 
         if (entity == null) {
             entity = instantiateEntity(entityMetadata);
+        }
+
+        if (entityMetadata.moduleInDevelopment()) {
+            log.info("[X-Ray] Converter.toEntity | entity={} fields={}",
+                entityMetadata.name(), fields.size());
         }
 
         ConversionContext ctx = new ConversionContext();
@@ -189,8 +199,15 @@ public class DynamicDTOConverter {
         }
 
         // Audit fields: set client, org, active, createdBy, creationDate, updatedBy, updated
+        boolean auditApplied = false;
         if (entity instanceof BaseRXObject rxObj) {
             auditServiceInterceptor.setAuditValues(rxObj);
+            auditApplied = true;
+        }
+
+        if (entityMetadata.moduleInDevelopment()) {
+            log.info("[X-Ray] Converter.toEntity | entity={} audit={}",
+                entityMetadata.name(), auditApplied);
         }
 
         return entity;

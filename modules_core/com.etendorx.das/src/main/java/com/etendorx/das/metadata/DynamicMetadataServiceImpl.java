@@ -63,7 +63,7 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
             // Step 1: Load projections with their entities (only from modules in development)
             String jpql = "SELECT DISTINCT p FROM ETRX_Projection p " +
                          "LEFT JOIN FETCH p.eTRXProjectionEntityList " +
-                         "JOIN p.module m WHERE m.inDevelopment = true";
+                         "JOIN FETCH p.module m WHERE m.inDevelopment = true";
             List<ETRXProjection> projections = entityManager
                 .createQuery(jpql, ETRXProjection.class).getResultList();
 
@@ -141,10 +141,11 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
         log.debug("Loading projection from database: {}", name);
 
         try {
+            // Step 1: Load projection with entities (avoids MultipleBagFetchException
+            // by NOT fetching fields in the same query)
             String jpql = "SELECT DISTINCT p FROM ETRX_Projection p " +
-                         "LEFT JOIN FETCH p.eTRXProjectionEntityList pe " +
-                         "LEFT JOIN FETCH pe.eTRXEntityFieldList " +
-                         "JOIN p.module m " +
+                         "LEFT JOIN FETCH p.eTRXProjectionEntityList " +
+                         "JOIN FETCH p.module m " +
                          "WHERE p.name = :name AND m.inDevelopment = true";
 
             TypedQuery<ETRXProjection> query = entityManager.createQuery(jpql, ETRXProjection.class);
@@ -159,7 +160,18 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
 
             ETRXProjection projection = results.get(0);
 
-            // Initialize lazy relationships
+            // Step 2: Load entity fields in a separate query (same pattern as preloadCache)
+            if (projection.getETRXProjectionEntityList() != null
+                    && !projection.getETRXProjectionEntityList().isEmpty()) {
+                entityManager.createQuery(
+                    "SELECT DISTINCT pe FROM ETRX_Projection_Entity pe " +
+                    "LEFT JOIN FETCH pe.eTRXEntityFieldList " +
+                    "WHERE pe.projection = :projection", ETRXProjectionEntity.class)
+                    .setParameter("projection", projection)
+                    .getResultList();
+            }
+
+            // Initialize lazy relationships on fields
             Hibernate.initialize(projection.getETRXProjectionEntityList());
             if (projection.getETRXProjectionEntityList() != null) {
                 for (ETRXProjectionEntity entity : projection.getETRXProjectionEntityList()) {
@@ -280,11 +292,16 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
      * Converts a JPA ETRXProjection entity to an immutable ProjectionMetadata record.
      */
     private ProjectionMetadata toProjectionMetadata(ETRXProjection projection) {
+        boolean moduleDev = projection.getModule() != null
+            && Boolean.TRUE.equals(projection.getModule().getInDevelopment());
+        String moduleName = projection.getModule() != null
+            ? projection.getModule().getName() : null;
+
         List<EntityMetadata> entities = new ArrayList<>();
 
         if (projection.getETRXProjectionEntityList() != null) {
             for (ETRXProjectionEntity entity : projection.getETRXProjectionEntityList()) {
-                entities.add(toEntityMetadata(entity));
+                entities.add(toEntityMetadata(entity, moduleDev));
             }
         }
 
@@ -293,14 +310,16 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
             projection.getName(),
             projection.getDescription(),
             projection.getGRPC() != null && projection.getGRPC(),
-            entities
+            entities,
+            moduleName,
+            moduleDev
         );
     }
 
     /**
      * Converts a JPA ETRXProjectionEntity to an immutable EntityMetadata record.
      */
-    private EntityMetadata toEntityMetadata(ETRXProjectionEntity entity) {
+    private EntityMetadata toEntityMetadata(ETRXProjectionEntity entity, boolean moduleInDevelopment) {
         List<FieldMetadata> fields = new ArrayList<>();
 
         if (entity.getETRXEntityFieldList() != null) {
@@ -323,7 +342,8 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
             entity.getIdentity() != null && entity.getIdentity(),
             entity.getRestEndPoint() != null && entity.getRestEndPoint(),
             entity.getExternalName(),
-            fields
+            fields,
+            moduleInDevelopment
         );
     }
 

@@ -374,7 +374,7 @@ public class DynamicMetadataServiceTest {
         // Given - populate cache via Spring wrapper
         String projectionName = "TestProjection";
         ProjectionMetadata metadata = new ProjectionMetadata(
-            "proj-123", projectionName, "desc", true, List.of()
+            "proj-123", projectionName, "desc", true, List.of(), null, false
         );
         springCache.put(projectionName, metadata);
 
@@ -462,10 +462,10 @@ public class DynamicMetadataServiceTest {
                 false, false, 20L, null, null, null, null, false)
         );
         EntityMetadata entityMeta = new EntityMetadata(
-            entityId, "Order", "table-789", "EW", false, true, "Order", expectedFields
+            entityId, "Order", "table-789", "EW", false, true, "Order", expectedFields, false
         );
         ProjectionMetadata projMeta = new ProjectionMetadata(
-            "proj-123", projectionName, "desc", true, List.of(entityMeta)
+            "proj-123", projectionName, "desc", true, List.of(entityMeta), null, false
         );
         springCache.put(projectionName, projMeta);
 
@@ -511,9 +511,9 @@ public class DynamicMetadataServiceTest {
     @Test
     void testGetAllProjectionNames() {
         // Given - multiple projections in cache
-        caffeineCache.put("Projection1", new ProjectionMetadata("1", "Projection1", "desc1", true, List.of()));
-        caffeineCache.put("Projection2", new ProjectionMetadata("2", "Projection2", "desc2", false, List.of()));
-        caffeineCache.put("Projection3", new ProjectionMetadata("3", "Projection3", "desc3", true, List.of()));
+        caffeineCache.put("Projection1", new ProjectionMetadata("1", "Projection1", "desc1", true, List.of(), null, false));
+        caffeineCache.put("Projection2", new ProjectionMetadata("2", "Projection2", "desc2", false, List.of(), null, false));
+        caffeineCache.put("Projection3", new ProjectionMetadata("3", "Projection3", "desc3", true, List.of(), null, false));
 
         // When
         Set<String> names = service.getAllProjectionNames();

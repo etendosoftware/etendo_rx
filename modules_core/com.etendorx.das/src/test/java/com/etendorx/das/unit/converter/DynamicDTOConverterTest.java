@@ -153,7 +153,8 @@ public class DynamicDTOConverterTest {
             false,                  // identity
             true,                   // restEndPoint
             name,                   // externalName
-            fields
+            fields,
+            false                   // moduleInDevelopment
         );
     }
 

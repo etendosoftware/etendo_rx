@@ -64,7 +64,8 @@ public class DynamicEndpointRegistryTest {
             false,                      // identity
             restEndPoint,               // restEndPoint
             externalName,               // externalName
-            List.of()                   // fields
+            List.of(),                  // fields
+            false                       // moduleInDevelopment
         );
     }
 
@@ -74,7 +75,9 @@ public class DynamicEndpointRegistryTest {
             name,                       // name
             "Test projection",          // description
             false,                      // grpc
-            entities
+            entities,                   // entities
+            null,                       // moduleName
+            false                       // moduleInDevelopment
         );
     }
 

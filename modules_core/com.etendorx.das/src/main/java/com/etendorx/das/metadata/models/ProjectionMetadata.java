@@ -12,13 +12,17 @@ import java.util.Optional;
  * @param description Human-readable description
  * @param grpc        Whether this projection supports gRPC endpoints
  * @param entities    List of entities included in this projection
+ * @param moduleName  Name of the owning module (null if module is null)
+ * @param moduleInDevelopment Whether the owning module has isInDevelopment=true
  */
 public record ProjectionMetadata(
     String id,
     String name,
     String description,
     boolean grpc,
-    List<EntityMetadata> entities
+    List<EntityMetadata> entities,
+    String moduleName,
+    boolean moduleInDevelopment
 ) {
     /**
      * Finds an entity within this projection by name.

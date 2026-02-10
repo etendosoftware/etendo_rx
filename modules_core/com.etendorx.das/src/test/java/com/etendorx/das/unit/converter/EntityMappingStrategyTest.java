@@ -123,7 +123,8 @@ public class EntityMappingStrategyTest {
             false,                  // identity
             true,                   // restEndPoint
             name,                   // externalName
-            fields
+            fields,
+            false                   // moduleInDevelopment
         );
     }
 

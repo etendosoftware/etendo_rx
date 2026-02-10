@@ -89,7 +89,8 @@ public class DynamicRestControllerTest {
             false,                      // identity
             true,                       // restEndPoint
             ENTITY_NAME,                // externalName (used in URL)
-            List.of()                   // fields
+            List.of(),                  // fields
+            false                       // moduleInDevelopment
         );
 
         // Default setup: registry resolves the test entity
@@ -112,7 +113,7 @@ public class DynamicRestControllerTest {
         Page<Map<String, Object>> page = new PageImpl<>(List.of(entity1, entity2));
         Pageable pageable = PageRequest.of(0, 20);
 
-        when(repository.findAll(eq("OBMAP"), eq(ENTITY_META_NAME), anyMap(), eq(pageable)))
+        when(repository.findAll(eq(PROJECTION_NAME), eq(ENTITY_META_NAME), anyMap(), eq(pageable)))
             .thenReturn(page);
 
         // Act
@@ -121,7 +122,7 @@ public class DynamicRestControllerTest {
 
         // Assert
         assertEquals(2, result.getContent().size());
-        verify(repository).findAll(eq("OBMAP"), eq(ENTITY_META_NAME), anyMap(), eq(pageable));
+        verify(repository).findAll(eq(PROJECTION_NAME), eq(ENTITY_META_NAME), anyMap(), eq(pageable));
     }
 
     /**
@@ -148,7 +149,7 @@ public class DynamicRestControllerTest {
         // Assert
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<String, String>> filtersCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(repository).findAll(eq("OBMAP"), eq(ENTITY_META_NAME),
+        verify(repository).findAll(eq(PROJECTION_NAME), eq(ENTITY_META_NAME),
             filtersCaptor.capture(), eq(pageable));
 
         Map<String, String> capturedFilters = filtersCaptor.getValue();
@@ -182,7 +183,7 @@ public class DynamicRestControllerTest {
         // Arrange
         EntityMetadata nonRestEntity = new EntityMetadata(
             "entity-2", "InternalEntity", "TABLE-INT", "EW",
-            false, false, "Internal", List.of()); // restEndPoint=false
+            false, false, "Internal", List.of(), false); // restEndPoint=false
 
         when(endpointRegistry.resolveEntityByExternalName(PROJECTION_NAME, "Internal"))
             .thenReturn(Optional.of(nonRestEntity));
@@ -205,7 +206,7 @@ public class DynamicRestControllerTest {
     void findById_returnsEntity() {
         // Arrange
         Map<String, Object> entity = Map.of("id", "123", "name", "Product A");
-        when(repository.findById("123", "OBMAP", ENTITY_META_NAME)).thenReturn(entity);
+        when(repository.findById("123", PROJECTION_NAME, ENTITY_META_NAME)).thenReturn(entity);
 
         // Act
         ResponseEntity<Map<String, Object>> response = controller.findById(
@@ -222,7 +223,7 @@ public class DynamicRestControllerTest {
     @Test
     void findById_returns404WhenNotFound() {
         // Arrange
-        when(repository.findById("999", "OBMAP", ENTITY_META_NAME))
+        when(repository.findById("999", PROJECTION_NAME, ENTITY_META_NAME))
             .thenThrow(new EntityNotFoundException("Not found"));
 
         // Act & Assert
@@ -239,7 +240,7 @@ public class DynamicRestControllerTest {
         // Arrange
         EntityMetadata nonRestEntity = new EntityMetadata(
             "entity-2", "InternalEntity", "TABLE-INT", "EW",
-            false, false, "Internal", List.of()); // restEndPoint=false
+            false, false, "Internal", List.of(), false); // restEndPoint=false
 
         when(endpointRegistry.resolveEntityByExternalName(PROJECTION_NAME, "Internal"))
             .thenReturn(Optional.of(nonRestEntity));
@@ -262,7 +263,7 @@ public class DynamicRestControllerTest {
         // Arrange
         String rawJson = "{\"name\":\"Test Product\"}";
         Map<String, Object> savedEntity = Map.of("id", "new-1", "name", "Test Product");
-        when(repository.save(anyMap(), eq("OBMAP"), eq(ENTITY_META_NAME)))
+        when(repository.save(anyMap(), eq(PROJECTION_NAME), eq(ENTITY_META_NAME)))
             .thenReturn(savedEntity);
 
         // Act
@@ -300,7 +301,7 @@ public class DynamicRestControllerTest {
         String rawJson = "[{\"name\":\"A\"},{\"name\":\"B\"}]";
         Map<String, Object> result1 = Map.of("id", "1", "name", "A");
         Map<String, Object> result2 = Map.of("id", "2", "name", "B");
-        when(repository.saveBatch(anyList(), eq("OBMAP"), eq(ENTITY_META_NAME)))
+        when(repository.saveBatch(anyList(), eq(PROJECTION_NAME), eq(ENTITY_META_NAME)))
             .thenReturn(List.of(result1, result2));
 
         // Act
@@ -323,7 +324,7 @@ public class DynamicRestControllerTest {
         // Arrange
         String rawJson = "{\"data\":{\"name\":\"Nested Product\"}}";
         Map<String, Object> savedEntity = Map.of("id", "new-1", "name", "Nested Product");
-        when(repository.save(anyMap(), eq("OBMAP"), eq(ENTITY_META_NAME)))
+        when(repository.save(anyMap(), eq(PROJECTION_NAME), eq(ENTITY_META_NAME)))
             .thenReturn(savedEntity);
 
         // Act
@@ -332,7 +333,7 @@ public class DynamicRestControllerTest {
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        verify(repository).save(anyMap(), eq("OBMAP"), eq(ENTITY_META_NAME));
+        verify(repository).save(anyMap(), eq(PROJECTION_NAME), eq(ENTITY_META_NAME));
     }
 
     /**
@@ -354,14 +355,14 @@ public class DynamicRestControllerTest {
     void create_defaultsJsonPathToDollarSign() {
         // Arrange
         String rawJson = "{\"name\":\"Test\"}";
-        when(repository.save(anyMap(), eq("OBMAP"), eq(ENTITY_META_NAME)))
+        when(repository.save(anyMap(), eq(PROJECTION_NAME), eq(ENTITY_META_NAME)))
             .thenReturn(Map.of("id", "new-1"));
 
         // Act & Assert - should not throw
         assertDoesNotThrow(() ->
             controller.create(PROJECTION_NAME, ENTITY_NAME, rawJson, null));
 
-        verify(repository).save(anyMap(), eq("OBMAP"), eq(ENTITY_META_NAME));
+        verify(repository).save(anyMap(), eq(PROJECTION_NAME), eq(ENTITY_META_NAME));
     }
 
     // ==========================================
@@ -376,7 +377,7 @@ public class DynamicRestControllerTest {
         // Arrange
         String rawJson = "{\"name\":\"Updated Product\"}";
         Map<String, Object> updatedEntity = Map.of("id", "123", "name", "Updated Product");
-        when(repository.update(anyMap(), eq("OBMAP"), eq(ENTITY_META_NAME)))
+        when(repository.update(anyMap(), eq(PROJECTION_NAME), eq(ENTITY_META_NAME)))
             .thenReturn(updatedEntity);
 
         // Act
@@ -404,7 +405,7 @@ public class DynamicRestControllerTest {
         // Assert
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<String, Object>> dtoCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(repository).update(dtoCaptor.capture(), eq("OBMAP"), eq(ENTITY_META_NAME));
+        verify(repository).update(dtoCaptor.capture(), eq(PROJECTION_NAME), eq(ENTITY_META_NAME));
 
         Map<String, Object> capturedDto = dtoCaptor.getValue();
         assertEquals("123", capturedDto.get("id"),

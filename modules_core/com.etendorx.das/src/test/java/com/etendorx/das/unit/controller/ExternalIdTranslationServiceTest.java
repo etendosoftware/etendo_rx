@@ -92,7 +92,8 @@ public class ExternalIdTranslationServiceTest {
             false,                      // identity
             true,                       // restEndPoint
             "TestEntity",               // externalName
-            fields
+            fields,
+            false                       // moduleInDevelopment
         );
     }
 
@@ -161,7 +162,7 @@ public class ExternalIdTranslationServiceTest {
 
         EntityMetadata relatedEntityMeta = new EntityMetadata(
             "related-proj-entity-id", "OrgEntity", "TABLE-ORG",
-            "EW", false, true, "Organization", List.of());
+            "EW", false, true, "Organization", List.of(), false);
 
         when(converter.findEntityMetadataById("related-proj-entity-id"))
             .thenReturn(relatedEntityMeta);
@@ -194,7 +195,7 @@ public class ExternalIdTranslationServiceTest {
 
         EntityMetadata relatedEntityMeta = new EntityMetadata(
             "related-proj-entity-id", "OrgEntity", "TABLE-ORG",
-            "EW", false, true, "Organization", List.of());
+            "EW", false, true, "Organization", List.of(), false);
 
         when(converter.findEntityMetadataById("related-proj-entity-id"))
             .thenReturn(relatedEntityMeta);
@@ -280,7 +281,7 @@ public class ExternalIdTranslationServiceTest {
 
         EntityMetadata relatedEntityMeta = new EntityMetadata(
             "related-proj-entity-id", "OrgEntity", "TABLE-ORG",
-            "EW", false, true, "Organization", List.of());
+            "EW", false, true, "Organization", List.of(), false);
 
         when(converter.findEntityMetadataById("related-proj-entity-id"))
             .thenReturn(relatedEntityMeta);
@@ -314,10 +315,10 @@ public class ExternalIdTranslationServiceTest {
 
         EntityMetadata orgMeta = new EntityMetadata(
             "related-org-id", "OrgEntity", "TABLE-ORG",
-            "EW", false, true, "Organization", List.of());
+            "EW", false, true, "Organization", List.of(), false);
         EntityMetadata whMeta = new EntityMetadata(
             "related-wh-id", "WhEntity", "TABLE-WH",
-            "EW", false, true, "Warehouse", List.of());
+            "EW", false, true, "Warehouse", List.of(), false);
 
         when(converter.findEntityMetadataById("related-org-id")).thenReturn(orgMeta);
         when(converter.findEntityMetadataById("related-wh-id")).thenReturn(whMeta);
