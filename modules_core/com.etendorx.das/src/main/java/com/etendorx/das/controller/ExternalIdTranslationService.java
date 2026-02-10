@@ -101,43 +101,54 @@ public class ExternalIdTranslationService {
      */
     private void translateEntityMappingFields(Map<String, Object> dto, EntityMetadata entityMeta) {
         for (FieldMetadata field : entityMeta.fields()) {
-            if (field.fieldMapping() != FieldMappingType.ENTITY_MAPPING) {
-                continue;
+            if (shouldTranslateField(field, dto)) {
+                translateField(field, dto, entityMeta);
             }
+        }
+    }
 
-            Object value = dto.get(field.name());
-            if (value == null) {
-                continue;
-            }
+    private boolean shouldTranslateField(FieldMetadata field, Map<String, Object> dto) {
+        return field.fieldMapping() == FieldMappingType.ENTITY_MAPPING 
+            && dto.get(field.name()) != null;
+    }
 
-            String referenceId = extractReferenceId(value, field.name());
-            if (referenceId == null) {
-                continue;
-            }
+    private void translateField(FieldMetadata field, Map<String, Object> dto, EntityMetadata entityMeta) {
+        Object value = dto.get(field.name());
+        String referenceId = extractReferenceId(value, field.name());
+        
+        if (referenceId == null) {
+            return;
+        }
 
-            // Resolve the related entity's tableId
-            EntityMetadata relatedEntityMeta = converter.findEntityMetadataById(
-                field.relatedProjectionEntityId());
-            if (relatedEntityMeta == null) {
-                log.warn("Cannot translate external ID for field '{}': related entity metadata " +
-                    "not found for projectionEntityId '{}'", field.name(),
-                    field.relatedProjectionEntityId());
-                continue;
-            }
+        EntityMetadata relatedEntityMeta = converter.findEntityMetadataById(
+            field.relatedProjectionEntityId());
+        
+        if (relatedEntityMeta == null) {
+            logMissingRelatedEntity(field);
+            return;
+        }
 
-            String internalId = externalIdService.convertExternalToInternalId(
-                relatedEntityMeta.tableId(), referenceId);
+        String internalId = externalIdService.convertExternalToInternalId(
+            relatedEntityMeta.tableId(), referenceId);
 
-            // Replace the value in the DTO maintaining the original structure
-            replaceReferenceId(dto, field.name(), value, internalId);
+        replaceReferenceId(dto, field.name(), value, internalId);
+        logTranslation(field, referenceId, internalId, relatedEntityMeta, entityMeta);
+    }
 
-            if (entityMeta.moduleInDevelopment()) {
-                log.info("[X-Ray] Translated EM field '{}' id '{}' -> '{}' (table: {})",
-                    field.name(), referenceId, internalId, relatedEntityMeta.tableId());
-            } else {
-                log.debug("Translated EM field '{}' id '{}' -> '{}' using table {}",
-                    field.name(), referenceId, internalId, relatedEntityMeta.tableId());
-            }
+    private void logMissingRelatedEntity(FieldMetadata field) {
+        log.warn("Cannot translate external ID for field '{}': related entity metadata " +
+            "not found for projectionEntityId '{}'", field.name(),
+            field.relatedProjectionEntityId());
+    }
+
+    private void logTranslation(FieldMetadata field, String referenceId, String internalId,
+                                EntityMetadata relatedEntityMeta, EntityMetadata entityMeta) {
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] Translated EM field '{}' id '{}' -> '{}' (table: {})",
+                field.name(), referenceId, internalId, relatedEntityMeta.tableId());
+        } else {
+            log.debug("Translated EM field '{}' id '{}' -> '{}' using table {}",
+                field.name(), referenceId, internalId, relatedEntityMeta.tableId());
         }
     }
 

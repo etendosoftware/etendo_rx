@@ -198,7 +198,6 @@ public class DynamicRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(security = { @SecurityRequirement(name = "basicScheme") })
-    @SuppressWarnings("unchecked")
     public ResponseEntity<Object> create(
             @PathVariable String projectionName,
             @PathVariable String entityName,
@@ -207,79 +206,13 @@ public class DynamicRestController {
         log.debug("POST /{}/{} - create", projectionName, entityName);
 
         EntityMetadata entityMeta = resolveEntityMetadata(projectionName, entityName);
-
-        if (entityMeta.moduleInDevelopment()) {
-            log.info("[X-Ray] POST /{}/{} create | jsonPath={}",
-                projectionName, entityName, jsonPath != null ? jsonPath : "$");
-        }
-
-        if (rawEntity == null || rawEntity.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                "Raw entity cannot be null or empty");
-        }
+        logCreateRequest(entityMeta, projectionName, entityName, jsonPath);
+        validateRawEntity(rawEntity);
 
         try {
-            jsonPath = (StringUtils.hasText(jsonPath)) ? jsonPath : "$";
-
-            // Parse JSON using Jayway JsonPath (exact pattern from BindedRestController)
-            Configuration conf = Configuration.defaultConfiguration().addOptions();
-            DocumentContext documentContext = JsonPath.using(conf).parse(rawEntity);
-            Object rawData = documentContext.read(jsonPath, Object.class);
-
-            // Handle rawData based on type
-            if (rawData instanceof JSONArray) {
-                // Batch processing
-                if (entityMeta.moduleInDevelopment()) {
-                    log.info("[X-Ray] POST /{}/{} create | batch=true size={}",
-                        projectionName, entityName, ((JSONArray) rawData).size());
-                }
-                List<Map<String, Object>> dtos = new ArrayList<>();
-                for (Object rawDatum : (JSONArray) rawData) {
-                    if (rawDatum instanceof Map) {
-                        Map<String, Object> dto = (Map<String, Object>) rawDatum;
-                        externalIdTranslationService.translateExternalIds(dto, entityMeta);
-                        dtos.add(dto);
-                    } else {
-                        log.error("Invalid JSON object in batch: {}", rawDatum);
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Invalid JSON object");
-                    }
-                }
-                List<Map<String, Object>> results = repository.saveBatch(
-                    dtos, projectionName, entityMeta.name());
-                if (entityMeta.moduleInDevelopment()) {
-                    log.info("[X-Ray] POST /{}/{} create | batch completed, count={}",
-                        projectionName, entityName, results.size());
-                }
-                return new ResponseEntity<>(results, HttpStatus.CREATED);
-            } else if (rawData instanceof Map) {
-                // Single entity
-                if (entityMeta.moduleInDevelopment()) {
-                    log.info("[X-Ray] POST /{}/{} create | batch=false",
-                        projectionName, entityName);
-                }
-                Map<String, Object> dto = (Map<String, Object>) rawData;
-                externalIdTranslationService.translateExternalIds(dto, entityMeta);
-                Map<String, Object> result = repository.save(
-                    dto, projectionName, entityMeta.name());
-                if (entityMeta.moduleInDevelopment()) {
-                    log.info("[X-Ray] POST /{}/{} create | completed, id={}",
-                        projectionName, entityName, result.get("id"));
-                }
-                return new ResponseEntity<>(result, HttpStatus.CREATED);
-            } else {
-                // Fallback: parse rawEntity with ObjectMapper as Map
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> dto = objectMapper.readValue(rawEntity, Map.class);
-                externalIdTranslationService.translateExternalIds(dto, entityMeta);
-                Map<String, Object> result = repository.save(
-                    dto, projectionName, entityMeta.name());
-                if (entityMeta.moduleInDevelopment()) {
-                    log.info("[X-Ray] POST /{}/{} create | completed (fallback), id={}",
-                        projectionName, entityName, result.get("id"));
-                }
-                return new ResponseEntity<>(result, HttpStatus.CREATED);
-            }
+            String effectiveJsonPath = StringUtils.hasText(jsonPath) ? jsonPath : "$";
+            Object rawData = parseJsonData(rawEntity, effectiveJsonPath);
+            return processRawData(rawData, entityMeta, projectionName, entityName, rawEntity);
         } catch (JsonProcessingException e) {
             log.error("JSON processing error while creating entity", e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid JSON format");
@@ -288,6 +221,135 @@ public class DynamicRestController {
         } catch (Exception e) {
             log.error("Error while creating entity", e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    private void logCreateRequest(EntityMetadata entityMeta, String projectionName, 
+                                  String entityName, String jsonPath) {
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] POST /{}/{} create | jsonPath={}",
+                projectionName, entityName, jsonPath != null ? jsonPath : "$");
+        }
+    }
+
+    private void validateRawEntity(String rawEntity) {
+        if (rawEntity == null || rawEntity.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Raw entity cannot be null or empty");
+        }
+    }
+
+    private Object parseJsonData(String rawEntity, String jsonPath) {
+        Configuration conf = Configuration.defaultConfiguration().addOptions();
+        DocumentContext documentContext = JsonPath.using(conf).parse(rawEntity);
+        return documentContext.read(jsonPath, Object.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private ResponseEntity<Object> processRawData(Object rawData, EntityMetadata entityMeta,
+                                                  String projectionName, String entityName,
+                                                  String rawEntity) throws JsonProcessingException {
+        if (rawData instanceof JSONArray) {
+            return processBatchCreation((JSONArray) rawData, entityMeta, projectionName, entityName);
+        } else if (rawData instanceof Map) {
+            return processSingleCreation((Map<String, Object>) rawData, entityMeta, 
+                projectionName, entityName);
+        } else {
+            return processFallbackCreation(rawEntity, entityMeta, projectionName, entityName);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private ResponseEntity<Object> processBatchCreation(JSONArray rawDataArray, 
+                                                        EntityMetadata entityMeta,
+                                                        String projectionName, 
+                                                        String entityName) {
+        logBatchStart(entityMeta, projectionName, entityName, rawDataArray.size());
+        List<Map<String, Object>> dtos = convertArrayToDtos(rawDataArray, entityMeta);
+        List<Map<String, Object>> results = repository.saveBatch(
+            dtos, projectionName, entityMeta.name());
+        logBatchComplete(entityMeta, projectionName, entityName, results.size());
+        return new ResponseEntity<>(results, HttpStatus.CREATED);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> convertArrayToDtos(JSONArray rawDataArray, 
+                                                          EntityMetadata entityMeta) {
+        List<Map<String, Object>> dtos = new ArrayList<>();
+        for (Object rawDatum : rawDataArray) {
+            if (rawDatum instanceof Map) {
+                Map<String, Object> dto = (Map<String, Object>) rawDatum;
+                externalIdTranslationService.translateExternalIds(dto, entityMeta);
+                dtos.add(dto);
+            } else {
+                log.error("Invalid JSON object in batch: {}", rawDatum);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid JSON object");
+            }
+        }
+        return dtos;
+    }
+
+    private ResponseEntity<Object> processSingleCreation(Map<String, Object> dto, 
+                                                         EntityMetadata entityMeta,
+                                                         String projectionName, 
+                                                         String entityName) {
+        logSingleEntityStart(entityMeta, projectionName, entityName);
+        externalIdTranslationService.translateExternalIds(dto, entityMeta);
+        Map<String, Object> result = repository.save(dto, projectionName, entityMeta.name());
+        logSingleEntityComplete(entityMeta, projectionName, entityName, result);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    private ResponseEntity<Object> processFallbackCreation(String rawEntity, 
+                                                           EntityMetadata entityMeta,
+                                                           String projectionName, 
+                                                           String entityName) 
+            throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> dto = objectMapper.readValue(rawEntity, Map.class);
+        externalIdTranslationService.translateExternalIds(dto, entityMeta);
+        Map<String, Object> result = repository.save(dto, projectionName, entityMeta.name());
+        logFallbackComplete(entityMeta, projectionName, entityName, result);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    private void logBatchStart(EntityMetadata entityMeta, String projectionName, 
+                               String entityName, int size) {
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] POST /{}/{} create | batch=true size={}",
+                projectionName, entityName, size);
+        }
+    }
+
+    private void logBatchComplete(EntityMetadata entityMeta, String projectionName, 
+                                  String entityName, int count) {
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] POST /{}/{} create | batch completed, count={}",
+                projectionName, entityName, count);
+        }
+    }
+
+    private void logSingleEntityStart(EntityMetadata entityMeta, String projectionName, 
+                                      String entityName) {
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] POST /{}/{} create | batch=false",
+                projectionName, entityName);
+        }
+    }
+
+    private void logSingleEntityComplete(EntityMetadata entityMeta, String projectionName, 
+                                         String entityName, Map<String, Object> result) {
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] POST /{}/{} create | completed, id={}",
+                projectionName, entityName, result.get("id"));
+        }
+    }
+
+    private void logFallbackComplete(EntityMetadata entityMeta, String projectionName, 
+                                     String entityName, Map<String, Object> result) {
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] POST /{}/{} create | completed (fallback), id={}",
+                projectionName, entityName, result.get("id"));
         }
     }
 

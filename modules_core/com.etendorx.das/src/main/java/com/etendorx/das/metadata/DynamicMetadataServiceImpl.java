@@ -42,6 +42,8 @@ import java.util.Set;
 @Slf4j
 public class DynamicMetadataServiceImpl implements DynamicMetadataService {
 
+    private static final String CACHE_NAME_PROJECTIONS_BY_NAME = "projectionsByName";
+
     private final EntityManager entityManager;
     private final CacheManager cacheManager;
 
@@ -60,74 +62,94 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
         log.info("Preloading projection metadata cache...");
 
         try {
-            // Step 1: Load projections with their entities (only from modules in development)
-            String jpql = "SELECT DISTINCT p FROM ETRX_Projection p " +
-                         "LEFT JOIN FETCH p.eTRXProjectionEntityList " +
-                         "JOIN FETCH p.module m WHERE m.inDevelopment = true";
-            List<ETRXProjection> projections = entityManager
-                .createQuery(jpql, ETRXProjection.class).getResultList();
-
-            // Step 2: Load entity fields in a separate query (avoids MultipleBagFetchException)
-            entityManager.createQuery(
-                "SELECT DISTINCT pe FROM ETRX_Projection_Entity pe " +
-                "LEFT JOIN FETCH pe.eTRXEntityFieldList " +
-                "WHERE pe.projection IN :projections", ETRXProjectionEntity.class)
-                .setParameter("projections", projections)
-                .getResultList();
-
-            log.info("Found {} projections to preload", projections.size());
-
-            Cache cache = cacheManager.getCache("projectionsByName");
+            List<ETRXProjection> projections = loadProjectionsFromDatabase();
+            Cache cache = getCacheByName(CACHE_NAME_PROJECTIONS_BY_NAME);
             if (cache == null) {
-                log.warn("projectionsByName cache not found, skipping preload");
                 return;
             }
 
-            // For each projection, initialize lazy relationships and populate cache
-            for (ETRXProjection projection : projections) {
-                try {
-                    // Initialize the projection entity list
-                    Hibernate.initialize(projection.getETRXProjectionEntityList());
-
-                    // Initialize fields for each entity
-                    if (projection.getETRXProjectionEntityList() != null) {
-                        for (ETRXProjectionEntity entity : projection.getETRXProjectionEntityList()) {
-                            Hibernate.initialize(entity.getETRXEntityFieldList());
-
-                            // Initialize lazy relationships in fields
-                            if (entity.getETRXEntityFieldList() != null) {
-                                for (ETRXEntityField field : entity.getETRXEntityFieldList()) {
-                                    // Initialize related entity if present
-                                    if (field.getEtrxProjectionEntityRelated() != null) {
-                                        Hibernate.initialize(field.getEtrxProjectionEntityRelated());
-                                    }
-                                    // Initialize java mapping if present
-                                    if (field.getJavaMapping() != null) {
-                                        Hibernate.initialize(field.getJavaMapping());
-                                    }
-                                    // Initialize constant value if present
-                                    if (field.getEtrxConstantValue() != null) {
-                                        Hibernate.initialize(field.getEtrxConstantValue());
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Convert to immutable record and store in cache
-                    ProjectionMetadata metadata = toProjectionMetadata(projection);
-                    cache.put(projection.getName(), metadata);
-                    log.debug("Preloaded projection: {}", projection.getName());
-
-                } catch (Exception e) {
-                    log.error("Failed to preload projection: {}", projection.getName(), e);
-                }
-            }
-
+            processAndCacheProjections(projections, cache);
             log.info("Projection metadata cache preloaded successfully with {} entries", projections.size());
-
         } catch (Exception e) {
             log.error("Failed to preload projection metadata cache", e);
+        }
+    }
+
+    private List<ETRXProjection> loadProjectionsFromDatabase() {
+        String jpql = "SELECT DISTINCT p FROM ETRX_Projection p " +
+                     "LEFT JOIN FETCH p.eTRXProjectionEntityList " +
+                     "JOIN FETCH p.module m WHERE m.inDevelopment = true";
+        List<ETRXProjection> projections = entityManager
+            .createQuery(jpql, ETRXProjection.class).getResultList();
+
+        loadEntityFieldsForProjections(projections);
+        log.info("Found {} projections to preload", projections.size());
+        return projections;
+    }
+
+    private void loadEntityFieldsForProjections(List<ETRXProjection> projections) {
+        entityManager.createQuery(
+            "SELECT DISTINCT pe FROM ETRX_Projection_Entity pe " +
+            "LEFT JOIN FETCH pe.eTRXEntityFieldList " +
+            "WHERE pe.projection IN :projections", ETRXProjectionEntity.class)
+            .setParameter("projections", projections)
+            .getResultList();
+    }
+
+    private Cache getCacheByName(String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache == null) {
+            log.warn("{} cache not found, skipping preload", cacheName);
+        }
+        return cache;
+    }
+
+    private void processAndCacheProjections(List<ETRXProjection> projections, Cache cache) {
+        for (ETRXProjection projection : projections) {
+            processProjection(projection, cache);
+        }
+    }
+
+    private void processProjection(ETRXProjection projection, Cache cache) {
+        try {
+            initializeProjectionRelationships(projection);
+            ProjectionMetadata metadata = toProjectionMetadata(projection);
+            cache.put(projection.getName(), metadata);
+            log.debug("Preloaded projection: {}", projection.getName());
+        } catch (Exception e) {
+            log.error("Failed to preload projection: {}", projection.getName(), e);
+        }
+    }
+
+    private void initializeProjectionRelationships(ETRXProjection projection) {
+        Hibernate.initialize(projection.getETRXProjectionEntityList());
+
+        if (projection.getETRXProjectionEntityList() != null) {
+            for (ETRXProjectionEntity entity : projection.getETRXProjectionEntityList()) {
+                initializeEntityRelationships(entity);
+            }
+        }
+    }
+
+    private void initializeEntityRelationships(ETRXProjectionEntity entity) {
+        Hibernate.initialize(entity.getETRXEntityFieldList());
+
+        if (entity.getETRXEntityFieldList() != null) {
+            for (ETRXEntityField field : entity.getETRXEntityFieldList()) {
+                initializeFieldRelationships(field);
+            }
+        }
+    }
+
+    private void initializeFieldRelationships(ETRXEntityField field) {
+        if (field.getEtrxProjectionEntityRelated() != null) {
+            Hibernate.initialize(field.getEtrxProjectionEntityRelated());
+        }
+        if (field.getJavaMapping() != null) {
+            Hibernate.initialize(field.getJavaMapping());
+        }
+        if (field.getEtrxConstantValue() != null) {
+            Hibernate.initialize(field.getEtrxConstantValue());
         }
     }
 
@@ -141,64 +163,46 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
         log.debug("Loading projection from database: {}", name);
 
         try {
-            // Step 1: Load projection with entities (avoids MultipleBagFetchException
-            // by NOT fetching fields in the same query)
-            String jpql = "SELECT DISTINCT p FROM ETRX_Projection p " +
-                         "LEFT JOIN FETCH p.eTRXProjectionEntityList " +
-                         "JOIN FETCH p.module m " +
-                         "WHERE p.name = :name AND m.inDevelopment = true";
-
-            TypedQuery<ETRXProjection> query = entityManager.createQuery(jpql, ETRXProjection.class);
-            query.setParameter("name", name);
-
-            List<ETRXProjection> results = query.getResultList();
-
-            if (results.isEmpty()) {
+            Optional<ETRXProjection> projectionOpt = loadProjectionByName(name);
+            if (projectionOpt.isEmpty()) {
                 log.debug("Projection not found: {}", name);
                 return Optional.empty();
             }
 
-            ETRXProjection projection = results.get(0);
-
-            // Step 2: Load entity fields in a separate query (same pattern as preloadCache)
-            if (projection.getETRXProjectionEntityList() != null
-                    && !projection.getETRXProjectionEntityList().isEmpty()) {
-                entityManager.createQuery(
-                    "SELECT DISTINCT pe FROM ETRX_Projection_Entity pe " +
-                    "LEFT JOIN FETCH pe.eTRXEntityFieldList " +
-                    "WHERE pe.projection = :projection", ETRXProjectionEntity.class)
-                    .setParameter("projection", projection)
-                    .getResultList();
-            }
-
-            // Initialize lazy relationships on fields
-            Hibernate.initialize(projection.getETRXProjectionEntityList());
-            if (projection.getETRXProjectionEntityList() != null) {
-                for (ETRXProjectionEntity entity : projection.getETRXProjectionEntityList()) {
-                    Hibernate.initialize(entity.getETRXEntityFieldList());
-
-                    if (entity.getETRXEntityFieldList() != null) {
-                        for (ETRXEntityField field : entity.getETRXEntityFieldList()) {
-                            if (field.getEtrxProjectionEntityRelated() != null) {
-                                Hibernate.initialize(field.getEtrxProjectionEntityRelated());
-                            }
-                            if (field.getJavaMapping() != null) {
-                                Hibernate.initialize(field.getJavaMapping());
-                            }
-                            if (field.getEtrxConstantValue() != null) {
-                                Hibernate.initialize(field.getEtrxConstantValue());
-                            }
-                        }
-                    }
-                }
-            }
+            ETRXProjection projection = projectionOpt.get();
+            loadFieldsForProjection(projection);
+            initializeProjectionRelationships(projection);
 
             ProjectionMetadata metadata = toProjectionMetadata(projection);
             return Optional.of(metadata);
-
         } catch (Exception e) {
             log.error("Failed to load projection: {}", name, e);
             return Optional.empty();
+        }
+    }
+
+    private Optional<ETRXProjection> loadProjectionByName(String name) {
+        String jpql = "SELECT DISTINCT p FROM ETRX_Projection p " +
+                     "LEFT JOIN FETCH p.eTRXProjectionEntityList " +
+                     "JOIN FETCH p.module m " +
+                     "WHERE p.name = :name AND m.inDevelopment = true";
+
+        TypedQuery<ETRXProjection> query = entityManager.createQuery(jpql, ETRXProjection.class);
+        query.setParameter("name", name);
+        List<ETRXProjection> results = query.getResultList();
+
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
+
+    private void loadFieldsForProjection(ETRXProjection projection) {
+        if (projection.getETRXProjectionEntityList() != null
+                && !projection.getETRXProjectionEntityList().isEmpty()) {
+            entityManager.createQuery(
+                "SELECT DISTINCT pe FROM ETRX_Projection_Entity pe " +
+                "LEFT JOIN FETCH pe.eTRXEntityFieldList " +
+                "WHERE pe.projection = :projection", ETRXProjectionEntity.class)
+                .setParameter("projection", projection)
+                .getResultList();
         }
     }
 
@@ -223,30 +227,46 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
             return Collections.emptyList();
         }
 
-        // Try to find in cache first
-        Cache cache = cacheManager.getCache("projectionsByName");
-        if (cache != null) {
-            Object nativeCache = cache.getNativeCache();
-            if (nativeCache instanceof com.github.benmanes.caffeine.cache.Cache) {
-                @SuppressWarnings("unchecked")
-                com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache =
-                    (com.github.benmanes.caffeine.cache.Cache<Object, Object>) nativeCache;
+        Cache cache = cacheManager.getCache(CACHE_NAME_PROJECTIONS_BY_NAME);
+        Optional<List<FieldMetadata>> cachedFields = findFieldsInCache(cache, projectionEntityId);
+        return cachedFields.orElseGet(() -> loadFieldsFromDb(projectionEntityId));
+    }
 
-                for (Object value : caffeineCache.asMap().values()) {
-                    ProjectionMetadata projection = unwrapCacheValue(value);
-                    if (projection != null) {
-                        for (EntityMetadata entity : projection.entities()) {
-                            if (entity.id().equals(projectionEntityId)) {
-                                return entity.fields();
-                            }
-                        }
-                    }
+    private Optional<List<FieldMetadata>> findFieldsInCache(Cache cache, String projectionEntityId) {
+        if (cache == null) {
+            return Optional.empty();
+        }
+
+        Object nativeCache = cache.getNativeCache();
+        if (!(nativeCache instanceof com.github.benmanes.caffeine.cache.Cache)) {
+            return Optional.empty();
+        }
+
+        @SuppressWarnings("unchecked")
+        com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache =
+            (com.github.benmanes.caffeine.cache.Cache<Object, Object>) nativeCache;
+
+        for (Object value : caffeineCache.asMap().values()) {
+            ProjectionMetadata projection = unwrapCacheValue(value);
+            if (projection != null) {
+                Optional<List<FieldMetadata>> fields = findFieldsInProjection(projection, projectionEntityId);
+                if (fields.isPresent()) {
+                    return fields;
                 }
             }
         }
 
-        // Not in cache, load from database
-        return loadFieldsFromDb(projectionEntityId);
+        return Optional.empty();
+    }
+
+    private Optional<List<FieldMetadata>> findFieldsInProjection(ProjectionMetadata projection, 
+                                                                  String projectionEntityId) {
+        for (EntityMetadata entity : projection.entities()) {
+            if (entity.id().equals(projectionEntityId)) {
+                return Optional.of(entity.fields());
+            }
+        }
+        return Optional.empty();
     }
 
     /**
@@ -255,7 +275,7 @@ public class DynamicMetadataServiceImpl implements DynamicMetadataService {
      */
     @Override
     public Set<String> getAllProjectionNames() {
-        Cache cache = cacheManager.getCache("projectionsByName");
+        Cache cache = cacheManager.getCache(CACHE_NAME_PROJECTIONS_BY_NAME);
         if (cache == null) {
             return Collections.emptySet();
         }

@@ -70,10 +70,12 @@ import java.util.Set;
 @Slf4j
 public class DynamicRepository {
 
+    private static final String ENTITY_NOT_FOUND_MESSAGE = "Entity metadata not found for projection: ";
+    private static final String ENTITY_SUFFIX = ", entity: ";
+
     private final EntityManager entityManager;
     private final DynamicDTOConverter converter;
     private final DynamicMetadataService metadataService;
-    private final AuditServiceInterceptor auditService;
     private final RestCallTransactionHandler transactionHandler;
     private final ExternalIdService externalIdService;
     private final PostSyncService postSyncService;
@@ -85,7 +87,6 @@ public class DynamicRepository {
             EntityManager entityManager,
             DynamicDTOConverter converter,
             DynamicMetadataService metadataService,
-            AuditServiceInterceptor auditService,
             RestCallTransactionHandler transactionHandler,
             ExternalIdService externalIdService,
             PostSyncService postSyncService,
@@ -95,7 +96,6 @@ public class DynamicRepository {
         this.entityManager = entityManager;
         this.converter = converter;
         this.metadataService = metadataService;
-        this.auditService = auditService;
         this.transactionHandler = transactionHandler;
         this.externalIdService = externalIdService;
         this.postSyncService = postSyncService;
@@ -120,7 +120,7 @@ public class DynamicRepository {
     public Map<String, Object> findById(String id, String projectionName, String entityName) {
         EntityMetadata entityMeta = metadataService.getProjectionEntity(projectionName, entityName)
             .orElseThrow(() -> new DynamicRepositoryException(
-                "Entity metadata not found for projection: " + projectionName + ", entity: " + entityName));
+                ENTITY_NOT_FOUND_MESSAGE + projectionName + ENTITY_SUFFIX + entityName));
 
         Class<?> entityClass = entityClassResolver.resolveByTableId(entityMeta.tableId());
 
@@ -162,7 +162,7 @@ public class DynamicRepository {
                                               Map<String, String> filters, Pageable pageable) {
         EntityMetadata entityMeta = metadataService.getProjectionEntity(projectionName, entityName)
             .orElseThrow(() -> new DynamicRepositoryException(
-                "Entity metadata not found for projection: " + projectionName + ", entity: " + entityName));
+                ENTITY_NOT_FOUND_MESSAGE + projectionName + ENTITY_SUFFIX + entityName));
 
         Class<?> entityClass = entityClassResolver.resolveByTableId(entityMeta.tableId());
 
@@ -299,7 +299,7 @@ public class DynamicRepository {
     public Map<String, Object> save(Map<String, Object> dto, String projectionName, String entityName) {
         EntityMetadata entityMeta = metadataService.getProjectionEntity(projectionName, entityName)
             .orElseThrow(() -> new DynamicRepositoryException(
-                "Entity metadata not found for projection: " + projectionName + ", entity: " + entityName));
+                ENTITY_NOT_FOUND_MESSAGE + projectionName + ENTITY_SUFFIX + entityName));
         return performSaveOrUpdate(dto, entityMeta, true);
     }
 
@@ -315,7 +315,7 @@ public class DynamicRepository {
     public Map<String, Object> update(Map<String, Object> dto, String projectionName, String entityName) {
         EntityMetadata entityMeta = metadataService.getProjectionEntity(projectionName, entityName)
             .orElseThrow(() -> new DynamicRepositoryException(
-                "Entity metadata not found for projection: " + projectionName + ", entity: " + entityName));
+                ENTITY_NOT_FOUND_MESSAGE + projectionName + ENTITY_SUFFIX + entityName));
         return performSaveOrUpdate(dto, entityMeta, false);
     }
 
@@ -333,7 +333,7 @@ public class DynamicRepository {
                                                 String projectionName, String entityName) {
         EntityMetadata entityMeta = metadataService.getProjectionEntity(projectionName, entityName)
             .orElseThrow(() -> new DynamicRepositoryException(
-                "Entity metadata not found for projection: " + projectionName + ", entity: " + entityName));
+                ENTITY_NOT_FOUND_MESSAGE + projectionName + ENTITY_SUFFIX + entityName));
 
         List<Map<String, Object>> results = new ArrayList<>();
         try {
@@ -401,15 +401,10 @@ public class DynamicRepository {
     private Map<String, Object> performSaveOrUpdateInternal(Map<String, Object> dto,
                                                              EntityMetadata entityMeta,
                                                              boolean isNewParam) {
-        boolean isNew = isNewParam;
         Class<?> entityClass = entityClassResolver.resolveByTableId(entityMeta.tableId());
         Object existingEntity = null;
         String dtoId = (String) dto.get("id");
-
-        if (entityMeta.moduleInDevelopment()) {
-            log.info("[X-Ray] Repository.save | operation={} class={} dtoId={}",
-                isNew ? "INSERT" : "UPDATE", entityClass.getSimpleName(), dtoId);
-        }
+        boolean isNew = isNewParam;
 
         // Upsert: check existence when ID provided
         if (dtoId != null) {
@@ -417,6 +412,11 @@ public class DynamicRepository {
             if (existingEntity != null) {
                 isNew = false;
             }
+        }
+
+        if (entityMeta.moduleInDevelopment()) {
+            log.info("[X-Ray] Repository.save | operation={} class={} dtoId={}",
+                isNew ? "INSERT" : "UPDATE", entityClass.getSimpleName(), dtoId);
         }
 
         // CRITICAL: Pre-instantiate new entity via metamodel if no existing entity found.

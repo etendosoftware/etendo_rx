@@ -23,8 +23,6 @@ import com.etendorx.das.metadata.models.FieldMetadata;
 import com.etendorx.das.repository.DynamicRepository;
 import com.etendorx.das.repository.DynamicRepositoryException;
 import com.etendorx.das.repository.EntityClassResolver;
-import com.etendorx.entities.entities.AuditServiceInterceptor;
-import com.etendorx.entities.entities.BaseRXObject;
 import com.etendorx.entities.mapper.lib.ExternalIdService;
 import com.etendorx.entities.mapper.lib.PostSyncService;
 import com.etendorx.eventhandler.transaction.RestCallTransactionHandler;
@@ -88,9 +86,6 @@ public class DynamicRepositoryTest {
     private DynamicMetadataService metadataService;
 
     @Mock
-    private AuditServiceInterceptor auditService;
-
-    @Mock
     private RestCallTransactionHandler transactionHandler;
 
     @Mock
@@ -130,7 +125,6 @@ public class DynamicRepositoryTest {
             entityManager,
             converter,
             metadataService,
-            auditService,
             transactionHandler,
             externalIdService,
             postSyncService,
@@ -461,7 +455,6 @@ public class DynamicRepositoryTest {
     /**
      * Test: save pre-instantiates new entity via metamodel (no null passed to converter).
      * Verifies converter.convertToEntity receives a NON-NULL entity argument.
-     * Also verifies auditService.setAuditValues is NEVER called directly by the repository.
      */
     @Test
     void save_preInstantiatesNewEntityViaMetamodel() {
@@ -485,9 +478,6 @@ public class DynamicRepositoryTest {
         assertNotNull(capturedEntity, "Converter must receive a non-null entity (pre-instantiated via metamodel)");
         assertTrue(capturedEntity instanceof TestEntity,
             "Pre-instantiated entity should be of the resolved class type");
-
-        // Assert - auditService.setAuditValues is NEVER called by repository
-        verify(auditService, never()).setAuditValues(any(BaseRXObject.class));
     }
 
     /**
@@ -563,25 +553,6 @@ public class DynamicRepositoryTest {
         verify(converter).convertToEntity(eq(dto), entityCaptor.capture(), eq(entityMeta), eq(entityMeta.fields()));
         assertNotNull(entityCaptor.getValue(),
             "Even when ID is provided but not found in DB, converter must receive a non-null entity");
-    }
-
-    /**
-     * Test: save does NOT call auditService.setAuditValues() directly.
-     * The converter handles audit internally.
-     */
-    @Test
-    void save_doesNotCallAuditServiceDirectly() {
-        // Arrange
-        EntityMetadata entityMeta = createEntityMetadata("e1", "TestEntity", Collections.emptyList());
-        Map<String, Object> dto = new HashMap<>();
-        dto.put("name", "test");
-        setupSaveStubs(entityMeta, dto);
-
-        // Act
-        repository.save(dto, "proj", "TestEntity");
-
-        // Assert
-        verify(auditService, never()).setAuditValues(any(BaseRXObject.class));
     }
 
     /**
