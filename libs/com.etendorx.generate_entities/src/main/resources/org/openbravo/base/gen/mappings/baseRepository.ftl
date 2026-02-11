@@ -33,12 +33,10 @@ public class ${mappingPrefix}${entity.externalName}DTORepositoryDefault extends 
     super(restCallTransactionHandler, repository, converter, retriever, auditService, validator, externalIdService, defaultValuesHandler, postSyncService);
   }
 
-  <#list modelProviderRX.getETRXRepositories(entity) as repo>
-    <#list repo.searches as search>
+  <#list modelProviderRX.getUniqueSearches(entity) as search>
   Page<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>${param.type} ${param.name}, </#list>Pageable page) {
       var repository = ((${entity.table.name}Repository) getRepository()).${search.method}(<#list search.params as param>${param.name}, </#list>page);
       return getConverter().convert(repository);
   }
-    </#list>
   </#list>
 }

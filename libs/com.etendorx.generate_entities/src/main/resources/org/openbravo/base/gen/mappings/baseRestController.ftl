@@ -70,15 +70,13 @@ public class ${mappingPrefix}${entity.externalName}RestController extends Binded
     return super.post(orderPostRequest, jsonPath);
   }
 
-  <#list modelProviderRX.getETRXRepositories(entity) as repo>
-    <#list repo.searches as search>
+  <#list modelProviderRX.getUniqueSearches(entity) as search>
   @GetMapping("/searches/${search.method}")
   @Operation(security = { @SecurityRequirement(name = "basicScheme") })
   @Transactional
   Page<${mappingPrefix}${entity.externalName}DTORead> ${search.method}(<#list search.params as param>${param.type} ${param.name}, </#list> @PageableDefault(size = 20) final Pageable pageable) {
     return ((${mappingPrefix}${entity.externalName}DTORepositoryDefault)getRepository()).${search.method}(<#list search.params as param>${param.name}, </#list> pageable);
   }
-    </#list>
   </#list>
 
 }
