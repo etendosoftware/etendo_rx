@@ -46,7 +46,7 @@ public class Projection {
     this(projection.getName());
     this.projection = projection;
     this.grpc = projection.isGrpc();
-    this.react = projection.getModule().isReact();
+    this.react = projection.getModule().isReact() != null && projection.getModule().isReact();
   }
 
   public File getModuleLocation() {
