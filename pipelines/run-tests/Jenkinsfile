@@ -29,7 +29,6 @@ pipeline {
         COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ae'").trim()
 
         BUILD_CLASSIC       = true
-
         TOMCAT_URL          = "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.98/bin/apache-tomcat-9.0.98.tar.gz"
 
         SUCCESS             = 'SUCCESS'
@@ -63,9 +62,9 @@ pipeline {
                             script: "git diff --name-only HEAD~1 HEAD",
                             returnStdout: true
                         ).trim()
-                            
+
                         echo "Files changed in last commit: ${changedFiles}"
-                        
+
                         // Check if only JenkinsFileTestCompile was changed
                         def filesList = changedFiles.split('\n')
                         def onlyJenkinsfile = filesList.every { it.startsWith("pipelines/publish-snapshots/") } && filesList.size() > 0
@@ -84,7 +83,7 @@ pipeline {
                             currentBuild.result = SUCCESS
                         }
                     } catch (Exception e) {
-                        echo "❌ Error in pipeline skip condition check: ${e.getMessage()}"            
+                        echo "❌ Error in pipeline skip condition check: ${e.getMessage()}"
                         env.DESCRIPTION = "Pipeline Check Failed"
                         currentBuild.result = FAILED
                         error("Failed to check pipeline skip condition: ${e.getMessage()}")
@@ -142,7 +141,7 @@ pipeline {
                             mkdir -p modules
                             ./gradlew setup
                             """
-                            
+
                             env.COMMIT_INFO = "<p>• Commit: ${RX_REPO_URL}/commit/${GIT_COMMIT}<br>• Author: ${COMMIT_AUTHOR_NAME} (${COMMIT_AUTHOR_EMAIL})</p>"
                             echo "---------------------- Commit Info ----------------------"
                             echo "${COMMIT_INFO}"
@@ -211,7 +210,7 @@ pipeline {
                                     GIT_SSH_COMMAND=\"ssh -i ${keyfile} -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\"\" git clone --branch main ${MODULE_RX_URL}
                                     git clone --branch main ${PET_CLINIC_CLASSIC_MODULE_URL}
                                     """
-                                    
+
                                     sh "./gradlew install --stacktrace"
                                     sh "./gradlew smartbuild --stacktrace"
                                     currentBuild.result = SUCCESS
@@ -640,7 +639,7 @@ pipeline {
                             """
                             env.PATH = "${env.PATH}:${WORKSPACE}/sonar-scanner-${SONAR_VERSION}-linux/bin"
                             dir(RX_DIR) {
-                                def sonarSources = "./libs,./modules_core" 
+                                def sonarSources = "./libs,./modules_core"
                                 def sonarProjectKey = sh(script: "grep 'sonar.projectKey' sonar-project.properties | cut -d '=' -f2", returnStdout: true).trim()
                                 env.PROJECT_KEY = sonarProjectKey
                                 echo "SonarQube Project Key: ${env.PROJECT_KEY}"
@@ -658,7 +657,7 @@ pipeline {
                                     -Dsonar.scm.revision=${GIT_COMMIT} \
                                     -Dsonar.coverage.jacoco.xmlReportPaths=${JACOCO_REPORT}
                                 """
-                                
+
                                 echo "---------------------- Getting SonarQube Report URL ----------------------"
                                 def branchName = URLEncoder.encode(GIT_BRANCH, 'UTF-8')
                                 def projectUrl = "${SONAR_SERVER}/dashboard?id=${env.PROJECT_KEY}&branch=${branchName}"
@@ -680,7 +679,7 @@ pipeline {
         stage('Compare Coverage Results') { // MARK: - Compare Coverage Results
             when {
                 expression {
-                    currentBuild.result == SUCCESS && env.JACOCO_REPORT_EXISTS && !(env.GIT_BRANCH == env.MAIN_BRANCH || env.GIT_BRANCH.startsWith("release/"))
+                    currentBuild.result == SUCCESS && env.JACOCO_REPORT_EXISTS && !(env.GIT_BRANCH == 'main' || env.GIT_BRANCH.startsWith("release/"))
                 }
             }
             steps {
@@ -815,7 +814,7 @@ pipeline {
                         <p>__________________________________________________________</p>
 
                         <h2 class="header">⚠️ ${env.EMAIL_SUBJECT} ⚠️</h2>
-                        
+
                         <p><strong>Reasons ⇢ <em>${env.BODY_MESSAGE_ERROR}</em></strong></p>
 
                         ${COMMIT_INFO}

@@ -31,13 +31,19 @@ import org.apache.logging.log4j.Logger;
 import org.etendorx.base.provider.OBProvider;
 import org.etendorx.base.provider.OBSingleton;
 import org.hibernate.Session;
+import org.openbravo.base.model.Entity;
+import org.openbravo.base.model.ModelObject;
+import org.openbravo.base.model.ModelProvider;
+import org.openbravo.base.model.ModelSessionFactoryController;
 import org.openbravo.base.model.Module;
-import org.openbravo.base.model.*;
+import org.openbravo.base.model.Table;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -45,6 +51,7 @@ import java.util.function.Function;
 public class ETRXModelProvider implements OBSingleton {
 
   private static final String ETENDO_RX_MODULE = "com.etendoerp.etendorx";
+  private static final String ACTIVE = "active";
 
   private static final Logger log = LogManager.getLogger();
   private static ETRXModelProvider instance;
@@ -200,8 +207,12 @@ public class ETRXModelProvider implements OBSingleton {
     CriteriaQuery<ETRXModule> criteria = builder.createQuery(ETRXModule.class);
     Root<ETRXModule> root = criteria.from(ETRXModule.class);
     criteria.select(root);
-    criteria.where(builder.equal(root.get("active"), true));
-    criteria.where(builder.equal(root.get("rx"), true));
+    criteria.where(
+        builder.and(
+            builder.equal(root.get(ACTIVE), true),
+            builder.equal(root.get("rx"), true)
+        )
+    );
     criteria.orderBy(builder.asc(root.get("seqno")));
 
     return session.createQuery(criteria).list();
@@ -228,7 +239,7 @@ public class ETRXModelProvider implements OBSingleton {
     CriteriaQuery<ETRXProjection> criteria = builder.createQuery(ETRXProjection.class);
     Root<ETRXProjection> root = criteria.from(ETRXProjection.class);
     criteria.select(root);
-    criteria.where(builder.equal(root.get("active"), true));
+    criteria.where(builder.equal(root.get(ACTIVE), true));
     return session.createQuery(criteria).list();
   }
 
@@ -242,6 +253,17 @@ public class ETRXModelProvider implements OBSingleton {
 
   public List<ETRXRepository> getETRXRepositories(ETRXProjectionEntity entity) {
     return getETRXRepositories(ModelProvider.getInstance().getEntity(entity.getTable().getName()));
+  }
+
+  public List<ETRXEntitySearch> getUniqueSearches(ETRXProjectionEntity entity) {
+    List<ETRXRepository> repos = getETRXRepositories(entity);
+    Map<String, ETRXEntitySearch> unique = new LinkedHashMap<>();
+    for (ETRXRepository repo : repos) {
+      for (ETRXEntitySearch search : repo.getSearches()) {
+        unique.putIfAbsent(search.getMethod(), search);
+      }
+    }
+    return new ArrayList<>(unique.values());
   }
 
   private Table retrieveTable(Session session, String tableId) {
@@ -260,8 +282,12 @@ public class ETRXModelProvider implements OBSingleton {
     CriteriaQuery<ETRXRepository> criteria = builder.createQuery(ETRXRepository.class);
     Root<ETRXRepository> root = criteria.from(ETRXRepository.class);
     criteria.select(root);
-    criteria.where(builder.equal(root.get("active"), true));
-    criteria.where(builder.equal(root.get("table"), table));
+    criteria.where(
+        builder.and(
+            builder.equal(root.get(ACTIVE), true),
+            builder.equal(root.get("table"), table)
+        )
+    );
     return session.createQuery(criteria).list();
   }
 
@@ -270,7 +296,7 @@ public class ETRXModelProvider implements OBSingleton {
     CriteriaQuery<ETRXRepository> criteria = builder.createQuery(ETRXRepository.class);
     Root<ETRXRepository> root = criteria.from(ETRXRepository.class);
     criteria.select(root);
-    criteria.where(builder.equal(root.get("active"), true));
+    criteria.where(builder.equal(root.get(ACTIVE), true));
     return session.createQuery(criteria).list();
   }
 
