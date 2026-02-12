@@ -300,11 +300,14 @@ public class GenerateEntities {
    */
   private List<HashMap<String, Object>> getSearchesMap(Entity entity) {
     List<Repository> repositories = getRepositories(entity);
-    List<HashMap<String, Object>> searchesMap = new ArrayList<>();
+    Map<String, HashMap<String, Object>> uniqueSearches = new LinkedHashMap<>();
     for (Repository repository : repositories) {
-      searchesMap.addAll(repository.getSearchesMap());
+      for (HashMap<String, Object> search : repository.getSearchesMap()) {
+        String method = (String) search.get("method");
+        uniqueSearches.putIfAbsent(method, search);
+      }
     }
-    return searchesMap;
+    return new ArrayList<>(uniqueSearches.values());
   }
 
   /**
