@@ -39,8 +39,9 @@ import static com.etendorx.gen.metadata.MetadataProjectionsAnalyzer.getProjectio
 
 public class GenerateProtoFile {
   private static final Logger log = LogManager.getLogger();
+  private static final String MOBILESYNC_DTO_PATH = "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/dto";
+  private static final String MOBILESYNC_ENTITIES_PACKAGE = "com.etendorx.integration.mobilesync.entities";
 
-  private List<Entity> entitiesModel = new ArrayList<>();
   private Map<String, Entity> entitiesModelMap = new HashMap<>();
 
   /**
@@ -97,21 +98,17 @@ public class GenerateProtoFile {
 
     for (Projection projection : filteredProjections) {
 
-      generateGrpcService(pathEtendoRx, projection, repositories, computedColumns, includeViews);
+      generateGrpcService(pathEtendoRx, projection, repositories);
 
-      generateGRPCDto(pathEtendoRx, projection, repositories, computedColumns, includeViews);
+      generateGRPCDto(pathEtendoRx, projection, repositories);
 
-      generateGRPCDtoProjection(pathEtendoRx, projection, repositories, computedColumns,
-          includeViews);
+      generateGRPCDtoProjection(pathEtendoRx, projection, repositories);
 
-      generateProjectionDTO2Grpc(pathEtendoRx, projection, repositories, computedColumns,
-          includeViews);
+      generateProjectionDTO2Grpc(pathEtendoRx, projection, repositories);
 
-      generateClientServiceInterface(pathEtendoRx, projection, repositories, computedColumns,
-          includeViews);
+      generateClientServiceInterface(pathEtendoRx, projection, repositories);
 
-      generateClientGrpcService(pathEtendoRx, projection, repositories, computedColumns,
-          includeViews);
+      generateClientGrpcService(pathEtendoRx, projection, repositories);
     }
   }
 
@@ -195,20 +192,17 @@ public class GenerateProtoFile {
    * @param pathEtendoRx
    * @param projection
    * @param repositories
-   * @param computedColumns
-   * @param includeViews
    * @param sourcefilePath
    * @param templatePath
-   * @param prefix
    * @param sufix
    * @throws FileNotFoundException
    */
   private void generateSourcefile(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews,
-      String sourcefilePath, String templatePath, String prefix, String sufix)
+      List<HashMap<String, Object>> repositories,
+      String sourcefilePath, String templatePath, String sufix)
       throws FileNotFoundException {
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
-        sourcefilePath, templatePath, prefix, sufix, null);
+    generateSourcefile(pathEtendoRx, projection, repositories,
+        sourcefilePath, templatePath, sufix, null);
   }
 
   /**
@@ -217,18 +211,15 @@ public class GenerateProtoFile {
    * @param pathEtendoRx
    * @param projection
    * @param repositories
-   * @param computedColumns
-   * @param includeViews
    * @param sourcefilePath
    * @param templatePath
-   * @param prefix
    * @param sufix
    * @param packageName
    * @throws FileNotFoundException
    */
   private void generateSourcefile(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews,
-      String sourcefilePath, String templatePath, String prefix, String sufix, String packageName)
+      List<HashMap<String, Object>> repositories,
+      String sourcefilePath, String templatePath, String sufix, String packageName)
       throws FileNotFoundException {
 
     var outFileDir = pathEtendoRx + sourcefilePath;
@@ -279,17 +270,15 @@ public class GenerateProtoFile {
    * @param pathEtendoRx
    * @param projection
    * @param repositories
-   * @param computedColumns
-   * @param includeViews
    * @throws FileNotFoundException
    */
   private void generateGrpcService(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
+      List<HashMap<String, Object>> repositories)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
+    generateSourcefile(pathEtendoRx, projection, repositories,
         "/modules_core/com.etendorx.das/src-gen/main/java/com/etendorx/das/grpcrepo",
-        "/org/openbravo/base/process/grpcservice.ftl", "", "GrpcService");
+        "/org/openbravo/base/process/grpcservice.ftl", "GrpcService");
 
   }
 
@@ -299,17 +288,15 @@ public class GenerateProtoFile {
    * @param pathEtendoRx
    * @param projection
    * @param repositories
-   * @param computedColumns
-   * @param includeViews
    * @throws FileNotFoundException
    */
   private void generateGRPCDto(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
+      List<HashMap<String, Object>> repositories)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
-        "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/dto",
-        "/org/openbravo/base/process/grpcentitydto.ftl", "", "DTO");
+    generateSourcefile(pathEtendoRx, projection, repositories,
+        MOBILESYNC_DTO_PATH,
+        "/org/openbravo/base/process/grpcentitydto.ftl", "DTO");
 
   }
 
@@ -319,19 +306,17 @@ public class GenerateProtoFile {
    * @param pathEtendoRx
    * @param projection
    * @param repositories
-   * @param computedColumns
-   * @param includeViews
    * @throws FileNotFoundException
    */
   private void generateGRPCDtoProjection(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
+      List<HashMap<String, Object>> repositories)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
-        "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/dto",
-        "/org/openbravo/base/process/entitydtogrpc2model.ftl", "",
+    generateSourcefile(pathEtendoRx, projection, repositories,
+        MOBILESYNC_DTO_PATH,
+        "/org/openbravo/base/process/entitydtogrpc2model.ftl",
         "DTOGrpc2" + projection.getName().substring(0, 1).toUpperCase() + projection.getName()
-            .substring(1), "com.etendorx.integration.mobilesync.entities"
+            .substring(1), MOBILESYNC_ENTITIES_PACKAGE
 
     );
   }
@@ -342,19 +327,17 @@ public class GenerateProtoFile {
    * @param pathEtendoRx
    * @param projection
    * @param repositories
-   * @param computedColumns
-   * @param includeViews
    * @throws FileNotFoundException
    */
   private void generateProjectionDTO2Grpc(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
+      List<HashMap<String, Object>> repositories)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
-        "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/dto",
-        "/org/openbravo/base/process/entitydtoprojection2grpc.ftl", "",
+    generateSourcefile(pathEtendoRx, projection, repositories,
+        MOBILESYNC_DTO_PATH,
+        "/org/openbravo/base/process/entitydtoprojection2grpc.ftl",
         "DTO" + projection.getName().substring(0, 1).toUpperCase() + projection.getName()
-            .substring(1) + "2Grpc", "com.etendorx.integration.mobilesync.entities");
+            .substring(1) + "2Grpc", MOBILESYNC_ENTITIES_PACKAGE);
 
   }
 
@@ -364,19 +347,17 @@ public class GenerateProtoFile {
    * @param pathEtendoRx
    * @param projection
    * @param repositories
-   * @param computedColumns
-   * @param includeViews
    * @throws FileNotFoundException
    */
   private void generateClientGrpcService(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
+      List<HashMap<String, Object>> repositories)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
+    generateSourcefile(pathEtendoRx, projection, repositories,
         "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/service/",
-        "/org/openbravo/base/process/grpcclientservice.ftl", "",
+        "/org/openbravo/base/process/grpcclientservice.ftl",
         "" + projection.getName().substring(0, 1).toUpperCase() + projection.getName()
-            .substring(1) + "DasServiceGrpcImpl", "com.etendorx.integration.mobilesync.entities");
+            .substring(1) + "DasServiceGrpcImpl", MOBILESYNC_ENTITIES_PACKAGE);
 
   }
 
@@ -386,29 +367,22 @@ public class GenerateProtoFile {
    * @param pathEtendoRx
    * @param projection
    * @param repositories
-   * @param computedColumns
-   * @param includeViews
    * @throws FileNotFoundException
    */
   private void generateClientServiceInterface(String pathEtendoRx, Projection projection,
-      List<HashMap<String, Object>> repositories, boolean computedColumns, boolean includeViews)
+      List<HashMap<String, Object>> repositories)
       throws FileNotFoundException {
 
-    generateSourcefile(pathEtendoRx, projection, repositories, computedColumns, includeViews,
+    generateSourcefile(pathEtendoRx, projection, repositories,
         "/modules/com.etendorx.integration.mobilesync/src-gen/main/java/com/etendorx/integration/mobilesync/service/",
-        "/org/openbravo/base/process/grpcclientinterface.ftl", "",
+        "/org/openbravo/base/process/grpcclientinterface.ftl",
         projection.getName().substring(0, 1).toUpperCase() + projection.getName()
-            .substring(1) + "DasService", "com.etendorx.integration.mobilesync.entities");
+            .substring(1) + "DasService", MOBILESYNC_ENTITIES_PACKAGE);
 
   }
 
   public void setEntitiesModel(List<Entity> entitiesModel) {
-    this.entitiesModel = entitiesModel;
-    this.setEntitiesModelMap(MetadataUtil.generateEntitiesMap(entitiesModel));
-  }
-
-  public void setEntitiesModelMap(Map<String, Entity> entitiesModelMap) {
-    this.entitiesModelMap = entitiesModelMap;
+    this.entitiesModelMap = MetadataUtil.generateEntitiesMap(entitiesModel);
   }
 
 }
