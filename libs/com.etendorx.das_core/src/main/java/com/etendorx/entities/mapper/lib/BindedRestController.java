@@ -112,7 +112,8 @@ public abstract class BindedRestController<E extends BaseDTOModel, F extends Bas
     if (entity != null) {
       return new ResponseEntity<>(entity, HttpStatus.OK);
     }
-    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found");
+    throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+        "Record not found: entity=" + repository.getClass().getSimpleName() + " id=" + id);
   }
 
   /**

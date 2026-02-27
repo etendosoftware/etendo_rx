@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EtendoRX Dev Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: #fff; color: #1a1a1a; }
+
+  nav { width: 232px; background: #fafafa; border-right: 1px solid #e5e5e5; padding: 20px 0; overflow-y: auto; flex-shrink: 0; display: flex; flex-direction: column; }
+  nav h2 { padding: 0 20px 16px; font-size: 13px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+  nav .section { padding: 16px 20px 6px; font-size: 10px; font-weight: 600; color: #bbb; text-transform: uppercase; letter-spacing: 0.5px; }
+  nav a { display: flex; align-items: center; gap: 8px; padding: 7px 20px; color: #555; text-decoration: none; font-size: 13px; font-weight: 400; border-left: 2px solid transparent; transition: all 0.1s; }
+  nav a:hover { background: #f0f0f0; color: #1a1a1a; }
+  nav a.active { border-left-color: #2563eb; background: #eff6ff; color: #1a1a1a; font-weight: 500; }
+  nav a .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  nav a .dot.up { background: #22c55e; }
+  nav a .dot.unknown { background: #d4d4d4; }
+
+  main { flex: 1; display: flex; flex-direction: column; background: #fff; }
+  header { padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5e5e5; }
+  header h1 { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+  header .url { font-size: 12px; color: #999; font-weight: 400; }
+  iframe { flex: 1; border: none; background: #fff; }
+  .welcome { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: #999; }
+  .welcome h2 { color: #1a1a1a; font-size: 18px; font-weight: 500; }
+  .welcome p { font-size: 13px; }
+  nav .spacer { flex: 1; }
+  nav .footer { padding: 16px 20px; font-size: 11px; color: #ccc; border-top: 1px solid #e5e5e5; }
+</style>
+</head>
+<body>
+
+<nav>
+  <h2>EtendoRX</h2>
+
+  <div class="section">Infrastructure</div>
+  <a href="#" data-url="http://localhost:9093" data-name="Redpanda Console">
+    <span class="dot unknown" data-port="9093"></span> Redpanda Console
+  </a>
+  <a href="#" data-url="http://localhost:8083" data-name="Kafka Connect API">
+    <span class="dot unknown" data-port="8083"></span> Kafka Connect
+  </a>
+  <a href="#" data-url="http://localhost:16686" data-name="Jaeger UI">
+    <span class="dot unknown" data-port="16686"></span> Jaeger Tracing
+  </a>
+
+  <div class="section">Core Services</div>
+  <a href="#" data-url="http://localhost:8888" data-name="Config Server">
+    <span class="dot unknown" data-port="8888"></span> Config Server
+  </a>
+  <a href="#" data-url="http://localhost:8094/actuator/health" data-name="Auth Service">
+    <span class="dot unknown" data-port="8094"></span> Auth Service
+  </a>
+  <a href="#" data-url="http://localhost:8092/actuator/health" data-name="DAS">
+    <span class="dot unknown" data-port="8092"></span> DAS
+  </a>
+  <a href="#" data-url="http://localhost:8096/actuator/health" data-name="Edge Gateway">
+    <span class="dot unknown" data-port="8096"></span> Edge Gateway
+  </a>
+  <a href="#" data-url="http://localhost:8099/actuator/health" data-name="Async Process">
+    <span class="dot unknown" data-port="8099"></span> Async Process
+  </a>
+
+  <div class="section">OBConnector</div>
+  <a href="#" data-url="http://localhost:8101/actuator/health" data-name="Connector Server">
+    <span class="dot unknown" data-port="8101"></span> Server API
+  </a>
+  <a href="#" data-url="http://localhost:8102/dashboard" data-name="Connector Dashboard">
+    <span class="dot unknown" data-port="8102"></span> Dashboard
+  </a>
+  <a href="#" data-url="http://localhost:8102/actuator/health" data-name="Connector Worker">
+    <span class="dot unknown" data-port="8102"></span> Worker Health
+  </a>
+
+  <div class="spacer"></div>
+  <div class="footer">Dev Portal</div>
+</nav>
+
+<main>
+  <header>
+    <h1 id="title">Select a service</h1>
+    <span class="url" id="current-url"></span>
+  </header>
+  <div class="welcome" id="welcome">
+    <h2>Dev Portal</h2>
+    <p>Click a service on the left to open it here.</p>
+  </div>
+  <iframe id="frame" style="display:none"></iframe>
+</main>
+
+<script>
+  const links = document.querySelectorAll('nav a');
+  const frame = document.getElementById('frame');
+  const welcome = document.getElementById('welcome');
+  const title = document.getElementById('title');
+  const urlEl = document.getElementById('current-url');
+
+  links.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      links.forEach(l => l.classList.remove('active'));
+      a.classList.add('active');
+      const url = a.dataset.url;
+      frame.src = url;
+      frame.style.display = 'block';
+      welcome.style.display = 'none';
+      title.textContent = a.dataset.name;
+      urlEl.textContent = url;
+    });
+  });
+
+  function checkHealth() {
+    document.querySelectorAll('.dot[data-port]').forEach(dot => {
+      const port = dot.dataset.port;
+      fetch(`http://localhost:${port}/`, { mode: 'no-cors', signal: AbortSignal.timeout(2000) })
+        .then(() => { dot.className = 'dot up'; })
+        .catch(() => { dot.className = 'dot unknown'; });
+    });
+  }
+  checkHealth();
+  setInterval(checkHealth, 10000);
+</script>
+
+</body>
+</html>
