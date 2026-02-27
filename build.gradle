@@ -85,6 +85,12 @@ subprojects {
     apply plugin: 'jacoco'
     apply plugin: 'java'
 
+    plugins.withId('org.springframework.boot') {
+        tasks.named('bootRun') {
+            systemProperties System.properties
+        }
+    }
+
     jacoco {
         toolVersion = "0.8.10"
     }

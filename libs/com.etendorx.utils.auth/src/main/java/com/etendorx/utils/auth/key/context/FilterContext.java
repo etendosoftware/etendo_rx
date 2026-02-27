@@ -53,12 +53,25 @@ public class FilterContext extends OncePerRequestFilter {
   String publicKey;
   @Value("${auth.token:}")
   String tokenYaml;
+  @Value("${auth.disabled:false}")
+  boolean authDisabled;
   @Autowired(required = false)
   private JwtClassicConfig jwtClassicConfig;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
+    if (authDisabled) {
+      userContext.setClientId("0");
+      userContext.setOrganizationId("0");
+      userContext.setUserId("100");
+      userContext.setRoleId("0");
+      userContext.setRestMethod(request.getMethod());
+      userContext.setRestUri(request.getRequestURI());
+      AppContext.setCurrentUser(userContext);
+      filterChain.doFilter(request, response);
+      return;
+    }
     String token = request.getHeader(HEADER_TOKEN);
     if (StringUtils.isEmpty(token)) {
       String authHeader = request.getHeader(HEADER_AUTHORIZATION);

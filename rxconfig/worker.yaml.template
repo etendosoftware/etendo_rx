@@ -1,7 +1,11 @@
 server:
-  port: 0
+  port: 8102
 openbravo:
   url:
 
 classic:
   token:
+
+# Sync dashboard (optional)
+# dashboard:
+#   enabled: true

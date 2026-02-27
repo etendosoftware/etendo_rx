@@ -98,7 +98,7 @@ public class AsyncProcessController {
   @Operation(summary = "Create the async process")
   @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public Map<String, String> index(@RequestBody Map<String, Map<String, ?>> bodyChanges,
+  public Map<String, String> index(@RequestBody Map<String, Object> bodyChanges,
       @RequestParam(required = false, name = "process") String processName,
       @RequestParam(required = false, name = "run_id") String runId) throws Exception {
     Map<String, String> ret = new HashMap<>();
