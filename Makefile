@@ -220,7 +220,7 @@ run-async: ## Start Async Process service (port 8099)
 # ORCHESTRATED STARTUP (background processes)
 # ==============================================================================
 
-.PHONY: up up-local up-kafka down status logs portal loadtest
+.PHONY: up up-local up-kafka down status logs portal loadtest loadtest.send loadtest.receive
 
 up: check-java check-db infra config ## Start everything with Config Server
 	@mkdir -p $(PIDS_DIR)
@@ -395,13 +395,42 @@ portal: ## Open Dev Portal (service browser on :8199)
 	@echo -e "$(GREEN)Dev Portal$(RESET) → http://localhost:8199"
 	@cd $(ROOT)/portal && exec python3 -m http.server 8199
 
-loadtest: ## Run load test against connector (via Kafka)
-	@echo -e "$(CYAN)Running load test...$(RESET)"
+loadtest: loadtest.send loadtest.receive ## Run Send + Receive load tests sequentially
+
+loadtest.send: ## Run Send load test (Debezium CDC via Kafka)
+	@echo -e "$(CYAN)Running Send load test...$(RESET)"
 	$(GRADLE) :com.etendorx.integration.obconn.loadtest:bootRun $(BOOTRUN_ARGS)
+
+loadtest.receive: ## Run Receive load test (HTTP POST to Server)
+	@echo -e "$(CYAN)Running Receive load test...$(RESET)"
+	$(GRADLE) :com.etendorx.integration.obconn.loadtest:bootRun \
+		--args='--loadtest.mode=receive --loadtest.enabled=false --loadtest.threads=1 --loadtest.messages-per-thread=5 --loadtest.poll-status=true'
 
 mock: ## Start mock external receiver on :8090 (for Send workflow testing)
 	@echo -e "$(CYAN)Starting Mock Receiver on :8090...$(RESET)"
 	$(GRADLE) :com.etendorx.integration.obconn.loadtest:bootRun --args='--spring.profiles.active=mock'
+
+REDPANDA_CTR := $(shell docker ps --format '{{.Names}}' 2>/dev/null | grep -m1 'redpanda-1$$' || echo "redpanda")
+PURGE_TOPICS := obconnector.send obconnector.send-dlt \
+	obconnector.send-retry-10000 obconnector.send-retry-20000 \
+	obconnector.send-retry-40000 obconnector.send-retry-60000 \
+	obconnector.receive obconnector.receive-dlt \
+	obconnector.receive-retry-10000 obconnector.receive-retry-20000 \
+	obconnector.receive-retry-40000 obconnector.receive-retry-60000 \
+	default.public.c_bpartner
+
+purge: ## Purge all OBConnector Kafka topics (delete + auto-recreate)
+	@echo -e "$(YELLOW)Purging Kafka topics...$(RESET)"
+	@for topic in $(PURGE_TOPICS); do \
+		if docker exec $(REDPANDA_CTR) rpk topic describe $$topic > /dev/null 2>&1; then \
+			docker exec $(REDPANDA_CTR) rpk topic delete $$topic > /dev/null 2>&1 \
+				&& echo -e "  $(GREEN)Deleted$(RESET)  $$topic" \
+				|| echo -e "  $(YELLOW)Error$(RESET)   $$topic"; \
+		else \
+			echo -e "  $(DIM)Skip$(RESET)    $$topic (not found)"; \
+		fi \
+	done
+	@echo -e "$(GREEN)Done.$(RESET) Topics auto-recreate when producers/consumers reconnect."
 
 # ==============================================================================
 # HELP
