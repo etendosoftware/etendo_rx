@@ -45,7 +45,12 @@ public class AsyncProcess {
     return this;
   }
 
+  private static final int MAX_EXECUTIONS = 50;
+
   private void addExecution(AsyncProcessExecution transactionClone) {
     executions.add(transactionClone);
+    while (executions.size() > MAX_EXECUTIONS) {
+      executions.pollLast();
+    }
   }
 }

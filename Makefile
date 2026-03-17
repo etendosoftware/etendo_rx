@@ -32,6 +32,19 @@ BOOTRUN_ARGS := -Dspring.profiles.active=local
 PIDS_DIR     := $(ROOT)/.run
 MAX_WAIT   := 120
 
+# Remote debug ports (JDWP)
+DBG_CONFIG ?= 5001
+DBG_AUTH   ?= 5002
+DBG_DAS    ?= 5003
+DBG_EDGE   ?= 5004
+DBG_ASYNC  ?= 5005
+DBG_SERVER ?= 5006
+DBG_WORKER ?= 5007
+
+# Build a Gradle bootRun debug argument for a given port
+# Uses non-suspending JDWP so services start normally and can be attached later.
+debug_jvm_arg = -PdebugEnabled=true -PdebugSuspend=false -PdebugServer=true -PdebugPort=$1
+
 # Wait for a service port to be ready: $(call wait_for,name,port)
 define wait_for
 	@printf "  Waiting for $(1) on :$(2) "; \
@@ -220,7 +233,7 @@ run-async: ## Start Async Process service (port 8099)
 # ORCHESTRATED STARTUP (background processes)
 # ==============================================================================
 
-.PHONY: up up-local up-kafka down status logs portal loadtest loadtest.send loadtest.receive
+.PHONY: up up-debug up-local up-kafka down status logs portal loadtest loadtest.send loadtest.receive
 
 up: check-java check-db infra config ## Start everything with Config Server
 	@mkdir -p $(PIDS_DIR)
@@ -234,16 +247,51 @@ up: check-java check-db infra config ## Start everything with Config Server
 	@$(GRADLE) :com.etendorx.auth:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/auth.log 2>&1 & echo $$! > $(PIDS_DIR)/auth.pid
 	@$(GRADLE) :com.etendorx.das:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/das.log 2>&1 & echo $$! > $(PIDS_DIR)/das.pid
 	@$(GRADLE) :com.etendorx.edge:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/edge.log 2>&1 & echo $$! > $(PIDS_DIR)/edge.pid
+	@$(GRADLE) :com.etendorx.asyncprocess:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/asyncprocess.log 2>&1 & echo $$! > $(PIDS_DIR)/asyncprocess.pid
 	$(call wait_for,Auth,8094)
 	$(call wait_for,DAS,8092)
 	$(call wait_for,Edge,8096)
+	$(call wait_for,Async Process,8099)
 	@echo ""
 	@echo -e "$(CYAN)Starting OBConnector Server + Worker...$(RESET)"
 	@$(GRADLE) :com.etendorx.integration.obconn.server:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/obconn-server.log 2>&1 & echo $$! > $(PIDS_DIR)/obconn-server.pid
 	@$(GRADLE) :com.etendorx.integration.obconn.worker:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/obconn-worker.log 2>&1 & echo $$! > $(PIDS_DIR)/obconn-worker.pid
 	$(call wait_for,OBConn Server,8101)
 	$(call wait_for,OBConn Worker,8102)
-	@$(MAKE) --no-print-directory _banner _CONFIGSRV="  Config Server         http://localhost:8888" _AUTH="  Auth Service          http://localhost:8094" _EDGE="  Edge Gateway          http://localhost:8096"
+	@$(MAKE) --no-print-directory _banner _CONFIGSRV="  Config Server         http://localhost:8888" _AUTH="  Auth Service          http://localhost:8094" _EDGE="  Edge Gateway          http://localhost:8096" _ASYNC="  Async Process         http://localhost:8099"
+
+up-debug: check-java check-db infra config ## Start everything with remote debug ports enabled
+	@mkdir -p $(PIDS_DIR)
+	@rm -f $(PIDS_DIR)/*.log $(PIDS_DIR)/*.pid
+	@echo ""
+	@echo -e "$(CYAN)Starting Config Server (debug :$(DBG_CONFIG))...$(RESET)"
+	@$(GRADLE) :com.etendorx.configserver:bootRun $(call debug_jvm_arg,$(DBG_CONFIG)) > $(PIDS_DIR)/configserver.log 2>&1 & echo $$! > $(PIDS_DIR)/configserver.pid
+	$(call wait_for,Config Server,8888)
+	@echo ""
+	@echo -e "$(CYAN)Starting Auth + DAS + Edge (debug enabled)...$(RESET)"
+	@$(GRADLE) :com.etendorx.auth:bootRun $(BOOTRUN_ARGS) $(call debug_jvm_arg,$(DBG_AUTH)) > $(PIDS_DIR)/auth.log 2>&1 & echo $$! > $(PIDS_DIR)/auth.pid
+	@$(GRADLE) :com.etendorx.das:bootRun $(BOOTRUN_ARGS) $(call debug_jvm_arg,$(DBG_DAS)) > $(PIDS_DIR)/das.log 2>&1 & echo $$! > $(PIDS_DIR)/das.pid
+	@$(GRADLE) :com.etendorx.edge:bootRun $(BOOTRUN_ARGS) $(call debug_jvm_arg,$(DBG_EDGE)) > $(PIDS_DIR)/edge.log 2>&1 & echo $$! > $(PIDS_DIR)/edge.pid
+	@$(GRADLE) :com.etendorx.asyncprocess:bootRun $(BOOTRUN_ARGS) $(call debug_jvm_arg,$(DBG_ASYNC)) > $(PIDS_DIR)/asyncprocess.log 2>&1 & echo $$! > $(PIDS_DIR)/asyncprocess.pid
+	$(call wait_for,Auth,8094)
+	$(call wait_for,DAS,8092)
+	$(call wait_for,Edge,8096)
+	$(call wait_for,Async Process,8099)
+	@echo ""
+	@echo -e "$(CYAN)Starting OBConnector Server + Worker (debug enabled)...$(RESET)"
+	@$(GRADLE) :com.etendorx.integration.obconn.server:bootRun $(BOOTRUN_ARGS) $(call debug_jvm_arg,$(DBG_SERVER)) > $(PIDS_DIR)/obconn-server.log 2>&1 & echo $$! > $(PIDS_DIR)/obconn-server.pid
+	@$(GRADLE) :com.etendorx.integration.obconn.worker:bootRun $(BOOTRUN_ARGS) $(call debug_jvm_arg,$(DBG_WORKER)) -PlogLevel=DEBUG > $(PIDS_DIR)/obconn-worker.log 2>&1 & echo $$! > $(PIDS_DIR)/obconn-worker.pid
+	$(call wait_for,OBConn Server,8101)
+	$(call wait_for,OBConn Worker,8102)
+	@$(MAKE) --no-print-directory _banner \
+		_CONFIGSRV="  Config Server         http://localhost:8888  $(DIM)(debug :$(DBG_CONFIG))$(RESET)" \
+		_AUTH="  Auth Service          http://localhost:8094  $(DIM)(debug :$(DBG_AUTH))$(RESET)" \
+		_EDGE="  Edge Gateway          http://localhost:8096  $(DIM)(debug :$(DBG_EDGE))$(RESET)" \
+		_ASYNC="  Async Process         http://localhost:8099  $(DIM)(debug :$(DBG_ASYNC))$(RESET)"
+	@echo -e "  DAS debug             :$(DBG_DAS)"
+	@echo -e "  Async debug           :$(DBG_ASYNC)"
+	@echo -e "  OBConn Server debug   :$(DBG_SERVER)"
+	@echo -e "  OBConn Worker debug   :$(DBG_WORKER)"
 
 up-local: check-java check-db infra config ## Start everything WITHOUT Config Server (fastest)
 	@mkdir -p $(PIDS_DIR)
@@ -292,7 +340,7 @@ up-local: check-java check-db infra config ## Start everything WITHOUT Config Se
 	$(call wait_for,OBConn Worker,8102)
 	$(call wait_for,Async Process,8099)
 	@sleep 2 && echo -e "  Mock Receiver         $(GREEN)OK$(RESET) (:8090)"
-	@$(MAKE) --no-print-directory _banner _CONFIGSRV="  Config Server         $(DIM)skipped (local mode)$(RESET)" _AUTH="  Auth Service          $(DIM)skipped (local mode)$(RESET)" _EDGE="  Edge Gateway          $(DIM)skipped (local mode)$(RESET)"
+	@$(MAKE) --no-print-directory _banner _CONFIGSRV="  Config Server         $(DIM)skipped (local mode)$(RESET)" _AUTH="  Auth Service          $(DIM)skipped (local mode)$(RESET)" _EDGE="  Edge Gateway          $(DIM)skipped (local mode)$(RESET)" _ASYNC="  Async Process         http://localhost:8099"
 
 up-kafka: check-java check-db infra-kafka config ## Start everything with Kafka instead of Redpanda
 	@mkdir -p $(PIDS_DIR)
@@ -306,16 +354,18 @@ up-kafka: check-java check-db infra-kafka config ## Start everything with Kafka 
 	@$(GRADLE) :com.etendorx.auth:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/auth.log 2>&1 & echo $$! > $(PIDS_DIR)/auth.pid
 	@$(GRADLE) :com.etendorx.das:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/das.log 2>&1 & echo $$! > $(PIDS_DIR)/das.pid
 	@$(GRADLE) :com.etendorx.edge:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/edge.log 2>&1 & echo $$! > $(PIDS_DIR)/edge.pid
+	@$(GRADLE) :com.etendorx.asyncprocess:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/asyncprocess.log 2>&1 & echo $$! > $(PIDS_DIR)/asyncprocess.pid
 	$(call wait_for,Auth,8094)
 	$(call wait_for,DAS,8092)
 	$(call wait_for,Edge,8096)
+	$(call wait_for,Async Process,8099)
 	@echo ""
 	@echo -e "$(CYAN)Starting OBConnector Server + Worker...$(RESET)"
 	@$(GRADLE) :com.etendorx.integration.obconn.server:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/obconn-server.log 2>&1 & echo $$! > $(PIDS_DIR)/obconn-server.pid
 	@$(GRADLE) :com.etendorx.integration.obconn.worker:bootRun $(BOOTRUN_ARGS) > $(PIDS_DIR)/obconn-worker.log 2>&1 & echo $$! > $(PIDS_DIR)/obconn-worker.pid
 	$(call wait_for,OBConn Server,8101)
 	$(call wait_for,OBConn Worker,8102)
-	@$(MAKE) --no-print-directory _banner _CONFIGSRV="  Config Server         http://localhost:8888" _AUTH="  Auth Service          http://localhost:8094" _EDGE="  Edge Gateway          http://localhost:8096"
+	@$(MAKE) --no-print-directory _banner _CONFIGSRV="  Config Server         http://localhost:8888" _AUTH="  Auth Service          http://localhost:8094" _EDGE="  Edge Gateway          http://localhost:8096" _ASYNC="  Async Process         http://localhost:8099"
 
 _banner:
 	@echo ""
@@ -334,6 +384,7 @@ _banner:
 	@echo -e "$(_AUTH)"
 	@echo -e "  DAS                   http://localhost:8092"
 	@echo -e "$(_EDGE)"
+	@echo -e "$(_ASYNC)"
 	@echo ""
 	@echo -e "$(CYAN)  OBConnector$(RESET)"
 	@echo -e "  Server API            http://localhost:8101/api/sync/"
@@ -395,20 +446,27 @@ portal: ## Open Dev Portal (service browser on :8199)
 	@echo -e "$(GREEN)Dev Portal$(RESET) → http://localhost:8199"
 	@cd $(ROOT)/portal && exec python3 -m http.server 8199
 
+THREADS  ?= 4
+MESSAGES ?= 100
+POLL     ?= true
+
 loadtest: loadtest.send loadtest.receive ## Run Send + Receive load tests sequentially
 
-loadtest.send: ## Run Send load test (Debezium CDC via Kafka)
-	@echo -e "$(CYAN)Running Send load test...$(RESET)"
-	$(GRADLE) :com.etendorx.integration.obconn.loadtest:bootRun $(BOOTRUN_ARGS)
-
-loadtest.receive: ## Run Receive load test (HTTP POST to Server)
-	@echo -e "$(CYAN)Running Receive load test...$(RESET)"
+loadtest.send: ## Run Send load test (THREADS=4 MESSAGES=100)
+	@echo -e "$(CYAN)Running Send load test ($(THREADS) threads × $(MESSAGES) msgs)...$(RESET)"
 	$(GRADLE) :com.etendorx.integration.obconn.loadtest:bootRun \
-		--args='--loadtest.mode=receive --loadtest.enabled=false --loadtest.threads=1 --loadtest.messages-per-thread=5 --loadtest.poll-status=true'
+		--args='--loadtest.mode=send --loadtest.threads=$(THREADS) --loadtest.messages-per-thread=$(MESSAGES) --loadtest.poll-status=$(POLL)'
+
+loadtest.receive: ## Run Receive load test (THREADS=4 MESSAGES=100)
+	@echo -e "$(CYAN)Running Receive load test ($(THREADS) threads × $(MESSAGES) msgs)...$(RESET)"
+	$(GRADLE) :com.etendorx.integration.obconn.loadtest:bootRun \
+		--args='--loadtest.mode=receive --loadtest.enabled=false --loadtest.threads=$(THREADS) --loadtest.messages-per-thread=$(MESSAGES) --loadtest.poll-status=$(POLL)'
 
 mock: ## Start mock external receiver on :8090 (for Send workflow testing)
 	@echo -e "$(CYAN)Starting Mock Receiver on :8090...$(RESET)"
 	$(GRADLE) :com.etendorx.integration.obconn.loadtest:bootRun --args='--spring.profiles.active=mock'
+
+.PHONY: purge purge-async
 
 REDPANDA_CTR := $(shell docker ps --format '{{.Names}}' 2>/dev/null | grep -m1 'redpanda-1$$' || echo "redpanda")
 PURGE_TOPICS := obconnector.send obconnector.send-dlt \
@@ -418,6 +476,20 @@ PURGE_TOPICS := obconnector.send obconnector.send-dlt \
 	obconnector.receive-retry-10000 obconnector.receive-retry-20000 \
 	obconnector.receive-retry-40000 obconnector.receive-retry-60000 \
 	default.public.c_bpartner
+
+purge-async: ## Purge async-process Kafka topics (async-process, async-process-execution, rejected-process and Streams internals)
+	@echo -e "$(YELLOW)Purging async-process Kafka topics...$(RESET)"
+	@ASYNC_TOPICS=$$(docker exec $(REDPANDA_CTR) rpk topic list 2>/dev/null | awk 'NR>1{print $$1}' | grep -E '^(async-process|rejected-process)'); \
+	if [ -z "$$ASYNC_TOPICS" ]; then \
+		echo -e "  $(DIM)No async-process topics found$(RESET)"; \
+	else \
+		for topic in $$ASYNC_TOPICS; do \
+			docker exec $(REDPANDA_CTR) rpk topic delete $$topic > /dev/null 2>&1 \
+				&& echo -e "  $(GREEN)Deleted$(RESET)  $$topic" \
+				|| echo -e "  $(YELLOW)Error$(RESET)   $$topic"; \
+		done; \
+	fi
+	@echo -e "$(GREEN)Done.$(RESET) Topics auto-recreate when async-process service reconnects."
 
 purge: ## Purge all OBConnector Kafka topics (delete + auto-recreate)
 	@echo -e "$(YELLOW)Purging Kafka topics...$(RESET)"
@@ -448,6 +520,7 @@ help: ## Show this help
 	@echo -e "$(CYAN)Quick start:$(RESET)"
 	@echo "  make up-local       # Fastest: Redpanda + services (no Config Server)"
 	@echo "  make up             # Redpanda + Config Server + services"
+	@echo "  make up-debug       # Redpanda + Config Server + services (with remote debug)"
 	@echo "  make up-kafka       # Kafka + Config Server + services"
 	@echo "  make down           # Stop everything"
 	@echo ""
