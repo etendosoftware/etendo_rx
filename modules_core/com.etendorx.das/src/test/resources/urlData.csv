@@ -178,7 +178,6 @@ http://localhost:8092/JOBS_Job
 http://localhost:8092/InvoiceTaxCashVAT
 http://localhost:8092/InvoiceDiscount
 http://localhost:8092/SalaryCategory
-http://localhost:8092/C_ExtBP_Config
 http://localhost:8092/SOLReservedStock
 http://localhost:8092/ADTab
 http://localhost:8092/ADProcessAccess
@@ -267,7 +266,6 @@ http://localhost:8092/ADMonthTrl
 http://localhost:8092/UOMConversion
 http://localhost:8092/ServicePriceRuleRange
 http://localhost:8092/ManufacturingOperationIndirectCost
-http://localhost:8092/C_ExtBP_Config_Filter_Opt
 http://localhost:8092/PricingAdjustmentTrl
 http://localhost:8092/ProductAccounts
 http://localhost:8092/OBULOG_Config
@@ -297,7 +295,6 @@ http://localhost:8092/OBWCL_StockByWarehouseView
 http://localhost:8092/OrganizationWarehouse
 http://localhost:8092/ADModuleMerge
 http://localhost:8092/MaterialMgmtABCActivity
-http://localhost:8092/C_ExtBP_Config_Property
 http://localhost:8092/FinancialMgmtAccountingFact
 http://localhost:8092/ManufacturingMeasureGroup
 http://localhost:8092/FinancialMgmtAcctRptGroup
@@ -361,7 +358,6 @@ http://localhost:8092/FinancialMgmtTaxRegisterTypeLines
 http://localhost:8092/OBUIAPP_Note
 http://localhost:8092/FIN_Payment_Sched_Inv_V
 http://localhost:8092/ADRoleOrganization
-http://localhost:8092/C_ExtBP_Config_Prop_Opt
 http://localhost:8092/LandedCostType
 http://localhost:8092/ServiceProductCategory
 http://localhost:8092/ColorPalette
@@ -383,7 +379,6 @@ http://localhost:8092/ProductOrg
 http://localhost:8092/ADDimensionMapping
 http://localhost:8092/ADClusterServiceSettings
 http://localhost:8092/CharacteristicSubset
-http://localhost:8092/C_ExtBP_Config_Filter
 http://localhost:8092/FinancialMgmtPaymentExecutionHistoryV
 http://localhost:8092/APRM_FinAcc_Transaction_acct_v
 http://localhost:8092/AD_CreateFact_template
