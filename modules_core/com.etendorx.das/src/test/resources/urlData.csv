@@ -197,8 +197,6 @@ http://localhost:8092/BusinessPartnerCategory
 http://localhost:8092/CostAdjustmentLine
 http://localhost:8092/ProjectType
 http://localhost:8092/FinancialMgmtAcctRptNode
-http://localhost:8092/OBSOID_User_Identifier
-http://localhost:8092/OBSEIG_Defaults
 http://localhost:8092/MaterialMgmtInternalConsumptionLine
 http://localhost:8092/OrganizationInformation
 http://localhost:8092/ADProcessParameter
