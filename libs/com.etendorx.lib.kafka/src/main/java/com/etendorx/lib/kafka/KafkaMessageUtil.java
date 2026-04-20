@@ -61,10 +61,11 @@ public class KafkaMessageUtil {
 
   public void saveProcessExecution(Object bodyChanges, String mid, String description,
       AsyncProcessState state) {
+    String rawParams = bodyChanges != null ? bodyChanges.toString() : "";
     AsyncProcessExecution process = AsyncProcessExecution.builder()
         .asyncProcessId(mid)
         .description(description)
-        .params(bodyChanges != null ? bodyChanges.toString() : "")
+        .params(rawParams.length() > 1000 ? rawParams.substring(0, 1000) + "..." : rawParams)
         .time(new Date())
         .state(state)
         .build();

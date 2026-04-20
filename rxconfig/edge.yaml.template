@@ -26,6 +26,47 @@ spring:
           filters:
             - RewritePath=/login, /api/authenticate
 
+        # Classic path
+        - id: classic_path_route
+          uri: ${classic.url}
+          predicates:
+            - Method=GET, POST, DELETE, HEAD, PATCH
+            - Path=/${classic.context.name}/**
+          filters:
+            - RewritePath=/${classic.context.name}/(?<segment>.*), /${classic.context.name}/$\{segment}
+            - RemoveResponseHeader=Location
+
+        # Das path
+        - id: das_path_route
+          uri: ${das.url}
+          predicates:
+            - Method=GET, PUT, POST, DELETE, HEAD, PATCH
+            - Path=/das/**
+          filters:
+            #- JwtAuthenticationFilter
+            - RewritePath=/das/(?<segment>.*), /$\{segment}
+            - RemoveResponseHeader=Location
+
+        # Subapp debug mode path
+        - id: subapp_debug_mode
+          uri: ${subapp.url}
+          predicates:
+            - Method=GET, POST, DELETE, HEAD, PATCH
+            - Path=/subapp/**
+          filters:
+            #- JwtAuthenticationFilter
+            - RewritePath=/subapp/(?<segment>.*), /$\{segment}
+            - RemoveResponseHeader=Location
+
+        # CUSTOM (API Connector)
+        - id: obconnector
+          uri: ${obconnector.url}
+          predicates:
+            - Method=GET, POST, PUT, DELETE
+            - Path=/api/sync/**
+          filters:
+            - JwtAuthenticationFilter
+
         # Root route
         - id: root-route
           uri: no://op

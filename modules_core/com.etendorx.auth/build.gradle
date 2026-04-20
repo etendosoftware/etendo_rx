@@ -71,6 +71,16 @@ dependencies {
 
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    // Google oAuth
+    implementation(platform("com.google.http-client:google-http-client-bom:2.0.0"))
+    implementation("com.google.http-client:google-http-client-gson")
+
+    implementation(platform("com.google.api-client:google-api-client-bom:2.8.1"))
+    implementation("com.google.api-client:google-api-client")
+
+    implementation("com.google.apis:google-api-services-sheets:v4-rev20250616-2.0.0")
+    implementation("com.google.apis:google-api-services-drive:v3-rev20250717-2.0.0")
 }
 
 ext {
@@ -86,11 +96,14 @@ sourceSets {
 }
 
 /**
- * To debug run with --debug-jvm -PdebugPort=<port>
- * ./gradlew com.etendorx.auth:bootRun --info --debug-jvm -PdebugPort=9994
+ * To debug run with -PdebugEnabled=true -PdebugSuspend=false -PdebugPort=<port>
+ * ./gradlew com.etendorx.auth:bootRun --info -PdebugEnabled=true -PdebugSuspend=false -PdebugPort=9994
  */
 bootRun {
     debugOptions {
+        enabled = Boolean.parseBoolean((findProperty('debugEnabled') ?: enabled.get()) as String)
+        suspend = Boolean.parseBoolean((findProperty('debugSuspend') ?: suspend.get()) as String)
+        server = Boolean.parseBoolean((findProperty('debugServer') ?: server.get()) as String)
         port = Integer.valueOf((findProperty('debugPort') ?: port.get()) as String)
     }
 }

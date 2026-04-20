@@ -66,7 +66,7 @@ public class StreamConfiguration {
   private String kafkaStreamsStateDir;
 
   // The bootstrap servers for Kafka.
-  @Value("${bootstrap_server:kafka:9092}")
+  @Value("${spring.kafka.bootstrap-servers:${bootstrap_server:localhost:29092}}")
   private String bootstrapServer;
 
   /**
@@ -83,7 +83,7 @@ public class StreamConfiguration {
     properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
     properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
     properties.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, "true");
-    properties.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, "0");
+    properties.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, "10485760");
     properties.put(StreamsConfig.APPLICATION_SERVER_CONFIG, kafkaStreamsHostInfo);
     properties.put(StreamsConfig.STATE_DIR_CONFIG, kafkaStreamsStateDir);
     return properties;

@@ -20,6 +20,7 @@ import com.etendorx.lib.kafka.model.AsyncProcess;
 import com.etendorx.lib.kafka.model.AsyncProcessExecution;
 import com.etendorx.lib.kafka.model.AsyncProcessState;
 import com.etendorx.lib.kafka.model.JsonSerde;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -31,6 +32,7 @@ import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.state.KeyValueStore;
 
+@Slf4j
 public class AsyncProcessTopology {
 
   public static final String ASYNC_PROCESS_EXECUTION = "async-process-execution";
@@ -45,6 +47,14 @@ public class AsyncProcessTopology {
 
     KStream<String, AsyncProcess> asyncProcessExecutionStream = streamsBuilder.stream(
             ASYNC_PROCESS_EXECUTION, Consumed.with(Serdes.String(), asyncProcessExecutionSerdes))
+        .filter((key, value) -> {
+          if (key == null || value == null) {
+            log.warn("Skipping async-process-execution record with null key={} or null value. "
+                + "This usually means a malformed message was published to the topic.", key);
+            return false;
+          }
+          return true;
+        })
         .groupByKey()
         .aggregate(AsyncProcess::new, (key, value, aggregate) -> aggregate.process(value),
             Materialized.<String, AsyncProcess, KeyValueStore<Bytes, byte[]>>as(ASYNC_PROCESS_STORE)

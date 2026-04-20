@@ -42,6 +42,15 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+bootRun {
+    debugOptions {
+        enabled = Boolean.parseBoolean((findProperty('debugEnabled') ?: enabled.get()) as String)
+        suspend = Boolean.parseBoolean((findProperty('debugSuspend') ?: suspend.get()) as String)
+        server = Boolean.parseBoolean((findProperty('debugServer') ?: server.get()) as String)
+        port = Integer.valueOf((findProperty('debugPort') ?: port.get()) as String)
+    }
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"

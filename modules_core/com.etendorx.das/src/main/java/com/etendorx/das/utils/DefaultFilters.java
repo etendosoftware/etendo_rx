@@ -72,6 +72,13 @@ public class DefaultFilters {
       return sql;
     }
 
+    if (restMethod == null) {
+      log.error("[ addFilters ] restMethod is null — UserContext.restMethod was not set. "
+          + "Check FilterContext auth-disabled block or token parsing. sql={}", sql);
+      throw new IllegalArgumentException(
+          "restMethod is null in UserContext. Ensure FilterContext sets restMethod on the request.");
+    }
+
     switch (restMethod) {
       case GET_METHOD:
         return replaceInQuery(sql, clientId, roleId, isActive);

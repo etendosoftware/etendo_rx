@@ -71,6 +71,15 @@ bootBuildImage {
     }
 }
 
+bootRun {
+    debugOptions {
+        enabled = Boolean.parseBoolean((findProperty('debugEnabled') ?: enabled.get()) as String)
+        suspend = Boolean.parseBoolean((findProperty('debugSuspend') ?: suspend.get()) as String)
+        server = Boolean.parseBoolean((findProperty('debugServer') ?: server.get()) as String)
+        port = Integer.valueOf((findProperty('debugPort') ?: port.get()) as String)
+    }
+}
+
 ext {
     set('springCloudVersion', "2022.0.4")
 }
