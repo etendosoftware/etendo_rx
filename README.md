@@ -43,6 +43,35 @@ By default the following services must be up:
 - Async
 
 
+### DAS Development Mode (Dynamic Mappings)
+
+To run DAS in development mode with dynamic mappings (no static code generation for DTOs, converters or controllers):
+
+1. Generate entities (only JPA entities, static mappings are disabled):
+```bash
+./gradlew generate.entities
+```
+
+2. Configure `modules_core/com.etendorx.das/src/main/resources/application-local.properties` with your database connection:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/etendo
+spring.datasource.username=tad
+spring.datasource.password=tad
+server.port=8092
+```
+
+3. Run DAS with the `local` profile:
+```bash
+./gradlew :com.etendorx.das:bootRun --args='--spring.profiles.active=local'
+```
+
+You can also override the database URL directly:
+```bash
+./gradlew :com.etendorx.das:bootRun --args='--spring.profiles.active=local --spring.datasource.url=jdbc:postgresql://localhost:5432/YOUR_DB'
+```
+
+DAS will dynamically register REST endpoints at startup for all projections in modules marked as "in development". No code generation is needed for mappings.
+
 ### Project properties
 
 You can set custom properties when running a project to override the default ones.

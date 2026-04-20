@@ -46,7 +46,8 @@ public class GenerateEntities {
   public static final String ERROR_GENERATING_FILE = "Error generating file: ";
   public static final String GENERATING_FILE = "Generating file: ";
   public static final String MODULES_GEN = "modules_gen";
-  public final static String GENERATED_DIR = "/../build/tmp/generated";
+  public static final String GENERATED_DIR = "/../build/tmp/generated";
+  private static final String ENTITY_SCAN_TEMPLATE = "/org/openbravo/base/gen/entityscan.ftl";
   private static final Logger log = LogManager.getLogger();
   private String basePath;
   private String propertiesFile;
@@ -123,10 +124,11 @@ public class GenerateEntities {
           var data = TemplateUtil.getModelData(paths, entity, getSearchesMap(entity),
               computedColumns, includeViews);
           generateEntityCode(data, paths, generators, dataRestEnabled);
-          generateMappingCode(entity, paths, mappingGenerators);
+          // Static mapping generation disabled — handled at runtime by DynamicRestController
+          // generateMappingCode(entity, paths, mappingGenerators);
         }
       }
-      generateMappingGroup(paths, new GenerateGroupedOpenApi());
+      // generateMappingGroup(paths, new GenerateGroupedOpenApi());
 
       generateGlobalCode(paths, entities);
 
@@ -356,9 +358,8 @@ public class GenerateEntities {
     var outFile = new File(pathEntitiesRx,
         "src/main/entities/com/etendorx/das/scan/EntityScan.java");
     new File(outFile.getParent()).mkdirs();
-    String ftlFileNameRX = "/org/openbravo/base/gen/entityscan.ftl";
     freemarker.template.Template templateRX = TemplateUtil.createTemplateImplementation(
-        ftlFileNameRX);
+        ENTITY_SCAN_TEMPLATE);
     Writer outWriter = new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8));
     TemplateUtil.processTemplate(templateRX, data, outWriter);

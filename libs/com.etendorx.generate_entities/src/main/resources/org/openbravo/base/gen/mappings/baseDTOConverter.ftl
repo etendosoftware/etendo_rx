@@ -107,7 +107,12 @@ public class ${mappingPrefix}${readEntity.externalName}DTOConverter extends
 
 <#else>
   @Override
-  public ${readEntity.table.className} convert((String) ${mappingPrefix}${readEntity.externalName}DTO dto, ${readEntity.table.className} entity) {
+  public ${readEntity.table.className} convert(${mappingPrefix}${readEntity.externalName}DTOWrite dto, ${readEntity.table.className} entity) {
+    return entity;
+  }
+
+  @Override
+  public ${readEntity.table.className} convertList(${mappingPrefix}${readEntity.externalName}DTOWrite dto, ${readEntity.table.className} entity) {
     return entity;
   }
 </#if>
