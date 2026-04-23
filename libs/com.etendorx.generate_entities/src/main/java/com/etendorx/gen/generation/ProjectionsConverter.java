@@ -8,6 +8,8 @@ import com.etendorx.gen.beans.ProjectionEntityField;
 import org.apache.commons.lang3.StringUtils;
 import org.openbravo.base.model.Entity;
 import org.openbravo.base.model.ModelProvider;
+import org.openbravo.base.model.Property;
+import org.openbravo.base.model.Table;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class ProjectionsConverter {
+
+  private static final String DEFAULT_TYPE = "Object";
 
   /**
    * Converts the ETRX projections to projections
@@ -88,16 +92,72 @@ public class ProjectionsConverter {
   private ProjectionEntity convertEntity(ETRXProjectionEntity entity) {
     var projection = new ProjectionEntity(entity.getTable().getName(), entity.getExternalName(), entity.getIdentity());
     entity.getFields().forEach(f -> {
-      var type =
-          ModelProvider.getInstance().getColumnTypeName(entity.getTable(),
-              entity.getTable().getName() + "." + f.getProperty());
-      if(type == null) {
-        type = "Object";
-      }
+      var type = resolvePropertyType(entity.getTable(), f.getProperty());
       var field = new ProjectionEntityField(f.getName(), f.getProperty(), type);
+
+      // Set projectedEntity and projectedField for navigated properties
+      if (f.getProperty() != null && f.getProperty().contains(".")) {
+        String[] parts = f.getProperty().split("\\.", 2);
+        field.setProjectedEntity(parts[0]);
+        field.setProjectedField(parts[1]);
+      }
+
       projection.getFields().put(field.getName(), field);
     });
     return projection;
+  }
+
+  /**
+   * Resolves the type of a property, supporting navigated properties (e.g., businessPartner.name)
+   *
+   * @param table    The starting table
+   * @param property The property path (may contain dots for navigation)
+   * @return The resolved type name, or "Object" if not found
+   */
+  private String resolvePropertyType(Table table, String property) {
+    if (property == null || property.isEmpty()) {
+      return DEFAULT_TYPE;
+    }
+
+    if (!property.contains(".")) {
+      return resolveSimpleProperty(table, property);
+    }
+
+    return resolveNavigatedProperty(table, property);
+  }
+
+  private String resolveSimpleProperty(Table table, String property) {
+    String type = ModelProvider.getInstance().getColumnTypeName(table,
+        table.getName() + "." + property);
+    return type != null ? type : DEFAULT_TYPE;
+  }
+
+  private String resolveNavigatedProperty(Table table, String property) {
+    String[] parts = property.split("\\.", 2);
+    String navigationProperty = parts[0];
+    String remainingPath = parts[1];
+
+    Entity currentEntity = ModelProvider.getInstance().getEntityByTableName(table.getTableName());
+    if (currentEntity == null) {
+      return DEFAULT_TYPE;
+    }
+
+    Property navProp = currentEntity.getProperty(navigationProperty, false);
+    if (navProp == null || navProp.getTargetEntity() == null) {
+      return DEFAULT_TYPE;
+    }
+
+    String targetTableName = navProp.getTargetEntity().getTableName();
+    if (targetTableName == null) {
+      return DEFAULT_TYPE;
+    }
+
+    Table targetTable = ModelProvider.getInstance().getTable(targetTableName);
+    if (targetTable == null) {
+      return DEFAULT_TYPE;
+    }
+
+    return resolvePropertyType(targetTable, remainingPath);
   }
 
   /**
